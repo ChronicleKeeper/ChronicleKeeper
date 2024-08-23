@@ -1,0 +1,11 @@
+llm_chain:
+  runtimes:
+    openai:
+      type: 'openai'
+      api_key: '%env(OPENAI_API_KEY)%'
+  llms:
+    original_gpt:
+      runtime: 'openai'
+  embeddings:
+    original_embeddings:
+      runtime: 'openai'

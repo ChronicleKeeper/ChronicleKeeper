@@ -1,0 +1,52 @@
+{% extends 'layout.html.twig' %}
+
+{% block page_title %}Rostbarts Gesprächsrunde{% endblock %}
+
+{% block page_title_actions %}
+    <div class="col-auto ms-auto d-print-none">
+        <div class="btn-list">
+            <a href="{{ path('reset_conversation') }}" class="btn d-none d-sm-inline-block">
+                <i class="fa-solid fa-trash"></i>
+                Neustart
+            </a>
+            <a href="{{ path('store_conversation') }}" class="btn d-none d-sm-inline-block">
+                <i class="fa-solid fa-download"></i>
+                Speichern
+            </a>
+            <a href="{{ path('load_conversation') }}" class="btn d-none d-sm-inline-block">
+                <i class="fa-solid fa-upload"></i>
+                Laden
+            </a>
+        </div>
+    </div>
+{% endblock %}
+
+{% block page_content %}
+<div class="container-xl">
+    <div class="row row-deck row-cards">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-body">
+                    <form action="{{ path('chat') }}" method="POST">
+                        <div class="input-group mb-2">
+                            <input name="question" type="text" class="form-control">
+                            <button class="btn" type="submit">Sach an!</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        {% for message in messages|reverse %}
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="card-title">{{ message.role }}</div>
+                        <p>{{ message.message|markdown_to_html }}</p>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,44 @@
+name: CI
+
+on:
+    pull_request: ~
+    push:
+        branches:
+            - main
+jobs:
+    ci:
+        runs-on: ubuntu-latest
+        strategy:
+            fail-fast: false
+            matrix:
+                php: [ '8.3' ]
+
+        name: PHP ${{ matrix.php }}
+
+        steps:
+            -   name: Checkout
+                uses: actions/checkout@v2
+
+            -   uses: shivammathur/setup-php@v2
+                with:
+                    php-version: ${{ matrix.php }}
+
+            -   uses: "ramsey/composer-install@v1"
+                with:
+                    composer-options: ${{ matrix.composer-options }}
+
+            -   name: Linting PHP
+                run: make lint-php
+                continue-on-error: ${{ matrix.experimental }}
+
+            -   name: PHPCS Code Style Check
+                run: make check-cs
+                continue-on-error: ${{ matrix.experimental }}
+
+            -   name: PHPStan Static Analyses
+                run: make static-analysis
+                continue-on-error: ${{ matrix.experimental }}
+
+            -   name: PHPUnit
+                run: make phpunit
+                continue-on-error: ${{ matrix.experimental }}

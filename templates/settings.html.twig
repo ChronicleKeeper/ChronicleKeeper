@@ -1,0 +1,51 @@
+{% extends 'layout.html.twig' %}
+
+{% block page_title %}Einstellungen{% endblock %}
+
+{% block page_title_actions %}
+    <div class="col-auto ms-auto d-print-none">
+        <div class="btn-list">
+            <a href="{{ path('settings_reset') }}" class="btn d-none d-sm-inline-block">
+                <i class="fa-solid fa-trash"></i>
+                Zurücksetzen
+            </a>
+        </div>
+    </div>
+{% endblock %}
+
+{% block page_content %}
+    <div class="container-xl">
+        <div class="row row-deck row-cards">
+            <div class="col-sm-12">
+                <div class="card">
+                    <form action="{{ path('settings') }}" method="post">
+                        <div class="card-body">
+                            <div class="row g-5 pb-5">
+                                <div class="col-6">
+                                    <label for="current_date" class="form-label">Aktuelles Datum</label>
+                                    <input type="text" class="form-control" name="current_date" value="{{ settings.currentDate }}" />
+                                </div>
+                                <div class="col-6">
+                                    <label for="max_documents" class="form-label">Maximale Kontextdokumente</label>
+                                    <input type="number" class="form-control" name="max_documents" value="{{ settings.maxDocumentResponses }}" />
+                                </div>
+                            </div>
+                            <div class="row g-5">
+                                <div class="col-12">
+                                    <label for="system_prompt" class="form-label">System Prompt</label>
+                                    <textarea rows="10" name="system_prompt" data-bs-toggle="autosize" class="form-control">{{ settings.systemPrompt }}</textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer text-end">
+                            <div class="d-flex">
+                                <a href="{{ path('chat') }}" class="btn btn-link">Abbruch</a>
+                                <button type="submit" class="btn btn-primary ms-auto">Speichern</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

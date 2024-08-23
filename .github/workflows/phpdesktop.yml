@@ -1,0 +1,27 @@
+name: Build PHPDesktop Archive
+
+on:
+  workflow_run:
+    workflows: [ CI ]
+    types: [ completed ]
+    branches: [ main ]
+
+jobs:
+  phpdesktop:
+    name: build phpdesktop
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+
+      - name: do application build
+        run: make phpdesktop
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: NovDoc-PHPDesktop
+          include-hidden-files: true
+          path: build
