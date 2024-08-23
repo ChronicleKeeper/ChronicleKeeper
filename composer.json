@@ -1,0 +1,55 @@
+{
+    "name": "dzunke/nov-doc",
+    "description": "Desktop Document Search Engine with ChatGPT Support",
+    "type": "project",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "DZunke\\NovDoc\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "DZunke\\NovDoc\\Test\\": "tests/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Denis Zunke",
+            "email": "denis.zunke@gmail.com"
+        }
+    ],
+    "require": {
+        "php": "^8.3",
+        "league/commonmark": "^2.5",
+        "oskarstark/readable-filesize-extension": "^1.2",
+        "php-llm/llm-chain": "@dev",
+        "php-llm/llm-chain-bundle": "@dev",
+        "symfony/clock": "^7.1",
+        "symfony/dotenv": "^7.1",
+        "symfony/finder": "^7.1",
+        "symfony/framework-bundle": "^7.1",
+        "symfony/monolog-bundle": "^3.10",
+        "symfony/twig-bundle": "^7.1",
+        "symfony/yaml": "^7.1",
+        "twig/extra-bundle": "^3.13",
+        "twig/markdown-extra": "^3.12"
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "php-http/discovery": true,
+            "dealerdirect/phpcodesniffer-composer-installer": true,
+            "symfony/flex": false
+        }
+    },
+    "require-dev": {
+        "doctrine/coding-standard": "^12.0",
+        "phpstan/phpstan": "^1.11",
+        "phpstan/phpstan-strict-rules": "^1.6",
+        "phpunit/phpunit": "^11.3",
+        "symfony/debug-bundle": "^7.1",
+        "symfony/var-dumper": "^7.1",
+        "symfony/web-profiler-bundle": "^7.1"
+    }
+}

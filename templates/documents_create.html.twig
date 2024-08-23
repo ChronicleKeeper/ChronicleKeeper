@@ -1,0 +1,34 @@
+{% extends 'layout.html.twig' %}
+
+{% block page_title %}Neues Dokument{% endblock %}
+
+{% block page_content %}
+<div class="container-xl">
+    <div class="row row-deck row-cards">
+        <div class="col-sm-12">
+            <div class="card">
+                <form action="{{ path('documents_create') }}" method="post">
+                    <div class="card-body">
+                        <div class="row g-5">
+                            <div class="col-12">
+                                <label for="title" class="form-label">Titel</label>
+                                <input type="text" class="form-control" name="title" />
+                            </div>
+                            <div class="col-12">
+                                <label for="content" class="form-label">Inhalt</label>
+                                <textarea rows="10" name="content" class="form-control"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer text-end">
+                        <div class="d-flex">
+                            <a href="{{ path('documents_overview') }}" class="btn btn-link">Abbruch</a>
+                            <button type="submit" class="btn btn-primary ms-auto">Speichern</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

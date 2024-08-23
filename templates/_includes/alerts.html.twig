@@ -1,0 +1,18 @@
+{% set flash_messages = app.session.get('flash_messages') %}
+
+{% if flash_messages is not empty %}
+<div class="container-xl">
+
+    {% for message in flash_messages %}
+        <div class="alert {{ message.type.class }} alert-dismissible" role="alert">
+            <div class="d-flex">
+                <div>{{ message.content }}</div>
+            </div>
+            <a class="btn-close" data-bs-dismiss="alert" aria-label="close"></a>
+        </div>
+    {% endfor %}
+
+</div>
+
+{% set foo = app.session.remove('flash_messages') %}
+{% endif %}

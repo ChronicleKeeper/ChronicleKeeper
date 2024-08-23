@@ -1,0 +1,25 @@
+parameters:
+  router.request_context.scheme: 'https'
+  asset.request_context.secure: true
+
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+    bind:
+      string $openAIKey: '%env(string:OPENAI_API_KEY)%'
+      string $documentStoragePath: '%kernel.project_dir%/var/documents'
+      string $filesystemEmbeddingStoragePath: '%kernel.project_dir%/var/data'
+      string $lastConversationFilePath: '%kernel.project_dir%/var/conversations/last_conversation.json'
+      string $settingsFilePath: '%kernel.project_dir%/var/settings.json'
+
+  DZunke\NovDoc\:
+    resource: '../src/*'
+    exclude: '../src/Web/{Model,Kernel.php}'
+
+  DZunke\NovDoc\Web\Controller\:
+    resource: '../src/Web/Controller'
+    tags: [ 'controller.service_arguments' ]
+
+  OskarStark\Twig\ReadableFilesizeExtension:
+    tags: [ 'twig.extension' ]

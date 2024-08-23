@@ -1,0 +1,65 @@
+{% extends 'layout.html.twig' %}
+
+{% block page_title %}Dokumentenverzeichnis{% endblock %}
+
+{% block page_title_actions %}
+    <div class="col-auto ms-auto d-print-none">
+        <div class="btn-list">
+            <a href="{{ path('update_search_index') }}" class="btn d-none d-sm-inline-block">
+                <i class="fas fa-sync"></i>
+                Aktualisiere Suchindex
+            </a>
+            <a href="{{ path('documents_create') }}" class="btn btn-primary d-none d-sm-inline-block">
+                <i class="fas fa-plus"></i>
+                Neues Dokument
+            </a>
+        </div>
+    </div>
+{% endblock %}
+
+{% block page_content %}
+
+    <div class="container-xl">
+        <div class="row row-deck row-cards">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-table table-responsive">
+                        <table class="table table-vcenter">
+                            <thead>
+                            <tr>
+                                <th>Titel</th>
+                                <th>Größe</th>
+                                <th>Aktualisiert</th>
+                                <th class="w-7">&nbsp;</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+
+                            {% for document in documents %}
+
+                                <tr>
+                                    <td>{{ document.title }}</td>
+                                    <td class="text-secondary">{{ document.size|readable_filesize }}</td>
+                                    <td class="text-secondary">{{ document.updatedAt|date('d.m.Y H:i:s') }}</td>
+                                    <td>
+                                        <a href="#" title="Bearbeiten"><i class="fa-solid fa-file-pen"></i></a>
+                                        &nbsp;
+                                        <a href="#" title="Löschen"><i class="fa-solid fa-file-circle-xmark"></i></a>
+                                    </td>
+                                </tr>
+
+                            {% else %}
+                                <tr>
+                                    <td colspan="4">Es wurden noch keine Dateien geladen.</td>
+                                </tr>
+                            {% endfor %}
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
