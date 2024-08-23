@@ -1,0 +1,18 @@
+parameters:
+  router.request_context.scheme: 'https'
+  asset.request_context.secure: true
+
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+    bind:
+      $openAIKey: '%env(OPENAI_API_KEY)%'
+
+  DZunke\NovDoc\:
+    resource: '../src/*'
+    exclude: '../src/Web/{Model,Kernel.php}'
+
+  DZunke\NovDoc\Web\Controller\:
+    resource: '../src/Web/Controller'
+    tags: [ 'controller.service_arguments' ]

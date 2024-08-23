@@ -1,0 +1,10 @@
+/build/
+/var/
+/vendor/
+
+/.env.local
+/.env.local.php
+/.env.*.local
+
+/.phpcs-cache
+/.phpunit.cache/
