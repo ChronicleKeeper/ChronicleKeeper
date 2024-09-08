@@ -8,6 +8,7 @@ use DateTimeImmutable;
 use DZunke\NovDoc\Domain\Document\Document;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 
 use function file_exists;
@@ -28,6 +29,7 @@ class FilesystemDocumentRepository
 {
     public function __construct(
         private readonly LoggerInterface $logger,
+        private readonly Filesystem $filesystem,
         private readonly string $documentStoragePath,
     ) {
     }
@@ -85,6 +87,16 @@ class FilesystemDocumentRepository
 
             return null;
         }
+    }
+
+    public function remove(Document $document): void
+    {
+        $filepath = $this->documentStoragePath . DIRECTORY_SEPARATOR . $document->id . '.json';
+        if (! file_exists($filepath) || ! is_readable($filepath)) {
+            return;
+        }
+
+        $this->filesystem->remove($filepath);
     }
 
     private function convertJsonToDocument(string $json): Document

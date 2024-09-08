@@ -8,6 +8,7 @@ use DZunke\NovDoc\Domain\VectorStorage\Distance\CosineDistance;
 use DZunke\NovDoc\Domain\VectorStorage\VectorDocument;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 
 use function array_filter;
@@ -32,6 +33,7 @@ class FilesystemVectorDocumentRepository
         private readonly LoggerInterface $logger,
         private readonly FilesystemDocumentRepository $documentRepository,
         private readonly CosineDistance $distance,
+        private readonly Filesystem $filesystem,
         private readonly string $filesystemEmbeddingStoragePath,
     ) {
     }
@@ -114,6 +116,16 @@ class FilesystemVectorDocumentRepository
             $this->findAll(),
             static fn (VectorDocument $vectorDocument): bool => $vectorDocument->document->id === $id,
         );
+    }
+
+    public function remove(VectorDocument $vectorDocument): void
+    {
+        $filepath = $this->filesystemEmbeddingStoragePath . DIRECTORY_SEPARATOR . $vectorDocument->id . '.json';
+        if (! file_exists($filepath) || ! is_readable($filepath)) {
+            return;
+        }
+
+        $this->filesystem->remove($filepath);
     }
 
     private function convertJsonToVectorDocument(string $json): VectorDocument
