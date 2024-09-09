@@ -42,7 +42,7 @@
                                     <td class="text-secondary">{{ document.size|readable_filesize }}</td>
                                     <td class="text-secondary">{{ document.updatedAt|date('d.m.Y H:i:s') }}</td>
                                     <td>
-                                        <a href="#" title="Bearbeiten"><i class="fa-solid fa-file-pen"></i></a>
+                                        <a href="{{ path('documents_edit', {'id': document.id}) }}" title="Bearbeiten"><i class="fa-solid fa-file-pen"></i></a>
                                         &nbsp;
                                         <a href="{{ path('document_delete', {'id': document.id}) }}" title="Löschen"><i class="fa-solid fa-file-circle-xmark"></i></a>
                                     </td>

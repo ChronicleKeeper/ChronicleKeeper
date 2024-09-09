@@ -44,7 +44,7 @@ class Updater
         $originalVectorDocument = reset($existingStorage);
 
         if ($originalVectorDocument->vectorContentHash === $document->getContentHash()) {
-            $this->logger->debug('Vector storage for document is up to date.', ['document' => $document->id]);
+            $this->logger->debug('Vector storage for document is up to date.', ['document' => $document]);
 
             return;
         }
@@ -54,7 +54,7 @@ class Updater
 
         $this->vectorDocumentRepository->store($originalVectorDocument);
 
-        $this->logger->debug('Vector storage for document was updated.', ['document' => $document->id]);
+        $this->logger->debug('Vector storage for document was updated.', ['document' => $document]);
     }
 
     private function createVectorDocument(Document $document): void
@@ -67,6 +67,6 @@ class Updater
 
         $this->vectorDocumentRepository->store($vectorDocument);
 
-        $this->logger->debug('Vector storage for document was created.', ['document' => $document->id]);
+        $this->logger->debug('Vector storage for document was created.', ['document' => $document]);
     }
 }

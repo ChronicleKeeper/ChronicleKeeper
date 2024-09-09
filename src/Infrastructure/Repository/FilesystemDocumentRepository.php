@@ -60,7 +60,7 @@ class FilesystemDocumentRepository
             try {
                 $documents[] = $this->convertJsonToDocument($documentFound->getContents());
             } catch (RuntimeException $e) {
-                $this->logger->debug($e);
+                $this->logger->error($e, ['file' => $documentFound]);
             }
         }
 
@@ -83,7 +83,7 @@ class FilesystemDocumentRepository
         try {
             return $this->convertJsonToDocument($documentJson);
         } catch (RuntimeException $e) {
-            $this->logger->debug($e);
+            $this->logger->error($e, ['json' => $documentJson]);
 
             return null;
         }

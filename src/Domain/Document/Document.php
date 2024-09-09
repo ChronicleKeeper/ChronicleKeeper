@@ -52,7 +52,7 @@ class Document
      */
     public static function isDocumentArray(array $documentArr): bool
     {
-        return count($documentArr) === 3
+        return count($documentArr) >= 3
             && array_key_exists('id', $documentArr)
             && array_key_exists('title', $documentArr)
             && array_key_exists('content', $documentArr);
