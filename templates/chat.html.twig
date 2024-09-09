@@ -6,15 +6,15 @@
     <div class="col-auto ms-auto d-print-none">
         <div class="btn-list">
             <a href="{{ path('reset_conversation') }}" class="btn d-none d-sm-inline-block">
-                <i class="fa-solid fa-trash"></i>
+                <i class="icon-link">{{ ux_icon('fa-solid:trash') }}</i>
                 Neustart
             </a>
             <a href="{{ path('store_conversation') }}" class="btn d-none d-sm-inline-block">
-                <i class="fa-solid fa-download"></i>
+                <i class="icon-link">{{ ux_icon('fa-solid:download') }}</i>
                 Speichern
             </a>
             <a href="{{ path('load_conversation') }}" class="btn d-none d-sm-inline-block">
-                <i class="fa-solid fa-upload"></i>
+                <i class="icon-link">{{ ux_icon('fa-solid:upload') }}</i>
                 Laden
             </a>
         </div>
@@ -26,7 +26,7 @@
     <div class="row row-deck row-cards">
         <div class="col-sm-12">
             <div class="card">
-                <div class="card-body">
+                <div class="card-body" {{ stimulus_controller('hello') }}>
                     <form action="{{ path('chat') }}" method="POST">
                         <div class="input-group mb-2">
                             <input name="question" type="text" class="form-control">

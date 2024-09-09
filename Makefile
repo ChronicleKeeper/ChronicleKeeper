@@ -42,4 +42,8 @@ lint-php: ## linting php files
 	 if find src -name "*.php" -exec php -l {} \; | grep -v "No syntax errors detected"; then exit 1; fi
 	 if find tests -name "*.php" -exec php -l {} \; | grep -v "No syntax errors detected"; then exit 1; fi
 
+frontend: ## run symfony frontend build commands
+	php bin/console importmap:install
+	php bin/console assets:install public
+
 build: lint-php check-cs static-analysis phpunit
