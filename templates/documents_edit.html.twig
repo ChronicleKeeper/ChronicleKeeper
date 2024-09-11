@@ -16,7 +16,7 @@
                             </div>
                             <div class="col-12">
                                 <label for="content" class="form-label">Inhalt</label>
-                                <textarea rows="10" name="content" class="form-control">{{ document.content }}</textarea>
+                                <twig:milkdown rows="10" name="content" content="{{ document.content }}" />
                             </div>
                         </div>
                     </div>
