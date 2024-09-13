@@ -7,7 +7,7 @@
     <div class="row row-deck row-cards">
         <div class="col-sm-12">
             <div class="card">
-                <form action="{{ path('documents_create') }}" method="post">
+                <form action="{{ directory is null ? path('documents_create') : path('documents_create_directory', {'directory': directory.id}) }}" method="post">
                     <div class="card-body">
                         <div class="row g-5">
                             <div class="col-12">

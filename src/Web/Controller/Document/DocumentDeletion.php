@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace DZunke\NovDoc\Web\Controller;
+namespace DZunke\NovDoc\Web\Controller\Document;
 
 use DZunke\NovDoc\Infrastructure\Repository\FilesystemDocumentRepository;
 use DZunke\NovDoc\Infrastructure\Repository\FilesystemVectorDocumentRepository;

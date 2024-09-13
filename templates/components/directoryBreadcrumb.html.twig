@@ -1,0 +1,7 @@
+<ol class="breadcrumb" aria-label="breadcrumbs">
+    {% for title, url in this.getFlattenedBreadcrumb %}
+        <li class="breadcrumb-item{{ loop.last ? ' active' }}"{{ loop.last ? ' aria-current="page"' : '' }}>
+            <a href="{{ url }}">{{ title }}</a>
+        </li>
+    {% endfor %}
+</ol>
