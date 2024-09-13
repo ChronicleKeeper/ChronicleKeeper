@@ -18,6 +18,7 @@ use function strlen;
  *     id: string,
  *     title: string,
  *     content: string,
+ *     directory?: string|null,
  *     last_updated?: string
  * }
  */
@@ -25,6 +26,7 @@ class Document
 {
     public string $id;
     public DateTimeImmutable $updatedAt;
+    public Directory|null $directory = null;
 
     public function __construct(public string $title, public string $content)
     {
@@ -65,6 +67,7 @@ class Document
             'id' => $this->id,
             'title' => $this->title,
             'content' => $this->content,
+            'directory' => $this->directory?->id,
             'last_updated' => $this->updatedAt->format(DateTimeInterface::ATOM),
         ];
     }

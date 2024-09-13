@@ -9,12 +9,19 @@
                 <i class="icon-link">{{ ux_icon('fa-solid:sync') }}</i>
                 Aktualisiere Suchindex
             </a>
-            <a href="{{ path('documents_create') }}" class="btn btn-primary d-none d-sm-inline-block">
-                <i class="icon-link">{{ ux_icon('fa-solid:plus') }}</i>
-                Neues Dokument
-            </a>
-            <a href="{{ path('documents_directory_create') }}" class="btn btn-primary d-none d-sm-inline-block">
-                <i class="fas fa-directory"></i>
+            {% if currentDirectory is null %}
+                <a href="{{ path('documents_create') }}" class="btn btn-primary d-none d-sm-inline-block">
+                    <i class="icon-link">{{ ux_icon('fa-solid:plus') }}</i>
+                    Neues Dokument
+                </a>
+            {% else %}
+                <a href="{{ path('documents_create_directory', {'directory': currentDirectory.id}) }}" class="btn btn-primary d-none d-sm-inline-block">
+                    <i class="icon-link">{{ ux_icon('fa-solid:plus') }}</i>
+                    Neues Dokument
+                </a>
+            {% endif %}
+            <a href="{{ path('documents_directory_create', {'parentDirectory': currentDirectory.id ?? 'root'}) }}" class="btn btn-primary d-none d-sm-inline-block">
+                <i class="icon-link">{{ ux_icon('fa6-solid:folder-plus') }}</i>
                 Neues Verzeichnis
             </a>
         </div>
@@ -25,6 +32,14 @@
 
     <div class="container-xl">
         <div class="row row-deck row-cards">
+            <div class="row-sm-12">
+                <div class="card card-borderless">
+                    <div class="card-body">
+                        <twig:directoryBreadcrumb directory="{{ currentDirectory }}" />
+                    </div>
+                </div>
+            </div>
+
             <div class="col-sm-12">
                 <div class="card">
                     <div class="card-table table-responsive">
@@ -39,16 +54,47 @@
                             </thead>
                             <tbody>
 
-                            {% for document in documents %}
+                            {% if currentDirectory is not null and currentDirectory.parent is null %}
+                                <tr>
+                                    <td colspan="4">
+                                        <a href="{{ path('documents_overview') }}">
+                                            {{ ux_icon('fa6-solid:folder', {'class': 'icon'}) }}&nbsp;...
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endif %}
 
+                            {% if currentDirectory is not null and currentDirectory.parent is not null %}
+                                <tr>
+                                    <td colspan="4">
+                                        <a href="{{ path('documents_overview_directory', {'directory': currentDirectory.parent.id}) }}">
+                                            {{ ux_icon('fa6-solid:folder', {'class': 'icon'}) }}&nbsp;...
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endif %}
+
+                            {% for directory in directories %}
+                                <tr>
+                                    <td colspan="4">
+                                        <a href="{{ path('documents_overview_directory', {'directory': directory.id}) }}">
+                                            {{ ux_icon('fa6-solid:folder', {'class': 'icon'}) }}&nbsp;{{ directory.title }}
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+
+                            {% for document in documents %}
                                 <tr>
                                     <td>{{ document.title }}</td>
                                     <td class="text-secondary">{{ document.size|readable_filesize }}</td>
                                     <td class="text-secondary">{{ document.updatedAt|date('d.m.Y H:i:s') }}</td>
                                     <td>
-                                        <a href="{{ path('documents_edit', {'id': document.id}) }}" title="Bearbeiten">{{ ux_icon('fa6-solid:file-pen') }}</a>
+                                        <a href="{{ path('documents_edit', {'id': document.id}) }}"
+                                           title="Bearbeiten">{{ ux_icon('fa6-solid:file-pen') }}</a>
                                         &nbsp;
-                                        <a href="{{ path('document_delete', {'id': document.id}) }}" title="Löschen">{{ ux_icon('fa6-solid:file-circle-xmark') }}</a>
+                                        <a href="{{ path('document_delete', {'id': document.id}) }}"
+                                           title="Löschen">{{ ux_icon('fa6-solid:file-circle-xmark') }}</a>
                                     </td>
                                 </tr>
 

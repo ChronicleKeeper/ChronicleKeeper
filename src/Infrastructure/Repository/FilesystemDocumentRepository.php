@@ -5,12 +5,15 @@ declare(strict_types=1);
 namespace DZunke\NovDoc\Infrastructure\Repository;
 
 use DateTimeImmutable;
+use DZunke\NovDoc\Domain\Document\Directory;
 use DZunke\NovDoc\Domain\Document\Document;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 
+use function array_filter;
+use function array_key_exists;
 use function file_exists;
 use function file_get_contents;
 use function file_put_contents;
@@ -31,6 +34,7 @@ class FilesystemDocumentRepository
         private readonly LoggerInterface $logger,
         private readonly Filesystem $filesystem,
         private readonly string $documentStoragePath,
+        private readonly FilesystemDirectoryRepository $directoryRepository,
     ) {
     }
 
@@ -72,6 +76,16 @@ class FilesystemDocumentRepository
         return $documents;
     }
 
+    /** @return list<Document> */
+    public function findByDirectory(Directory|null $directory): array
+    {
+        $documents = $this->findAll();
+
+        return array_filter($documents, static function (Document $document) use ($directory) {
+            return $document->directory?->id === $directory?->id;
+        });
+    }
+
     public function findById(string $id): Document|null
     {
         $documentJson = $this->getContentOfDocumentFile($id . '.json');
@@ -108,6 +122,9 @@ class FilesystemDocumentRepository
         }
 
         $document = Document::fromArray($documentArr);
+        if (array_key_exists('directory', $documentArr) && $documentArr['directory'] !== null) {
+            $document->directory = $this->directoryRepository->findById($documentArr['directory']);
+        }
 
         $filepath            = $this->documentStoragePath . DIRECTORY_SEPARATOR . $document->id . '.json';
         $document->updatedAt = (new DateTimeImmutable())->setTimestamp((int) filectime($filepath));

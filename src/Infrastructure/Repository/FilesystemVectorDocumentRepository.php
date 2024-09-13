@@ -154,7 +154,7 @@ class FilesystemVectorDocumentRepository
     private function getContentOfVectorDocumentFile(string $filename): string|null
     {
         $filepath = $this->filesystemEmbeddingStoragePath . DIRECTORY_SEPARATOR . $filename;
-        if (! file_exists($filepath) || is_readable($filepath)) {
+        if (! file_exists($filepath) || ! is_readable($filepath)) {
             return null;
         }
 
