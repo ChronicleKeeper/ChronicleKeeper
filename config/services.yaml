@@ -13,6 +13,7 @@ services:
       string $filesystemEmbeddingStoragePath: '%kernel.project_dir%/var/data'
       string $lastConversationFilePath: '%kernel.project_dir%/var/conversations/last_conversation.json'
       string $settingsFilePath: '%kernel.project_dir%/var/settings.json'
+      string $changelogFile: '%kernel.project_dir%/CHANGELOG.md'
 
   DZunke\NovDoc\:
     resource: '../src/*'

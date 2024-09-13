@@ -1,0 +1,16 @@
+{% extends 'layout.html.twig' %}
+
+{% block page_title %}Changelog{% endblock %}
+{% block page_header %}{% endblock %}
+
+{% block page_content %}
+    <div class="container-xl">
+        <div class="row row-deck row-cards">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-body markdown">{{ changelog|markdown_to_html }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
