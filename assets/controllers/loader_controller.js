@@ -6,6 +6,7 @@ export default class extends Controller {
 
         const showLoader = () => {
             console.log('Show Loader');
+
             loaderElement.classList.remove("invisible");
         };
 
