@@ -4,6 +4,7 @@
 
 ### Added
 - Implement Symfony UX with a Loader Component to indicate page loading.
+- Implement TOAST UI Editor for creating and editing documents to have improved markdown access.
 
 ### Changed
 - Replace Font Awesome full icon set reference with Symfony UX Icons.

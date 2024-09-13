@@ -13,6 +13,6 @@ class MilkdownComponent
     use DefaultActionTrait;
 
     public string $name;
-    public int $rows = 10;
+    public int $rows       = 10;
     public string $content = '';
 }

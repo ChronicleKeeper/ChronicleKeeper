@@ -1,3 +1,4 @@
-<div id="{{ random() }}" {{ stimulus_controller('milkdown') }}>
-
+<div id="milkdown_{{ random() }}" {{ stimulus_controller('milkdown') }}>
+    <textarea name="{{ name }}" class="editor-content" style="display: none;">{{ content }}</textarea>
+    <div class="editor"></div>
 </div>

@@ -28,4 +28,48 @@ return [
     '@hotwired/turbo' => [
         'version' => '8.0.4',
     ],
+    '@toast-ui/editor' => [
+        'version' => '3.2.2',
+    ],
+    'prosemirror-model' => [
+        'version' => '1.19.4',
+    ],
+    'prosemirror-view' => [
+        'version' => '1.32.7',
+    ],
+    'prosemirror-transform' => [
+        'version' => '1.10.0',
+    ],
+    'prosemirror-state' => [
+        'version' => '1.4.3',
+    ],
+    'prosemirror-keymap' => [
+        'version' => '1.2.2',
+    ],
+    'prosemirror-commands' => [
+        'version' => '1.5.2',
+    ],
+    'prosemirror-inputrules' => [
+        'version' => '1.3.0',
+    ],
+    'prosemirror-history' => [
+        'version' => '1.3.2',
+    ],
+    'orderedmap' => [
+        'version' => '2.1.1',
+    ],
+    'w3c-keyname' => [
+        'version' => '2.2.8',
+    ],
+    'rope-sequence' => [
+        'version' => '1.3.4',
+    ],
+    'prosemirror-view/style/prosemirror.min.css' => [
+        'version' => '1.32.7',
+        'type' => 'css',
+    ],
+    '@toast-ui/editor/dist/toastui-editor.css' => [
+        'version' => '3.2.2',
+        'type' => 'css',
+    ],
 ];

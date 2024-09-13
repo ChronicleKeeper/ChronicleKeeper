@@ -1,21 +1,42 @@
 import {Controller} from '@hotwired/stimulus';
+import Editor from '@toast-ui/editor';
+import '@toast-ui/editor/dist/toastui-editor.css';
 
-import { Crepe } from 'https://cdn.jsdelivr.net/npm/@milkdown/crepe@7.5.7/+esm';
-
+// import '@toast-ui/editor/dist/theme/toastui-editor-dark.css';
+import '../css/toastui-editor-dark.css';
 
 export default class extends Controller {
     connect() {
-        console.log('Connect Crepe Editor');
-        console.log(this.element);
-        console.log(this.element.getAttribute('id'));
+        console.log('Connect Markdown Editor');
 
-        const crepe = new Crepe({
-            root: this.element,
-            defaultValue: 'Hello, Milkdown!',
+        let $elementIdentifier = this.element.getAttribute('id');
+        let $mainElement = document.getElementById($elementIdentifier);
+
+        const $formElement = $mainElement.getElementsByClassName('editor-content')[0];
+        let $editorElement = $mainElement.getElementsByClassName('editor')[0];
+
+        const editor = new Editor({
+            el: $editorElement,
+            height: '500px',
+            initialValue: $formElement.value,
+            initialEditType: 'wysiwyg',
+            previewStyle: 'vertical',
+            theme: 'dark',
+            usageStatistics: false,
+            toolbarItems: [
+                ['heading', 'bold', 'italic'],
+                ['hr', 'quote'],
+                ['ul', 'ol', 'indent', 'outdent'],
+                ['table']
+            ]
         });
 
-        crepe.create().then(() => {
-            console.log('Crepe Editor is ready to use!');
+        editor.on('change', function () {
+            console.log('Change Found!');
+
+            $formElement.value = editor.getMarkdown();
+
+            console.log($formElement.value);
         });
     }
 }
