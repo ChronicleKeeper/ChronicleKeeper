@@ -1,0 +1,23 @@
+{% extends 'layout.html.twig' %}
+
+{% block page_title %}{{ document.title }}{% endblock %}
+
+{% block page_content %}
+    <div class="container-xl">
+        <div class="row row-deck row-cards">
+            <div class="row-sm-12">
+                <div class="card card-borderless">
+                    <div class="card-body">
+                        <twig:directoryBreadcrumb directory="{{ document.directory }}" extraLastNode="{{ document.title }}" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-body markdown">{{ document.content|markdown_to_html }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

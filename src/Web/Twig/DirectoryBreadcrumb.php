@@ -20,13 +20,18 @@ class DirectoryBreadcrumb
     }
 
     public Directory|null $directory;
+    public string|null $extraLastNode = null;
 
-    /** @return array<string, string> */
+    /** @return array<string, string|null> */
     public function getFlattenedBreadcrumb(): array
     {
         $breadcrumbs = ['Hauptverzeichnis' => $this->router->generate('documents_overview')];
 
         if ($this->directory === null) {
+            if ($this->extraLastNode !== null) {
+                $breadcrumbs[$this->extraLastNode] = null;
+            }
+
             return $breadcrumbs;
         }
 
@@ -41,6 +46,12 @@ class DirectoryBreadcrumb
             $workOnBreadCrumb = $workOnBreadCrumb->parent;
         } while ($workOnBreadCrumb !== null);
 
-        return array_merge($breadcrumbs, array_reverse($unsortedBreadcrumbs));
+        $breadcrumbs = array_merge($breadcrumbs, array_reverse($unsortedBreadcrumbs));
+
+        if ($this->extraLastNode !== null) {
+            $breadcrumbs[$this->extraLastNode] = null;
+        }
+
+        return $breadcrumbs;
     }
 }

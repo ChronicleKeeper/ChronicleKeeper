@@ -8,6 +8,7 @@
 - Implement virtual directories to the library functionality to bring some order to it.
 - New setting for custom naming the chatbot, shown in the menu and in replies to conversations.
 - New setting for custom naming the user, shown in dialogs.
+- Implement view for documents with parsed output, including full directory breadcrumb navigation.
 
 ### Changed
 - Replace Font Awesome full icon set reference with Symfony UX Icons and utilize tabler.io icons.
