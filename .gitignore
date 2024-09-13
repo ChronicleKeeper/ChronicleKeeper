@@ -1,6 +1,7 @@
 /build/
 /var/
 /vendor/
+/public/assets/
 
 /.env.local
 /.env.local.php

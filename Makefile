@@ -20,7 +20,9 @@ phpdesktop: ## build phpdesktop release
 	git archive HEAD | (cd build/www; tar x)
 	cd build/www; mv config/phpdesktop/php.ini ../php
 	cd build/www; mv config/phpdesktop/settings.json ../
-	cd build/www; APP_ENV=prod composer install --optimize-autoloader --no-dev --prefer-dist --no-plugins --no-scripts --no-progress
+	cd build/www; APP_ENV=prod composer install --optimize-autoloader --no-dev --prefer-dist --no-progress
+	cd build/www; APP_ENV=prod php bin/console asset-map:compile
+	cd build/www; APP_ENV=prod php bin/console cache:warmup
 	cd build/www; rm composer.lock composer.json
 
 serve-web: ## start dev webserver
@@ -41,5 +43,9 @@ phpunit: ## run phpunit
 lint-php: ## linting php files
 	 if find src -name "*.php" -exec php -l {} \; | grep -v "No syntax errors detected"; then exit 1; fi
 	 if find tests -name "*.php" -exec php -l {} \; | grep -v "No syntax errors detected"; then exit 1; fi
+
+frontend: ## run symfony frontend build commands
+	php bin/console importmap:install
+	php bin/console assets:install public
 
 build: lint-php check-cs static-analysis phpunit

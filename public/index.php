@@ -3,15 +3,9 @@
 declare(strict_types=1);
 
 use DZunke\NovDoc\Web\Kernel;
-use Symfony\Component\Dotenv\Dotenv;
-use Symfony\Component\HttpFoundation\Request;
 
-require __DIR__ . '/../vendor/autoload.php';
+require_once dirname(__DIR__) . '/vendor/autoload_runtime.php';
 
-(new Dotenv())->loadEnv(__DIR__ . '/../.env');
-
-$kernel   = new Kernel($_ENV['APP_ENV'], (bool) $_ENV['APP_DEBUG']);
-$request  = Request::createFromGlobals();
-$response = $kernel->handle($request);
-$response->send();
-$kernel->terminate($request, $response);
+return static function (array $context) {
+    return new Kernel($context['APP_ENV'], (bool) $context['APP_DEBUG']);
+};

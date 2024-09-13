@@ -25,12 +25,20 @@
         "oskarstark/readable-filesize-extension": "^1.2",
         "php-llm/llm-chain": "@dev",
         "php-llm/llm-chain-bundle": "@dev",
+        "symfony/asset": "^7.1",
+        "symfony/asset-mapper": "^7.1",
         "symfony/clock": "^7.1",
+        "symfony/console": "^7.1",
         "symfony/dotenv": "^7.1",
         "symfony/finder": "^7.1",
         "symfony/framework-bundle": "^7.1",
         "symfony/monolog-bundle": "^3.10",
+        "symfony/runtime": "^7.1",
+        "symfony/stimulus-bundle": "^2.19",
         "symfony/twig-bundle": "^7.1",
+        "symfony/ux-icons": "^2.19",
+        "symfony/ux-live-component": "^2.19",
+        "symfony/ux-turbo": "^2.19",
         "symfony/yaml": "^7.1",
         "twig/extra-bundle": "^3.13",
         "twig/markdown-extra": "^3.12"
@@ -40,7 +48,8 @@
         "allow-plugins": {
             "php-http/discovery": true,
             "dealerdirect/phpcodesniffer-composer-installer": true,
-            "symfony/flex": false
+            "symfony/flex": false,
+            "symfony/runtime": true
         }
     },
     "require-dev": {
@@ -51,5 +60,18 @@
         "symfony/debug-bundle": "^7.1",
         "symfony/var-dumper": "^7.1",
         "symfony/web-profiler-bundle": "^7.1"
+    },
+    "scripts": {
+        "post-install-cmd": [
+            "@auto-scripts"
+        ],
+        "post-update-cmd": [
+            "@auto-scripts"
+        ],
+        "auto-scripts": {
+            "cache:clear": "php bin/console cache:clear",
+            "assets:install %PUBLIC_DIR%": "php bin/console assets:install public",
+            "importmap:install": "php bin/console importmap:install"
+        }
     }
 }
