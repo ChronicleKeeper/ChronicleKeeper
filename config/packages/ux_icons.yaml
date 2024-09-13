@@ -1,0 +1,4 @@
+ux_icons:
+  default_icon_attributes:
+    fill: currentColor
+    class: "icon icon-tabler icons-tabler-outline icon-tabler-link"
