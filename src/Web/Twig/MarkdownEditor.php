@@ -7,8 +7,8 @@ namespace DZunke\NovDoc\Web\Twig;
 use Symfony\UX\LiveComponent\DefaultActionTrait;
 use Symfony\UX\TwigComponent\Attribute\AsTwigComponent;
 
-#[AsTwigComponent('milkdown')]
-class MilkdownComponent
+#[AsTwigComponent('markdownEditor')]
+class MarkdownEditor
 {
     use DefaultActionTrait;
 

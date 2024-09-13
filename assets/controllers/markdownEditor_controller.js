@@ -2,7 +2,6 @@ import {Controller} from '@hotwired/stimulus';
 import Editor from '@toast-ui/editor';
 import '@toast-ui/editor/dist/toastui-editor.css';
 
-// import '@toast-ui/editor/dist/theme/toastui-editor-dark.css';
 import '../css/toastui-editor-dark.css';
 
 export default class extends Controller {
