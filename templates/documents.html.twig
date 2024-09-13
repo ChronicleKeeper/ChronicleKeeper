@@ -72,10 +72,13 @@
 
                             {% for directory in directories %}
                                 <tr>
-                                    <td colspan="4">
+                                    <td colspan="3">
                                         <a href="{{ path('documents_overview_directory', {'directory': directory.id}) }}">
                                             {{ ux_icon('tabler:folder') }} {{ directory.title }}
                                         </a>
+                                    </td>
+                                    <td>
+                                        <a href="{{ path('documents_directory_edit', {'directory': directory.id}) }}" title="Verzeichnis bearbeiten">{{ ux_icon('tabler:folder-cog') }}</a>
                                     </td>
                                 </tr>
                             {% endfor %}
