@@ -13,6 +13,7 @@
 - Replace Font Awesome full icon set reference with Symfony UX Icons and utilize tabler.io icons.
 - Rename the document section to library for better wording.
 - Design change of the settings page in preparation for upcoming extended settings.
+- Change log configuration to a rotation model, keeping logs for the last 14 days instead of a single endless file.
 
 ## [alpha-0.1] - Dungeon Master Showcase Prototype
 
