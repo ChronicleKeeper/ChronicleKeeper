@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace DZunke\NovDoc\Web\Controller;
 
 use DZunke\NovDoc\Domain\Chat as ChatTool;
+use DZunke\NovDoc\Domain\Settings\SettingsHandler;
 use PhpLlm\LlmChain\Message\MessageBag;
 use PhpLlm\LlmChain\Message\Role;
 use Symfony\Component\HttpFoundation\Request;
@@ -20,6 +21,7 @@ class Chat
     public function __construct(
         private readonly Environment $environment,
         private readonly ChatTool $chatTool,
+        private readonly SettingsHandler $settingsHandler,
     ) {
     }
 
@@ -40,9 +42,11 @@ class Chat
         ));
     }
 
-    /** @return list<array{role: 'Elias'|'Rostbart', message: string}> */
+    /** @return list<array{role: string, message: string}> */
     private function formatMessagesForOutput(MessageBag $messageBag): array
     {
+        $settings = $this->settingsHandler->get();
+
         $messages = [];
 
         foreach ($messageBag as $originMessage) {
@@ -51,7 +55,7 @@ class Chat
             }
 
             $messages[] = [
-                'role' => $originMessage->role === Role::User ? 'Elias' : 'Rostbart',
+                'role' => $originMessage->role === Role::User ? $settings->chatterName : $settings->chatbotName,
                 'message' => (string) $originMessage->content,
             ];
         }

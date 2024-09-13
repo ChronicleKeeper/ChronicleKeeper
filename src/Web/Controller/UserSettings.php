@@ -48,6 +48,16 @@ class UserSettings
                 $settings->maxDocumentResponses = (int) $maxDocuments;
             }
 
+            $chatbotName = $request->get('chatbot_name', '');
+            if (is_string($chatbotName) && $chatbotName !== '') {
+                $settings->chatbotName = $chatbotName;
+            }
+
+            $chatterName = $request->get('chatter_name', '');
+            if (is_string($chatterName) && $chatterName !== '') {
+                $settings->chatterName = $chatterName;
+            }
+
             $this->settingsHandler->store();
 
             $this->addFlashMessage($request, Alert::SUCCESS, 'Einstellungen wurden erfolgreich gespeichert.');

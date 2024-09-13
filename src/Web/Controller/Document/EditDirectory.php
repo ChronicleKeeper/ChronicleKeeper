@@ -16,7 +16,7 @@ use Twig\Environment;
 
 use function is_string;
 
-#[Route('/documents/directory/{directory}', name: 'documents_directory_edit')]
+#[Route('/documents/directory/{directory}/edit', name: 'documents_directory_edit')]
 class EditDirectory
 {
     use HandleFlashMessages;

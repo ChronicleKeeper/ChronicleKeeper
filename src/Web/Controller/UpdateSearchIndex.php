@@ -30,7 +30,7 @@ class UpdateSearchIndex
         $this->addFlashMessage(
             $request,
             Alert::SUCCESS,
-            'Veränderte Dokumente wurden in den Suchindex geladen, Rostbart freut sich auf deine Fragen.',
+            'Veränderte Dokumente wurden in den Suchindex geladen, ab in die Schenke zu einem Plausch!',
         );
 
         return new RedirectResponse($this->router->generate('chat'));

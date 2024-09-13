@@ -28,7 +28,7 @@ class ResetConversation
         $this->addFlashMessage(
             $request,
             Alert::SUCCESS,
-            'Rostbart hat sich ein neues Bier geholt und ist bereit für ein neues Gespräch.',
+            'Ein neuer Krug Bier wurde herbeigebracht so dass das Gespräch weitergehen kann!',
         );
 
         return new RedirectResponse('/');
