@@ -8,7 +8,6 @@ use DZunke\NovDoc\Domain\Document\Directory;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\UX\TwigComponent\Attribute\AsTwigComponent;
 
-use function array_merge;
 use function array_reverse;
 
 #[AsTwigComponent('directoryBreadcrumb')]
@@ -19,34 +18,30 @@ class DirectoryBreadcrumb
     ) {
     }
 
-    public Directory|null $directory;
+    public Directory $directory;
     public string|null $extraLastNode = null;
 
     /** @return array<string, string|null> */
     public function getFlattenedBreadcrumb(): array
     {
-        $breadcrumbs = ['Hauptverzeichnis' => $this->router->generate('documents_overview')];
+        $workOnBreadCrumb = $this->directory;
 
-        if ($this->directory === null) {
-            if ($this->extraLastNode !== null) {
-                $breadcrumbs[$this->extraLastNode] = null;
-            }
-
-            return $breadcrumbs;
-        }
-
-        $workOnBreadCrumb    = $this->directory;
         $unsortedBreadcrumbs = [];
         do {
             $unsortedBreadcrumbs[$workOnBreadCrumb->title] = $this->router->generate(
-                'documents_overview_directory',
+                'library',
                 ['directory' => $workOnBreadCrumb->id],
             );
 
-            $workOnBreadCrumb = $workOnBreadCrumb->parent;
-        } while ($workOnBreadCrumb !== null);
+            if ($workOnBreadCrumb->parent === null) {
+                // Break the loop as soon as the root directory is reached
+                break;
+            }
 
-        $breadcrumbs = array_merge($breadcrumbs, array_reverse($unsortedBreadcrumbs));
+            $workOnBreadCrumb = $workOnBreadCrumb->parent;
+        } while (true);
+
+        $breadcrumbs = array_reverse($unsortedBreadcrumbs);
 
         if ($this->extraLastNode !== null) {
             $breadcrumbs[$this->extraLastNode] = null;

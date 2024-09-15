@@ -6,6 +6,7 @@ namespace DZunke\NovDoc\Domain\Document;
 
 use DateTimeImmutable;
 use DateTimeInterface;
+use DZunke\NovDoc\Domain\Library\Directory\RootDirectory;
 use Symfony\Component\Uid\Uuid;
 
 use function array_key_exists;
@@ -18,7 +19,7 @@ use function strlen;
  *     id: string,
  *     title: string,
  *     content: string,
- *     directory?: string|null,
+ *     directory?: string,
  *     last_updated?: string
  * }
  */
@@ -26,11 +27,12 @@ class Document
 {
     public string $id;
     public DateTimeImmutable $updatedAt;
-    public Directory|null $directory = null;
+    public Directory $directory;
 
     public function __construct(public string $title, public string $content)
     {
         $this->id        = Uuid::v4()->toString();
+        $this->directory = RootDirectory::get();
         $this->updatedAt = new DateTimeImmutable();
     }
 
@@ -67,7 +69,7 @@ class Document
             'id' => $this->id,
             'title' => $this->title,
             'content' => $this->content,
-            'directory' => $this->directory?->id,
+            'directory' => $this->directory->id,
             'last_updated' => $this->updatedAt->format(DateTimeInterface::ATOM),
         ];
     }

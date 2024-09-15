@@ -2,15 +2,20 @@
 
 declare(strict_types=1);
 
-namespace DZunke\NovDoc\Web\Controller\Document;
+namespace DZunke\NovDoc\Web\Controller\Library;
 
 use DZunke\NovDoc\Infrastructure\Repository\FilesystemDocumentRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\Requirement\Requirement;
 use Twig\Environment;
 
-#[Route('/documents/{document}/view', name: 'document_view')]
+#[Route(
+    '/library/document/{document}',
+    name: 'library_document_view',
+    requirements: ['document' => Requirement::UUID],
+)]
 class DocumentView
 {
     public function __construct(
@@ -24,7 +29,7 @@ class DocumentView
         $document = $this->documentRepository->findById($document);
 
         return new Response($this->environment->render(
-            'documents/document_view.html.twig',
+            'library/document_view.html.twig',
             ['document' => $document],
         ));
     }

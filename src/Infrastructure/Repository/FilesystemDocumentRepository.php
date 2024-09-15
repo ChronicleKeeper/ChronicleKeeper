@@ -77,12 +77,12 @@ class FilesystemDocumentRepository
     }
 
     /** @return list<Document> */
-    public function findByDirectory(Directory|null $directory): array
+    public function findByDirectory(Directory $directory): array
     {
         $documents = $this->findAll();
 
         return array_filter($documents, static function (Document $document) use ($directory) {
-            return $document->directory?->id === $directory?->id;
+            return $document->directory->id === $directory->id;
         });
     }
 
@@ -122,8 +122,13 @@ class FilesystemDocumentRepository
         }
 
         $document = Document::fromArray($documentArr);
-        if (array_key_exists('directory', $documentArr) && $documentArr['directory'] !== null) {
-            $document->directory = $this->directoryRepository->findById($documentArr['directory']);
+        if (array_key_exists('directory', $documentArr)) {
+            $directory = $this->directoryRepository->findById($documentArr['directory']);
+            if ($directory === null) {
+                throw new RuntimeException('The directory "' . $documentArr['directory'] . '" can not be found.');
+            }
+
+            $document->directory = $directory;
         }
 
         $filepath            = $this->documentStoragePath . DIRECTORY_SEPARATOR . $document->id . '.json';

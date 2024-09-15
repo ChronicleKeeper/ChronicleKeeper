@@ -8,16 +8,10 @@
             <a href="{{ path('update_search_index') }}" class="btn d-none d-sm-inline-block">
                 {{ ux_icon('tabler:reload') }}Aktualisiere Suchindex
             </a>
-            {% if currentDirectory is null %}
-                <a href="{{ path('documents_create') }}" class="btn btn-primary d-none d-sm-inline-block">
-                    {{ ux_icon('tabler:file-plus') }}Neues Dokument
-                </a>
-            {% else %}
-                <a href="{{ path('documents_create_directory', {'directory': currentDirectory.id}) }}" class="btn btn-primary d-none d-sm-inline-block">
-                    {{ ux_icon('tabler:file-plus') }}Neues Dokument
-                </a>
-            {% endif %}
-            <a href="{{ path('documents_directory_create', {'parentDirectory': currentDirectory.id ?? 'root'}) }}" class="btn btn-primary d-none d-sm-inline-block">
+            <a href="{{ path('library_document_create', {'directory': currentDirectory.id }) }}" class="btn btn-primary d-none d-sm-inline-block">
+                {{ ux_icon('tabler:file-plus') }}Neues Dokument
+            </a>
+            <a href="{{ path('library_directory_create', {'parentDirectory': currentDirectory.id }) }}" class="btn btn-primary d-none d-sm-inline-block">
                 {{ ux_icon('tabler:folder-plus') }}Neues Verzeichnis
             </a>
         </div>
@@ -50,35 +44,26 @@
                             </thead>
                             <tbody>
 
-                            {% if currentDirectory is not null and currentDirectory.parent is null %}
+                            {% if currentDirectory.parent is not null %}
                                 <tr>
                                     <td colspan="4">
-                                        <a href="{{ path('documents_overview') }}">
+                                        <a href="{{ path('library', {'directory': currentDirectory.parent.id }) }}">
                                             {{ ux_icon('tabler:folder-up') }} ...
                                         </a>
                                     </td>
                                 </tr>
                             {% endif %}
 
-                            {% if currentDirectory is not null and currentDirectory.parent is not null %}
-                                <tr>
-                                    <td colspan="4">
-                                        <a href="{{ path('documents_overview_directory', {'directory': currentDirectory.parent.id}) }}">
-                                            {{ ux_icon('tabler:folder') }} ...
-                                        </a>
-                                    </td>
-                                </tr>
-                            {% endif %}
 
                             {% for directory in directories %}
                                 <tr>
                                     <td colspan="3">
-                                        <a href="{{ path('documents_overview_directory', {'directory': directory.id}) }}">
+                                        <a href="{{ path('library', {'directory': directory.id}) }}">
                                             {{ ux_icon('tabler:folder') }} {{ directory.title }}
                                         </a>
                                     </td>
                                     <td>
-                                        <a href="{{ path('documents_directory_edit', {'directory': directory.id}) }}" title="Verzeichnis bearbeiten">{{ ux_icon('tabler:folder-cog') }}</a>
+                                        <a href="{{ path('library_directory_edit', {'directory': directory.id}) }}" title="Verzeichnis bearbeiten">{{ ux_icon('tabler:folder-cog') }}</a>
                                     </td>
                                 </tr>
                             {% endfor %}
@@ -89,9 +74,9 @@
                                     <td class="text-secondary">{{ document.size|readable_filesize }}</td>
                                     <td class="text-secondary">{{ document.updatedAt|date('d.m.Y H:i:s') }}</td>
                                     <td>
-                                        <a href="{{ path('document_view', {'document': document.id}) }}" title="Ansehen">{{ ux_icon('tabler:file-text') }}</a>
-                                        <a href="{{ path('documents_edit', {'id': document.id}) }}" title="Bearbeiten">{{ ux_icon('tabler:file-pencil') }}</a>
-                                        <a href="{{ path('document_delete', {'id': document.id}) }}" title="Löschen">{{ ux_icon('tabler:file-x') }}</a>
+                                        <a href="{{ path('library_document_view', {'document': document.id}) }}" title="Ansehen">{{ ux_icon('tabler:file-text') }}</a>
+                                        <a href="{{ path('library_document_edit', {'document': document.id}) }}" title="Bearbeiten">{{ ux_icon('tabler:file-pencil') }}</a>
+                                        <a href="{{ path('library_document_delete', {'document': document.id}) }}" title="Löschen">{{ ux_icon('tabler:file-x') }}</a>
                                     </td>
                                 </tr>
 

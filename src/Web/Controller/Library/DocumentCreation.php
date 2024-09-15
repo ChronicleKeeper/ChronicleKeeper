@@ -2,22 +2,30 @@
 
 declare(strict_types=1);
 
-namespace DZunke\NovDoc\Web\Controller\Document;
+namespace DZunke\NovDoc\Web\Controller\Library;
 
+use DZunke\NovDoc\Domain\Document\Document;
+use DZunke\NovDoc\Infrastructure\Repository\FilesystemDirectoryRepository;
 use DZunke\NovDoc\Infrastructure\Repository\FilesystemDocumentRepository;
 use DZunke\NovDoc\Web\FlashMessages\Alert;
 use DZunke\NovDoc\Web\FlashMessages\HandleFlashMessages;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\Requirement\Requirement;
 use Symfony\Component\Routing\RouterInterface;
 use Twig\Environment;
 
 use function is_string;
 
-#[Route('/documents/{id}/edit', name: 'documents_edit')]
-class DocumentEdit
+#[Route(
+    '/library/directory/{directory}/create_document',
+    name: 'library_document_create',
+    requirements: ['directory' => Requirement::UUID],
+)]
+class DocumentCreation
 {
     use HandleFlashMessages;
 
@@ -25,45 +33,39 @@ class DocumentEdit
         private readonly Environment $environment,
         private readonly RouterInterface $router,
         private readonly FilesystemDocumentRepository $documentRepository,
-        private readonly FilesystemDocumentRepository $filesystemDocumentRepository,
+        private readonly FilesystemDirectoryRepository $directoryRepository,
     ) {
     }
 
-    public function __invoke(Request $request, string $id): Response
+    public function __invoke(Request $request, string $directory): Response
     {
-        $document = $this->filesystemDocumentRepository->findById($id);
-        if ($document === null) {
-            $this->addFlashMessage(
-                $request,
-                Alert::DANGER,
-                'Das Dokument wurde nicht gefunden.',
-            );
-
-            return new RedirectResponse($this->router->generate('documents_overview'));
+        $directory = $this->directoryRepository->findById($directory);
+        if ($directory === null) {
+            throw new NotFoundHttpException('Directory not found.');
         }
 
         if ($request->isMethod(Request::METHOD_POST)) {
             $title   = $request->get('title', '');
             $content = $request->get('content', '');
             if (is_string($title) && is_string($content)) {
-                $document->title   = $title;
-                $document->content = $content;
+                $document            = new Document($title, $content);
+                $document->directory = $directory;
 
                 $this->documentRepository->store($document);
 
                 $this->addFlashMessage(
                     $request,
                     Alert::SUCCESS,
-                    'Das Dokument wurde bearbeitet, damit die Änderungen in der Suche aktiv sind muss der Index aktualisiert werden.',
+                    'Das Dokument wurde erstellt, damit es in der Suche aktiv ist kannst du den Suchindex aktualisieren.',
                 );
 
-                return new RedirectResponse($this->router->generate('documents_overview'));
+                return new RedirectResponse($this->router->generate('library', ['directory' => $directory->id]));
             }
         }
 
         return new Response($this->environment->render(
-            'documents_edit.html.twig',
-            ['document' => $document],
+            'library/document_create.html.twig',
+            ['directory' => $directory],
         ));
     }
 }

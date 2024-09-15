@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace DZunke\NovDoc\Domain\Document;
 
+use DZunke\NovDoc\Domain\Library\Directory\RootDirectory;
 use Symfony\Component\Uid\Uuid;
 
 use function array_key_exists;
@@ -13,22 +14,18 @@ use function count;
  * @phpstan-type DirectoryArray = array{
  *     id: string,
  *     title: string,
- *     parent: string|null,
+ *     parent: string,
  * }
  */
 class Directory
 {
     public string $id;
-    public Directory|null $parent = null;
+    public Directory|null $parent;
 
     public function __construct(public string $title)
     {
-        $this->id = Uuid::v4()->toString();
-    }
-
-    public static function createForRoot(): Directory
-    {
-        return new Directory('Root');
+        $this->id     = Uuid::v4()->toString();
+        $this->parent = RootDirectory::get(); // Initially root directory
     }
 
     /**
@@ -50,7 +47,7 @@ class Directory
         return [
             'id' => $this->id,
             'title' => $this->title,
-            'parent' => $this->parent?->id,
+            'parent' => $this->parent?->id ?? RootDirectory::ID,
         ];
     }
 }

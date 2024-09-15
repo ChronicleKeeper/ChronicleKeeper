@@ -2,18 +2,23 @@
 
 declare(strict_types=1);
 
-namespace DZunke\NovDoc\Web\Controller\Document;
+namespace DZunke\NovDoc\Web\Controller\Library;
 
 use DZunke\NovDoc\Infrastructure\Repository\FilesystemDirectoryRepository;
 use DZunke\NovDoc\Infrastructure\Repository\FilesystemDocumentRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\Requirement\Requirement;
 use Twig\Environment;
 
-#[Route('/documents', name: 'documents_overview', defaults: ['directory' => null])]
-#[Route('/documents/{directory}', name: 'documents_overview_directory')]
-class DocumentOverview
+#[Route(
+    '/library/{directory}',
+    name: 'library',
+    requirements: ['directory' => Requirement::UUID],
+)]
+class Library
 {
     public function __construct(
         private readonly Environment $environment,
@@ -22,14 +27,15 @@ class DocumentOverview
     ) {
     }
 
-    public function __invoke(Request $request, string|null $directory): Response
+    public function __invoke(Request $request, string $directory): Response
     {
-        if ($directory !== null) {
-            $directory = $this->directoryRepository->findById($directory);
+        $directory = $this->directoryRepository->findById($directory);
+        if ($directory === null) {
+            throw new NotFoundHttpException('Directory not found.');
         }
 
         return new Response($this->environment->render(
-            'documents.html.twig',
+            'library/library.html.twig',
             [
                 'currentDirectory' => $directory,
                 'directories' => $this->directoryRepository->findByParent($directory),

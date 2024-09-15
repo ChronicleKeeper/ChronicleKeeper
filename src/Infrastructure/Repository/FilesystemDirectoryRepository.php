@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace DZunke\NovDoc\Infrastructure\Repository;
 
 use DZunke\NovDoc\Domain\Document\Directory;
+use DZunke\NovDoc\Domain\Library\Directory\RootDirectory;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Symfony\Component\Finder\Finder;
@@ -67,18 +68,22 @@ class FilesystemDirectoryRepository
     }
 
     /** @return list<Directory> */
-    public function findByParent(Directory|null $parent): array
+    public function findByParent(Directory $parent): array
     {
         $directories = $this->findAll();
 
         return array_filter(
             $directories,
-            static fn (Directory $directory) => $directory->parent?->id === $parent?->id,
+            static fn (Directory $directory) => $directory->parent?->id === $parent->id,
         );
     }
 
     public function findById(string $id): Directory|null
     {
+        if ($id === RootDirectory::ID) {
+            return RootDirectory::get();
+        }
+
         $json = $this->getContentOfFile($id . '.json');
 
         if ($json === null || ! json_validate($json)) {
@@ -102,13 +107,8 @@ class FilesystemDirectoryRepository
             throw new RuntimeException('Document to load contain invalid content.');
         }
 
-        $directory     = new Directory($directoryArr['title']);
-        $directory->id = $directoryArr['id'];
-
-        if ($directoryArr['parent'] === null) {
-            return $directory;
-        }
-
+        $directory         = new Directory($directoryArr['title']);
+        $directory->id     = $directoryArr['id'];
         $directory->parent = $this->findById($directoryArr['parent']);
 
         return $directory;

@@ -4,3 +4,4 @@ twig:
     strict_variables: '%kernel.debug%'
     globals:
       settings_handler: '@DZunke\NovDoc\Domain\Settings\SettingsHandler'
+      library_root: '@DZunke\NovDoc\Domain\Library\Directory\RootDirectory'

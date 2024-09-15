@@ -2,8 +2,9 @@
 
 declare(strict_types=1);
 
-namespace DZunke\NovDoc\Web\Controller\Document;
+namespace DZunke\NovDoc\Web\Controller\Library;
 
+use DZunke\NovDoc\Domain\Library\Directory\RootDirectory;
 use DZunke\NovDoc\Infrastructure\Repository\FilesystemDocumentRepository;
 use DZunke\NovDoc\Infrastructure\Repository\FilesystemVectorDocumentRepository;
 use DZunke\NovDoc\Web\FlashMessages\Alert;
@@ -12,9 +13,14 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\Requirement\Requirement;
 use Symfony\Component\Routing\RouterInterface;
 
-#[Route('/documents/{id}/delete', name: 'document_delete')]
+#[Route(
+    '/library/document/{document}/delete',
+    name: 'library_document_delete',
+    requirements: ['directory' => Requirement::UUID],
+)]
 class DocumentDeletion
 {
     use HandleFlashMessages;
@@ -26,13 +32,13 @@ class DocumentDeletion
     ) {
     }
 
-    public function __invoke(Request $request, string $id): Response
+    public function __invoke(Request $request, string $document): Response
     {
-        $document = $this->documentRepository->findById($id);
+        $document = $this->documentRepository->findById($document);
         if ($document === null) {
             $this->addFlashMessage($request, Alert::WARNING, 'Das Dokument existiert nicht.');
 
-            return new RedirectResponse($this->router->generate('documents_overview'));
+            return new RedirectResponse($this->router->generate('library', ['directory' => RootDirectory::ID]));
         }
 
         $vectorDocuments = $this->vectorDocumentRepository->findAllByDocumentId($document->id);
@@ -49,6 +55,6 @@ class DocumentDeletion
             'Das Dokument "' . $document->title . '" wurde erfolgreich gelöscht.',
         );
 
-        return new RedirectResponse($this->router->generate('documents_overview'));
+        return new RedirectResponse($this->router->generate('library', ['directory' => $document->directory->id]));
     }
 }

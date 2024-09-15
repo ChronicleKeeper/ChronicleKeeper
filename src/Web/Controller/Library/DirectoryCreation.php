@@ -2,8 +2,9 @@
 
 declare(strict_types=1);
 
-namespace DZunke\NovDoc\Web\Controller\Document;
+namespace DZunke\NovDoc\Web\Controller\Library;
 
+use DZunke\NovDoc\Domain\Document\Directory;
 use DZunke\NovDoc\Infrastructure\Repository\FilesystemDirectoryRepository;
 use DZunke\NovDoc\Web\FlashMessages\Alert;
 use DZunke\NovDoc\Web\FlashMessages\HandleFlashMessages;
@@ -11,13 +12,18 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\Requirement\Requirement;
 use Symfony\Component\Routing\RouterInterface;
 use Twig\Environment;
 
 use function is_string;
 
-#[Route('/documents/directory/{directory}/edit', name: 'documents_directory_edit')]
-class EditDirectory
+#[Route(
+    '/library/directory/{parentDirectory}/create_directory',
+    name: 'library_directory_create',
+    requirements: ['parentDirectory' => Requirement::UUID],
+)]
+class DirectoryCreation
 {
     use HandleFlashMessages;
 
@@ -28,47 +34,35 @@ class EditDirectory
     ) {
     }
 
-    public function __invoke(Request $request, string $directory): Response
+    public function __invoke(Request $request, string $parentDirectory): Response
     {
-        $directory = $this->directoryRepository->findById($directory);
-        if ($directory === null) {
-            $this->addFlashMessage(
-                $request,
-                Alert::DANGER,
-                'Das Verzeichnis wurde nicht gefunden.',
-            );
-
-            return new RedirectResponse($this->router->generate('documents_overview'));
-        }
+        $parentDirectory = $this->directoryRepository->findById($parentDirectory);
 
         if ($request->isMethod(Request::METHOD_POST)) {
             $title = $request->get('title', '');
             if (is_string($title) && $title !== '') {
-                $directory->title = $title;
+                $directory         = new Directory($title);
+                $directory->parent = $parentDirectory;
 
                 $this->directoryRepository->store($directory);
 
                 $this->addFlashMessage(
                     $request,
                     Alert::SUCCESS,
-                    'Das Verzeichnis "' . $title . '" wurde erfolgreich bearbeitet.',
+                    'Das Verzeichnis "' . $title . '" wurde erfolgreich erstellt.',
                 );
 
-                if ($directory->parent === null) {
-                    return new RedirectResponse($this->router->generate('documents_overview'));
-                }
-
                 return new RedirectResponse($this->router->generate(
-                    'documents_overview_directory',
-                    ['directory' => $directory?->parent->id ?? $directory->id],
+                    'library',
+                    ['directory' => $directory->id],
                 ));
             }
         }
 
         return new Response(
             $this->environment->render(
-                'documents/directory_edit.html.twig',
-                ['directory' => $directory],
+                'library/directory_create.html.twig',
+                ['parentDirectory' => $parentDirectory],
             ),
         );
     }

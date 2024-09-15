@@ -1,24 +1,24 @@
 {% extends 'layout.html.twig' %}
 
-{% block page_title %}Neues Verzeichnis{% endblock %}
+{% block page_title %}Verzeichnis "{{ directory.title }}" bearbeiten{% endblock %}
 
 {% block page_content %}
     <div class="container-xl">
         <div class="row row-deck row-cards">
             <div class="col-sm-12">
                 <div class="card">
-                    <form action="{{ path('documents_directory_create', {'parentDirectory': parentDirectory ?? 'root'}) }}" method="post">
+                    <form action="{{ path('library_directory_edit', {'directory': directory.id}) }}" method="post">
                         <div class="card-body">
                             <div class="row g-5">
                                 <div class="col-12">
                                     <label for="title" class="form-label">Titel</label>
-                                    <input type="text" class="form-control" name="title" />
+                                    <input type="text" class="form-control" name="title" value="{{ directory.title }}" />
                                 </div>
                             </div>
                         </div>
                         <div class="card-footer text-end">
                             <div class="d-flex">
-                                <a href="{{ path('documents_overview') }}" class="btn btn-link">Abbruch</a>
+                                <a href="{{ path('library', {'directory': directory.id}) }}" class="btn btn-link">Abbruch</a>
                                 <button type="submit" class="btn btn-primary ms-auto">Speichern</button>
                             </div>
                         </div>
