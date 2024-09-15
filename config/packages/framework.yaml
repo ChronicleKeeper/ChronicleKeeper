@@ -1,4 +1,5 @@
 framework:
+  default_locale: 'de'
   secret: '%env(APP_SECRET)%'
   session: ~
   php_errors:

@@ -8,6 +8,8 @@ use DZunke\NovDoc\Domain\Document\Directory;
 use DZunke\NovDoc\Infrastructure\Repository\FilesystemDirectoryRepository;
 use DZunke\NovDoc\Web\FlashMessages\Alert;
 use DZunke\NovDoc\Web\FlashMessages\HandleFlashMessages;
+use DZunke\NovDoc\Web\Form\Library\DirectoryType;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -16,7 +18,9 @@ use Symfony\Component\Routing\Requirement\Requirement;
 use Symfony\Component\Routing\RouterInterface;
 use Twig\Environment;
 
-use function is_string;
+use function array_key_exists;
+use function assert;
+use function is_array;
 
 #[Route(
     '/library/directory/{directory}/edit',
@@ -31,35 +35,39 @@ class DirectoryEdit
         private readonly Environment $environment,
         private readonly RouterInterface $router,
         private readonly FilesystemDirectoryRepository $directoryRepository,
+        private readonly FormFactoryInterface $formFactory,
     ) {
     }
 
     public function __invoke(Request $request, Directory $directory): Response
     {
-        if ($request->isMethod(Request::METHOD_POST)) {
-            $title = $request->get('title', '');
-            if (is_string($title) && $title !== '') {
-                $directory->title = $title;
+        $form = $this->formFactory->create(DirectoryType::class, ['title' => $directory->title]);
+        $form->handleRequest($request);
 
-                $this->directoryRepository->store($directory);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $directoryArray = $form->getData();
+            assert(is_array($directoryArray) && array_key_exists('title', $directoryArray));
 
-                $this->addFlashMessage(
-                    $request,
-                    Alert::SUCCESS,
-                    'Das Verzeichnis "' . $title . '" wurde erfolgreich bearbeitet.',
-                );
+            $directory->title = $directoryArray['title'];
 
-                return new RedirectResponse($this->router->generate(
-                    'library',
-                    ['directory' => $directory->id],
-                ));
-            }
+            $this->directoryRepository->store($directory);
+
+            $this->addFlashMessage(
+                $request,
+                Alert::SUCCESS,
+                'Das Verzeichnis "' . $directory->title . '" wurde erfolgreich bearbeitet.',
+            );
+
+            return new RedirectResponse($this->router->generate(
+                'library',
+                ['directory' => $directory->id],
+            ));
         }
 
         return new Response(
             $this->environment->render(
                 'library/directory_edit.html.twig',
-                ['directory' => $directory],
+                ['directory' => $directory, 'form' => $form->createView()],
             ),
         );
     }

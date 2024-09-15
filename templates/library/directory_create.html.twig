@@ -11,8 +11,9 @@
                         <div class="card-body">
                             <div class="row g-5">
                                 <div class="col-12">
-                                    <label for="title" class="form-label">Titel</label>
-                                    <input type="text" class="form-control" name="title" />
+                                    {{ form_label(form.title) }}
+                                    {{ form_widget(form.title) }}
+                                    {{ form_errors(form.title) }}
                                 </div>
                             </div>
                         </div>
