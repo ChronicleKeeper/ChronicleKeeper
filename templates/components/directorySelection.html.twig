@@ -1,0 +1,5 @@
+<select name="{{ name }}" class="form-control">
+    {% for value, label in this.getSortedList %}
+        <option value="{{ value }}"{{ value is same as preSelected ? ' selected' : '' }}>{{ label }}</option>
+    {% endfor %}
+</select>

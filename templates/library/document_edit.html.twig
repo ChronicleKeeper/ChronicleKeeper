@@ -15,6 +15,10 @@
                                 <input type="text" class="form-control" name="title" value="{{ document.title }}" />
                             </div>
                             <div class="col-12">
+                                <label for="directory" class="form-label">Verschieben in Verzeichnis ...</label>
+                                <twig:directorySelection name="directory" preSelected="{{ document.directory.id }}" />
+                            </div>
+                            <div class="col-12">
                                 <label for="content" class="form-label">Inhalt</label>
                                 <twig:markdownEditor rows="10" name="content" content="{{ document.content }}" />
                             </div>

@@ -6,6 +6,7 @@ namespace DZunke\NovDoc\Web\Controller\Library;
 
 use DZunke\NovDoc\Domain\Document\Directory;
 use DZunke\NovDoc\Domain\Document\Document;
+use DZunke\NovDoc\Infrastructure\Repository\FilesystemDirectoryRepository;
 use DZunke\NovDoc\Infrastructure\Repository\FilesystemDocumentRepository;
 use DZunke\NovDoc\Web\FlashMessages\Alert;
 use DZunke\NovDoc\Web\FlashMessages\HandleFlashMessages;
@@ -32,6 +33,7 @@ class DocumentCreation
         private readonly Environment $environment,
         private readonly RouterInterface $router,
         private readonly FilesystemDocumentRepository $documentRepository,
+        private readonly FilesystemDirectoryRepository $directoryRepository,
     ) {
     }
 
@@ -40,9 +42,18 @@ class DocumentCreation
         if ($request->isMethod(Request::METHOD_POST)) {
             $title   = $request->get('title', '');
             $content = $request->get('content', '');
+
+            $storeDirectory = $request->getPayload()->get('directory');
+
+            if (is_string($storeDirectory)) {
+                $storeDirectory = $this->directoryRepository->findById($storeDirectory) ?? $directory;
+            } else {
+                $storeDirectory = $directory;
+            }
+
             if (is_string($title) && is_string($content)) {
                 $document            = new Document($title, $content);
-                $document->directory = $directory;
+                $document->directory = $storeDirectory;
 
                 $this->documentRepository->store($document);
 

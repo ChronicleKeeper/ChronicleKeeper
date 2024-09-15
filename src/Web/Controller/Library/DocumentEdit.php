@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace DZunke\NovDoc\Web\Controller\Library;
 
 use DZunke\NovDoc\Domain\Document\Document;
+use DZunke\NovDoc\Infrastructure\Repository\FilesystemDirectoryRepository;
 use DZunke\NovDoc\Infrastructure\Repository\FilesystemDocumentRepository;
 use DZunke\NovDoc\Web\FlashMessages\Alert;
 use DZunke\NovDoc\Web\FlashMessages\HandleFlashMessages;
@@ -31,6 +32,7 @@ class DocumentEdit
         private readonly Environment $environment,
         private readonly RouterInterface $router,
         private readonly FilesystemDocumentRepository $documentRepository,
+        private readonly FilesystemDirectoryRepository $directoryRepository,
     ) {
     }
 
@@ -42,6 +44,16 @@ class DocumentEdit
             if (is_string($title) && is_string($content)) {
                 $document->title   = $title;
                 $document->content = $content;
+
+                $storeDirectory = $request->getPayload()->get('directory');
+
+                if (is_string($storeDirectory)) {
+                    $storeDirectory = $this->directoryRepository->findById($storeDirectory) ?? $document->directory;
+                } else {
+                    $storeDirectory = $document->directory;
+                }
+
+                $document->directory = $storeDirectory;
 
                 $this->documentRepository->store($document);
 
