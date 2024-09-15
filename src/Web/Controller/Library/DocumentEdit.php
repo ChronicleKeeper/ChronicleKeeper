@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace DZunke\NovDoc\Web\Controller\Library;
 
-use DZunke\NovDoc\Domain\Library\Directory\RootDirectory;
+use DZunke\NovDoc\Domain\Document\Document;
 use DZunke\NovDoc\Infrastructure\Repository\FilesystemDocumentRepository;
 use DZunke\NovDoc\Web\FlashMessages\Alert;
 use DZunke\NovDoc\Web\FlashMessages\HandleFlashMessages;
@@ -31,23 +31,11 @@ class DocumentEdit
         private readonly Environment $environment,
         private readonly RouterInterface $router,
         private readonly FilesystemDocumentRepository $documentRepository,
-        private readonly FilesystemDocumentRepository $filesystemDocumentRepository,
     ) {
     }
 
-    public function __invoke(Request $request, string $document): Response
+    public function __invoke(Request $request, Document $document): Response
     {
-        $document = $this->filesystemDocumentRepository->findById($document);
-        if ($document === null) {
-            $this->addFlashMessage(
-                $request,
-                Alert::DANGER,
-                'Das Dokument wurde nicht gefunden.',
-            );
-
-            return new RedirectResponse($this->router->generate('library', ['directory' => RootDirectory::ID]));
-        }
-
         if ($request->isMethod(Request::METHOD_POST)) {
             $title   = $request->get('title', '');
             $content = $request->get('content', '');

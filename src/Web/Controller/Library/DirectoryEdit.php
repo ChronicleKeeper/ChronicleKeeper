@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace DZunke\NovDoc\Web\Controller\Library;
 
-use DZunke\NovDoc\Domain\Library\Directory\RootDirectory;
+use DZunke\NovDoc\Domain\Document\Directory;
 use DZunke\NovDoc\Infrastructure\Repository\FilesystemDirectoryRepository;
 use DZunke\NovDoc\Web\FlashMessages\Alert;
 use DZunke\NovDoc\Web\FlashMessages\HandleFlashMessages;
@@ -34,19 +34,8 @@ class DirectoryEdit
     ) {
     }
 
-    public function __invoke(Request $request, string $directory): Response
+    public function __invoke(Request $request, Directory $directory): Response
     {
-        $directory = $this->directoryRepository->findById($directory);
-        if ($directory === null) {
-            $this->addFlashMessage(
-                $request,
-                Alert::DANGER,
-                'Das Verzeichnis wurde nicht gefunden.',
-            );
-
-            return new RedirectResponse($this->router->generate('library', ['directory' => RootDirectory::ID]));
-        }
-
         if ($request->isMethod(Request::METHOD_POST)) {
             $title = $request->get('title', '');
             if (is_string($title) && $title !== '') {

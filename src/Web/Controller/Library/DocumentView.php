@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace DZunke\NovDoc\Web\Controller\Library;
 
-use DZunke\NovDoc\Infrastructure\Repository\FilesystemDocumentRepository;
+use DZunke\NovDoc\Domain\Document\Document;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -20,14 +20,11 @@ class DocumentView
 {
     public function __construct(
         private readonly Environment $environment,
-        private readonly FilesystemDocumentRepository $documentRepository,
     ) {
     }
 
-    public function __invoke(Request $request, string $document): Response
+    public function __invoke(Request $request, Document $document): Response
     {
-        $document = $this->documentRepository->findById($document);
-
         return new Response($this->environment->render(
             'library/document_view.html.twig',
             ['document' => $document],

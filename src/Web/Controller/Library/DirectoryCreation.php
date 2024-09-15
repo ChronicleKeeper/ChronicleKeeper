@@ -34,10 +34,8 @@ class DirectoryCreation
     ) {
     }
 
-    public function __invoke(Request $request, string $parentDirectory): Response
+    public function __invoke(Request $request, Directory $parentDirectory): Response
     {
-        $parentDirectory = $this->directoryRepository->findById($parentDirectory);
-
         if ($request->isMethod(Request::METHOD_POST)) {
             $title = $request->get('title', '');
             if (is_string($title) && $title !== '') {

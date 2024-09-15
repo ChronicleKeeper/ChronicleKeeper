@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace DZunke\NovDoc\Web\Controller\Library;
 
-use DZunke\NovDoc\Domain\Library\Directory\RootDirectory;
+use DZunke\NovDoc\Domain\Document\Document;
 use DZunke\NovDoc\Infrastructure\Repository\FilesystemDocumentRepository;
 use DZunke\NovDoc\Infrastructure\Repository\FilesystemVectorDocumentRepository;
 use DZunke\NovDoc\Web\FlashMessages\Alert;
@@ -32,15 +32,8 @@ class DocumentDeletion
     ) {
     }
 
-    public function __invoke(Request $request, string $document): Response
+    public function __invoke(Request $request, Document $document): Response
     {
-        $document = $this->documentRepository->findById($document);
-        if ($document === null) {
-            $this->addFlashMessage($request, Alert::WARNING, 'Das Dokument existiert nicht.');
-
-            return new RedirectResponse($this->router->generate('library', ['directory' => RootDirectory::ID]));
-        }
-
         $vectorDocuments = $this->vectorDocumentRepository->findAllByDocumentId($document->id);
 
         foreach ($vectorDocuments as $vectorDocument) {

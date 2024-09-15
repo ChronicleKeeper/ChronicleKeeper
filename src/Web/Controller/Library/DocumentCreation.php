@@ -4,15 +4,14 @@ declare(strict_types=1);
 
 namespace DZunke\NovDoc\Web\Controller\Library;
 
+use DZunke\NovDoc\Domain\Document\Directory;
 use DZunke\NovDoc\Domain\Document\Document;
-use DZunke\NovDoc\Infrastructure\Repository\FilesystemDirectoryRepository;
 use DZunke\NovDoc\Infrastructure\Repository\FilesystemDocumentRepository;
 use DZunke\NovDoc\Web\FlashMessages\Alert;
 use DZunke\NovDoc\Web\FlashMessages\HandleFlashMessages;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Requirement\Requirement;
 use Symfony\Component\Routing\RouterInterface;
@@ -33,17 +32,11 @@ class DocumentCreation
         private readonly Environment $environment,
         private readonly RouterInterface $router,
         private readonly FilesystemDocumentRepository $documentRepository,
-        private readonly FilesystemDirectoryRepository $directoryRepository,
     ) {
     }
 
-    public function __invoke(Request $request, string $directory): Response
+    public function __invoke(Request $request, Directory $directory): Response
     {
-        $directory = $this->directoryRepository->findById($directory);
-        if ($directory === null) {
-            throw new NotFoundHttpException('Directory not found.');
-        }
-
         if ($request->isMethod(Request::METHOD_POST)) {
             $title   = $request->get('title', '');
             $content = $request->get('content', '');
