@@ -1,5 +1,12 @@
 # Changelog
 
+## [alpha-0.3] - Images will rule the world
+
+### Added
+- Show referenced documents from vector storage during chat, disable with general chatbot setting.
+
+### Changed
+
 ## [alpha-0.2] - Improve Document Workflows
 
 ### Added

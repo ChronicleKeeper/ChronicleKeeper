@@ -93,6 +93,10 @@ class FilesystemVectorDocumentRepository
         $vectorDocuments = $this->findAll();
 
         foreach ($vectorDocuments as $index => $document) {
+            if ($document->document->content === '') {
+                continue;
+            }
+
             $dist              = $this->distance->measure($searchedVectors, $document->vector);
             $distances[$index] = $dist;
         }

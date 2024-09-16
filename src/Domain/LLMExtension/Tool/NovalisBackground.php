@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace DZunke\NovDoc\Domain\LLMExtension\Tool;
 
+use DZunke\NovDoc\Domain\Document\Document;
 use DZunke\NovDoc\Domain\Settings\SettingsHandler;
 use DZunke\NovDoc\Infrastructure\Repository\FilesystemVectorDocumentRepository;
 use PhpLlm\LlmChain\EmbeddingModel;
@@ -19,6 +20,9 @@ use const PHP_EOL;
 )]
 final class NovalisBackground
 {
+    /** @var list<Document> */
+    private array $referencedDocuments = [];
+
     public function __construct(
         private readonly FilesystemVectorDocumentRepository $vectorDocumentRepository,
         private readonly EmbeddingModel $embeddings,
@@ -35,6 +39,7 @@ final class NovalisBackground
             maxResults: $this->settingsHandler->get()->getChatbotGeneral()->getMaxDocumentResponses(),
         );
 
+        $this->referencedDocuments = [];
         if (count($documents) === 0) {
             return 'There are no matching documents.';
         }
@@ -43,8 +48,23 @@ final class NovalisBackground
         foreach ($documents as $document) {
             $result .= '# Title: ' . $document->document->title . PHP_EOL;
             $result .= $document->document->content;
+
+            if ($this->settingsHandler->get()->getChatbotGeneral()->showReferencedDocuments() !== true) {
+                continue;
+            }
+
+            $this->referencedDocuments[] = $document->document;
         }
 
         return $result;
+    }
+
+    /** @return list<Document> */
+    public function getReferencedDocuments(): array
+    {
+        $documents                 = $this->referencedDocuments;
+        $this->referencedDocuments = [];
+
+        return $documents;
     }
 }

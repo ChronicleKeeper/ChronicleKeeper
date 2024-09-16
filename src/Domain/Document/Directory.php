@@ -8,7 +8,9 @@ use DZunke\NovDoc\Domain\Library\Directory\RootDirectory;
 use Symfony\Component\Uid\Uuid;
 
 use function array_key_exists;
+use function array_reverse;
 use function count;
+use function implode;
 
 /**
  * @phpstan-type DirectoryArray = array{
@@ -26,6 +28,19 @@ class Directory
     {
         $this->id     = Uuid::v4()->toString();
         $this->parent = RootDirectory::get(); // Initially root directory
+    }
+
+    public function flattenHierarchyTitle(): string
+    {
+        $directory = $this;
+
+        $components = [];
+        do {
+            $components[] = $directory->title;
+            $directory    = $directory->parent;
+        } while ($directory !== null);
+
+        return implode(' > ', array_reverse($components));
     }
 
     /**

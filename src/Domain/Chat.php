@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace DZunke\NovDoc\Domain;
 
+use DZunke\NovDoc\Domain\LLMExtension\Tool\NovalisBackground;
 use DZunke\NovDoc\Domain\Settings\SettingsHandler;
 use PhpLlm\LlmChain\Message\Message;
 use PhpLlm\LlmChain\Message\MessageBag;
@@ -11,6 +12,9 @@ use PhpLlm\LlmChain\OpenAI\Model\Gpt\Version;
 use PhpLlm\LlmChain\ToolChain;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Routing\RouterInterface;
+
+use const PHP_EOL;
 
 final class Chat
 {
@@ -20,6 +24,8 @@ final class Chat
         private readonly RequestStack $requestStack,
         private readonly ToolChain $toolChain,
         private readonly SettingsHandler $settingsHandler,
+        private readonly NovalisBackground $novalisBackground,
+        private readonly RouterInterface $router,
     ) {
     }
 
@@ -38,10 +44,31 @@ final class Chat
         $messages = $this->loadMessages();
 
         $messages[] = Message::ofUser($message);
-        $response   = $this->toolChain->call($messages, ['model' => Version::GPT_4o_MINI]);
+
+        $response = $this->toolChain->call($messages, ['model' => Version::GPT_4o_MINI]);
+        $response = $this->appendReferencedDocumentsFromBackground($response);
+
         $messages[] = Message::ofAssistant($response);
 
         $this->saveMessages($messages);
+    }
+
+    private function appendReferencedDocumentsFromBackground(string $response): string
+    {
+        $referencedDocuments = $this->novalisBackground->getReferencedDocuments();
+        if ($referencedDocuments === []) {
+            return $response;
+        }
+
+        $referencedDocumentsString = '***' . PHP_EOL . 'Die folgenden Dokumente wurden referenziert:' . PHP_EOL;
+        foreach ($referencedDocuments as $document) {
+            $linkLabel = $document->directory->flattenHierarchyTitle() . ' > ' . $document->title;
+            $link      = $this->router->generate('library_document_view', ['document' => $document->id]);
+
+            $referencedDocumentsString .= '- [' . $linkLabel . '](' . $link . ')' . PHP_EOL;
+        }
+
+        return $response . PHP_EOL . $referencedDocumentsString;
     }
 
     private function initMessages(): MessageBag

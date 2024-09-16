@@ -8,7 +8,8 @@ namespace DZunke\NovDoc\Domain\Settings\Settings;
  * @phpstan-type ChatbotGeneralSettings = array{
  *     max_document_responses: int,
  *     chatbot_name: string,
- *     chatter_name: string
+ *     chatter_name: string,
+ *     show_referenced_documents: bool
  * }
  */
 readonly class ChatbotGeneral
@@ -17,6 +18,7 @@ readonly class ChatbotGeneral
         private int $maxDocumentResponses = 4,
         private string $chatbotName = 'Rostbart',
         private string $chatterName = 'Elias',
+        private bool $showReferencedDocuments = true,
     ) {
     }
 
@@ -27,6 +29,7 @@ readonly class ChatbotGeneral
             $settings['max_document_responses'],
             $settings['chatbot_name'],
             $settings['chatter_name'],
+            $settings['show_referenced_documents'],
         );
     }
 
@@ -37,6 +40,7 @@ readonly class ChatbotGeneral
             'max_document_responses' => $this->maxDocumentResponses,
             'chatbot_name' => $this->chatbotName,
             'chatter_name' => $this->chatterName,
+            'show_referenced_documents' => $this->showReferencedDocuments,
         ];
     }
 
@@ -53,5 +57,10 @@ readonly class ChatbotGeneral
     public function getChatterName(): string
     {
         return $this->chatterName;
+    }
+
+    public function showReferencedDocuments(): bool
+    {
+        return $this->showReferencedDocuments;
     }
 }

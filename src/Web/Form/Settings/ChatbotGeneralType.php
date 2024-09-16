@@ -8,6 +8,7 @@ use DZunke\NovDoc\Domain\Settings\Settings;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\DataMapperInterface;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -17,6 +18,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Throwable;
 use Traversable;
 
+use function is_bool;
 use function is_int;
 use function is_string;
 use function iterator_to_array;
@@ -66,6 +68,16 @@ final class ChatbotGeneralType extends AbstractType implements DataMapperInterfa
                 'constraints' => [new NotBlank()],
             ],
         );
+
+        $builder->add(
+            'showReferencedDocuments',
+            CheckboxType::class,
+            [
+                'label' => 'Referenzierte Dokumente anzeigen',
+                'translation_domain' => false,
+                'required' => false,
+            ],
+        );
     }
 
     /** @param Traversable<FormInterface> $forms */
@@ -85,6 +97,7 @@ final class ChatbotGeneralType extends AbstractType implements DataMapperInterfa
         $forms['maxDocumentResponses']->setData($viewData->getChatbotGeneral()->getMaxDocumentResponses());
         $forms['chatbotName']->setData($viewData->getChatbotGeneral()->getChatbotName());
         $forms['chatterName']->setData($viewData->getChatbotGeneral()->getChatterName());
+        $forms['showReferencedDocuments']->setData($viewData->getChatbotGeneral()->showReferencedDocuments());
     }
 
     /** @param Traversable<FormInterface> $forms */
@@ -113,7 +126,17 @@ final class ChatbotGeneralType extends AbstractType implements DataMapperInterfa
                 throw new UnexpectedTypeException($chatterName, 'string');
             }
 
-            $viewData->setChatbotGeneral(new Settings\ChatbotGeneral($maxDocumentResponses, $chatbotName, $chatterName));
+            $showReferencedDocuments = $forms['showReferencedDocuments']->getData();
+            if (! is_bool($showReferencedDocuments)) {
+                throw new UnexpectedTypeException($showReferencedDocuments, 'bool');
+            }
+
+            $viewData->setChatbotGeneral(new Settings\ChatbotGeneral(
+                $maxDocumentResponses,
+                $chatbotName,
+                $chatterName,
+                $showReferencedDocuments,
+            ));
         } catch (Throwable) {
             return;
         }
