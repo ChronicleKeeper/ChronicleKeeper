@@ -54,8 +54,13 @@ class Chat
                 continue;
             }
 
+            $role = $settings->getChatbotGeneral()->getChatbotName();
+            if ($originMessage->role === Role::User) {
+                $role = $settings->getChatbotGeneral()->getChatterName();
+            }
+
             $messages[] = [
-                'role' => $originMessage->role === Role::User ? $settings->chatterName : $settings->chatbotName,
+                'role' => $role,
                 'message' => (string) $originMessage->content,
             ];
         }

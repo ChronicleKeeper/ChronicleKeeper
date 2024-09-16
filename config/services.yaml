@@ -25,3 +25,6 @@ services:
 
   OskarStark\Twig\ReadableFilesizeExtension:
     tags: [ 'twig.extension' ]
+
+  League\CommonMark\Extension\Table\TableExtension:
+    tags: [ 'twig.markdown.league_extension' ]

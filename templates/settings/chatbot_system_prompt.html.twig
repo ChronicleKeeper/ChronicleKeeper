@@ -1,0 +1,41 @@
+{% extends 'layout.html.twig' %}
+
+{% block page_title %}Einstellungen - Chatbot - System Prompt{% endblock %}
+
+{% block page_title_actions %}
+    <div class="col-auto ms-auto d-print-none">
+        <div class="btn-list">
+            <a href="{{ path('settings_reset') }}" class="btn d-none d-sm-inline-block">
+                {{ ux_icon('tabler:trash') }}Alle Einstellungen Zurücksetzen
+            </a>
+        </div>
+    </div>
+{% endblock %}
+
+{% block page_content %}
+    <div class="container-xl">
+        {{ form_start(form) }}
+            <div class="card">
+                <div class="row g-0">
+                    {% include 'settings/_includes/settings_nav.html.twig' %}
+                    <div class="col-12 col-md-9 d-flex flex-column">
+                        <div class="card-body">
+                            <div class="row g-5 pb-5">
+                                <div class="col-12">
+                                    {{ form_label(form.systemPrompt) }}
+                                    <twig:markdownEditor name="chatbot_system_prompt[systemPrompt]" content="{{ form.systemPrompt.vars.data ?? '' }}" />
+                                    {{ form_errors(form.systemPrompt) }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer mt-auto">
+                    <div class="btn-list justify-content-end">
+                        <button type="submit" class="btn btn-primary">Speichern</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+{% endblock %}

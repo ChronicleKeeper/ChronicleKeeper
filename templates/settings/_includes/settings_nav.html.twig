@@ -1,0 +1,20 @@
+<div class="col-12 col-md-3 border-end">
+    <div class="card-body">
+        <h4 class="subheader">Chatbot</h4>
+        <div class="list-group list-group-transparent">
+            <a href="{{ path('settings') }}" class="list-group-item list-group-item-action d-flex align-items-center{{ form.vars.name is same as 'chatbot_general' ? ' active' : '' }}">Allgemein</a>
+            <a href="{{ path('settings', {'section': 'chatbot_system_prompt'}) }}" class="list-group-item list-group-item-action{{ form.vars.name is same as 'chatbot_system_prompt' ? ' active' : '' }}">System Prompt</a>
+        </div>
+        <h4 class="subheader mt-4">Kalender</h4>
+        <div class="list-group list-group-transparent">
+            <a href="{{ path('settings', {'section': 'calendar_general'}) }}" class="list-group-item list-group-item-action{{ form.vars.name is same as 'calendar_general' ? ' active' : '' }}">Allgemein</a>
+            <a href="{{ path('settings', {'section': 'calendar_holiday'}) }}" class="list-group-item list-group-item-action{{ form.vars.name is same as 'calendar_holiday' ? ' active' : '' }}">Feiertage</a>
+            <a href="{{ path('settings', {'section': 'calendar_moon'}) }}" class="list-group-item list-group-item-action{{ form.vars.name is same as 'calendar_moon' ? ' active' : '' }}">Mondkalender</a>
+        </div>
+        {# <h4 class="subheader mt-4">Bibliothek</h4>
+        <div class="list-group list-group-transparent">
+            <a class="list-group-item list-group-item-action">Import</a>
+            <a class="list-group-item list-group-item-action">Export</a>
+        </div> #}
+    </div>
+</div>

@@ -65,11 +65,11 @@ class SettingsHandler
         }
 
         $settingsArr = json_decode($settingsFileContent, true);
-        if (! is_array($settingsArr) || ! Settings::isSettingsArr($settingsArr)) {
+        if (! is_array($settingsArr)) {
             return;
         }
 
-        $this->settings = Settings::fromArray($settingsArr);
+        $this->settings = Settings::fromArray($settingsArr); // @phpstan-ignore argument.type
         $this->loaded   = true;
     }
 }

@@ -32,7 +32,7 @@ final class NovalisBackground
         $vector    = $this->embeddings->create($search);
         $documents = $this->vectorDocumentRepository->findSimilarDocuments(
             $vector->getData(),
-            maxResults: $this->settingsHandler->get()->maxDocumentResponses,
+            maxResults: $this->settingsHandler->get()->getChatbotGeneral()->getMaxDocumentResponses(),
         );
 
         if (count($documents) === 0) {

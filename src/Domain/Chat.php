@@ -48,7 +48,7 @@ final class Chat
     {
         $settings = $this->settingsHandler->get();
 
-        return new MessageBag(Message::forSystem($settings->systemPrompt));
+        return new MessageBag(Message::forSystem($settings->getChatbotSystemPrompt()->getSystemPrompt()));
     }
 
     public function reset(): void
