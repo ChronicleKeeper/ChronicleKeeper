@@ -44,7 +44,8 @@
         "symfony/validator": "^7.1",
         "symfony/yaml": "^7.1",
         "twig/extra-bundle": "^3.13",
-        "twig/markdown-extra": "^3.12"
+        "twig/markdown-extra": "^3.12",
+        "ext-zip": "*"
     },
     "config": {
         "sort-packages": true,

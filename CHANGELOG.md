@@ -11,6 +11,7 @@
 - Add a footer page link to the rendered changelog from the filesystem.
 - Implement view for documents with parsed output, including full directory breadcrumb navigation.
 - Add GPT Functions for extended information to the calendar system, holidays, and moon calendar, configurable within the settings.
+- Added an export functionality to the settings area as preparation for alpha-0.3 import and migration.
 
 ### Changed
 - Replace Font Awesome full icon set reference with Symfony UX Icons and utilize tabler.io icons.

@@ -40,6 +40,11 @@ export default class extends Controller {
                 return;
             }
 
+            if (target.classList.contains('no-loader') === true) {
+                console.log('No loader shown because of "no-loader" class');
+                return;
+            }
+
             let linkUrl = new URL(target.getAttribute('href'), window.location.href); // Using the second argument to handle relative URLs
             let currentHostname = window.location.hostname;
 
@@ -48,12 +53,19 @@ export default class extends Controller {
                 return;
             }
 
+            console.log(target);
             showLoader();
         });
 
         attachFormSubmitListener();
 
-        window.onbeforeunload = showLoader;
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'F5') {
+                console.log('F5 pressed!');
+                showLoader();
+            }
+        });
+
         window.onpageshow = () => {
             hideLoader();
             attachFormSubmitListener();

@@ -11,10 +11,10 @@
             <a href="{{ path('settings', {'section': 'calendar_holiday'}) }}" class="list-group-item list-group-item-action{{ form.vars.name is same as 'calendar_holiday' ? ' active' : '' }}">Feiertage</a>
             <a href="{{ path('settings', {'section': 'calendar_moon'}) }}" class="list-group-item list-group-item-action{{ form.vars.name is same as 'calendar_moon' ? ' active' : '' }}">Mondkalender</a>
         </div>
-        {# <h4 class="subheader mt-4">Bibliothek</h4>
+        <h4 class="subheader mt-4">Anwendung</h4>
         <div class="list-group list-group-transparent">
-            <a class="list-group-item list-group-item-action">Import</a>
-            <a class="list-group-item list-group-item-action">Export</a>
-        </div> #}
+            {# <a class="list-group-item list-group-item-action">Import</a> #}
+            <a href="{{ path('application_export') }}" class="list-group-item list-group-item-action no-loader">Export</a>
+        </div>
     </div>
 </div>

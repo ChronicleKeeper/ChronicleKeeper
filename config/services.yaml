@@ -8,6 +8,7 @@ services:
     autoconfigure: true
     bind:
       string $openAIKey: '%env(string:OPENAI_API_KEY)%'
+      string $dotEnvFile: '%kernel.project_dir%/.env'
       string $documentStoragePath: '%kernel.project_dir%/var/documents'
       string $directoryStoragePath: '%kernel.project_dir%/var/directories'
       string $filesystemEmbeddingStoragePath: '%kernel.project_dir%/var/data'
