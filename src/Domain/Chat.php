@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace DZunke\NovDoc\Domain;
 
-use DZunke\NovDoc\Domain\LLMExtension\Tool\NovalisBackground;
 use DZunke\NovDoc\Domain\Settings\SettingsHandler;
+use DZunke\NovDoc\Infrastructure\LLMChainExtension\Tool\NovalisBackground;
+use DZunke\NovDoc\Infrastructure\LLMChainExtension\Tool\NovalisImages;
 use PhpLlm\LlmChain\Message\Message;
 use PhpLlm\LlmChain\Message\MessageBag;
 use PhpLlm\LlmChain\OpenAI\Model\Gpt\Version;
@@ -25,6 +26,7 @@ final class Chat
         private readonly ToolChain $toolChain,
         private readonly SettingsHandler $settingsHandler,
         private readonly NovalisBackground $novalisBackground,
+        private readonly NovalisImages $novalisImages,
         private readonly RouterInterface $router,
     ) {
     }
@@ -47,10 +49,29 @@ final class Chat
 
         $response = $this->toolChain->call($messages, ['model' => Version::GPT_4o_MINI]);
         $response = $this->appendReferencedDocumentsFromBackground($response);
+        $response = $this->appendReferencedImages($response);
 
         $messages[] = Message::ofAssistant($response);
 
         $this->saveMessages($messages);
+    }
+
+    private function appendReferencedImages(string $response): string
+    {
+        $referencedImages = $this->novalisImages->getReferencedImages();
+        if ($referencedImages === []) {
+            return $response;
+        }
+
+        $referencedDocumentsString = '***' . PHP_EOL . 'Die folgenden Bilder wurden referenziert:' . PHP_EOL;
+        foreach ($referencedImages as $image) {
+            $linkLabel = $image->directory->flattenHierarchyTitle() . ' > ' . $image->title;
+            $link      = $this->router->generate('library_image_view', ['image' => $image->id]);
+
+            $referencedDocumentsString .= '- [' . $linkLabel . '](' . $link . ')' . PHP_EOL;
+        }
+
+        return $response . PHP_EOL . $referencedDocumentsString;
     }
 
     private function appendReferencedDocumentsFromBackground(string $response): string

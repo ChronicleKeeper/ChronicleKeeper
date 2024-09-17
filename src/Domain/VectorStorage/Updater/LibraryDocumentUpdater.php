@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace DZunke\NovDoc\Domain\SearchIndex;
+namespace DZunke\NovDoc\Domain\VectorStorage\Updater;
 
 use DZunke\NovDoc\Domain\Document\Document;
 use DZunke\NovDoc\Domain\VectorStorage\VectorDocument;
@@ -13,7 +13,7 @@ use Psr\Log\LoggerInterface;
 
 use function reset;
 
-class Updater
+class LibraryDocumentUpdater
 {
     public function __construct(
         private readonly LoggerInterface $logger,
@@ -30,7 +30,7 @@ class Updater
         }
     }
 
-    public function updateOrCreateVectorsForDocument(Document $document): void
+    private function updateOrCreateVectorsForDocument(Document $document): void
     {
         $existingStorage = $this->vectorDocumentRepository->findAllByDocumentId($document->id);
 

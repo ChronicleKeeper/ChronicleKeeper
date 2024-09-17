@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace DZunke\NovDoc\Domain\LLMExtension\Tool;
+namespace DZunke\NovDoc\Infrastructure\LLMChainExtension\Tool;
 
 use DZunke\NovDoc\Domain\Settings\SettingsHandler;
 use PhpLlm\LlmChain\ToolBox\AsTool;

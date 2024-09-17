@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace DZunke\NovDoc\Web\Controller;
 
-use DZunke\NovDoc\Domain\SearchIndex\Updater;
+use DZunke\NovDoc\Domain\VectorStorage\Updater;
 use DZunke\NovDoc\Web\FlashMessages\Alert;
 use DZunke\NovDoc\Web\FlashMessages\HandleFlashMessages;
 use Symfony\Component\HttpFoundation\RedirectResponse;

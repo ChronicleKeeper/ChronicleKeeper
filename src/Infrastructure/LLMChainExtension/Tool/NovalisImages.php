@@ -1,0 +1,76 @@
+<?php
+
+declare(strict_types=1);
+
+namespace DZunke\NovDoc\Infrastructure\LLMChainExtension\Tool;
+
+use DZunke\NovDoc\Domain\Library\Image\Image;
+use DZunke\NovDoc\Domain\Settings\SettingsHandler;
+use DZunke\NovDoc\Infrastructure\Repository\FilesystemVectorImageRepository;
+use PhpLlm\LlmChain\EmbeddingModel;
+use PhpLlm\LlmChain\ToolBox\AsTool;
+
+use function count;
+
+use const PHP_EOL;
+
+#[AsTool(
+    'novalis_images',
+    description: <<<'TEXT'
+    Delivers images and pictures from the world of Novalis. For additional background information to the background
+    utilize function "novalis_background". The images and pictures delivered here will help you describing locations,
+    situations and persons from the world of novalis. Feel free to utilize those information if someone is asking for
+    information about locations, situations or persons.
+    TEXT,
+)]
+final class NovalisImages
+{
+    /** @var list<Image> */
+    private array $referencedImages = [];
+
+    public function __construct(
+        private readonly FilesystemVectorImageRepository $vectorImageRepository,
+        private readonly EmbeddingModel $embeddings,
+        private readonly SettingsHandler $settingsHandler,
+    ) {
+    }
+
+    /** @param string $search Contains the question or message the user has sent in reference to novalis. */
+    public function __invoke(string $search): string
+    {
+        $vector  = $this->embeddings->create($search);
+        $results = $this->vectorImageRepository->findSimilar(
+            $vector->getData(),
+            maxResults: $this->settingsHandler->get()->getChatbotGeneral()->getMaxDocumentResponses(),
+        );
+
+        $this->referencedImages = [];
+        if (count($results) === 0) {
+            return 'There are no matching images.';
+        }
+
+        $result  = 'You will just output text from the following information. Do not display an image.' . PHP_EOL;
+        $result .= 'I have found the following pictures and images that are associated to the world of Novalis:' . PHP_EOL;
+        foreach ($results as $image) {
+            $result .= '# Image Name: ' . $image->image->title . PHP_EOL;
+            $result .= $image->image->description;
+
+            if ($this->settingsHandler->get()->getChatbotGeneral()->showReferencedDocuments() !== true) {
+                continue;
+            }
+
+            $this->referencedImages[] = $image->image;
+        }
+
+        return $result;
+    }
+
+    /** @return list<Image> */
+    public function getReferencedImages(): array
+    {
+        $images                 = $this->referencedImages;
+        $this->referencedImages = [];
+
+        return $images;
+    }
+}

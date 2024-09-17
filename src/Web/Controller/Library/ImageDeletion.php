@@ -6,6 +6,7 @@ namespace DZunke\NovDoc\Web\Controller\Library;
 
 use DZunke\NovDoc\Domain\Library\Image\Image;
 use DZunke\NovDoc\Infrastructure\Repository\FilesystemImageRepository;
+use DZunke\NovDoc\Infrastructure\Repository\FilesystemVectorImageRepository;
 use DZunke\NovDoc\Web\FlashMessages\Alert;
 use DZunke\NovDoc\Web\FlashMessages\HandleFlashMessages;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -27,6 +28,7 @@ class ImageDeletion
     public function __construct(
         private readonly RouterInterface $router,
         private readonly FilesystemImageRepository $imageRepository,
+        private readonly FilesystemVectorImageRepository $vectorImageRepository,
     ) {
     }
 
@@ -40,6 +42,10 @@ class ImageDeletion
             );
 
             return new RedirectResponse($this->router->generate('library', ['directory' => $image->directory->id]));
+        }
+
+        foreach ($this->vectorImageRepository->findAllByImageId($image->id) as $vectorImage) {
+            $this->vectorImageRepository->remove($vectorImage);
         }
 
         $this->imageRepository->remove($image);

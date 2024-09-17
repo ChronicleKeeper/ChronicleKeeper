@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace DZunke\NovDoc\Domain\LLMExtension\Tool;
+namespace DZunke\NovDoc\Infrastructure\LLMChainExtension\Tool;
 
 use DZunke\NovDoc\Domain\Document\Document;
 use DZunke\NovDoc\Domain\Settings\SettingsHandler;
@@ -16,7 +16,7 @@ use const PHP_EOL;
 
 #[AsTool(
     'novalis_background',
-    description: 'Delivers all background information to the world of novalis or characters living in the world.',
+    description: 'Delivers all background information to the world of novalis or characters living in the world. For detailied visual information utilize function "novalis_images".',
 )]
 final class NovalisBackground
 {

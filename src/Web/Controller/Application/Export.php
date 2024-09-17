@@ -28,7 +28,7 @@ class Export
         private readonly string $settingsFilePath,
         private readonly string $directoryStoragePath,
         private readonly string $documentStoragePath,
-        private readonly string $filesystemEmbeddingStoragePath,
+        private readonly string $vectorDocumentsPath,
         private readonly string $changelogFile,
     ) {
     }
@@ -106,7 +106,7 @@ class Export
     {
         $finder = (new Finder())
             ->ignoreDotFiles(true)
-            ->in($this->filesystemEmbeddingStoragePath)
+            ->in($this->vectorDocumentsPath)
             ->files();
 
         foreach ($finder as $vectorDocument) {
