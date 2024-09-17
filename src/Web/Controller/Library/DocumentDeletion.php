@@ -19,7 +19,7 @@ use Symfony\Component\Routing\RouterInterface;
 #[Route(
     '/library/document/{document}/delete',
     name: 'library_document_delete',
-    requirements: ['directory' => Requirement::UUID],
+    requirements: ['document' => Requirement::UUID],
 )]
 class DocumentDeletion
 {

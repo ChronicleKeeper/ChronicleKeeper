@@ -9,6 +9,7 @@ use DZunke\NovDoc\Domain\Document\Directory;
 use DZunke\NovDoc\Domain\Library\Image\Image;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 
 use function array_filter;
@@ -33,6 +34,7 @@ class FilesystemImageRepository
         private readonly string $libraryImageStoragePath,
         private readonly LoggerInterface $logger,
         private readonly FilesystemDirectoryRepository $directoryRepository,
+        private readonly Filesystem $filesystem,
     ) {
     }
 
@@ -103,6 +105,16 @@ class FilesystemImageRepository
 
             return null;
         }
+    }
+
+    public function remove(Image $image): void
+    {
+        $filepath = $this->libraryImageStoragePath . DIRECTORY_SEPARATOR . $image->id . '.json';
+        if (! file_exists($filepath) || ! is_readable($filepath)) {
+            return;
+        }
+
+        $this->filesystem->remove($filepath);
     }
 
     private function convertJsonToImage(string $json): Image
