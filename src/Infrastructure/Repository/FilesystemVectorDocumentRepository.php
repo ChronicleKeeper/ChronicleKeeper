@@ -92,7 +92,7 @@ class FilesystemVectorDocumentRepository
         $distances       = [];
         $vectorDocuments = $this->findAll();
 
-        $maxDistance = 0.7; // Maximum of distance an image is allowed to be away from the result
+        $maxDistance = 0.85; // Maximum of distance an image is allowed to be away from the result
         foreach ($vectorDocuments as $index => $document) {
             if ($document->document->content === '') {
                 continue;

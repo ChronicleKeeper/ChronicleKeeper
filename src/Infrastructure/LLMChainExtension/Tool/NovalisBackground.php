@@ -47,6 +47,7 @@ final class NovalisBackground
         $result = 'I have found the following information that are associated to the world of Novalis:' . PHP_EOL;
         foreach ($documents as $document) {
             $result .= '# Title: ' . $document->document->title . PHP_EOL;
+            $result .= 'Storage Directory: ' . $document->document->directory->flattenHierarchyTitle() . PHP_EOL;
             $result .= $document->document->content;
 
             if ($this->settingsHandler->get()->getChatbotGeneral()->showReferencedDocuments() !== true) {
