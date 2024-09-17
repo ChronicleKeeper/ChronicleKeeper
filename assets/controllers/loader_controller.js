@@ -35,6 +35,10 @@ export default class extends Controller {
                 }
             }
 
+            if (event.defaultPrevented === true) {
+                return;
+            }
+
             if (target.attributes.href === undefined) {
                 console.log('Just something that is a link clicked, no loader.')
                 return;
@@ -53,7 +57,6 @@ export default class extends Controller {
                 return;
             }
 
-            console.log(target);
             showLoader();
         });
 

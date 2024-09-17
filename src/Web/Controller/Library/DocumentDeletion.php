@@ -34,6 +34,16 @@ class DocumentDeletion
 
     public function __invoke(Request $request, Document $document): Response
     {
+        if ($request->get('confirm', 0) === 0) {
+            $this->addFlashMessage(
+                $request,
+                Alert::WARNING,
+                'Das Löschen des Dokumentes "' . $document->title . '" muss erst bestätigt werden!',
+            );
+
+            return new RedirectResponse($this->router->generate('library', ['directory' => $document->directory->id]));
+        }
+
         $vectorDocuments = $this->vectorDocumentRepository->findAllByDocumentId($document->id);
 
         foreach ($vectorDocuments as $vectorDocument) {

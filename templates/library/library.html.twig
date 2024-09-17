@@ -76,7 +76,7 @@
                                     <td>
                                         <a href="{{ path('library_document_view', {'document': document.id}) }}" title="Ansehen">{{ ux_icon('tabler:file-text') }}</a>
                                         <a href="{{ path('library_document_edit', {'document': document.id}) }}" title="Bearbeiten">{{ ux_icon('tabler:file-pencil') }}</a>
-                                        <a href="{{ path('library_document_delete', {'document': document.id}) }}" title="Löschen">{{ ux_icon('tabler:file-x') }}</a>
+                                        <a href="{{ path('library_document_delete', {'document': document.id}) }}" title="Löschen" {{ stimulus_controller('confirm') }}>{{ ux_icon('tabler:file-x') }}</a>
                                     </td>
                                 </tr>
 

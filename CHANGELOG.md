@@ -5,7 +5,8 @@
 ### Added
 - Show referenced documents from vector storage during chat, disable with general chatbot setting.
 
-### Changed
+### Fixed
+- Deletion of media within the library could be executed when the loader shows and the mouse is hovering over the delete action.
 
 ## [alpha-0.2] - Improve Document Workflows
 
