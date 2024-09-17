@@ -51,7 +51,8 @@ class FilesystemDirectoryRepository
             ->in($this->directoryStoragePath)
             ->files();
 
-        $directories = [];
+        $directories   = [];
+        $directories[] = RootDirectory::get();
         foreach ($finder as $file) {
             try {
                 $directories[] = $this->convertJsonToDirectory($file->getContents());
@@ -62,7 +63,7 @@ class FilesystemDirectoryRepository
 
         usort(
             $directories,
-            static fn (Directory $left, Directory $right) => strcasecmp($left->title, $right->title),
+            static fn (Directory $left, Directory $right) => strcasecmp($left->flattenHierarchyTitle(), $right->flattenHierarchyTitle()),
         );
 
         return $directories;

@@ -1,0 +1,47 @@
+{% extends 'layout.html.twig' %}
+
+{% block page_title %}Bild "{{ image.title }}" bearbeiten{% endblock %}
+
+{% block page_content %}
+    <form action="{{ path('library_image_edit', {'image': image.id}) }}" method="post">
+    <div class="container-xl">
+        <div class="row row-deck row-cards">
+            <div class="row-sm-12">
+                <div class="card card-borderless">
+                    <div class="card-body">
+                        <twig:directoryBreadcrumb directory="{{ image.directory }}" extraLastNode="{{ image.title }}" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-6">
+                <div class="card">
+                    <img src="{{ image.imageUrl }}" class="card-img-top" alt="{{ image.title }}">
+                </div>
+            </div>
+
+            <div class="col-sm-6">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row g-5">
+                            <div class="col-12">{{ form_row(form.title) }}</div>
+                            <div class="col-12">{{ form_row(form.directory) }}</div>
+                            <div class="col-12">
+                                <label for="description" class="form-label">Beschreibung</label>
+                                <twig:markdownEditor name="image[description]" content="{{ image.description }}" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer text-end">
+                        <div class="d-flex">
+                            <a href="{{ path('library', {'directory': image.directory.id }) }}" class="btn btn-link">Abbruch</a>
+                            <button type="submit" class="btn btn-primary ms-auto">Speichern</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    </form>
+{% endblock %}
