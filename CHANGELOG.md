@@ -4,9 +4,19 @@
 
 ### Added
 - Show referenced documents from vector storage during chat, disable with general chatbot setting.
+- Library extended with image management: upload, view, edit, delete, and vector storage for search.
+- Images in the library get LLM-guessed descriptions on upload for search and chatbot context.
+- New settings in the general chatbot section to define the number of context images and whether to collect them for chat output.
+
+### Changed
+- Chatbot messages now store context in a custom design instead of directly in the chat response.
+- Vector storage search for context documents and images now uses a max distance to reduce false positives.
+- Upgraded tabler.io design from beta-20 to beta-21.
 
 ### Fixed
-- Deletion of media within the library could be executed when the loader shows and the mouse is hovering over the delete action.
+- Media deletion in the library could be executed when the loader shows and the mouse hovers over the delete action.
+- Loader spinner no longer displayed on history back.
+- Library sorting now respects German umlauts.
 
 ## [alpha-0.2] - Improve Document Workflows
 

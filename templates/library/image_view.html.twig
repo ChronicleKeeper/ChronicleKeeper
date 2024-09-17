@@ -2,6 +2,22 @@
 
 {% block page_title %}{{ image.title }}{% endblock %}
 
+{% block page_title_actions %}
+    <div class="col-auto ms-auto d-print-none">
+        <div class="btn-list">
+            <a href="{{ path('library_image_download', {'image': image.id }) }}" class="btn d-none d-sm-inline-block no-loader">
+                {{ ux_icon('tabler:cloud-down') }}Download
+            </a>
+            <a href="{{ path('library_image_edit', {'image': image.id }) }}" class="btn btn-icon btn-warning">
+                {{ ux_icon('tabler:photo-edit') }}
+            </a>
+            <a href="{{ path('library_image_delete', {'image': image.id }) }}" class="btn btn-icon btn-danger" {{ stimulus_controller('confirm') }}>
+                {{ ux_icon('tabler:photo-minus') }}
+            </a>
+        </div>
+    </div>
+{% endblock %}
+
 {% block page_content %}
     <div class="container-xl">
         <div class="row row-deck row-cards">
