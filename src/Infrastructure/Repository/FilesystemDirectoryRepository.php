@@ -19,6 +19,7 @@ use function is_readable;
 use function json_decode;
 use function json_encode;
 use function json_validate;
+use function strcasecmp;
 use function usort;
 
 use const DIRECTORY_SEPARATOR;
@@ -50,7 +51,8 @@ class FilesystemDirectoryRepository
             ->in($this->directoryStoragePath)
             ->files();
 
-        $directories = [];
+        $directories   = [];
+        $directories[] = RootDirectory::get();
         foreach ($finder as $file) {
             try {
                 $directories[] = $this->convertJsonToDirectory($file->getContents());
@@ -61,7 +63,7 @@ class FilesystemDirectoryRepository
 
         usort(
             $directories,
-            static fn (Directory $left, Directory $right) => $left->title <=> $right->title,
+            static fn (Directory $left, Directory $right) => strcasecmp($left->flattenHierarchyTitle(), $right->flattenHierarchyTitle()),
         );
 
         return $directories;

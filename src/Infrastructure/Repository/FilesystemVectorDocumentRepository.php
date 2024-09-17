@@ -34,14 +34,14 @@ class FilesystemVectorDocumentRepository
         private readonly FilesystemDocumentRepository $documentRepository,
         private readonly CosineDistance $distance,
         private readonly Filesystem $filesystem,
-        private readonly string $filesystemEmbeddingStoragePath,
+        private readonly string $vectorDocumentsPath,
     ) {
     }
 
     public function store(VectorDocument $vectorDocument): void
     {
         $filename        = $vectorDocument->id . '.json';
-        $filepath        = $this->filesystemEmbeddingStoragePath . DIRECTORY_SEPARATOR . $filename;
+        $filepath        = $this->vectorDocumentsPath . DIRECTORY_SEPARATOR . $filename;
         $documentAsArray = $vectorDocument->toArray();
         $documentAsJson  = json_encode($documentAsArray, JSON_PRETTY_PRINT);
 
@@ -53,7 +53,7 @@ class FilesystemVectorDocumentRepository
     {
         $documentFinder = (new Finder())
             ->ignoreDotFiles(true)
-            ->in($this->filesystemEmbeddingStoragePath)
+            ->in($this->vectorDocumentsPath)
             ->files();
 
         $documents = [];
@@ -87,17 +87,23 @@ class FilesystemVectorDocumentRepository
      *
      * @return list<VectorDocument>
      */
-    public function findSimilarDocuments(array $searchedVectors, int $maxResults = 4): array
+    public function findSimilar(array $searchedVectors, int $maxResults = 4): array
     {
         $distances       = [];
         $vectorDocuments = $this->findAll();
 
+        $maxDistance = 0.85; // Maximum of distance an image is allowed to be away from the result
         foreach ($vectorDocuments as $index => $document) {
             if ($document->document->content === '') {
                 continue;
             }
 
-            $dist              = $this->distance->measure($searchedVectors, $document->vector);
+            $dist = $this->distance->measure($searchedVectors, $document->vector);
+            if ($dist > $maxDistance) {
+                unset($vectorDocuments[$index]);
+                continue;
+            }
+
             $distances[$index] = $dist;
         }
 
@@ -124,7 +130,7 @@ class FilesystemVectorDocumentRepository
 
     public function remove(VectorDocument $vectorDocument): void
     {
-        $filepath = $this->filesystemEmbeddingStoragePath . DIRECTORY_SEPARATOR . $vectorDocument->id . '.json';
+        $filepath = $this->vectorDocumentsPath . DIRECTORY_SEPARATOR . $vectorDocument->id . '.json';
         if (! file_exists($filepath) || ! is_readable($filepath)) {
             return;
         }
@@ -157,7 +163,7 @@ class FilesystemVectorDocumentRepository
 
     private function getContentOfVectorDocumentFile(string $filename): string|null
     {
-        $filepath = $this->filesystemEmbeddingStoragePath . DIRECTORY_SEPARATOR . $filename;
+        $filepath = $this->vectorDocumentsPath . DIRECTORY_SEPARATOR . $filename;
         if (! file_exists($filepath) || ! is_readable($filepath)) {
             return null;
         }

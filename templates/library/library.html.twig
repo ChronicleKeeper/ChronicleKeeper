@@ -8,6 +8,9 @@
             <a href="{{ path('update_search_index') }}" class="btn d-none d-sm-inline-block">
                 {{ ux_icon('tabler:reload') }}Aktualisiere Suchindex
             </a>
+            <a href="{{ path('library_image_upload', {'directory': currentDirectory.id }) }}" class="btn btn-primary d-none d-sm-inline-block">
+                {{ ux_icon('tabler:photo-plus') }}Neues Bild
+            </a>
             <a href="{{ path('library_document_create', {'directory': currentDirectory.id }) }}" class="btn btn-primary d-none d-sm-inline-block">
                 {{ ux_icon('tabler:file-plus') }}Neues Dokument
             </a>
@@ -68,21 +71,28 @@
                                 </tr>
                             {% endfor %}
 
-                            {% for document in documents %}
-                                <tr>
-                                    <td>{{ ux_icon('tabler:file') }} {{ document.title }}</td>
-                                    <td class="text-secondary">{{ document.size|readable_filesize }}</td>
-                                    <td class="text-secondary">{{ document.updatedAt|date('d.m.Y H:i:s') }}</td>
-                                    <td>
-                                        <a href="{{ path('library_document_view', {'document': document.id}) }}" title="Ansehen">{{ ux_icon('tabler:file-text') }}</a>
-                                        <a href="{{ path('library_document_edit', {'document': document.id}) }}" title="Bearbeiten">{{ ux_icon('tabler:file-pencil') }}</a>
-                                        <a href="{{ path('library_document_delete', {'document': document.id}) }}" title="Löschen" {{ stimulus_controller('confirm') }}>{{ ux_icon('tabler:file-x') }}</a>
-                                    </td>
-                                </tr>
+                            {% if media is empty %}
+                                <tr><td colspan="4">Es wurden noch keine Dateien geladen.</td></tr>
+                            {% endif %}
 
-                            {% else %}
+                            {% for medium in media %}
                                 <tr>
-                                    <td colspan="4">Es wurden noch keine Dateien geladen.</td>
+                                    <td>{{ medium is document ? ux_icon('tabler:file') : ux_icon('tabler:photo') }} {{ medium.title }}</td>
+                                    <td class="text-secondary">{{ medium.size|readable_filesize }}</td>
+                                    <td class="text-secondary">{{ medium.updatedAt|date('d.m.Y H:i:s') }}</td>
+                                    {% if medium is document %}
+                                        <td>
+                                            <a href="{{ path('library_document_view', {'document': medium.id}) }}" title="Ansehen">{{ ux_icon('tabler:file-text') }}</a>
+                                            <a href="{{ path('library_document_edit', {'document': medium.id}) }}" title="Bearbeiten">{{ ux_icon('tabler:file-pencil', {'color': 'var(--tblr-warning)'}) }}</a>
+                                            <a href="{{ path('library_document_delete', {'document': medium.id}) }}" title="Löschen" {{ stimulus_controller('confirm') }}>{{ ux_icon('tabler:file-x', {'color': 'var(--tblr-danger)'}) }}</a>
+                                        </td>
+                                    {% else %}
+                                        <td>
+                                            <a href="{{ path('library_image_view', {'image': medium.id}) }}" title="Ansehen">{{ ux_icon('tabler:photo-search') }}</a>
+                                            <a href="{{ path('library_image_edit', {'image': medium.id}) }}" title="Bearbeiten">{{ ux_icon('tabler:photo-edit', {'color': 'var(--tblr-warning)'}) }}</a>
+                                            <a href="{{ path('library_image_delete', {'image': medium.id}) }}" title="Löschen" {{ stimulus_controller('confirm') }}>{{ ux_icon('tabler:photo-minus', {'color': 'var(--tblr-danger)'}) }}</a>
+                                        </td>
+                                    {% endif %}
                                 </tr>
                             {% endfor %}
 

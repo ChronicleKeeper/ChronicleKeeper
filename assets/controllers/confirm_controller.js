@@ -5,8 +5,6 @@ import '../css/toastui-editor-dark.css';
 
 export default class extends Controller {
     connect() {
-        console.log('Connect Confirm!');
-
         const thatElement = this.element;
         const confirmBeforeRedirect = function (e) {
             e.preventDefault();

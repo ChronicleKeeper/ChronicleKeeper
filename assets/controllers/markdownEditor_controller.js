@@ -6,8 +6,6 @@ import '../css/toastui-editor-dark.css';
 
 export default class extends Controller {
     connect() {
-        console.log('Connect Markdown Editor');
-
         let $elementIdentifier = this.element.getAttribute('id');
         let $mainElement = document.getElementById($elementIdentifier);
 
@@ -31,11 +29,7 @@ export default class extends Controller {
         });
 
         editor.on('change', function () {
-            console.log('Change Found!');
-
             $formElement.value = editor.getMarkdown();
-
-            console.log($formElement.value);
         });
     }
 }

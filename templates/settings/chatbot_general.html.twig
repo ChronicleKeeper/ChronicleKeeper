@@ -32,10 +32,15 @@
                                 <div class="col-6">
                                     {{ form_row(form.maxDocumentResponses) }}
                                 </div>
+                                <div class="col-6">
+                                    {{ form_row(form.maxImageResponses) }}
+                                </div>
                             </div>
                             <div class="row g-5 pb-5">
                                 <div class="col-6">
+                                    <h3>Zusätzliche Ausgaben im Chat</h3>
                                     {{ form_row(form.showReferencedDocuments) }}
+                                    {{ form_row(form.showReferencedImages) }}
                                 </div>
                             </div>
                         </div>

@@ -23,6 +23,7 @@ use function is_readable;
 use function json_decode;
 use function json_encode;
 use function json_validate;
+use function strcasecmp;
 use function usort;
 
 use const DIRECTORY_SEPARATOR;
@@ -70,7 +71,7 @@ class FilesystemDocumentRepository
 
         usort(
             $documents,
-            static fn (Document $documentLeft, Document $documentRight) => $documentLeft->title <=> $documentRight->title,
+            static fn (Document $documentLeft, Document $documentRight) => strcasecmp($documentLeft->title, $documentRight->title),
         );
 
         return $documents;

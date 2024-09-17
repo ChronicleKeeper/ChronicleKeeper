@@ -5,6 +5,14 @@
 {% block page_content %}
     <div class="container-xl">
         <div class="row row-deck row-cards">
+            <div class="row-sm-12">
+                <div class="card card-borderless">
+                    <div class="card-body">
+                        <twig:directoryBreadcrumb directory="{{ directory }}" />
+                    </div>
+                </div>
+            </div>
+
             <div class="col-sm-12">
                 <div class="card">
                     <form action="{{ path('library_directory_edit', {'directory': directory.id}) }}" method="post">

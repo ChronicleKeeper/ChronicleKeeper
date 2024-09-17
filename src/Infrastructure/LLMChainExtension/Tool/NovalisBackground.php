@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace DZunke\NovDoc\Domain\LLMExtension\Tool;
+namespace DZunke\NovDoc\Infrastructure\LLMChainExtension\Tool;
 
 use DZunke\NovDoc\Domain\Document\Document;
 use DZunke\NovDoc\Domain\Settings\SettingsHandler;
@@ -16,7 +16,7 @@ use const PHP_EOL;
 
 #[AsTool(
     'novalis_background',
-    description: 'Delivers all background information to the world of novalis or characters living in the world.',
+    description: 'Delivers all background information to the world of novalis or characters living in the world. For detailied visual information utilize function "novalis_images".',
 )]
 final class NovalisBackground
 {
@@ -34,7 +34,7 @@ final class NovalisBackground
     public function __invoke(string $search): string
     {
         $vector    = $this->embeddings->create($search);
-        $documents = $this->vectorDocumentRepository->findSimilarDocuments(
+        $documents = $this->vectorDocumentRepository->findSimilar(
             $vector->getData(),
             maxResults: $this->settingsHandler->get()->getChatbotGeneral()->getMaxDocumentResponses(),
         );
@@ -47,6 +47,7 @@ final class NovalisBackground
         $result = 'I have found the following information that are associated to the world of Novalis:' . PHP_EOL;
         foreach ($documents as $document) {
             $result .= '# Title: ' . $document->document->title . PHP_EOL;
+            $result .= 'Storage Directory: ' . $document->document->directory->flattenHierarchyTitle() . PHP_EOL;
             $result .= $document->document->content;
 
             if ($this->settingsHandler->get()->getChatbotGeneral()->showReferencedDocuments() !== true) {

@@ -1,0 +1,62 @@
+{% for message in messages|reverse %}
+
+<div class="col-12">
+
+    <div class="row row-cards">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="card-title">{{ message.role }}</div>
+                    <p>{{ message.message|markdown_to_html }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+{% set contextDocuments = message.extended.documents %}
+{% set contextImages = message.extended.images %}
+
+{% if contextDocuments is not empty or contextImages is not empty %}
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header border-0">
+                <h3 class="card-title">Ausgewertete Informationen</h3>
+            </div>
+            <div class="card-body">
+                <div class="row row-cards">
+                    {% if contextDocuments is not empty %}
+                        <div class="col-6">
+                            <div class="card">
+                                <div class="list-group list-group-flush">
+                                    {% for document in message.extended.documents %}
+                                        <a href="{{ path('library_document_view', {'document': document.id}) }}" class="list-group-item list-group-item-action">{{ document.directory.flattenHierarchyTitle }} > {{ document.title }}</a>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    {% if contextImages is not empty %}
+                        <div class="col-{{ contextDocuments is empty ? '12' : '6' }}">
+                            <div class="row row-cols-{{ contextDocuments is empty ? '4' : '2' }} g-3">
+                                {% for image in message.extended.images %}
+                                    <div class="col">
+                                        <a data-fslightbox="gallery" href="{{ path('library_image_view', {'image': image.id} )}}">
+                                            <div class="img-responsive img-responsive-1x1 rounded border" style="background-image: url({{ image.imageUrl }})"></div>
+                                        </a>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endif %}
+
+
+
+{% endfor %}

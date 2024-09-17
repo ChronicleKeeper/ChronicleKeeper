@@ -21,7 +21,7 @@
 {% block page_content %}
 <div class="container-xl">
     <div class="row row-deck row-cards">
-        <div class="col-sm-12">
+        <div class="col-12">
             <div class="card">
                 <div class="card-body" {{ stimulus_controller('hello') }}>
                     <form action="{{ path('chat') }}" method="POST">
@@ -34,16 +34,8 @@
             </div>
         </div>
 
-        {% for message in messages|reverse %}
-            <div class="col-sm-12">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="card-title">{{ message.role }}</div>
-                        <p>{{ message.message|markdown_to_html }}</p>
-                    </div>
-                </div>
-            </div>
-        {% endfor %}
+        {% include 'chat/_includes/_chat_content_vertical.html.twig' %}
+
     </div>
 </div>
 {% endblock %}

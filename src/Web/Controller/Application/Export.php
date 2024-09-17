@@ -28,8 +28,10 @@ class Export
         private readonly string $settingsFilePath,
         private readonly string $directoryStoragePath,
         private readonly string $documentStoragePath,
-        private readonly string $filesystemEmbeddingStoragePath,
+        private readonly string $vectorDocumentsPath,
         private readonly string $changelogFile,
+        private readonly string $libraryImageStoragePath,
+        private readonly string $vectorImagesPath,
     ) {
     }
 
@@ -45,7 +47,9 @@ class Export
 
         $this->archiveLibraryDirectories($zip);
         $this->archiveLibraryDocuments($zip);
+        $this->archiveLibraryImages($zip);
         $this->archiveVectorStorageDocuments($zip);
+        $this->archiveVectorStorageImages($zip);
 
         $zip->close();
 
@@ -102,15 +106,39 @@ class Export
         }
     }
 
+    private function archiveLibraryImages(ZipArchive $archive): void
+    {
+        $finder = (new Finder())
+            ->ignoreDotFiles(true)
+            ->in($this->libraryImageStoragePath)
+            ->files();
+
+        foreach ($finder as $image) {
+            $archive->addFile($image->getRealPath(), 'library/images/' . $image->getFilename());
+        }
+    }
+
     private function archiveVectorStorageDocuments(ZipArchive $archive): void
     {
         $finder = (new Finder())
             ->ignoreDotFiles(true)
-            ->in($this->filesystemEmbeddingStoragePath)
+            ->in($this->vectorDocumentsPath)
             ->files();
 
         foreach ($finder as $vectorDocument) {
             $archive->addFile($vectorDocument->getRealPath(), 'vector/document/' . $vectorDocument->getFilename());
+        }
+    }
+
+    private function archiveVectorStorageImages(ZipArchive $archive): void
+    {
+        $finder = (new Finder())
+            ->ignoreDotFiles(true)
+            ->in($this->vectorImagesPath)
+            ->files();
+
+        foreach ($finder as $vectorImage) {
+            $archive->addFile($vectorImage->getRealPath(), 'vector/image/' . $vectorImage->getFilename());
         }
     }
 }
