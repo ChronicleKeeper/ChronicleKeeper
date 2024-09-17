@@ -10,7 +10,9 @@ use DZunke\NovDoc\Domain\Document\Directory;
 use DZunke\NovDoc\Domain\Library\Directory\RootDirectory;
 use Symfony\Component\Uid\Uuid;
 
+use function base64_decode;
 use function sha1;
+use function strlen;
 
 /**
  * @phpstan-type ImageArray = array{
@@ -62,5 +64,15 @@ class Image
     public function getDescriptionHash(): string
     {
         return sha1($this->description);
+    }
+
+    public function getSize(): int
+    {
+        $decodedImage = base64_decode($this->encodedImage, true);
+        if ($decodedImage === false) {
+            return 0;
+        }
+
+        return strlen($decodedImage);
     }
 }
