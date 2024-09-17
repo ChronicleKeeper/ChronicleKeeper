@@ -8,6 +8,7 @@
 - Images in the library get LLM-guessed descriptions on upload for search and chatbot context.
 - New settings in the general chatbot section to define the number of context images and whether to collect them for chat output.
 - Chatbot fine-tuning options for general temperature and vector storage distance settings for images and documents.
+- Responses from the chatbot can now be turned into documents as content template for the editor.
 
 ### Changed
 - Chatbot messages now store context in a custom design instead of directly in the chat response.
