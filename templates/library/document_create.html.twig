@@ -19,8 +19,8 @@
                     <div class="card-body">
                         <div class="row g-5">
                             <div class="col-12">
-                                <label for="title" class="form-label">Titel</label>
-                                <input type="text" class="form-control" name="title" />
+                                <label for="title" class="form-label required">Titel</label>
+                                <input type="text" class="form-control" name="title" required />
                             </div>
                             <div class="col-12">
                                 <label for="directory" class="form-label">Erstellen in Verzeichnis ...</label>
@@ -28,7 +28,7 @@
                             </div>
                             <div class="col-12">
                                 <label for="content" class="form-label">Inhalt</label>
-                                <twig:markdownEditor rows="10" name="content" />
+                                <twig:markdownEditor rows="10" name="content" content="{{ template_content }}" />
                             </div>
                         </div>
                     </div>
