@@ -5,15 +5,15 @@ export default class extends Controller {
         const loaderElement = this.element;
 
         const showLoader = () => {
-            console.log('Show Loader');
-
             loaderElement.classList.remove("invisible");
         };
 
         const hideLoader = () => {
-            console.log('Hide Loader');
             loaderElement.classList.add("invisible");
         };
+
+        // Initially call hide on connect method
+        hideLoader();
 
         const attachFormSubmitListener = () => {
             const form = document.querySelector('form');
@@ -40,12 +40,10 @@ export default class extends Controller {
             }
 
             if (target.attributes.href === undefined) {
-                console.log('Just something that is a link clicked, no loader.')
                 return;
             }
 
             if (target.classList.contains('no-loader') === true) {
-                console.log('No loader shown because of "no-loader" class');
                 return;
             }
 
@@ -53,7 +51,6 @@ export default class extends Controller {
             let currentHostname = window.location.hostname;
 
             if (linkUrl.hostname !== currentHostname) {
-                console.log('External Link clicked, no loader.')
                 return;
             }
 
@@ -64,7 +61,6 @@ export default class extends Controller {
 
         document.addEventListener('keydown', (e) => {
             if (e.key === 'F5') {
-                console.log('F5 pressed!');
                 showLoader();
             }
         });
