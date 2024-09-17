@@ -34,7 +34,7 @@ final class NovalisBackground
     public function __invoke(string $search): string
     {
         $vector    = $this->embeddings->create($search);
-        $documents = $this->vectorDocumentRepository->findSimilarDocuments(
+        $documents = $this->vectorDocumentRepository->findSimilar(
             $vector->getData(),
             maxResults: $this->settingsHandler->get()->getChatbotGeneral()->getMaxDocumentResponses(),
         );

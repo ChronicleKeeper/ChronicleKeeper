@@ -87,17 +87,23 @@ class FilesystemVectorDocumentRepository
      *
      * @return list<VectorDocument>
      */
-    public function findSimilarDocuments(array $searchedVectors, int $maxResults = 4): array
+    public function findSimilar(array $searchedVectors, int $maxResults = 4): array
     {
         $distances       = [];
         $vectorDocuments = $this->findAll();
 
+        $maxDistance = 0.7; // Maximum of distance an image is allowed to be away from the result
         foreach ($vectorDocuments as $index => $document) {
             if ($document->document->content === '') {
                 continue;
             }
 
-            $dist              = $this->distance->measure($searchedVectors, $document->vector);
+            $dist = $this->distance->measure($searchedVectors, $document->vector);
+            if ($dist > $maxDistance) {
+                unset($vectorDocuments[$index]);
+                continue;
+            }
+
             $distances[$index] = $dist;
         }
 

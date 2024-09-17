@@ -92,12 +92,18 @@ class FilesystemVectorImageRepository
         $distances    = [];
         $vectorImages = $this->findAll();
 
+        $maxDistance = 0.7; // Maximum of distance an image is allowed to be away from the result
         foreach ($vectorImages as $index => $image) {
             if ($image->image->description === '') {
                 continue;
             }
 
-            $dist              = $this->distance->measure($searchedVectors, $image->vector);
+            $dist = $this->distance->measure($searchedVectors, $image->vector);
+            if ($dist > $maxDistance) {
+                unset($vectorImages[$index]);
+                continue;
+            }
+
             $distances[$index] = $dist;
         }
 
