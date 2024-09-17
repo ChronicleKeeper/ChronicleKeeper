@@ -34,49 +34,8 @@
             </div>
         </div>
 
-        {% for message in messages|reverse %}
-            {% dump(message) %}
+        {% include 'chat/_includes/_chat_content_vertical.html.twig' %}
 
-            <div class="col-12">
-                <div class="row row-cards">
-                    <div class="col-9">
-                        <div class="card">
-                            <div class="card-body">
-                                <div class="card-title">{{ message.role }}</div>
-                                <p>{{ message.message|markdown_to_html }}</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-3">
-                        <div class="row g-2">
-                            <div class="col-12">
-                                <div class="card">
-                                    <div class="card-body">
-                                        <h3>Dokumente</h3>
-                                        <ul>
-                                        {% for document in message.extended.documents %}
-                                            <li>{{ document.title }}</li>
-                                        {% endfor %}
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-12">
-                                <div class="row row-cols-2 g-3">
-                                    {% for image in message.extended.images %}
-                                        <div class="col">
-                                            <a data-fslightbox="gallery" href="{{ path('library_image_view', {'image': image.id} )}}">
-                                                <div class="img-responsive img-responsive-1x1 rounded border" style="background-image: url({{ image.imageUrl }})"></div>
-                                            </a>
-                                        </div>
-                                    {% endfor %}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        {% endfor %}
     </div>
 </div>
 {% endblock %}
