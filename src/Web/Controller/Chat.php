@@ -6,7 +6,8 @@ namespace DZunke\NovDoc\Web\Controller;
 
 use DZunke\NovDoc\Domain\Chat as ChatTool;
 use DZunke\NovDoc\Domain\Settings\SettingsHandler;
-use PhpLlm\LlmChain\Message\MessageBag;
+use DZunke\NovDoc\Infrastructure\LLMChainExtension\Message\ExtendedMessage;
+use DZunke\NovDoc\Infrastructure\LLMChainExtension\Message\ExtendedMessageBag;
 use PhpLlm\LlmChain\Message\Role;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -42,14 +43,16 @@ class Chat
         ));
     }
 
-    /** @return list<array{role: string, message: string}> */
-    private function formatMessagesForOutput(MessageBag $messageBag): array
+    /** @return list<array{role: string, message: string, extended: ExtendedMessage}> */
+    private function formatMessagesForOutput(ExtendedMessageBag $messageBag): array
     {
         $settings = $this->settingsHandler->get();
 
         $messages = [];
 
-        foreach ($messageBag as $originMessage) {
+        foreach ($messageBag as $extendedMessage) {
+            $originMessage = $extendedMessage->message;
+
             if ($originMessage->role !== Role::User && $originMessage->role !== Role::Assistant) {
                 continue;
             }
@@ -62,6 +65,7 @@ class Chat
             $messages[] = [
                 'role' => $role,
                 'message' => (string) $originMessage->content,
+                'extended' => $extendedMessage,
             ];
         }
 

@@ -5,17 +5,15 @@ declare(strict_types=1);
 namespace DZunke\NovDoc\Domain;
 
 use DZunke\NovDoc\Domain\Settings\SettingsHandler;
+use DZunke\NovDoc\Infrastructure\LLMChainExtension\Message\ExtendedMessage;
+use DZunke\NovDoc\Infrastructure\LLMChainExtension\Message\ExtendedMessageBag;
 use DZunke\NovDoc\Infrastructure\LLMChainExtension\Tool\NovalisBackground;
 use DZunke\NovDoc\Infrastructure\LLMChainExtension\Tool\NovalisImages;
 use PhpLlm\LlmChain\Message\Message;
-use PhpLlm\LlmChain\Message\MessageBag;
 use PhpLlm\LlmChain\OpenAI\Model\Gpt\Version;
 use PhpLlm\LlmChain\ToolChain;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\Routing\RouterInterface;
-
-use const PHP_EOL;
 
 final class Chat
 {
@@ -27,14 +25,13 @@ final class Chat
         private readonly SettingsHandler $settingsHandler,
         private readonly NovalisBackground $novalisBackground,
         private readonly NovalisImages $novalisImages,
-        private readonly RouterInterface $router,
     ) {
     }
 
-    public function loadMessages(): MessageBag
+    public function loadMessages(): ExtendedMessageBag
     {
         $messageBag = $this->requestStack->getSession()->get(self::SESSION_KEY, $this->initMessages());
-        if (! $messageBag instanceof MessageBag) {
+        if (! $messageBag instanceof ExtendedMessageBag) {
             throw new RuntimeException('Session is corrupted and does not contain a MessageBag.');
         }
 
@@ -45,58 +42,46 @@ final class Chat
     {
         $messages = $this->loadMessages();
 
-        $messages[] = Message::ofUser($message);
+        $messages[] = new ExtendedMessage(message: Message::ofUser($message));
 
-        $response = $this->toolChain->call($messages, ['model' => Version::GPT_4o_MINI]);
-        $response = $this->appendReferencedDocumentsFromBackground($response);
-        $response = $this->appendReferencedImages($response);
+        $response = $this->toolChain->call($messages->getLLMChainMessages(), ['model' => Version::GPT_4o_MINI]);
+        $response = new ExtendedMessage(message: Message::ofAssistant($response));
 
-        $messages[] = Message::ofAssistant($response);
+        $this->appendReferencedDocumentsFromBackground($response);
+        $this->appendReferencedImages($response);
+
+        $messages[] = $response;
 
         $this->saveMessages($messages);
     }
 
-    private function appendReferencedImages(string $response): string
+    private function appendReferencedImages(ExtendedMessage $response): void
     {
         $referencedImages = $this->novalisImages->getReferencedImages();
         if ($referencedImages === []) {
-            return $response;
+            return;
         }
 
-        $referencedDocumentsString = '***' . PHP_EOL . 'Die folgenden Bilder wurden referenziert:' . PHP_EOL;
-        foreach ($referencedImages as $image) {
-            $linkLabel = $image->directory->flattenHierarchyTitle() . ' > ' . $image->title;
-            $link      = $this->router->generate('library_image_view', ['image' => $image->id]);
-
-            $referencedDocumentsString .= '- [' . $linkLabel . '](' . $link . ')' . PHP_EOL;
-        }
-
-        return $response . PHP_EOL . $referencedDocumentsString;
+        $response->images = $referencedImages;
     }
 
-    private function appendReferencedDocumentsFromBackground(string $response): string
+    private function appendReferencedDocumentsFromBackground(ExtendedMessage $response): void
     {
         $referencedDocuments = $this->novalisBackground->getReferencedDocuments();
         if ($referencedDocuments === []) {
-            return $response;
+            return;
         }
 
-        $referencedDocumentsString = '***' . PHP_EOL . 'Die folgenden Dokumente wurden referenziert:' . PHP_EOL;
-        foreach ($referencedDocuments as $document) {
-            $linkLabel = $document->directory->flattenHierarchyTitle() . ' > ' . $document->title;
-            $link      = $this->router->generate('library_document_view', ['document' => $document->id]);
-
-            $referencedDocumentsString .= '- [' . $linkLabel . '](' . $link . ')' . PHP_EOL;
-        }
-
-        return $response . PHP_EOL . $referencedDocumentsString;
+        $response->documents = $referencedDocuments;
     }
 
-    private function initMessages(): MessageBag
+    private function initMessages(): ExtendedMessageBag
     {
         $settings = $this->settingsHandler->get();
 
-        return new MessageBag(Message::forSystem($settings->getChatbotSystemPrompt()->getSystemPrompt()));
+        return new ExtendedMessageBag(new ExtendedMessage(
+            Message::forSystem($settings->getChatbotSystemPrompt()->getSystemPrompt()),
+        ));
     }
 
     public function reset(): void
@@ -104,7 +89,7 @@ final class Chat
         $this->requestStack->getSession()->remove(self::SESSION_KEY);
     }
 
-    private function saveMessages(MessageBag $messages): void
+    private function saveMessages(ExtendedMessageBag $messages): void
     {
         $this->requestStack->getSession()->set(self::SESSION_KEY, $messages);
     }
