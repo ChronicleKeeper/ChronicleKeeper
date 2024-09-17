@@ -44,7 +44,13 @@ final class Chat
 
         $messages[] = new ExtendedMessage(message: Message::ofUser($message));
 
-        $response = $this->toolChain->call($messages->getLLMChainMessages(), ['model' => Version::GPT_4o_MINI]);
+        $response = $this->toolChain->call(
+            $messages->getLLMChainMessages(),
+            [
+                'model' => Version::GPT_4o_MINI,
+                'temperature' => $this->settingsHandler->get()->getChatbotTuning()->getTemperature(),
+            ],
+        );
         $response = new ExtendedMessage(message: Message::ofAssistant($response));
 
         $this->appendReferencedDocumentsFromBackground($response);

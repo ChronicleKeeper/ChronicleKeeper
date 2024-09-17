@@ -46,7 +46,7 @@ class LLMDescriber
 
         $body = [
             'model' => Version::GPT_4o,
-            'temperature' => 1.0,
+            'temperature' => $settings->getChatbotTuning()->getTemperature(),
             'messages' => $messages,
         ];
 

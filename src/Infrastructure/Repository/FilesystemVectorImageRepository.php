@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace DZunke\NovDoc\Infrastructure\Repository;
 
+use DZunke\NovDoc\Domain\Settings\SettingsHandler;
 use DZunke\NovDoc\Domain\VectorStorage\Distance\CosineDistance;
 use DZunke\NovDoc\Domain\VectorStorage\VectorImage;
 use Psr\Log\LoggerInterface;
@@ -35,6 +36,7 @@ class FilesystemVectorImageRepository
         private readonly CosineDistance $distance,
         private readonly Filesystem $filesystem,
         private readonly string $vectorImagesPath,
+        private readonly SettingsHandler $settingsHandler,
     ) {
     }
 
@@ -92,7 +94,9 @@ class FilesystemVectorImageRepository
         $distances    = [];
         $vectorImages = $this->findAll();
 
-        $maxDistance = 0.7; // Maximum of distance an image is allowed to be away from the result
+        // Maximum of distance an image is allowed to be away from the result
+        $maxDistance = $this->settingsHandler->get()->getChatbotTuning()->getImagesMaxDistance();
+
         foreach ($vectorImages as $index => $image) {
             if ($image->image->description === '') {
                 continue;

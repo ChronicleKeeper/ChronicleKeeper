@@ -12,6 +12,7 @@ use DZunke\NovDoc\Web\Form\Settings\CalendarHolidayType;
 use DZunke\NovDoc\Web\Form\Settings\CalendarMoonType;
 use DZunke\NovDoc\Web\Form\Settings\ChatbotGeneralType;
 use DZunke\NovDoc\Web\Form\Settings\ChatbotSystemPromptType;
+use DZunke\NovDoc\Web\Form\Settings\ChatbotTuningType;
 use RuntimeException;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -31,6 +32,7 @@ class ChangeSettings
     private const FORM_MAPPING = [
         'chatbot_general' => ChatbotGeneralType::class,
         'chatbot_system_prompt' => ChatbotSystemPromptType::class,
+        'chatbot_tuning' => ChatbotTuningType::class,
         'calendar_general' => CalendarGeneralType::class,
         'calendar_holiday' => CalendarHolidayType::class,
         'calendar_moon' => CalendarMoonType::class,

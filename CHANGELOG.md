@@ -7,6 +7,7 @@
 - Library extended with image management: upload, view, edit, delete, and vector storage for search.
 - Images in the library get LLM-guessed descriptions on upload for search and chatbot context.
 - New settings in the general chatbot section to define the number of context images and whether to collect them for chat output.
+- Chatbot fine-tuning options for general temperature and vector storage distance settings for images and documents.
 
 ### Changed
 - Chatbot messages now store context in a custom design instead of directly in the chat response.
