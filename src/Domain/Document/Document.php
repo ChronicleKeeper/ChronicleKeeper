@@ -7,6 +7,7 @@ namespace DZunke\NovDoc\Domain\Document;
 use DateTimeImmutable;
 use DateTimeInterface;
 use DZunke\NovDoc\Domain\Library\Directory\RootDirectory;
+use Symfony\Component\String\Slugger\AsciiSlugger;
 use Symfony\Component\Uid\Uuid;
 
 use function array_key_exists;
@@ -72,6 +73,11 @@ class Document
             'directory' => $this->directory->id,
             'last_updated' => $this->updatedAt->format(DateTimeInterface::ATOM),
         ];
+    }
+
+    public function getSlug(): string
+    {
+        return (new AsciiSlugger('de'))->slug($this->title)->toString();
     }
 
     public function getSize(): int

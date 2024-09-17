@@ -1,0 +1,29 @@
+{% extends 'layout.html.twig' %}
+
+{% block page_title %}{{ image.title }}{% endblock %}
+
+{% block page_content %}
+    <div class="container-xl">
+        <div class="row row-deck row-cards">
+            <div class="row-sm-12">
+                <div class="card card-borderless">
+                    <div class="card-body">
+                        <twig:directoryBreadcrumb directory="{{ image.directory }}" extraLastNode="{{ image.title }}" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-6">
+                <div class="card">
+                    <img src="{{ image.imageUrl }}" class="card-img-top" alt="{{ image.title }}">
+                </div>
+            </div>
+
+            <div class="col-sm-6">
+                <div class="card">
+                    <div class="card-body markdown">{{ image.description|markdown_to_html }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

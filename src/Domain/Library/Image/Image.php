@@ -8,6 +8,7 @@ use DateTimeImmutable;
 use DateTimeInterface;
 use DZunke\NovDoc\Domain\Document\Directory;
 use DZunke\NovDoc\Domain\Library\Directory\RootDirectory;
+use Symfony\Component\String\Slugger\AsciiSlugger;
 use Symfony\Component\Uid\Uuid;
 
 use function base64_decode;
@@ -54,6 +55,11 @@ class Image
             'directory' => $this->directory->id,
             'last_updated' => $this->updatedAt->format(DateTimeInterface::ATOM),
         ];
+    }
+
+    public function getSlug(): string
+    {
+        return (new AsciiSlugger('de'))->slug($this->title)->toString();
     }
 
     public function getImageUrl(): string

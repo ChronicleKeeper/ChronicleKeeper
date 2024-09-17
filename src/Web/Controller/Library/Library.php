@@ -44,7 +44,7 @@ class Library
 
         usort(
             $directoryContent,
-            static fn (Image|Document $left, Image|Document $right) => strcasecmp($left->title, $right->title),
+            static fn (Image|Document $left, Image|Document $right) => strcasecmp($left->getSlug(), $right->getSlug()),
         );
 
         return new Response($this->environment->render(
