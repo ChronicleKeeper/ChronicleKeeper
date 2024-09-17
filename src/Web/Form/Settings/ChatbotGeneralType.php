@@ -46,6 +46,16 @@ final class ChatbotGeneralType extends AbstractType implements DataMapperInterfa
                 'constraints' => [new NotBlank()],
             ],
         );
+        $builder->add(
+            'maxImageResponses',
+            IntegerType::class,
+            [
+                'label' => 'Maximale Kontextbilder',
+                'translation_domain' => false,
+                'required' => false,
+                'constraints' => [new NotBlank()],
+            ],
+        );
 
         $builder->add(
             'chatbotName',
@@ -78,6 +88,16 @@ final class ChatbotGeneralType extends AbstractType implements DataMapperInterfa
                 'required' => false,
             ],
         );
+
+        $builder->add(
+            'showReferencedImages',
+            CheckboxType::class,
+            [
+                'label' => 'Referenzierte Bilder anzeigen',
+                'translation_domain' => false,
+                'required' => false,
+            ],
+        );
     }
 
     /** @param Traversable<FormInterface> $forms */
@@ -95,9 +115,11 @@ final class ChatbotGeneralType extends AbstractType implements DataMapperInterfa
         $forms = iterator_to_array($forms);
 
         $forms['maxDocumentResponses']->setData($viewData->getChatbotGeneral()->getMaxDocumentResponses());
+        $forms['maxImageResponses']->setData($viewData->getChatbotGeneral()->getMaxImageResponses());
         $forms['chatbotName']->setData($viewData->getChatbotGeneral()->getChatbotName());
         $forms['chatterName']->setData($viewData->getChatbotGeneral()->getChatterName());
         $forms['showReferencedDocuments']->setData($viewData->getChatbotGeneral()->showReferencedDocuments());
+        $forms['showReferencedImages']->setData($viewData->getChatbotGeneral()->showReferencedImages());
     }
 
     /** @param Traversable<FormInterface> $forms */
@@ -116,6 +138,11 @@ final class ChatbotGeneralType extends AbstractType implements DataMapperInterfa
                 throw new UnexpectedTypeException($maxDocumentResponses, 'int');
             }
 
+            $maxImageResponses = $forms['maxImageResponses']->getData();
+            if (! is_int($maxImageResponses)) {
+                throw new UnexpectedTypeException($maxImageResponses, 'int');
+            }
+
             $chatbotName = $forms['chatbotName']->getData();
             if (! is_string($chatbotName)) {
                 throw new UnexpectedTypeException($chatbotName, 'string');
@@ -131,11 +158,18 @@ final class ChatbotGeneralType extends AbstractType implements DataMapperInterfa
                 throw new UnexpectedTypeException($showReferencedDocuments, 'bool');
             }
 
+            $showReferencedImages = $forms['showReferencedImages']->getData();
+            if (! is_bool($showReferencedImages)) {
+                throw new UnexpectedTypeException($showReferencedImages, 'bool');
+            }
+
             $viewData->setChatbotGeneral(new Settings\ChatbotGeneral(
                 $maxDocumentResponses,
+                $maxImageResponses,
                 $chatbotName,
                 $chatterName,
                 $showReferencedDocuments,
+                $showReferencedImages,
             ));
         } catch (Throwable) {
             return;

@@ -41,7 +41,7 @@ final class NovalisImages
         $vector  = $this->embeddings->create($search);
         $results = $this->vectorImageRepository->findSimilar(
             $vector->getData(),
-            maxResults: $this->settingsHandler->get()->getChatbotGeneral()->getMaxDocumentResponses(),
+            maxResults: $this->settingsHandler->get()->getChatbotGeneral()->getMaxImageResponses(),
         );
 
         $this->referencedImages = [];
@@ -55,7 +55,7 @@ final class NovalisImages
             $result .= '# Image Name: ' . $image->image->title . PHP_EOL;
             $result .= $image->image->description;
 
-            if ($this->settingsHandler->get()->getChatbotGeneral()->showReferencedDocuments() !== true) {
+            if ($this->settingsHandler->get()->getChatbotGeneral()->showReferencedImages() !== true) {
                 continue;
             }
 
