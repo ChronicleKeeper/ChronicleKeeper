@@ -1,0 +1,54 @@
+{% extends 'layout.html.twig' %}
+
+{% block page_title %}Dokument Hochladen{% endblock %}
+
+{% block page_content %}
+    <div class="container-xl">
+        <div class="row row-deck row-cards">
+            <div class="row-sm-12">
+                <div class="card card-borderless">
+                    <div class="card-body">
+                        <twig:directoryBreadcrumb directory="{{ directory }}" extraLastNode="Dokument Hochladen" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-12">
+                <div class="card">
+                    <form action="{{ path('library_document_upload', {'directory': directory.id }) }}" method="post" enctype="multipart/form-data">
+                        <div class="card-body">
+                            <div class="row g-5">
+                                <div class="col-12">
+                                    <div class="alert alert-info">
+                                        Das Hochladen von Dokumenten wird aktuell unterstützt für Dateien der Formate
+                                        <b>txt</b>, <b>docx</b>, und <b>md</b>.
+                                        <br /><br />
+                                        <u>Beachte:</u>
+                                        <br /><br />
+                                        Bei Dokumenten des Types <b>docx</b> ist es nicht unüblich,
+                                        dass diese sehr Bescheiden von Word formatiert sind in den Quelldateien.
+                                        Es kommt zum Beispiel sehr häufig vor, dass jeder Buchstabe eines Textes mit
+                                        eigenen Formatierungen und zusätzlichen "Umbrüchen" ausgestattet ist, die du in
+                                        Word gar nicht siehst. Die Konvertierung führt dazu, dass die Dokumente sehr
+                                        zerrissen aussehen können. Es wird also empfohlen die automatische Optimierung
+                                        der Dokumente zu nutzen um ein halbwegs anständiges Dokument zu bekommen.<br>
+                                        Inhaltlich sollte sich an den Dokumenten nichts ändern, wenn sie dann auch nicht
+                                        mehr so aussehen und formuliert sind wie du sie importieren wolltest.
+                                    </div>
+                                    {{ form_row(form.document) }}
+                                    {{ form_row(form.optimize) }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer text-end">
+                            <div class="d-flex">
+                                <a href="{{ path('library', {'directory': directory.id }) }}" class="btn btn-link">Abbruch</a>
+                                <button type="submit" class="btn btn-primary ms-auto">Speichern</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

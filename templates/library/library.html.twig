@@ -11,6 +11,9 @@
             <a href="{{ path('library_image_upload', {'directory': currentDirectory.id }) }}" class="btn btn-primary d-none d-sm-inline-block">
                 {{ ux_icon('tabler:photo-plus') }}Neues Bild
             </a>
+            <a href="{{ path('library_document_upload', {'directory': currentDirectory.id }) }}" class="btn btn-primary d-none d-sm-inline-block">
+                {{ ux_icon('tabler:file-plus') }}Dokument Hochladen
+            </a>
             <a href="{{ path('library_document_create', {'directory': currentDirectory.id }) }}" class="btn btn-primary d-none d-sm-inline-block">
                 {{ ux_icon('tabler:file-plus') }}Neues Dokument
             </a>
