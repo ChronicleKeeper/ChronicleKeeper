@@ -9,6 +9,8 @@
 - New settings in the general chatbot section to define the number of context images and whether to collect them for chat output.
 - Chatbot fine-tuning options for general temperature and vector storage distance settings for images and documents.
 - Responses from the chatbot can now be turned into documents as content template for the editor.
+- Upload documents in Plain Text or Word format, automatically converting them to Markdown.
+- Enable LLM-supported optimization for uploaded documents with an upload form checkbox.
 
 ### Changed
 - Chatbot messages now store context in a custom design instead of directly in the chat response.
