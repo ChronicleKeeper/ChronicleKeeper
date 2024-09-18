@@ -23,6 +23,8 @@
         "php": "^8.3",
         "ext-zip": "*",
         "league/commonmark": "^2.5",
+        "league/flysystem": "^3.28",
+        "league/flysystem-ziparchive": "^3.28",
         "league/html-to-markdown": "^5.1",
         "oskarstark/readable-filesize-extension": "^1.2",
         "php-llm/llm-chain": "@dev",

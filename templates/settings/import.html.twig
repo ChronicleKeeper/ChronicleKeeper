@@ -1,0 +1,36 @@
+{% extends 'layout.html.twig' %}
+
+{% block page_title %}Einstellungen - Anwendung - Import{% endblock %}
+
+{% block page_content %}
+    <div class="container-xl">
+        <form action="{{ path('application_import') }}" method="post" enctype="multipart/form-data">
+        <div class="card">
+            <div class="row g-0">
+                {% include 'settings/_includes/settings_nav.html.twig' %}
+                <div class="col-12 col-md-9 d-flex flex-column">
+                    <div class="card-body">
+                        <div class="row g-5 pb-5">
+                            <div class="col-12">
+                                <div class="alert alert-info">
+                                    Der Import ermöglicht es dir eine zuvor exportierte Version von
+                                    NovDoc wieder zu importieren. Entsprechend solltest du nur Archive
+                                    von dieser Anwendung verwenden. Diese Möglichkeit kann auch genutzt
+                                    werden um Datenbestände oder -sicherungen von älteren Versionen
+                                    einzuspielen.
+                                </div>
+                                {{ form_row(form.archive) }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer mt-auto">
+                <div class="btn-list justify-content-end">
+                    <button type="submit" class="btn btn-primary">Speichern</button>
+                </div>
+            </div>
+        </div>
+        </form>
+    </div>
+{% endblock %}

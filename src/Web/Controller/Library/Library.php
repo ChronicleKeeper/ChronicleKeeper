@@ -6,6 +6,7 @@ namespace DZunke\NovDoc\Web\Controller\Library;
 
 use DZunke\NovDoc\Domain\Document\Directory;
 use DZunke\NovDoc\Domain\Document\Document;
+use DZunke\NovDoc\Domain\Library\Directory\RootDirectory;
 use DZunke\NovDoc\Domain\Library\Image\Image;
 use DZunke\NovDoc\Infrastructure\Repository\FilesystemDirectoryRepository;
 use DZunke\NovDoc\Infrastructure\Repository\FilesystemDocumentRepository;
@@ -23,6 +24,7 @@ use function usort;
 #[Route(
     '/library/{directory}',
     name: 'library',
+    defaults: ['directory' => RootDirectory::ID],
     requirements: ['directory' => Requirement::UUID],
 )]
 class Library
