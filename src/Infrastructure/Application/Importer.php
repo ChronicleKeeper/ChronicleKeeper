@@ -6,11 +6,13 @@ namespace DZunke\NovDoc\Infrastructure\Application;
 
 use DZunke\NovDoc\Infrastructure\Application\Importer\ImportedFileBag;
 use DZunke\NovDoc\Infrastructure\Application\Importer\SingleImport;
+use DZunke\NovDoc\Infrastructure\Event\FileImported;
 use League\Flysystem\Filesystem;
 use League\Flysystem\ZipArchive\FilesystemZipArchiveProvider;
 use League\Flysystem\ZipArchive\ZipArchiveAdapter;
 use RuntimeException;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 use function unlink;
 use function version_compare;
@@ -23,6 +25,7 @@ class Importer
         private readonly iterable $importer,
         private readonly Version $version,
         private readonly LibraryPruner $pruner,
+        private readonly EventDispatcherInterface $eventDispatcher,
     ) {
     }
 
@@ -51,6 +54,10 @@ class Importer
         }
 
         @unlink($archiveFile);
+
+        foreach ($importedFiles as $importedFile) {
+            $this->eventDispatcher->dispatch(new FileImported($importSettings, $importedFile, $versionOfArchive));
+        }
 
         return $importedFiles;
     }

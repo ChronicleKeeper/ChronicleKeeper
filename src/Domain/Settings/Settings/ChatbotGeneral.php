@@ -31,11 +31,11 @@ readonly class ChatbotGeneral
     {
         return new ChatbotGeneral(
             $settings['max_document_responses'],
-            $settings['max_image_responses'] ?? 2, // @phpstan-ignore nullCoalesce.offset
+            $settings['max_image_responses'],
             $settings['chatbot_name'],
             $settings['chatter_name'],
             $settings['show_referenced_documents'],
-            $settings['show_referenced_images'] ?? true, // @phpstan-ignore nullCoalesce.offset
+            $settings['show_referenced_images'],
         );
     }
 
