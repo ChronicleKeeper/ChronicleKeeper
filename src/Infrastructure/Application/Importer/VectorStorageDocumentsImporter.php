@@ -26,7 +26,7 @@ final class VectorStorageDocumentsImporter implements SingleImport
     public function import(Filesystem $filesystem, ImportSettings $settings): ImportedFileBag
     {
         $importedFileBag      = new ImportedFileBag();
-        $libraryDirectoryPath = 'library/document/';
+        $libraryDirectoryPath = 'vector/document/';
 
         foreach ($filesystem->listContents($libraryDirectoryPath) as $zippedFile) {
             assert($zippedFile instanceof FileAttributes);

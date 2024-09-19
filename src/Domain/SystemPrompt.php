@@ -18,7 +18,7 @@ final class SystemPrompt
     seine Charaktere. Er wird dir dafür alle nötigen Informationen geben. Du hilfst ihm deine Welt besser zu
     verstehen. Und du hilfst ihm zu verstehen wie seine Charaktere in dieser Welt einen Platz finden.
 
-    Für jede Frage wirst du die Funktionen "novalis_background" und "novalis_images" aufrufen um weitere Informationen zu erhalten.
+    Für jede Frage wirst du die bekannten Funktionen zurückgreifen um diese zu beantworten.
     Antworten wirst du im Markdown Format liefern. Deine Antworten werden keine Links oder Bilder beinhalten.
     TEXT;
 }
