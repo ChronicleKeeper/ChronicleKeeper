@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace DZunke\NovDoc\Infrastructure\LLMChainExtension\Tool;
 
 use DZunke\NovDoc\Domain\Settings\SettingsHandler;
+use DZunke\NovDoc\Infrastructure\LLMChainExtension\ToolUsageCollector;
 use PhpLlm\LlmChain\ToolBox\AsTool;
 
 #[AsTool(
@@ -22,11 +23,14 @@ final class Calendar
 {
     public function __construct(
         private readonly SettingsHandler $settingsHandler,
+        private readonly ToolUsageCollector $collector,
     ) {
     }
 
     public function __invoke(): string
     {
+        $this->collector->called('calendar');
+
         $furtherCalendarExplanation = $this->settingsHandler->get()->getCalendar()->getCalendarDescription();
 
         if ($furtherCalendarExplanation === '') {

@@ -10,6 +10,7 @@ use DZunke\NovDoc\Web\FlashMessages\HandleFlashMessages;
 use DZunke\NovDoc\Web\Form\Settings\CalendarGeneralType;
 use DZunke\NovDoc\Web\Form\Settings\CalendarHolidayType;
 use DZunke\NovDoc\Web\Form\Settings\CalendarMoonType;
+use DZunke\NovDoc\Web\Form\Settings\ChatbotFunctionsType;
 use DZunke\NovDoc\Web\Form\Settings\ChatbotGeneralType;
 use DZunke\NovDoc\Web\Form\Settings\ChatbotSystemPromptType;
 use DZunke\NovDoc\Web\Form\Settings\ChatbotTuningType;
@@ -33,6 +34,7 @@ class ChangeSettings
         'chatbot_general' => ChatbotGeneralType::class,
         'chatbot_system_prompt' => ChatbotSystemPromptType::class,
         'chatbot_tuning' => ChatbotTuningType::class,
+        'chatbot_functions' => ChatbotFunctionsType::class,
         'calendar_general' => CalendarGeneralType::class,
         'calendar_holiday' => CalendarHolidayType::class,
         'calendar_moon' => CalendarMoonType::class,

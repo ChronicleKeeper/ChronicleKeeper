@@ -17,6 +17,26 @@
                 </div>
                 <div class="card-body">
                     <p>{{ message.message|markdown_to_html }}</p>
+
+                    {% if settings_handler.get.chatbotFunctions.allowDebugOutput and message.extended.calledTools is not empty %}
+                        <div class="hr-text text-warning">GPT Functions Debugging Ausgaben</div>
+                        <div class="accordion" id="debug-tool-calls">
+                            {% for index, call in message.extended.calledTools %}
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="heading-{{ index }}">
+                                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-{{ index }}" aria-expanded="true">
+                                            Aufgerufene Funktion: {{ call.tool }}
+                                        </button>
+                                    </h2>
+                                    <div id="collapse-{{ index }}" class="accordion-collapse collapse" data-bs-parent="#debug-tool-calls" style="">
+                                        <div class="accordion-body pt-0">
+                                            <pre>{{ call.arguments|json_encode(constant('JSON_PRETTY_PRINT')) }}</pre>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -27,7 +47,7 @@
 {% set contextDocuments = message.extended.documents %}
 {% set contextImages = message.extended.images %}
 
-{% if contextDocuments is not empty or contextImages is not empty %}
+{% if (settings_handler.get.chatbotGeneral.showReferencedDocuments and contextDocuments is not empty) or (settings_handler.get.chatbotGeneral.showReferencedImages and contextImages is not empty) %}
     <div class="col-12">
         <div class="card">
             <div class="card-header border-0">

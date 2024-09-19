@@ -6,6 +6,7 @@ namespace DZunke\NovDoc\Infrastructure\LLMChainExtension\Tool;
 
 use DZunke\NovDoc\Domain\Document\Document;
 use DZunke\NovDoc\Domain\Settings\SettingsHandler;
+use DZunke\NovDoc\Infrastructure\LLMChainExtension\ToolUsageCollector;
 use DZunke\NovDoc\Infrastructure\Repository\FilesystemVectorDocumentRepository;
 use PhpLlm\LlmChain\EmbeddingModel;
 use PhpLlm\LlmChain\ToolBox\AsTool;
@@ -27,12 +28,15 @@ final class NovalisBackground
         private readonly FilesystemVectorDocumentRepository $vectorDocumentRepository,
         private readonly EmbeddingModel $embeddings,
         private readonly SettingsHandler $settingsHandler,
+        private readonly ToolUsageCollector $collector,
     ) {
     }
 
     /** @param string $search Contains the question or message the user has sent in reference to novalis. */
     public function __invoke(string $search): string
     {
+        $this->collector->called('novalis_background', ['search' => $search]);
+
         $vector    = $this->embeddings->create($search);
         $documents = $this->vectorDocumentRepository->findSimilar(
             $vector->getData(),
@@ -49,10 +53,6 @@ final class NovalisBackground
             $result .= '# Title: ' . $document->document->title . PHP_EOL;
             $result .= 'Storage Directory: ' . $document->document->directory->flattenHierarchyTitle() . PHP_EOL;
             $result .= $document->document->content;
-
-            if ($this->settingsHandler->get()->getChatbotGeneral()->showReferencedDocuments() !== true) {
-                continue;
-            }
 
             $this->referencedDocuments[] = $document->document;
         }

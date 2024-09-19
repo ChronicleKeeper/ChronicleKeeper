@@ -13,6 +13,7 @@
 - Enable LLM-supported optimization for uploaded documents with an upload form checkbox.
 - Export, implemented with alpha-0.2, is now also importable - only older versions can be imported. 
 - Library can be pruned before import is starting.
+- Collect debugging information about called tools for analysis. Displayed within the response if the setting is enabled.
 
 ### Changed
 - Chatbot messages now store context in a custom design instead of directly in the chat response.

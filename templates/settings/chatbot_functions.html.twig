@@ -1,0 +1,139 @@
+{% extends 'layout.html.twig' %}
+
+{% block page_title %}Einstellungen - Chatbot - Funktionen{% endblock %}
+
+{% block page_title_actions %}
+    <div class="col-auto ms-auto d-print-none">
+        <div class="btn-list">
+            <a href="{{ path('settings_reset') }}" class="btn d-none d-sm-inline-block">
+                {{ ux_icon('tabler:trash') }}Alle Einstellungen Zurücksetzen
+            </a>
+        </div>
+    </div>
+{% endblock %}
+
+{% block page_content %}
+    <div class="container-xl">
+        {{ form_start(form) }}
+            <div class="card">
+                <div class="row g-0">
+                    {% include 'settings/_includes/settings_nav.html.twig' %}
+                    <div class="col-12 col-md-9 d-flex flex-column">
+                        <div class="card-body">
+                            {{ form_row(form.allowDebugOutput) }}
+                            {{ form_row(form.timestamp) }}
+
+                            <div class="hr-text">Verfügbare GPT Funktionen</div>
+
+                            <div class="alert alert-info">
+                                Die folgenden GPT Funktionen stehen zur Verfügung. Beachte bitte, dass du diese auch in
+                                einer Frage an den Chat auch forcieren kannst, wenn du die Namen der Funktionen mit, zum
+                                Beispiel, der Ansage "Nutze die Funktion background_novalis" an deiner Frage. Es lassen
+                                sich auch mehrere Funktionen benennen.
+                                <br />
+                                <br />
+                                Manchmal kann das helfen im Chatverlauf noch zusätzliche Informationen zu holen, wenn der Bot
+                                nicht von Beginn an selbstständig auf die Funktionen zugreifen will. Informationen darüber
+                                könnten helfen die Funktionsbeschreibungen zu verbessern.
+                            </div>
+
+                            <div class="accordion" id="accordion-example">
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="heading-1">
+                                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-1" aria-expanded="true">
+                                            novalis_background
+                                        </button>
+                                    </h2>
+                                    <div id="collapse-1" class="accordion-collapse collapse show" data-bs-parent="#accordion-example" style="">
+                                        <div class="accordion-body pt-0">
+                                            Delivers all background information to the world of novalis or characters
+                                            living in the world. For detailied visual information utilize function
+                                            "novalis_images".
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="heading-2">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-2" aria-expanded="false">
+                                            novalis_images
+                                        </button>
+                                    </h2>
+                                    <div id="collapse-2" class="accordion-collapse collapse" data-bs-parent="#accordion-example" style="">
+                                        <div class="accordion-body pt-0">
+                                            Delivers images and pictures from the world of Novalis. For additional background information to the background
+                                            utilize function "novalis_background". The images and pictures delivered here will help you to describe locations,
+                                            situations and persons from the world of novalis. Feel free to utilize those information if someone is asking for
+                                            information about locations, situations or persons.
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="heading-3">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-3" aria-expanded="false">
+                                            current_date
+                                        </button>
+                                    </h2>
+                                    <div id="collapse-3" class="accordion-collapse collapse" data-bs-parent="#accordion-example" style="">
+                                        <div class="accordion-body pt-0">
+                                            Provides the current date and time.
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="heading-4">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-4" aria-expanded="false">
+                                            calendar
+                                        </button>
+                                    </h2>
+                                    <div id="collapse-4" class="accordion-collapse collapse" data-bs-parent="#accordion-example" style="">
+                                        <div class="accordion-body pt-0">
+                                            Diese Funktion liefert Kalenderinformationen zur Welt von Novalis. Sie stellt Informationen bereit um Fragen wie zum
+                                            Beispiel "Welcher Tag ist nächste Woche?" oder "Welche Monate gibt es?" sollten mit dieser Funktion beantwortet werden.
+                                            Es kann auch hilfreich sein sie zu verwenden, wenn generell Fragen zum Kalendersystem aufkommen wie zum Beispiel
+                                            "Wie viele Tage hat ein Jahr?", "Wie viele Tage hat ein Zyklus?" oder "Wie viele Tage hat ein Monat?". Verwende die
+                                            Funktion "current_date" um das aktuelle Datum zu erhalten. Auch "Welche weiteren Monate gibt es?" könnte eine Frage sein
+                                            die du hier beantwortet bekommst.
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="heading-5">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-5" aria-expanded="false">
+                                            calendar_holiday
+                                        </button>
+                                    </h2>
+                                    <div id="collapse-5" class="accordion-collapse collapse" data-bs-parent="#accordion-example" style="">
+                                        <div class="accordion-body pt-0">
+                                            Diese Funktion liefert Informationen über die Feiertage in Novalis. Für die Beziehung der Feiertage zum Kalender
+                                            kann die Funktion "calendar" zusätzliche Informationen ausgeben. Genauso kann die Funktion "current_date" helfen
+                                            die Position der Feiertage zum aktuellen Datum herauszufinden.
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="heading-6">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-6" aria-expanded="false">
+                                            moon_calendar
+                                        </button>
+                                    </h2>
+                                    <div id="collapse-6" class="accordion-collapse collapse" data-bs-parent="#accordion-example" style="">
+                                        <div class="accordion-body pt-0">
+                                            Liefert Informationen zu den Mondzyklen und dem gesamten Mondkalender in der Welt von Novalis. Für Fragen wie der
+                                            Mond an einem spezfisichen Tag steht befrage auch die Funktion "current_date" nach dem aktuellen Datum.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer mt-auto">
+                    <div class="btn-list justify-content-end">
+                        <button type="submit" class="btn btn-primary">Speichern</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+{% endblock %}

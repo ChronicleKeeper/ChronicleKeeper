@@ -9,6 +9,7 @@ use DZunke\NovDoc\Infrastructure\LLMChainExtension\Message\ExtendedMessage;
 use DZunke\NovDoc\Infrastructure\LLMChainExtension\Message\ExtendedMessageBag;
 use DZunke\NovDoc\Infrastructure\LLMChainExtension\Tool\NovalisBackground;
 use DZunke\NovDoc\Infrastructure\LLMChainExtension\Tool\NovalisImages;
+use DZunke\NovDoc\Infrastructure\LLMChainExtension\ToolUsageCollector;
 use PhpLlm\LlmChain\Message\Message;
 use PhpLlm\LlmChain\OpenAI\Model\Gpt\Version;
 use PhpLlm\LlmChain\ToolChain;
@@ -25,6 +26,7 @@ final class Chat
         private readonly SettingsHandler $settingsHandler,
         private readonly NovalisBackground $novalisBackground,
         private readonly NovalisImages $novalisImages,
+        private readonly ToolUsageCollector $collector,
     ) {
     }
 
@@ -55,10 +57,21 @@ final class Chat
 
         $this->appendReferencedDocumentsFromBackground($response);
         $this->appendReferencedImages($response);
+        $this->appendCalledTools($response);
 
         $messages[] = $response;
 
         $this->saveMessages($messages);
+    }
+
+    private function appendCalledTools(ExtendedMessage $response): void
+    {
+        $toolCalls = $this->collector->getCalls();
+        if ($toolCalls === []) {
+            return;
+        }
+
+        $response->calledTools = $toolCalls;
     }
 
     private function appendReferencedImages(ExtendedMessage $response): void

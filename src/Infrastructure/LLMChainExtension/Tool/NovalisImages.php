@@ -6,6 +6,7 @@ namespace DZunke\NovDoc\Infrastructure\LLMChainExtension\Tool;
 
 use DZunke\NovDoc\Domain\Library\Image\Image;
 use DZunke\NovDoc\Domain\Settings\SettingsHandler;
+use DZunke\NovDoc\Infrastructure\LLMChainExtension\ToolUsageCollector;
 use DZunke\NovDoc\Infrastructure\Repository\FilesystemVectorImageRepository;
 use PhpLlm\LlmChain\EmbeddingModel;
 use PhpLlm\LlmChain\ToolBox\AsTool;
@@ -32,12 +33,15 @@ final class NovalisImages
         private readonly FilesystemVectorImageRepository $vectorImageRepository,
         private readonly EmbeddingModel $embeddings,
         private readonly SettingsHandler $settingsHandler,
+        private readonly ToolUsageCollector $collector,
     ) {
     }
 
     /** @param string $search Contains the question or message the user has sent in reference to novalis. */
     public function __invoke(string $search): string
     {
+        $this->collector->called('novalis_images', ['search' => $search]);
+
         $vector  = $this->embeddings->create($search);
         $results = $this->vectorImageRepository->findSimilar(
             $vector->getData(),
@@ -54,10 +58,6 @@ final class NovalisImages
         foreach ($results as $image) {
             $result .= '# Image Name: ' . $image->image->title . PHP_EOL;
             $result .= $image->image->description;
-
-            if ($this->settingsHandler->get()->getChatbotGeneral()->showReferencedImages() !== true) {
-                continue;
-            }
 
             $this->referencedImages[] = $image->image;
         }
