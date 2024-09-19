@@ -10,7 +10,7 @@
                 {% include 'settings/_includes/settings_nav.html.twig' %}
                 <div class="col-12 col-md-9 d-flex flex-column">
                     <div class="card-body">
-                        <div class="row g-5 pb-5">
+                        <div class="row">
                             <div class="col-12">
                                 <div class="alert alert-info">
                                     Der Import ermöglicht es dir eine zuvor exportierte Version von
@@ -20,6 +20,23 @@
                                     einzuspielen.
                                 </div>
                                 {{ form_row(form.archive) }}
+                            </div>
+                            <div class="col-12">
+                                <b>Weitere Einstellungen</b>
+                            </div>
+                            <div class="col-12 mt-5">
+                                <div class="row">
+                                    <div class="col-6">
+                                        {{ form_row(form.overwrite_settings) }}
+                                        {{ form_row(form.overwrite_library) }}
+                                    </div>
+                                    <div class="col-6">
+                                        {{ form_row(form.prune_library) }}
+                                        <span style="color: var(--tblr-danger-text-emphasis);">
+                                            {{ ux_icon('tabler:alert-circle') }} Vorsicht! Der harte Besen kehrt wirklich alles aus der Bilbiothek!
+                                        </span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

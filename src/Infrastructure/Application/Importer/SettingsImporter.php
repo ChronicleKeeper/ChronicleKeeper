@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace DZunke\NovDoc\Infrastructure\Application\Importer;
 
 use DZunke\NovDoc\Infrastructure\Application\FileType;
+use DZunke\NovDoc\Infrastructure\Application\ImportSettings;
 use League\Flysystem\Filesystem;
 
+use function file_exists;
 use function file_put_contents;
 
 final class SettingsImporter implements SingleImport
@@ -16,9 +18,12 @@ final class SettingsImporter implements SingleImport
     ) {
     }
 
-    public function import(Filesystem $filesystem): ImportedFileBag
+    public function import(Filesystem $filesystem, ImportSettings $settings): ImportedFileBag
     {
-        // Other then the files from the library the settings will be always overwritten - Settings kommen noch!
+        if ($settings->overwriteSettings === false && file_exists($this->settingsFilePath)) {
+            return new ImportedFileBag(ImportedFile::asIgnored($this->settingsFilePath, FileType::SETTINGS));
+        }
+
         $content = $filesystem->read('settings.json');
         file_put_contents($this->settingsFilePath, $content);
 

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace DZunke\NovDoc\Infrastructure\Application\Importer;
 
 use DZunke\NovDoc\Infrastructure\Application\FileType;
+use DZunke\NovDoc\Infrastructure\Application\ImportSettings;
 use League\Flysystem\FileAttributes;
 use League\Flysystem\Filesystem;
 
@@ -22,7 +23,7 @@ final class VectorStorageDocumentsImporter implements SingleImport
     ) {
     }
 
-    public function import(Filesystem $filesystem): ImportedFileBag
+    public function import(Filesystem $filesystem, ImportSettings $settings): ImportedFileBag
     {
         $importedFileBag      = new ImportedFileBag();
         $libraryDirectoryPath = 'library/document/';
@@ -33,7 +34,7 @@ final class VectorStorageDocumentsImporter implements SingleImport
             $targetFilename = str_replace($libraryDirectoryPath, '', $zippedFile->path());
             $targetPath     = $this->vectorDocumentsPath . DIRECTORY_SEPARATOR . $targetFilename;
 
-            if (file_exists($targetPath)) {
+            if ($settings->overwriteLibrary === false && file_exists($targetPath)) {
                 $importedFileBag->append(ImportedFile::asIgnored($targetFilename, FileType::VECTOR_STORAGE_DOCUMENT));
                 continue;
             }

@@ -22,10 +22,11 @@ class Importer
         #[AutowireIterator('application_exporer_single_import')]
         private readonly iterable $importer,
         private readonly Version $version,
+        private readonly LibraryPruner $pruner,
     ) {
     }
 
-    public function import(string $archiveFile): ImportedFileBag
+    public function import(string $archiveFile, ImportSettings $importSettings): ImportedFileBag
     {
         $adapter                   = new ZipArchiveAdapter(new FilesystemZipArchiveProvider($archiveFile));
         $filesystem                = new Filesystem($adapter);
@@ -40,9 +41,13 @@ class Importer
             );
         }
 
+        if ($importSettings->pruneLibrary === true) {
+            $this->pruner->prune();
+        }
+
         $importedFiles = new ImportedFileBag();
         foreach ($this->importer as $import) {
-            $importedFiles = $importedFiles->extend(...$import->import($filesystem));
+            $importedFiles = $importedFiles->extend(...$import->import($filesystem, $importSettings));
         }
 
         @unlink($archiveFile);
