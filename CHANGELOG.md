@@ -16,6 +16,7 @@
 - Chatbot messages now store context in a custom design instead of directly in the chat response.
 - Vector storage search for context documents and images now uses a max distance to reduce false positives.
 - Upgraded tabler.io design from beta-20 to beta-21.
+- The chat with "Rostbart" now uses GPT-4o instead of GPT-4o-mini to improve context interpretation.
 
 ### Fixed
 - Media deletion in the library could be executed when the loader shows and the mouse hovers over the delete action.
