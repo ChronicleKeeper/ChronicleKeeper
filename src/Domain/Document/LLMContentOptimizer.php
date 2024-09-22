@@ -9,9 +9,6 @@ use PhpLlm\LlmChain\Message\Message;
 use PhpLlm\LlmChain\Message\MessageBag;
 use PhpLlm\LlmChain\OpenAI\Model\Gpt\Version;
 
-use function is_array;
-use function is_string;
-
 class LLMContentOptimizer
 {
     public function __construct(
@@ -26,22 +23,7 @@ class LLMContentOptimizer
             ['model' => Version::GPT_4o_MINI, 'temperature' => 0.75],
         );
 
-        $choices = $response['choices'];
-        if (! isset($choices) || ! is_array($choices)) {
-            return $content;
-        }
-
-        $firstChoice = $choices[0];
-        if (! isset($firstChoice['message']) || ! is_array($firstChoice['message'])) {
-            return $content;
-        }
-
-        $message = $firstChoice['message'];
-        if (! isset($message['content']) || ! is_string($message['content'])) {
-            return $content;
-        }
-
-        return $message['content'];
+        return (string) $response->getContent();
     }
 
     private function getSystemPrompt(): Message

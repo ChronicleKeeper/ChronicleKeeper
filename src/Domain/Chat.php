@@ -10,11 +10,14 @@ use DZunke\NovDoc\Infrastructure\LLMChainExtension\Message\ExtendedMessageBag;
 use DZunke\NovDoc\Infrastructure\LLMChainExtension\Tool\NovalisBackground;
 use DZunke\NovDoc\Infrastructure\LLMChainExtension\Tool\NovalisImages;
 use DZunke\NovDoc\Infrastructure\LLMChainExtension\ToolUsageCollector;
+use PhpLlm\LlmChain\Chain;
 use PhpLlm\LlmChain\Message\Message;
 use PhpLlm\LlmChain\OpenAI\Model\Gpt\Version;
-use PhpLlm\LlmChain\ToolChain;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\RequestStack;
+
+use function assert;
+use function is_string;
 
 final class Chat
 {
@@ -22,7 +25,7 @@ final class Chat
 
     public function __construct(
         private readonly RequestStack $requestStack,
-        private readonly ToolChain $toolChain,
+        private readonly Chain $chain,
         private readonly SettingsHandler $settingsHandler,
         private readonly NovalisBackground $novalisBackground,
         private readonly NovalisImages $novalisImages,
@@ -46,13 +49,15 @@ final class Chat
 
         $messages[] = new ExtendedMessage(message: Message::ofUser($message));
 
-        $response = $this->toolChain->call(
+        $response = $this->chain->call(
             $messages->getLLMChainMessages(),
             [
                 'model' => Version::GPT_4o,
                 'temperature' => $this->settingsHandler->get()->getChatbotTuning()->getTemperature(),
             ],
         );
+        assert(is_string($response));
+
         $response = new ExtendedMessage(message: Message::ofAssistant($response));
 
         $this->appendReferencedDocumentsFromBackground($response);
