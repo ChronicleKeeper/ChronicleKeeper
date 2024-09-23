@@ -1032,12 +1032,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-llm/llm-chain.git",
-                "reference": "d67c5e76d34397a2abc1570e91d4589c93985cca"
+                "reference": "e704c55175486929c3c6e5414f887dd230218522"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-llm/llm-chain/zipball/d67c5e76d34397a2abc1570e91d4589c93985cca",
-                "reference": "d67c5e76d34397a2abc1570e91d4589c93985cca",
+                "url": "https://api.github.com/repos/php-llm/llm-chain/zipball/e704c55175486929c3c6e5414f887dd230218522",
+                "reference": "e704c55175486929c3c6e5414f887dd230218522",
                 "shasum": ""
             },
             "require": {
@@ -1058,6 +1058,7 @@
                 "phpstan/phpstan": "^1.12",
                 "phpunit/phpunit": "^11.3",
                 "probots-io/pinecone-php": "^1.0",
+                "rector/rector": "^1.2",
                 "symfony/clock": "^6.4 || ^7.1",
                 "symfony/console": "^6.4 || ^7.1",
                 "symfony/css-selector": "^6.4 || ^7.1",
@@ -1091,9 +1092,9 @@
             "description": "A slim PHP component with tooling around LLMs.",
             "support": {
                 "issues": "https://github.com/php-llm/llm-chain/issues",
-                "source": "https://github.com/php-llm/llm-chain/tree/main"
+                "source": "https://github.com/php-llm/llm-chain/tree/0.1"
             },
-            "time": "2024-09-21T23:45:37+00:00"
+            "time": "2024-09-22T21:07:52+00:00"
         },
         {
             "name": "php-llm/llm-chain-bundle",
@@ -1101,20 +1102,24 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-llm/llm-chain-bundle.git",
-                "reference": "b6dc6b87ef5ab939ff82b63215544a39523cf73a"
+                "reference": "322011b8355f416955058177dffbb7ffe0a50fc8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-llm/llm-chain-bundle/zipball/b6dc6b87ef5ab939ff82b63215544a39523cf73a",
-                "reference": "b6dc6b87ef5ab939ff82b63215544a39523cf73a",
+                "url": "https://api.github.com/repos/php-llm/llm-chain-bundle/zipball/322011b8355f416955058177dffbb7ffe0a50fc8",
+                "reference": "322011b8355f416955058177dffbb7ffe0a50fc8",
                 "shasum": ""
             },
             "require": {
-                "php": ">=8.1",
+                "php": ">=8.2",
                 "php-llm/llm-chain": "dev-main",
                 "symfony/config": "^6.4 || ^7.0",
                 "symfony/dependency-injection": "^6.4 || ^7.0",
                 "symfony/framework-bundle": "^6.4 || ^7.0"
+            },
+            "require-dev": {
+                "php-cs-fixer/shim": "^3.64",
+                "phpstan/phpstan": "^1.12"
             },
             "default-branch": true,
             "type": "symfony-bundle",
@@ -1136,9 +1141,9 @@
             "description": "Symfony integration bundle for php-llm/llm-chain",
             "support": {
                 "issues": "https://github.com/php-llm/llm-chain-bundle/issues",
-                "source": "https://github.com/php-llm/llm-chain-bundle/tree/main"
+                "source": "https://github.com/php-llm/llm-chain-bundle/tree/0.1"
             },
-            "time": "2024-09-21T22:00:37+00:00"
+            "time": "2024-09-22T21:30:00+00:00"
         },
         {
             "name": "phpdocumentor/reflection-common",
