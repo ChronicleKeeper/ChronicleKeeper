@@ -32,5 +32,5 @@ return [
 
     // Development Packages
     DebugBundle::class => ['dev' => true],
-    WebProfilerBundle::class => ['dev' => true],
+    WebProfilerBundle::class => ['dev' => true, 'test' => true],
 ];

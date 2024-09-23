@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace DZunke\NovDoc\Library\ValueResolver;
+namespace DZunke\NovDoc\Library\Infrastructure\ValueResolver;
 
 use DZunke\NovDoc\Library\Domain\Entity\Document;
 use DZunke\NovDoc\Library\Infrastructure\Repository\FilesystemDocumentRepository;
-use RuntimeException;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Uid\Uuid;
 
 use function is_a;
@@ -39,7 +39,7 @@ class LibraryDocumentResolver implements ValueResolverInterface
 
         $document = $this->documentRepository->findById($documentIdentifier);
         if ($document === null) {
-            throw new RuntimeException('Document "' . $documentIdentifier . '" not found.');
+            throw new NotFoundHttpException('Document "' . $documentIdentifier . '" not found.');
         }
 
         return [$document];

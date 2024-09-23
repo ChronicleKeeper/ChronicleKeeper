@@ -17,7 +17,7 @@ use Twig\Environment;
 
 use function is_string;
 
-#[Route('/', name: 'chat')]
+#[Route('/', name: 'chat', methods: [Request::METHOD_GET, Request::METHOD_POST])]
 class Chat extends AbstractController
 {
     public function __construct(

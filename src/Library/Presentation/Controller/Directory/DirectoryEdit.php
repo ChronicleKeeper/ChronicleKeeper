@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace DZunke\NovDoc\Library\Presentation\Controller\Directory;
 
 use DZunke\NovDoc\Library\Domain\Entity\Directory;
+use DZunke\NovDoc\Library\Domain\RootDirectory;
 use DZunke\NovDoc\Library\Infrastructure\Repository\FilesystemDirectoryRepository;
 use DZunke\NovDoc\Library\Presentation\Form\DirectoryType;
 use DZunke\NovDoc\Shared\Presentation\FlashMessages\Alert;
@@ -14,6 +15,7 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Requirement\Requirement;
 use Symfony\Component\Routing\RouterInterface;
@@ -42,6 +44,10 @@ class DirectoryEdit extends AbstractController
 
     public function __invoke(Request $request, Directory $directory): Response
     {
+        if ($directory->id === RootDirectory::ID) {
+            throw new AccessDeniedHttpException();
+        }
+
         $form = $this->formFactory->create(DirectoryType::class, ['title' => $directory->title]);
         $form->handleRequest($request);
 

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace DZunke\NovDoc\Library\ValueResolver;
+namespace DZunke\NovDoc\Library\Infrastructure\ValueResolver;
 
 use DZunke\NovDoc\Library\Domain\Entity\Image;
 use DZunke\NovDoc\Library\Infrastructure\Repository\FilesystemImageRepository;

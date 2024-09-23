@@ -7,12 +7,19 @@ namespace DZunke\NovDoc\Test\Library\Domain\Entity;
 use DateTimeImmutable;
 use DateTimeInterface;
 use DZunke\NovDoc\Library\Domain\Entity\Document;
+use DZunke\NovDoc\Library\Domain\RootDirectory;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Small;
+use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Uid\Uuid;
 
 use function sha1;
 use function strlen;
 
+#[CoversClass(Document::class)]
+#[UsesClass(RootDirectory::class)]
+#[Small]
 class DocumentTest extends TestCase
 {
     public function testConstructorInitializesProperties(): void

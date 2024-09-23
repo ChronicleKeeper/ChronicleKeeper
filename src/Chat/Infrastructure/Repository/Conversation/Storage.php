@@ -16,6 +16,7 @@ use function file_put_contents;
 use function is_array;
 use function json_decode;
 use function json_encode;
+use function unlink;
 
 use const JSON_PRETTY_PRINT;
 use const JSON_THROW_ON_ERROR;
@@ -28,6 +29,11 @@ class Storage
         private readonly string $lastConversationFilePath,
         private readonly RequestStack $requestStack,
     ) {
+    }
+
+    public function reset(): void
+    {
+        @unlink($this->lastConversationFilePath);
     }
 
     public function store(): void
