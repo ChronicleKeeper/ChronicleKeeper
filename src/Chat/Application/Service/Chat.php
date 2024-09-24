@@ -52,7 +52,7 @@ final class Chat
         $response = $this->chain->call(
             $messages->getLLMChainMessages(),
             [
-                'model' => Version::GPT_4o,
+                'model' => Version::gpt4oMini(),
                 'temperature' => $this->settingsHandler->get()->getChatbotTuning()->getTemperature(),
             ],
         );
