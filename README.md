@@ -1,14 +1,12 @@
 <p align="center">
-    <a href="https://github.com/DZunke/NovDoc">
+    <a href="https://github.com/ChronicleKeeper/ChronicleKeeper">
         <img 
-            src="https://raw.githubusercontent.com/DZunke/NovDoc/main/assets/images/logo.png" 
+            src="https://raw.githubusercontent.com/ChronicleKeeper/ChronicleKeeper/main/assets/images/logo.png" 
             alt="Chronicle Keeper - Rollenspiel Chatbot - Wissenbewahrer" 
             width="300"
         >
     </a>
 </p>
-
-
 
 ## Der Chronicle Keeper
 
@@ -33,7 +31,7 @@ Gefährte zur Seite.
 ## Installation für Benutzer
 
 Um den Chronicle Keeper in deiner Runde zu nutzen, musst du keine Taverne aufsuchen oder einen Dungeon durchforsten. 
-Lade einfach die ZIP-Datei des [aktuellsten Releases](https://github.com/DZunke/NovDoc/releases/latest) herunter. 
+Lade die ZIP-Datei des [aktuellsten Releases](https://github.com/ChronicleKeeper/ChronicleKeeper/releases/latest) herunter. 
 Diese enthält die vollständige Desktop-Variante.
 
 Nach dem Entpacken des Verzeichnisses musst du die Datei `www/.env` anpassen und 

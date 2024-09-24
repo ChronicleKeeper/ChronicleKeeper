@@ -1,6 +1,6 @@
 {
-    "name": "dzunke/nov-doc",
-    "description": "Desktop Document Search Engine with ChatGPT Support",
+    "name": "chronical-keeper/chronical-keeper",
+    "description": "Der Chronicle Keeper ist ein interaktiver Begleiter für Rollenspieler, der mit ChatGPT Dokumente effizient verwaltet und Abenteuer zum Leben erweckt.",
     "type": "project",
     "license": "MIT",
     "autoload": {

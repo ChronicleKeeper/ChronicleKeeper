@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "30c6c3b11d25802197c5275b490bee3f",
+    "content-hash": "41e917947cd8f1f74bc6ea5050b46de9",
     "packages": [
         {
             "name": "composer/semver",
@@ -1099,16 +1099,16 @@
         },
         {
             "name": "php-llm/llm-chain-bundle",
-            "version": "dev-main",
+            "version": "0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-llm/llm-chain-bundle.git",
-                "reference": "1c237971b45e36d8ea6a43ffd56446a68fcd017f"
+                "reference": "322011b8355f416955058177dffbb7ffe0a50fc8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-llm/llm-chain-bundle/zipball/1c237971b45e36d8ea6a43ffd56446a68fcd017f",
-                "reference": "1c237971b45e36d8ea6a43ffd56446a68fcd017f",
+                "url": "https://api.github.com/repos/php-llm/llm-chain-bundle/zipball/322011b8355f416955058177dffbb7ffe0a50fc8",
+                "reference": "322011b8355f416955058177dffbb7ffe0a50fc8",
                 "shasum": ""
             },
             "require": {
@@ -1122,7 +1122,6 @@
                 "php-cs-fixer/shim": "^3.64",
                 "phpstan/phpstan": "^1.12"
             },
-            "default-branch": true,
             "type": "symfony-bundle",
             "autoload": {
                 "psr-4": {
@@ -1142,9 +1141,9 @@
             "description": "Symfony integration bundle for php-llm/llm-chain",
             "support": {
                 "issues": "https://github.com/php-llm/llm-chain-bundle/issues",
-                "source": "https://github.com/php-llm/llm-chain-bundle/tree/main"
+                "source": "https://github.com/php-llm/llm-chain-bundle/tree/0.1"
             },
-            "time": "2024-09-23T12:58:41+00:00"
+            "time": "2024-09-22T21:30:00+00:00"
         },
         {
             "name": "phpdocumentor/reflection-common",
@@ -5141,16 +5140,16 @@
         },
         {
             "name": "symfony/stimulus-bundle",
-            "version": "v2.19.0",
+            "version": "v2.20.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/stimulus-bundle.git",
-                "reference": "5e2e1aff3e7cff2875e2f901437543fda9ca9910"
+                "reference": "ae69e3a764694b9f45d8a009dd2b8c22444c5e0c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/stimulus-bundle/zipball/5e2e1aff3e7cff2875e2f901437543fda9ca9910",
-                "reference": "5e2e1aff3e7cff2875e2f901437543fda9ca9910",
+                "url": "https://api.github.com/repos/symfony/stimulus-bundle/zipball/ae69e3a764694b9f45d8a009dd2b8c22444c5e0c",
+                "reference": "ae69e3a764694b9f45d8a009dd2b8c22444c5e0c",
                 "shasum": ""
             },
             "require": {
@@ -5190,7 +5189,7 @@
                 "symfony-ux"
             ],
             "support": {
-                "source": "https://github.com/symfony/stimulus-bundle/tree/v2.19.0"
+                "source": "https://github.com/symfony/stimulus-bundle/tree/v2.20.0"
             },
             "funding": [
                 {
@@ -5206,7 +5205,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-07-30T19:26:23+00:00"
+            "time": "2024-09-24T09:27:42+00:00"
         },
         {
             "name": "symfony/string",
@@ -5818,16 +5817,16 @@
         },
         {
             "name": "symfony/ux-icons",
-            "version": "v2.19.0",
+            "version": "v2.20.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/ux-icons.git",
-                "reference": "c4826439f464c23cc0c2e2a997252100d6049daa"
+                "reference": "07328c6d3cf480f7d5dafdf621f0d54323e23035"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/ux-icons/zipball/c4826439f464c23cc0c2e2a997252100d6049daa",
-                "reference": "c4826439f464c23cc0c2e2a997252100d6049daa",
+                "url": "https://api.github.com/repos/symfony/ux-icons/zipball/07328c6d3cf480f7d5dafdf621f0d54323e23035",
+                "reference": "07328c6d3cf480f7d5dafdf621f0d54323e23035",
                 "shasum": ""
             },
             "require": {
@@ -5886,7 +5885,7 @@
                 "twig"
             ],
             "support": {
-                "source": "https://github.com/symfony/ux-icons/tree/v2.19.0"
+                "source": "https://github.com/symfony/ux-icons/tree/v2.20.0"
             },
             "funding": [
                 {
@@ -5902,20 +5901,20 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-08-07T13:07:19+00:00"
+            "time": "2024-09-18T14:55:01+00:00"
         },
         {
             "name": "symfony/ux-live-component",
-            "version": "v2.19.2",
+            "version": "v2.20.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/ux-live-component.git",
-                "reference": "9b292543eed8ae0d760d7f5e5397e91e632f2cf5"
+                "reference": "c05ac6bfa7368415676d74183eded05be2635a1d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/ux-live-component/zipball/9b292543eed8ae0d760d7f5e5397e91e632f2cf5",
-                "reference": "9b292543eed8ae0d760d7f5e5397e91e632f2cf5",
+                "url": "https://api.github.com/repos/symfony/ux-live-component/zipball/c05ac6bfa7368415676d74183eded05be2635a1d",
+                "reference": "c05ac6bfa7368415676d74183eded05be2635a1d",
                 "shasum": ""
             },
             "require": {
@@ -5947,7 +5946,7 @@
                 "symfony/twig-bundle": "^5.4|^6.0|^7.0",
                 "symfony/validator": "^5.4|^6.0|^7.0",
                 "zenstruck/browser": "^1.2.0",
-                "zenstruck/foundry": "1.37.*"
+                "zenstruck/foundry": "^2.0"
             },
             "type": "symfony-bundle",
             "extra": {
@@ -5979,7 +5978,7 @@
                 "twig"
             ],
             "support": {
-                "source": "https://github.com/symfony/ux-live-component/tree/v2.19.2"
+                "source": "https://github.com/symfony/ux-live-component/tree/v2.20.0"
             },
             "funding": [
                 {
@@ -5995,20 +5994,20 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-08-11T12:24:16+00:00"
+            "time": "2024-09-24T09:27:42+00:00"
         },
         {
             "name": "symfony/ux-turbo",
-            "version": "v2.19.3",
+            "version": "v2.20.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/ux-turbo.git",
-                "reference": "4a38f267193017958d487171c0a86e64f36164a3"
+                "reference": "5eaa803dea9f954aa124963f2c872b414d97cc97"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/ux-turbo/zipball/4a38f267193017958d487171c0a86e64f36164a3",
-                "reference": "4a38f267193017958d487171c0a86e64f36164a3",
+                "url": "https://api.github.com/repos/symfony/ux-turbo/zipball/5eaa803dea9f954aa124963f2c872b414d97cc97",
+                "reference": "5eaa803dea9f954aa124963f2c872b414d97cc97",
                 "shasum": ""
             },
             "require": {
@@ -6076,7 +6075,7 @@
                 "turbo-stream"
             ],
             "support": {
-                "source": "https://github.com/symfony/ux-turbo/tree/v2.19.3"
+                "source": "https://github.com/symfony/ux-turbo/tree/v2.20.0"
             },
             "funding": [
                 {
@@ -6092,20 +6091,20 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-08-14T04:55:38+00:00"
+            "time": "2024-09-10T12:38:04+00:00"
         },
         {
             "name": "symfony/ux-twig-component",
-            "version": "v2.19.2",
+            "version": "v2.20.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/ux-twig-component.git",
-                "reference": "7f8d4891e8e3a3303de11bfc7224b176a23a2c1c"
+                "reference": "edcd13daa4566435fbfc8b9766dbcfebb679384f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/ux-twig-component/zipball/7f8d4891e8e3a3303de11bfc7224b176a23a2c1c",
-                "reference": "7f8d4891e8e3a3303de11bfc7224b176a23a2c1c",
+                "url": "https://api.github.com/repos/symfony/ux-twig-component/zipball/edcd13daa4566435fbfc8b9766dbcfebb679384f",
+                "reference": "edcd13daa4566435fbfc8b9766dbcfebb679384f",
                 "shasum": ""
             },
             "require": {
@@ -6126,7 +6125,6 @@
                 "symfony/framework-bundle": "^5.4|^6.0|^7.0",
                 "symfony/phpunit-bridge": "^6.0|^7.0",
                 "symfony/stimulus-bundle": "^2.9.1",
-                "symfony/stopwatch": "^5.4|^6.0|^7.0",
                 "symfony/twig-bundle": "^5.4|^6.0|^7.0",
                 "symfony/webpack-encore-bundle": "^1.15"
             },
@@ -6160,7 +6158,7 @@
                 "twig"
             ],
             "support": {
-                "source": "https://github.com/symfony/ux-twig-component/tree/v2.19.2"
+                "source": "https://github.com/symfony/ux-twig-component/tree/v2.20.0"
             },
             "funding": [
                 {
@@ -6176,7 +6174,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-08-13T03:00:01+00:00"
+            "time": "2024-09-24T09:36:36+00:00"
         },
         {
             "name": "symfony/validator",
