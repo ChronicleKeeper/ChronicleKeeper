@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace DZunke\NovDoc\Library\Infrastructure\VectorStorage\Distance;
+namespace ChronicleKeeper\Library\Infrastructure\VectorStorage\Distance;
 
 use InvalidArgumentException;
 

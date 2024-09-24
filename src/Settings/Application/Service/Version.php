@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace DZunke\NovDoc\Settings\Application\Service;
+namespace ChronicleKeeper\Settings\Application\Service;
 
 use function end;
 use function explode;

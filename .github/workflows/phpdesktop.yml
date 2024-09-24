@@ -25,12 +25,12 @@ jobs:
         uses: thedoctor0/zip-release@0.7.5
         with:
           type: 'zip'
-          command: 'mv build/ NovDoc-PHPDesktop-${{ github.ref_name }}/'
-          path: "NovDoc-PHPDesktop-${{ github.ref_name }}"
-          filename: "NovDoc-PHPDesktop-${{ github.ref_name }}.zip"
+          command: 'mv build/ ChronicleKeeper-Desktop-${{ github.ref_name }}/'
+          path: "ChronicleKeeper-Desktop-${{ github.ref_name }}"
+          filename: "ChronicleKeeper-Desktop-${{ github.ref_name }}.zip"
 
       - name: Upload Release
         uses: ncipollo/release-action@v1.12.0
         with:
           allowUpdates: true
-          artifacts: "NovDoc-PHPDesktop-${{ github.ref_name }}.zip"
+          artifacts: "ChronicleKeeper-Desktop-${{ github.ref_name }}.zip"

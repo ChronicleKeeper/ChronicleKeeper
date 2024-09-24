@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace DZunke\NovDoc\Library\Presentation\Controller\Image;
+namespace ChronicleKeeper\Library\Presentation\Controller\Image;
 
-use DZunke\NovDoc\Library\Domain\Entity\Image;
-use DZunke\NovDoc\Library\Infrastructure\Repository\FilesystemImageRepository;
-use DZunke\NovDoc\Library\Presentation\Form\ImageType;
-use DZunke\NovDoc\Shared\Presentation\FlashMessages\Alert;
-use DZunke\NovDoc\Shared\Presentation\FlashMessages\HandleFlashMessages;
+use ChronicleKeeper\Library\Domain\Entity\Image;
+use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemImageRepository;
+use ChronicleKeeper\Library\Presentation\Form\ImageType;
+use ChronicleKeeper\Shared\Presentation\FlashMessages\Alert;
+use ChronicleKeeper\Shared\Presentation\FlashMessages\HandleFlashMessages;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;

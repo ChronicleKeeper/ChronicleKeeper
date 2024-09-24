@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace DZunke\NovDoc\Library\Presentation\Twig;
+namespace ChronicleKeeper\Library\Presentation\Twig;
 
-use DZunke\NovDoc\Library\Domain\RootDirectory;
-use DZunke\NovDoc\Library\Infrastructure\Repository\FilesystemDirectoryRepository;
+use ChronicleKeeper\Library\Domain\RootDirectory;
+use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemDirectoryRepository;
 use Symfony\UX\TwigComponent\Attribute\AsTwigComponent;
 
 use function array_merge;

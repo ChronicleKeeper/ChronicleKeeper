@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace DZunke\NovDoc\Library\Presentation\Controller;
+namespace ChronicleKeeper\Library\Presentation\Controller;
 
-use DZunke\NovDoc\Library\Domain\Entity\Directory;
-use DZunke\NovDoc\Library\Domain\Entity\Document;
-use DZunke\NovDoc\Library\Domain\Entity\Image;
-use DZunke\NovDoc\Library\Domain\RootDirectory;
-use DZunke\NovDoc\Library\Infrastructure\Repository\FilesystemDirectoryRepository;
-use DZunke\NovDoc\Library\Infrastructure\Repository\FilesystemDocumentRepository;
-use DZunke\NovDoc\Library\Infrastructure\Repository\FilesystemImageRepository;
+use ChronicleKeeper\Library\Domain\Entity\Directory;
+use ChronicleKeeper\Library\Domain\Entity\Document;
+use ChronicleKeeper\Library\Domain\Entity\Image;
+use ChronicleKeeper\Library\Domain\RootDirectory;
+use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemDirectoryRepository;
+use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemDocumentRepository;
+use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemImageRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

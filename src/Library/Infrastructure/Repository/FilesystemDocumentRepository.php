@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace DZunke\NovDoc\Library\Infrastructure\Repository;
+namespace ChronicleKeeper\Library\Infrastructure\Repository;
 
+use ChronicleKeeper\Library\Domain\Entity\Directory;
+use ChronicleKeeper\Library\Domain\Entity\Document;
 use DateTimeImmutable;
-use DZunke\NovDoc\Library\Domain\Entity\Directory;
-use DZunke\NovDoc\Library\Domain\Entity\Document;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Symfony\Component\Filesystem\Filesystem;

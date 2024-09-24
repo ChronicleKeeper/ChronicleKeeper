@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace DZunke\NovDoc\Shared\Presentation\FlashMessages;
+namespace ChronicleKeeper\Shared\Presentation\FlashMessages;
 
 enum Alert: string
 {

@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace DZunke\NovDoc\Library\Infrastructure\LLMChain\Tool;
+namespace ChronicleKeeper\Library\Infrastructure\LLMChain\Tool;
 
-use DZunke\NovDoc\Library\Domain\Entity\Document;
-use DZunke\NovDoc\Library\Infrastructure\Repository\FilesystemVectorDocumentRepository;
-use DZunke\NovDoc\Settings\Application\SettingsHandler;
-use DZunke\NovDoc\Shared\Infrastructure\LLMChain\ToolUsageCollector;
+use ChronicleKeeper\Library\Domain\Entity\Document;
+use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemVectorDocumentRepository;
+use ChronicleKeeper\Settings\Application\SettingsHandler;
+use ChronicleKeeper\Shared\Infrastructure\LLMChain\ToolUsageCollector;
 use PhpLlm\LlmChain\EmbeddingModel;
 use PhpLlm\LlmChain\ToolBox\AsTool;
 
@@ -19,7 +19,7 @@ use const PHP_EOL;
     'novalis_background',
     description: 'Delivers all background information to the world of novalis or characters living in the world. For detailied visual information utilize function "novalis_images".',
 )]
-final class NovalisBackground
+final class LibraryDocuments
 {
     /** @var list<Document> */
     private array $referencedDocuments = [];

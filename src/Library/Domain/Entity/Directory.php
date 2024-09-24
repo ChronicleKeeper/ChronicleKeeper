@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace DZunke\NovDoc\Library\Domain\Entity;
+namespace ChronicleKeeper\Library\Domain\Entity;
 
-use DZunke\NovDoc\Library\Domain\RootDirectory;
+use ChronicleKeeper\Library\Domain\RootDirectory;
 use Symfony\Component\Uid\Uuid;
 
 use function array_key_exists;

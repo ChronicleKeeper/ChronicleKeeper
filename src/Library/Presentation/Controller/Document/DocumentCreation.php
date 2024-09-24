@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace DZunke\NovDoc\Library\Presentation\Controller\Document;
+namespace ChronicleKeeper\Library\Presentation\Controller\Document;
 
-use DZunke\NovDoc\Chat\Application\Service\Chat;
-use DZunke\NovDoc\Chat\Infrastructure\LLMChain\ExtendedMessage;
-use DZunke\NovDoc\Library\Domain\Entity\Directory;
-use DZunke\NovDoc\Library\Domain\Entity\Document;
-use DZunke\NovDoc\Library\Domain\RootDirectory;
-use DZunke\NovDoc\Library\Infrastructure\Repository\FilesystemDirectoryRepository;
-use DZunke\NovDoc\Library\Infrastructure\Repository\FilesystemDocumentRepository;
-use DZunke\NovDoc\Shared\Presentation\FlashMessages\Alert;
-use DZunke\NovDoc\Shared\Presentation\FlashMessages\HandleFlashMessages;
+use ChronicleKeeper\Chat\Application\Service\Chat;
+use ChronicleKeeper\Chat\Infrastructure\LLMChain\ExtendedMessage;
+use ChronicleKeeper\Library\Domain\Entity\Directory;
+use ChronicleKeeper\Library\Domain\Entity\Document;
+use ChronicleKeeper\Library\Domain\RootDirectory;
+use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemDirectoryRepository;
+use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemDocumentRepository;
+use ChronicleKeeper\Shared\Presentation\FlashMessages\Alert;
+use ChronicleKeeper\Shared\Presentation\FlashMessages\HandleFlashMessages;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;

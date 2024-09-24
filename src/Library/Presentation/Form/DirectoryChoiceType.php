@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace DZunke\NovDoc\Library\Presentation\Form;
+namespace ChronicleKeeper\Library\Presentation\Form;
 
-use DZunke\NovDoc\Library\Domain\Entity\Directory;
-use DZunke\NovDoc\Library\Infrastructure\Repository\FilesystemDirectoryRepository;
+use ChronicleKeeper\Library\Domain\Entity\Directory;
+use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemDirectoryRepository;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\OptionsResolver;

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use DZunke\NovDoc\Shared\Kernel;
+use ChronicleKeeper\Shared\Kernel;
 
 require_once dirname(__DIR__) . '/vendor/autoload_runtime.php';
 

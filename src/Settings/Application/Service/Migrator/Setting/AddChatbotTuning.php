@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace DZunke\NovDoc\Settings\Application\Service\Migrator\Setting;
+namespace ChronicleKeeper\Settings\Application\Service\Migrator\Setting;
 
-use DZunke\NovDoc\Settings\Application\Service\FileType;
-use DZunke\NovDoc\Settings\Application\Service\Migrator\FileMigration;
+use ChronicleKeeper\Settings\Application\Service\FileType;
+use ChronicleKeeper\Settings\Application\Service\Migrator\FileMigration;
 
 use function array_key_exists;
 use function file_get_contents;

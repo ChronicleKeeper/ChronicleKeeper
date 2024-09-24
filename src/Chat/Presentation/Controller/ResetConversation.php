@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace DZunke\NovDoc\Chat\Presentation\Controller;
+namespace ChronicleKeeper\Chat\Presentation\Controller;
 
-use DZunke\NovDoc\Chat\Application\Service\Chat;
-use DZunke\NovDoc\Shared\Presentation\FlashMessages\Alert;
-use DZunke\NovDoc\Shared\Presentation\FlashMessages\HandleFlashMessages;
+use ChronicleKeeper\Chat\Application\Service\Chat;
+use ChronicleKeeper\Shared\Presentation\FlashMessages\Alert;
+use ChronicleKeeper\Shared\Presentation\FlashMessages\HandleFlashMessages;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace DZunke\NovDoc\Library\Presentation\Twig;
+namespace ChronicleKeeper\Library\Presentation\Twig;
 
-use DZunke\NovDoc\Library\Domain\Entity\Directory;
+use ChronicleKeeper\Library\Domain\Entity\Directory;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\UX\TwigComponent\Attribute\AsTwigComponent;
 

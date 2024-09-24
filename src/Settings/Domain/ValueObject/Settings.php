@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace DZunke\NovDoc\Settings\Domain\ValueObject;
+namespace ChronicleKeeper\Settings\Domain\ValueObject;
 
-use DZunke\NovDoc\Settings\Domain\ValueObject\Settings\Calendar;
-use DZunke\NovDoc\Settings\Domain\ValueObject\Settings\ChatbotFunctions;
-use DZunke\NovDoc\Settings\Domain\ValueObject\Settings\ChatbotGeneral;
-use DZunke\NovDoc\Settings\Domain\ValueObject\Settings\ChatbotSystemPrompt;
-use DZunke\NovDoc\Settings\Domain\ValueObject\Settings\ChatbotTuning;
-use DZunke\NovDoc\Settings\Domain\ValueObject\Settings\Holiday;
-use DZunke\NovDoc\Settings\Domain\ValueObject\Settings\MoonCalendar;
+use ChronicleKeeper\Settings\Domain\ValueObject\Settings\Calendar;
+use ChronicleKeeper\Settings\Domain\ValueObject\Settings\ChatbotFunctions;
+use ChronicleKeeper\Settings\Domain\ValueObject\Settings\ChatbotGeneral;
+use ChronicleKeeper\Settings\Domain\ValueObject\Settings\ChatbotSystemPrompt;
+use ChronicleKeeper\Settings\Domain\ValueObject\Settings\ChatbotTuning;
+use ChronicleKeeper\Settings\Domain\ValueObject\Settings\Holiday;
+use ChronicleKeeper\Settings\Domain\ValueObject\Settings\MoonCalendar;
 
 /**
  * @phpstan-import-type ChatbotGeneralSettings from ChatbotGeneral

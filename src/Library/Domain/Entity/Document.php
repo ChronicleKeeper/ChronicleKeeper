@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace DZunke\NovDoc\Library\Domain\Entity;
+namespace ChronicleKeeper\Library\Domain\Entity;
 
+use ChronicleKeeper\Library\Domain\RootDirectory;
 use DateTimeImmutable;
 use DateTimeInterface;
-use DZunke\NovDoc\Library\Domain\RootDirectory;
 use Symfony\Component\String\Slugger\AsciiSlugger;
 use Symfony\Component\Uid\Uuid;
 

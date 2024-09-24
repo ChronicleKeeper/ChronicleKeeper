@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace DZunke\NovDoc\Settings\Presentation\Controller;
+namespace ChronicleKeeper\Settings\Presentation\Controller;
 
-use DZunke\NovDoc\Settings\Application\SettingsHandler;
-use DZunke\NovDoc\Shared\Presentation\FlashMessages\Alert;
-use DZunke\NovDoc\Shared\Presentation\FlashMessages\HandleFlashMessages;
+use ChronicleKeeper\Settings\Application\SettingsHandler;
+use ChronicleKeeper\Shared\Presentation\FlashMessages\Alert;
+use ChronicleKeeper\Shared\Presentation\FlashMessages\HandleFlashMessages;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;

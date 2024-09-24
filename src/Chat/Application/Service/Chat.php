@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace DZunke\NovDoc\Chat\Application\Service;
+namespace ChronicleKeeper\Chat\Application\Service;
 
-use DZunke\NovDoc\Chat\Infrastructure\LLMChain\ExtendedMessage;
-use DZunke\NovDoc\Chat\Infrastructure\LLMChain\ExtendedMessageBag;
-use DZunke\NovDoc\Library\Infrastructure\LLMChain\Tool\NovalisBackground;
-use DZunke\NovDoc\Library\Infrastructure\LLMChain\Tool\NovalisImages;
-use DZunke\NovDoc\Settings\Application\SettingsHandler;
-use DZunke\NovDoc\Shared\Infrastructure\LLMChain\ToolUsageCollector;
+use ChronicleKeeper\Chat\Infrastructure\LLMChain\ExtendedMessage;
+use ChronicleKeeper\Chat\Infrastructure\LLMChain\ExtendedMessageBag;
+use ChronicleKeeper\Library\Infrastructure\LLMChain\Tool\LibraryDocuments;
+use ChronicleKeeper\Library\Infrastructure\LLMChain\Tool\LibraryImages;
+use ChronicleKeeper\Settings\Application\SettingsHandler;
+use ChronicleKeeper\Shared\Infrastructure\LLMChain\ToolUsageCollector;
 use PhpLlm\LlmChain\Chain;
 use PhpLlm\LlmChain\Message\Message;
 use PhpLlm\LlmChain\OpenAI\Model\Gpt\Version;
@@ -27,8 +27,8 @@ final class Chat
         private readonly RequestStack $requestStack,
         private readonly Chain $chain,
         private readonly SettingsHandler $settingsHandler,
-        private readonly NovalisBackground $novalisBackground,
-        private readonly NovalisImages $novalisImages,
+        private readonly LibraryDocuments $libraryDocuments,
+        private readonly LibraryImages $libraryImages,
         private readonly ToolUsageCollector $collector,
     ) {
     }
@@ -81,7 +81,7 @@ final class Chat
 
     private function appendReferencedImages(ExtendedMessage $response): void
     {
-        $referencedImages = $this->novalisImages->getReferencedImages();
+        $referencedImages = $this->libraryImages->getReferencedImages();
         if ($referencedImages === []) {
             return;
         }
@@ -91,7 +91,7 @@ final class Chat
 
     private function appendReferencedDocumentsFromBackground(ExtendedMessage $response): void
     {
-        $referencedDocuments = $this->novalisBackground->getReferencedDocuments();
+        $referencedDocuments = $this->libraryDocuments->getReferencedDocuments();
         if ($referencedDocuments === []) {
             return;
         }

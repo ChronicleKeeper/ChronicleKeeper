@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace DZunke\NovDoc\Settings\Infrastructure\Event;
+namespace ChronicleKeeper\Settings\Infrastructure\Event;
 
-use DZunke\NovDoc\Settings\Application\Service\Importer\State;
-use DZunke\NovDoc\Settings\Domain\Event\FileImported;
+use ChronicleKeeper\Settings\Application\Service\Importer\State;
+use ChronicleKeeper\Settings\Domain\Event\FileImported;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 

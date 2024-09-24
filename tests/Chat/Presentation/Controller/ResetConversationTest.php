@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace DZunke\NovDoc\Test\Chat\Presentation\Controller;
+namespace ChronicleKeeper\Test\Chat\Presentation\Controller;
 
-use DZunke\NovDoc\Chat\Presentation\Controller\ResetConversation;
+use ChronicleKeeper\Chat\Presentation\Controller\ResetConversation;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Large;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;

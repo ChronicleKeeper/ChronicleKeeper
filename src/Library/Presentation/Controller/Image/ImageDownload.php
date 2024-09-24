@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace DZunke\NovDoc\Library\Presentation\Controller\Image;
+namespace ChronicleKeeper\Library\Presentation\Controller\Image;
 
-use DZunke\NovDoc\Library\Domain\Entity\Image;
+use ChronicleKeeper\Library\Domain\Entity\Image;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;

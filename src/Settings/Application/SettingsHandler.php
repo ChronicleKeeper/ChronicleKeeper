@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace DZunke\NovDoc\Settings\Application;
+namespace ChronicleKeeper\Settings\Application;
 
-use DZunke\NovDoc\Settings\Domain\ValueObject\Settings;
+use ChronicleKeeper\Settings\Domain\ValueObject\Settings;
 
 use function file_exists;
 use function file_get_contents;

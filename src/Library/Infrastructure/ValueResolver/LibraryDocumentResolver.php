@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace DZunke\NovDoc\Library\Infrastructure\ValueResolver;
+namespace ChronicleKeeper\Library\Infrastructure\ValueResolver;
 
-use DZunke\NovDoc\Library\Domain\Entity\Document;
-use DZunke\NovDoc\Library\Infrastructure\Repository\FilesystemDocumentRepository;
+use ChronicleKeeper\Library\Domain\Entity\Document;
+use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemDocumentRepository;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;

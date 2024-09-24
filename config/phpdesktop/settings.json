@@ -10,7 +10,7 @@
         "log_file": "debug.log"
     },
     "main_window": {
-        "title": "Novalis Chatbot",
+        "title": "Der Chronicle Keeper - Rollenspiel Chatbot - Wissenbewahrer",
         "icon": "www/public/favicon.ico",
         "default_size": [1024, 768],
         "minimum_size": [1024, 768],

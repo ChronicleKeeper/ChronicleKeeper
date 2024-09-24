@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace DZunke\NovDoc\Library\Application\Service\Document\Importer;
+namespace ChronicleKeeper\Library\Application\Service\Document\Importer;
 
 use League\HTMLToMarkdown\HtmlConverter;
 use PhpOffice\PhpWord\IOFactory;

@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace DZunke\NovDoc\Library\Presentation\Form;
+namespace ChronicleKeeper\Library\Presentation\Form;
 
+use ChronicleKeeper\Library\Domain\Entity\Directory;
+use ChronicleKeeper\Library\Domain\Entity\Image;
 use DateTimeImmutable;
-use DZunke\NovDoc\Library\Domain\Entity\Directory;
-use DZunke\NovDoc\Library\Domain\Entity\Image;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\DataMapperInterface;
 use Symfony\Component\Form\Exception;

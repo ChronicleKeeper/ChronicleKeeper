@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace DZunke\NovDoc\Library\Application\Service\Document;
+namespace ChronicleKeeper\Library\Application\Service\Document;
 
-use DZunke\NovDoc\Chat\Application\Service\LLMContentOptimizer;
-use DZunke\NovDoc\Library\Application\Service\Document\Importer\FileConverter;
-use DZunke\NovDoc\Library\Domain\Entity\Directory;
-use DZunke\NovDoc\Library\Domain\Entity\Document;
-use DZunke\NovDoc\Library\Infrastructure\Repository\FilesystemDocumentRepository;
+use ChronicleKeeper\Chat\Application\Service\LLMContentOptimizer;
+use ChronicleKeeper\Library\Application\Service\Document\Importer\FileConverter;
+use ChronicleKeeper\Library\Domain\Entity\Directory;
+use ChronicleKeeper\Library\Domain\Entity\Document;
+use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemDocumentRepository;
 use RuntimeException;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\HttpFoundation\File\UploadedFile;

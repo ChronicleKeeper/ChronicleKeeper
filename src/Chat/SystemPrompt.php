@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace DZunke\NovDoc\Chat;
+namespace ChronicleKeeper\Chat;
 
 final class SystemPrompt
 {

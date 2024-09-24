@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace DZunke\NovDoc\Shared\Infrastructure\LLMChain;
+namespace ChronicleKeeper\Shared\Infrastructure\LLMChain;
 
 class ToolUsageCollector
 {

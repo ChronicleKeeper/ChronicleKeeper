@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace DZunke\NovDoc\Settings\Domain\ValueObject\Settings;
+namespace ChronicleKeeper\Settings\Domain\ValueObject\Settings;
 
-use DZunke\NovDoc\Chat\SystemPrompt;
+use ChronicleKeeper\Chat\SystemPrompt;
 
 /**
  * @phpstan-type ChatbotSystemPromptSettings = array{

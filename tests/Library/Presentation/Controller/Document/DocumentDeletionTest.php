@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace DZunke\NovDoc\Test\Library\Presentation\Controller\Document;
+namespace ChronicleKeeper\Test\Library\Presentation\Controller\Document;
 
-use DZunke\NovDoc\Library\Presentation\Controller\Document\DocumentCreation;
+use ChronicleKeeper\Library\Presentation\Controller\Document\DocumentCreation;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Large;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;

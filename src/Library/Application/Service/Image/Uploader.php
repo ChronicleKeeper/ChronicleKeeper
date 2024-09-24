@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace DZunke\NovDoc\Library\Application\Service\Image;
+namespace ChronicleKeeper\Library\Application\Service\Image;
 
-use DZunke\NovDoc\Library\Domain\Entity\Directory;
-use DZunke\NovDoc\Library\Domain\Entity\Image;
-use DZunke\NovDoc\Library\Domain\RootDirectory;
-use DZunke\NovDoc\Library\Infrastructure\Repository\FilesystemImageRepository;
+use ChronicleKeeper\Library\Domain\Entity\Directory;
+use ChronicleKeeper\Library\Domain\Entity\Image;
+use ChronicleKeeper\Library\Domain\RootDirectory;
+use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemImageRepository;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 

@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace DZunke\NovDoc\Settings\Presentation\Form;
+namespace ChronicleKeeper\Settings\Presentation\Form;
 
-use DZunke\NovDoc\Settings\Domain\ValueObject\Settings;
-use DZunke\NovDoc\Settings\Domain\ValueObject\Settings\MoonCalendar;
+use ChronicleKeeper\Settings\Domain\ValueObject\Settings;
+use ChronicleKeeper\Settings\Domain\ValueObject\Settings\MoonCalendar;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\DataMapperInterface;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;

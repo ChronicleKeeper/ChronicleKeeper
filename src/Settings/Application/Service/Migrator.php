@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace DZunke\NovDoc\Settings\Application\Service;
+namespace ChronicleKeeper\Settings\Application\Service;
 
-use DZunke\NovDoc\Settings\Application\Service\Migrator\FileMigration;
+use ChronicleKeeper\Settings\Application\Service\Migrator\FileMigration;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 

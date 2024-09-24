@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace DZunke\NovDoc\Library\Infrastructure\Repository;
+namespace ChronicleKeeper\Library\Infrastructure\Repository;
 
-use DZunke\NovDoc\Library\Infrastructure\VectorStorage\Distance\CosineDistance;
-use DZunke\NovDoc\Library\Infrastructure\VectorStorage\VectorDocument;
-use DZunke\NovDoc\Settings\Application\SettingsHandler;
+use ChronicleKeeper\Library\Infrastructure\VectorStorage\Distance\CosineDistance;
+use ChronicleKeeper\Library\Infrastructure\VectorStorage\VectorDocument;
+use ChronicleKeeper\Settings\Application\SettingsHandler;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Symfony\Component\Filesystem\Filesystem;

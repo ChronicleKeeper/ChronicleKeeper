@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace DZunke\NovDoc\Test\Library\Domain\Entity;
+namespace ChronicleKeeper\Test\Library\Domain\Entity;
 
+use ChronicleKeeper\Library\Domain\Entity\Document;
+use ChronicleKeeper\Library\Domain\RootDirectory;
 use DateTimeImmutable;
 use DateTimeInterface;
-use DZunke\NovDoc\Library\Domain\Entity\Document;
-use DZunke\NovDoc\Library\Domain\RootDirectory;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\Attributes\UsesClass;

@@ -17,7 +17,7 @@ services:
       string $changelogFile: '%kernel.project_dir%/CHANGELOG.md'
       string $libraryImageStoragePath: '%kernel.project_dir%/var/library/images'
 
-  DZunke\NovDoc\:
+  ChronicleKeeper\:
     resource: '../src/*'
     exclude: '../src/Web/{Model,Kernel.php}'
 

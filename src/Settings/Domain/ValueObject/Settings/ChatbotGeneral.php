@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace DZunke\NovDoc\Settings\Domain\ValueObject\Settings;
+namespace ChronicleKeeper\Settings\Domain\ValueObject\Settings;
 
 /**
  * @phpstan-type ChatbotGeneralSettings = array{

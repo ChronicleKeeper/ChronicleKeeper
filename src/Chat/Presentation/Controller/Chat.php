@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace DZunke\NovDoc\Chat\Presentation\Controller;
+namespace ChronicleKeeper\Chat\Presentation\Controller;
 
-use DZunke\NovDoc\Chat\Application\Service\Chat as ChatTool;
-use DZunke\NovDoc\Chat\Infrastructure\LLMChain\ExtendedMessage;
-use DZunke\NovDoc\Chat\Infrastructure\LLMChain\ExtendedMessageBag;
-use DZunke\NovDoc\Settings\Application\SettingsHandler;
+use ChronicleKeeper\Chat\Application\Service\Chat as ChatTool;
+use ChronicleKeeper\Chat\Infrastructure\LLMChain\ExtendedMessage;
+use ChronicleKeeper\Chat\Infrastructure\LLMChain\ExtendedMessageBag;
+use ChronicleKeeper\Settings\Application\SettingsHandler;
 use PhpLlm\LlmChain\Message\Role;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;

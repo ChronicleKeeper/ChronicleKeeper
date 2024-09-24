@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace DZunke\NovDoc\Library\Presentation\Twig;
+namespace ChronicleKeeper\Library\Presentation\Twig;
 
-use DZunke\NovDoc\Library\Domain\Entity\Document;
-use DZunke\NovDoc\Library\Domain\Entity\Image;
+use ChronicleKeeper\Library\Domain\Entity\Document;
+use ChronicleKeeper\Library\Domain\Entity\Image;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigTest;
 

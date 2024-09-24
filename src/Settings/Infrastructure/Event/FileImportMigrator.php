@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace DZunke\NovDoc\Settings\Infrastructure\Event;
+namespace ChronicleKeeper\Settings\Infrastructure\Event;
 
-use DZunke\NovDoc\Settings\Application\Service\Migrator;
-use DZunke\NovDoc\Settings\Domain\Event\FileImported;
+use ChronicleKeeper\Settings\Application\Service\Migrator;
+use ChronicleKeeper\Settings\Domain\Event\FileImported;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 class FileImportMigrator

@@ -4,5 +4,5 @@ twig:
     strict_variables: '%kernel.debug%'
     form_themes: ['bootstrap_5_layout.html.twig']
     globals:
-      settings_handler: '@DZunke\NovDoc\Settings\Application\SettingsHandler'
-      library_root: '@DZunke\NovDoc\Library\Domain\RootDirectory'
+      settings_handler: '@ChronicleKeeper\Settings\Application\SettingsHandler'
+      library_root: '@ChronicleKeeper\Library\Domain\RootDirectory'

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace DZunke\NovDoc\Library\Domain;
+namespace ChronicleKeeper\Library\Domain;
 
-use DZunke\NovDoc\Library\Domain\Entity\Directory;
+use ChronicleKeeper\Library\Domain\Entity\Directory;
 use ReflectionClass;
 
 final class RootDirectory

@@ -5,12 +5,12 @@
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "DZunke\\NovDoc\\": "src/"
+            "ChronicleKeeper\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "DZunke\\NovDoc\\Test\\": "tests/"
+            "ChronicleKeeper\\Test\\": "tests/"
         }
     },
     "authors": [

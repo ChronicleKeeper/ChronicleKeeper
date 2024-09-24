@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace DZunke\NovDoc\Chat\Infrastructure\LLMChain;
+namespace ChronicleKeeper\Chat\Infrastructure\LLMChain;
 
 use ArrayObject;
 use PhpLlm\LlmChain\Message\Message;

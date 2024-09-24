@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace DZunke\NovDoc\Library\Infrastructure\ValueResolver;
+namespace ChronicleKeeper\Library\Infrastructure\ValueResolver;
 
-use DZunke\NovDoc\Library\Domain\Entity\Image;
-use DZunke\NovDoc\Library\Infrastructure\Repository\FilesystemImageRepository;
+use ChronicleKeeper\Library\Domain\Entity\Image;
+use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemImageRepository;
 use RuntimeException;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Component\HttpFoundation\Request;

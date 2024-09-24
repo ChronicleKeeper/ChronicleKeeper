@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace DZunke\NovDoc\Settings\Application\Service\Importer;
+namespace ChronicleKeeper\Settings\Application\Service\Importer;
 
-use DZunke\NovDoc\Settings\Application\Service\ImportSettings;
+use ChronicleKeeper\Settings\Application\Service\ImportSettings;
 use League\Flysystem\Filesystem;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 

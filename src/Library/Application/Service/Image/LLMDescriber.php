@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace DZunke\NovDoc\Library\Application\Service\Image;
+namespace ChronicleKeeper\Library\Application\Service\Image;
 
-use DZunke\NovDoc\Library\Domain\Entity\Image;
-use DZunke\NovDoc\Settings\Application\SettingsHandler;
+use ChronicleKeeper\Library\Domain\Entity\Image;
+use ChronicleKeeper\Settings\Application\SettingsHandler;
 use PhpLlm\LlmChain\Message\Role;
 use PhpLlm\LlmChain\OpenAI\Model\Gpt\Version;
 use PhpLlm\LlmChain\OpenAI\Runtime;

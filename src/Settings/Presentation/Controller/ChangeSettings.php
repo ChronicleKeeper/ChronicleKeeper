@@ -2,18 +2,18 @@
 
 declare(strict_types=1);
 
-namespace DZunke\NovDoc\Settings\Presentation\Controller;
+namespace ChronicleKeeper\Settings\Presentation\Controller;
 
-use DZunke\NovDoc\Settings\Application\SettingsHandler;
-use DZunke\NovDoc\Settings\Presentation\Form\CalendarGeneralType;
-use DZunke\NovDoc\Settings\Presentation\Form\CalendarHolidayType;
-use DZunke\NovDoc\Settings\Presentation\Form\CalendarMoonType;
-use DZunke\NovDoc\Settings\Presentation\Form\ChatbotFunctionsType;
-use DZunke\NovDoc\Settings\Presentation\Form\ChatbotGeneralType;
-use DZunke\NovDoc\Settings\Presentation\Form\ChatbotSystemPromptType;
-use DZunke\NovDoc\Settings\Presentation\Form\ChatbotTuningType;
-use DZunke\NovDoc\Shared\Presentation\FlashMessages\Alert;
-use DZunke\NovDoc\Shared\Presentation\FlashMessages\HandleFlashMessages;
+use ChronicleKeeper\Settings\Application\SettingsHandler;
+use ChronicleKeeper\Settings\Presentation\Form\CalendarGeneralType;
+use ChronicleKeeper\Settings\Presentation\Form\CalendarHolidayType;
+use ChronicleKeeper\Settings\Presentation\Form\CalendarMoonType;
+use ChronicleKeeper\Settings\Presentation\Form\ChatbotFunctionsType;
+use ChronicleKeeper\Settings\Presentation\Form\ChatbotGeneralType;
+use ChronicleKeeper\Settings\Presentation\Form\ChatbotSystemPromptType;
+use ChronicleKeeper\Settings\Presentation\Form\ChatbotTuningType;
+use ChronicleKeeper\Shared\Presentation\FlashMessages\Alert;
+use ChronicleKeeper\Shared\Presentation\FlashMessages\HandleFlashMessages;
 use RuntimeException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormFactoryInterface;

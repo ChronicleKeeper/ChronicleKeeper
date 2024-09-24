@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace DZunke\NovDoc\Settings\Presentation\Controller;
+namespace ChronicleKeeper\Settings\Presentation\Controller;
 
-use DZunke\NovDoc\Settings\Application\Service\Importer;
-use DZunke\NovDoc\Settings\Application\Service\ImportSettings;
-use DZunke\NovDoc\Settings\Presentation\Form\ImportType;
-use DZunke\NovDoc\Shared\Presentation\FlashMessages\HandleFlashMessages;
+use ChronicleKeeper\Settings\Application\Service\Importer;
+use ChronicleKeeper\Settings\Application\Service\ImportSettings;
+use ChronicleKeeper\Settings\Presentation\Form\ImportType;
+use ChronicleKeeper\Shared\Presentation\FlashMessages\HandleFlashMessages;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;

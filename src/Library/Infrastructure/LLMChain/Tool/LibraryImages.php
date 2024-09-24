@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace DZunke\NovDoc\Library\Infrastructure\LLMChain\Tool;
+namespace ChronicleKeeper\Library\Infrastructure\LLMChain\Tool;
 
-use DZunke\NovDoc\Library\Domain\Entity\Image;
-use DZunke\NovDoc\Library\Infrastructure\Repository\FilesystemVectorImageRepository;
-use DZunke\NovDoc\Settings\Application\SettingsHandler;
-use DZunke\NovDoc\Shared\Infrastructure\LLMChain\ToolUsageCollector;
+use ChronicleKeeper\Library\Domain\Entity\Image;
+use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemVectorImageRepository;
+use ChronicleKeeper\Settings\Application\SettingsHandler;
+use ChronicleKeeper\Shared\Infrastructure\LLMChain\ToolUsageCollector;
 use PhpLlm\LlmChain\EmbeddingModel;
 use PhpLlm\LlmChain\ToolBox\AsTool;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -26,7 +26,7 @@ use const PHP_EOL;
     information about locations, situations or persons. Found images are embedded as markdown by you.
     TEXT,
 )]
-final class NovalisImages
+final class LibraryImages
 {
     /** @var list<Image> */
     private array $referencedImages = [];

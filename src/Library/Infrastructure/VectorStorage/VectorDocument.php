@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace DZunke\NovDoc\Library\Infrastructure\VectorStorage;
+namespace ChronicleKeeper\Library\Infrastructure\VectorStorage;
 
-use DZunke\NovDoc\Library\Domain\Entity\Document;
+use ChronicleKeeper\Library\Domain\Entity\Document;
 use Symfony\Component\Uid\Uuid;
 
 use function array_key_exists;

@@ -1,7 +1,7 @@
 #!/usr/bin/env php
 <?php
 
-use DZunke\NovDoc\Shared\Kernel;
+use ChronicleKeeper\Shared\Kernel;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 
 if (!is_dir(dirname(__DIR__).'/vendor')) {

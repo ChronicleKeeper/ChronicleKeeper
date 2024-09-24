@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace DZunke\NovDoc\Library\Infrastructure\VectorStorage\Updater;
+namespace ChronicleKeeper\Library\Infrastructure\VectorStorage\Updater;
 
-use DZunke\NovDoc\Library\Domain\Entity\Image;
-use DZunke\NovDoc\Library\Infrastructure\Repository\FilesystemImageRepository;
-use DZunke\NovDoc\Library\Infrastructure\Repository\FilesystemVectorImageRepository;
-use DZunke\NovDoc\Library\Infrastructure\VectorStorage\VectorImage;
+use ChronicleKeeper\Library\Domain\Entity\Image;
+use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemImageRepository;
+use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemVectorImageRepository;
+use ChronicleKeeper\Library\Infrastructure\VectorStorage\VectorImage;
 use PhpLlm\LlmChain\EmbeddingModel;
 use Psr\Log\LoggerInterface;
 

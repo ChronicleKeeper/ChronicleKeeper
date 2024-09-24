@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace DZunke\NovDoc\Chat\Infrastructure\LLMChain;
+namespace ChronicleKeeper\Chat\Infrastructure\LLMChain;
 
-use DZunke\NovDoc\Library\Domain\Entity\Document;
-use DZunke\NovDoc\Library\Domain\Entity\Image;
+use ChronicleKeeper\Library\Domain\Entity\Document;
+use ChronicleKeeper\Library\Domain\Entity\Image;
 use PhpLlm\LlmChain\Message\Message;
 use Symfony\Component\Uid\Uuid;
 

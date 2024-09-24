@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace DZunke\NovDoc\Settings\Application\Service;
+namespace ChronicleKeeper\Settings\Application\Service;
 
-use DZunke\NovDoc\Settings\Application\Service\Importer\ImportedFileBag;
-use DZunke\NovDoc\Settings\Application\Service\Importer\SingleImport;
-use DZunke\NovDoc\Settings\Domain\Event\FileImported;
+use ChronicleKeeper\Settings\Application\Service\Importer\ImportedFileBag;
+use ChronicleKeeper\Settings\Application\Service\Importer\SingleImport;
+use ChronicleKeeper\Settings\Domain\Event\FileImported;
 use League\Flysystem\Filesystem;
 use League\Flysystem\ZipArchive\FilesystemZipArchiveProvider;
 use League\Flysystem\ZipArchive\ZipArchiveAdapter;

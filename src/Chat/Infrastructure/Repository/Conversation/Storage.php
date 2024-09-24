@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace DZunke\NovDoc\Chat\Infrastructure\Repository\Conversation;
+namespace ChronicleKeeper\Chat\Infrastructure\Repository\Conversation;
 
 use PhpLlm\LlmChain\Message\Message;
 use PhpLlm\LlmChain\Message\MessageBag;

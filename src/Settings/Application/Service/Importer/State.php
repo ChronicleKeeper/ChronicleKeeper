@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace DZunke\NovDoc\Settings\Application\Service\Importer;
+namespace ChronicleKeeper\Settings\Application\Service\Importer;
 
 enum State: string
 {

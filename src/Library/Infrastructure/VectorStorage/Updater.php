@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace DZunke\NovDoc\Library\Infrastructure\VectorStorage;
+namespace ChronicleKeeper\Library\Infrastructure\VectorStorage;
 
-use DZunke\NovDoc\Library\Infrastructure\VectorStorage\Updater\LibraryDocumentUpdater;
-use DZunke\NovDoc\Library\Infrastructure\VectorStorage\Updater\LibraryImageUpdater;
+use ChronicleKeeper\Library\Infrastructure\VectorStorage\Updater\LibraryDocumentUpdater;
+use ChronicleKeeper\Library\Infrastructure\VectorStorage\Updater\LibraryImageUpdater;
 
 class Updater
 {

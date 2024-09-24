@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace DZunke\NovDoc\Settings\Application\Service\Exporter;
+namespace ChronicleKeeper\Settings\Application\Service\Exporter;
 
-use DZunke\NovDoc\Settings\Application\SettingsHandler;
+use ChronicleKeeper\Settings\Application\SettingsHandler;
 use ZipArchive;
 
 use function file_exists;

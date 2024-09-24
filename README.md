@@ -1,93 +1,47 @@
-# Novalis Document Management (Pending Name)
-
-ChatGPT Supported document management to make the documents questionable from a system prompt.
-
-## Features
-
-- **Document Management**: Efficiently manage and organize your documents for Context knowledge.
-- **ChatGPT Integration**: Make your documents interactive and queryable through system prompts.
-- **PHPDesktop Support**: Build and run the application using PHPDesktop.
-
-## Requirements
-
-- PHP 8.3
-- Composer
-- Symfony CLI (for development server)
-- OpenAI API Key
-
-## Installation for Users
-
-1. **Download the PHPDesktop Application**:
-    - Go to the [latest release](https://github.com/DZunke/novdoc/releases/latest) of the project.
-    - Download the `NovDoc-PHPDesktop.zip` file.
+<p align="center">
+    <a href="https://github.com/DZunke/NovDoc">
+        <img 
+            src="https://raw.githubusercontent.com/DZunke/NovDoc/main/assets/images/logo.png" 
+            alt="Chronicle Keeper - Rollenspiel Chatbot - Wissenbewahrer" 
+            width="300"
+        >
+    </a>
+</p>
 
 
-2. **Extract the Application**:
-    - Extract the contents of the `NovDoc-PHPDesktop.zip` file to your desired location.
 
+## Der Chronicle Keeper
 
-3. **Set up Environment Variables**:
-    - Open the extracted folder and locate the `.env` file.
-    - Open the `.env` file in a text editor and add your OpenAI API Key:
-      ```dotenv
-      OPENAI_API_KEY="your_openai_api_key_here"
-      ```
+Der Chronicle Keeper ist ein mächtiger Begleiter, der speziell für die Welt der Rollenspiele erschaffen wurde. Er dient als 
+Hüter des Wissens und als weiser Berater, der dir hilft, Dokumente und Bilder effizient zu verwalten und zu organisieren. 
+Mit der Integration von ChatGPT kannst du deine gesammelten Schätze interaktiv und durch magische System-Prompts 
+abfragbar machen.
 
+Mit der Hilfe des Chronicle Keeper kannst du die epische Reise deines Charakters begleiten und deine eigene Rollenspielwelt 
+als Spielleiter mühelos durchsuchbar und erweiterbar gestalten. Der Chronicle Keeper steht jedem Abenteurer als treuer
+Gefährte zur Seite.
 
-4. **Run the Application**:
-    - Navigate to the extracted folder and run `php-desktop.exe`.
+**Eine kleine Auswahl der Magie des Chronicle Keepers:**
 
-## Installation for Development
+- ChatGPT Integration: Mach deine Dokumente interaktiv und abfragbar durch System-Prompts.
+- Document Management: Verwalte und organisiere Dokumente und Bilder effizient für Kontextwissen.
+- PHPDesktop Support: Führe die Anwendung als Desktop-Applikation für Windows aus.
+- Export / Import: Exportiere deine Daten, um sie wieder zu importieren, weiterzugeben oder zu sichern.
+- Umfangreiche Konfiguration zum Verhalten des Chronicle Keeper im Gespräch.
+- Konfigurierbare Kalender mit Feiertagen und Mondzyklen, unabhängig vom realen Kalender und dem realen Zeitablauf.
 
-1. **Clone the repository**:
-    ```sh
-    git clone https://github.com/DZunke/novdoc.git
-    cd novdoc
-    ```
+## Installation für Benutzer
 
-2. **Install dependencies**:
-    ```sh
-    composer install
-    ```
+Um den Chronicle Keeper in deiner Runde zu nutzen, musst du keine Taverne aufsuchen oder einen Dungeon durchforsten. 
+Lade einfach die ZIP-Datei des [aktuellsten Releases](https://github.com/DZunke/NovDoc/releases/latest) herunter. 
+Diese enthält die vollständige Desktop-Variante.
 
-3. **Set up environment variables**:
-   Copy the `.env` file and update the necessary values.
-    ```sh
-    cp .env .env.local
-    ```
-   
-## Usage
-
-### Development Server
-
-Start the development server using Symfony CLI:
-```sh
-make serve-web
-```
-
-### PHPDesktop Application
-
-Build with `make phpdesktop` creates a `build` directory. Copy the `.env.local` file to the `www` directory
-of the build application and copy the `build` directory where ever you want to execute the `php-desktop.exe`
-
-### Code Quality Checks
-
-Run the following commands to ensure code quality:
-
-```sh
-make lint-php
-make check-cs
-make static-analysis
-make phpunit
-```
-
-## Contributing
-
-Contributions are welcome! Please open an issue or submit a pull request.
+Nach dem Entpacken des Verzeichnisses musst du die Datei `www/.env` anpassen und 
+deinen [OpenAI API Key](https://platform.openai.com/api-keys) eintragen. Dann kannst du sofort loslegen.
 
 ## License
 
-**NovDoc** © 2024+, Denis Zunke. Published within a custom license. See LICENSE.
+**ChronicleKeeper** © 2024+, Denis Zunke. Published within a custom license. See LICENSE.
 
 > GitHub [@dzunke](https://github.com/DZunke) &nbsp;&middot;&nbsp;
 > Twitter [@DZunke](https://twitter.com/DZunke)

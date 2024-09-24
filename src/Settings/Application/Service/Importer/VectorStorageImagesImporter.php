@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace DZunke\NovDoc\Settings\Application\Service\Importer;
+namespace ChronicleKeeper\Settings\Application\Service\Importer;
 
-use DZunke\NovDoc\Settings\Application\Service\FileType;
-use DZunke\NovDoc\Settings\Application\Service\ImportSettings;
+use ChronicleKeeper\Settings\Application\Service\FileType;
+use ChronicleKeeper\Settings\Application\Service\ImportSettings;
 use League\Flysystem\FileAttributes;
 use League\Flysystem\Filesystem;
 

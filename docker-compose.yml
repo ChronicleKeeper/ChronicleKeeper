@@ -1,7 +1,5 @@
 services:
   frankenphp:
-    environment:
-      SERVER_NAME: "novdoc.local"
     ports:
       - '80:80'
       - '443:443'

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace DZunke\NovDoc\Shared\Presentation\Twig;
+namespace ChronicleKeeper\Shared\Presentation\Twig;
 
 use Symfony\UX\TwigComponent\Attribute\AsTwigComponent;
 

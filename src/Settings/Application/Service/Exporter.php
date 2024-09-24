@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace DZunke\NovDoc\Settings\Application\Service;
+namespace ChronicleKeeper\Settings\Application\Service;
 
-use DZunke\NovDoc\Settings\Application\Service\Exporter\SingleExport;
+use ChronicleKeeper\Settings\Application\Service\Exporter\SingleExport;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use ZipArchive;
 
@@ -21,7 +21,7 @@ class Exporter
 
     public function export(): string
     {
-        $zipName = 'NovDoc-Export-' . date('Y-m-d-H-i-s') . '.zip';
+        $zipName = 'ChronicleKeeper-Export-' . date('Y-m-d-H-i-s') . '.zip';
 
         $zip = new ZipArchive();
         $zip->open($zipName, ZipArchive::CREATE);
