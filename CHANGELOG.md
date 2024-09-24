@@ -1,5 +1,19 @@
 # Changelog
 
+## [alpha-0.4] - Conversations will save the world
+
+### Added
+- Docker development environment with [FrankenPHP](https://frankenphp.dev/) support as an alternative to the Symfony local server.
+
+### Changed
+- Began project file structure cleanup, moving from prototyping to clean code.
+- Navigation now displays the project logo and is sticky at the top.
+- Reverted default GPT model to GPT4o-mini from GPT4o due to lack of improvement.
+
+### Fixed
+- Resolved build process failure caused by a missing content block in the loader component.
+- Disabled unnecessary Turbo streams activation.
+
 ## [alpha-0.3] - Images will rule the world
 
 ### Added
