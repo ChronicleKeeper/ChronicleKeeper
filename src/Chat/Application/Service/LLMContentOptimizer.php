@@ -20,7 +20,7 @@ class LLMContentOptimizer
     {
         $response = $this->llm->call(
             new MessageBag($this->getSystemPrompt(), Message::ofUser($content)),
-            ['model' => Version::gpt4oMini(), 'temperature' => 0.75],
+            ['model' => Version::gpt4oMini()->name, 'temperature' => 0.75],
         );
 
         return (string) $response->getContent();
