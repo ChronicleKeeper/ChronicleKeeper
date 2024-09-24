@@ -56,7 +56,7 @@
             <div class="card-body">
                 <div class="row row-cards">
                     {% if contextDocuments is not empty %}
-                        <div class="col-6">
+                        <div class="col-{{ contextImages is empty ? '12' : '6' }}">
                             <div class="card">
                                 <div class="list-group list-group-flush">
                                     {% for document in message.extended.documents %}
