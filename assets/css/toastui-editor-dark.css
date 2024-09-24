@@ -1,4 +1,13 @@
 @charset "utf-8";
+
+/** ADDITIONALLY ADDED, DO NOT REMOVE! **/
+.toastui-editor-contents img {
+    max-width: 400px;
+    max-height: 400px;
+}
+
+/** ORIGINAL CONTENT OF THE THEME! **/
+
 .toastui-editor-dark.toastui-editor-defaultUI {
   border: var(--tblr-border-width) solid var(--tblr-border-color);
   color: var(--tblr-body-color);

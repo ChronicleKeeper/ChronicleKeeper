@@ -1,5 +1,5 @@
 @charset "utf-8";
-div.chatbot-message img {
+div.chatbot-message img, .markdown img {
     max-width: 400px;
     max-height: 400px;
 }
