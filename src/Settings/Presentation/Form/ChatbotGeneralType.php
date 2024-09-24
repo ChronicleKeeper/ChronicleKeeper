@@ -84,7 +84,7 @@ final class ChatbotGeneralType extends AbstractType implements DataMapperInterfa
             'showReferencedDocuments',
             CheckboxType::class,
             [
-                'label' => 'Referenzierte Dokumente aufzeichnen',
+                'label' => 'Referenzierte Dokumente anzeigen',
                 'translation_domain' => false,
                 'required' => false,
             ],
@@ -94,7 +94,7 @@ final class ChatbotGeneralType extends AbstractType implements DataMapperInterfa
             'showReferencedImages',
             CheckboxType::class,
             [
-                'label' => 'Referenzierte Bilder aufzeichnen',
+                'label' => 'Referenzierte Bilder anzeigen',
                 'translation_domain' => false,
                 'required' => false,
             ],

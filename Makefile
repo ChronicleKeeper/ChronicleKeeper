@@ -38,6 +38,7 @@ static-analysis: ## runs static analysis
 	 vendor/bin/phpstan analyse -c phpstan.neon
 
 phpunit: ## run phpunit
+	APP_ENV=test php bin/console cache:clear
 	 vendor/bin/phpunit
 
 lint-php: ## linting php files
