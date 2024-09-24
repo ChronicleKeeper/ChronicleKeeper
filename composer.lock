@@ -5818,16 +5818,16 @@
         },
         {
             "name": "symfony/ux-icons",
-            "version": "v2.19.0",
+            "version": "v2.20.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/ux-icons.git",
-                "reference": "c4826439f464c23cc0c2e2a997252100d6049daa"
+                "reference": "07328c6d3cf480f7d5dafdf621f0d54323e23035"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/ux-icons/zipball/c4826439f464c23cc0c2e2a997252100d6049daa",
-                "reference": "c4826439f464c23cc0c2e2a997252100d6049daa",
+                "url": "https://api.github.com/repos/symfony/ux-icons/zipball/07328c6d3cf480f7d5dafdf621f0d54323e23035",
+                "reference": "07328c6d3cf480f7d5dafdf621f0d54323e23035",
                 "shasum": ""
             },
             "require": {
@@ -5886,7 +5886,7 @@
                 "twig"
             ],
             "support": {
-                "source": "https://github.com/symfony/ux-icons/tree/v2.19.0"
+                "source": "https://github.com/symfony/ux-icons/tree/v2.20.0"
             },
             "funding": [
                 {
@@ -5902,7 +5902,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-08-07T13:07:19+00:00"
+            "time": "2024-09-18T14:55:01+00:00"
         },
         {
             "name": "symfony/ux-live-component",
