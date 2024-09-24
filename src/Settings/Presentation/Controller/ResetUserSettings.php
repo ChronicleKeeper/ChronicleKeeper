@@ -14,7 +14,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\RouterInterface;
 
-#[Route('/settings/reset', name: 'settings_reset')]
+#[Route('/settings/{section}/reset', name: 'settings_reset')]
 class ResetUserSettings extends AbstractController
 {
     use HandleFlashMessages;
@@ -25,11 +25,11 @@ class ResetUserSettings extends AbstractController
     ) {
     }
 
-    public function __invoke(Request $request): Response
+    public function __invoke(Request $request, string $section): Response
     {
         $this->settingsHandler->reset();
         $this->addFlashMessage($request, Alert::SUCCESS, 'Einstellungen wurden auf den Standard zurückgesetzt.');
 
-        return new RedirectResponse($this->router->generate('settings'));
+        return new RedirectResponse($this->router->generate('settings', ['section' => $section]));
     }
 }

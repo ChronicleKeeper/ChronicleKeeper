@@ -4,6 +4,7 @@
 
 ### Added
 - Docker development environment with [FrankenPHP](https://frankenphp.dev/) support as an alternative to the Symfony local server.
+- Added a confirmation dialog for resetting settings.
 
 ### Changed
 - Began project file structure cleanup, moving from prototyping to clean code.
