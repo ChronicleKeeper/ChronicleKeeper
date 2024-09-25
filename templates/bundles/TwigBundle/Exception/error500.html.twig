@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="{{ app.request.locale }}">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <title>Oops - Dem Chronicle Keeper ist das Bier heruntergefallen!</title>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta21/dist/css/tabler.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta21/dist/css/tabler-vendors.min.css">
+
+    {% block stylesheets %}
+    {% endblock %}
+
+</head>
+<body data-bs-theme="dark">
+    <div class="page page-center">
+        <div class="container-tight py-4">
+            <div class="empty">
+                <div class="empty-header">500</div>
+                <p class="empty-title">Oops ... dem Chronicle Keeper ...</p>
+                <p class="empty-subtitle text-secondary">
+                    ... ist das letzte Bier aus der Hand gefallen.
+                </p>
+                <div class="empty-action">
+                    <a href="/" class="btn btn-dark">
+                        {{ ux_icon('tabler:arrow-left') }} Zur Türe ...
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
