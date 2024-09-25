@@ -27,6 +27,19 @@
                         {{ ux_icon('tabler:arrow-left') }} Zur Türe ...
                     </a>
                 </div>
+                <hr />
+                <div class="card" style="text-align: left;">
+                    <div class="card-header">
+                        <h3 class="card-title">Der Chronicle Keeper würde folgendes an einen Entwickler geben ...</h3>
+                    </div>
+                    <div class="card-body">
+                        <p>Fehler</p>
+                        <pre>{{ exception.message }}</pre>
+                        <pre>{{ exception.file }}:{{ exception.line }}</pre>
+                        <pre>{{ exception.traceAsString }}</pre>
+                        <pre>{{ app.request.attributes.all|json_encode(constant('JSON_PRETTY_PRINT')) }}</pre>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

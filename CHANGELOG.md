@@ -6,6 +6,7 @@
 - Docker development environment with [FrankenPHP](https://frankenphp.dev/) support as an alternative to the Symfony local server.
 - Confirmation dialog for resetting settings.
 - Image button in the markdown editor for embedding image links.
+- Error pages for 404 and 500 HTTP status codes. The 500 error page includes debug information for developers.
 
 ### Changed
 - Began project file structure cleanup, moving from prototyping to clean code.
