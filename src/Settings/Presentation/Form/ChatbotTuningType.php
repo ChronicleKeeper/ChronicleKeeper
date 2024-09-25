@@ -43,7 +43,7 @@ final class ChatbotTuningType extends AbstractType implements DataMapperInterfac
                 'required' => false,
                 'scale' => 2,
                 'constraints' => [
-                    new LessThanOrEqual(1.0),
+                    new LessThanOrEqual(2.0),
                     new GreaterThanOrEqual(0.1),
                 ],
             ],
