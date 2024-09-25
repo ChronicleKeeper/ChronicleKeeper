@@ -12,6 +12,7 @@
 - Navigation now displays the project logo and is sticky at the top.
 - Reverted default GPT model to GPT4o-mini from GPT4o due to lack of improvement.
 - The chatbot now embeds images if their descriptions match the user's request.
+- When uploading images, descriptive context data is now attempted to be retrieved from documents based on the file name.
 
 ### Fixed
 - Resolved build process failure caused by a missing content block in the loader component.

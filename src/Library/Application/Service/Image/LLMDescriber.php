@@ -6,68 +6,55 @@ namespace ChronicleKeeper\Library\Application\Service\Image;
 
 use ChronicleKeeper\Library\Domain\Entity\Image;
 use ChronicleKeeper\Settings\Application\SettingsHandler;
-use PhpLlm\LlmChain\Message\Role;
+use PhpLlm\LlmChain\Chain;
+use PhpLlm\LlmChain\Message\Content\Image as LLMImage;
+use PhpLlm\LlmChain\Message\Message;
+use PhpLlm\LlmChain\Message\MessageBag;
 use PhpLlm\LlmChain\OpenAI\Model\Gpt\Version;
-use PhpLlm\LlmChain\OpenAI\Platform;
+use RuntimeException;
 
-use function is_array;
 use function is_string;
 
 class LLMDescriber
 {
     public function __construct(
-        private readonly Platform $runtime,
         private readonly SettingsHandler $settingsHandler,
+        private readonly Chain $chain,
     ) {
     }
 
-    public function getDescription(Image $image): string
+    public function getDescription(Image $imageToAnalyze): string
     {
         $settings = $this->settingsHandler->get();
 
-        $messages = [
+        $response = $this->chain->call(
+            new MessageBag(
+                Message::forSystem($settings->getChatbotSystemPrompt()->getSystemPrompt()),
+                Message::ofUser(
+                    $this->getUserPromptText($imageToAnalyze),
+                    new LLMImage('data:' . $imageToAnalyze->mimeType . ';base64,' . $imageToAnalyze->encodedImage),
+                ),
+            ),
             [
-                'role' => Role::System->value,
-                'content' => $settings->getChatbotSystemPrompt()->getSystemPrompt(),
+                'model' => Version::gpt4o()->name,
+                'temperature' => $settings->getChatbotTuning()->getTemperature(),
             ],
-            [
-                'role' => Role::User->value,
-                'content' => [
-                    [
-                        'type' => 'text',
-                        'text' => 'Mit der Information, dass das Bild "' . $image->title . '" heißt, beschreibe bis ins kleinste Detail jede relevante Information aus diesem Bild. Füge keine Links ein. Schlussfolgerungen möchtest du nicht machen, sondern nur den Inhalt beschreiben.',
-                    ],
-                    [
-                        'type' => 'image_url',
-                        'image_url' => ['url' => 'data:' . $image->mimeType . ';base64,' . $image->encodedImage],
-                    ],
-                ],
-            ],
-        ];
+        );
 
-        $body = [
-            'model' => Version::gpt4o()->name,
-            'temperature' => $settings->getChatbotTuning()->getTemperature(),
-            'messages' => $messages,
-        ];
-
-        $response = $this->runtime->request('chat/completions', $body);
-
-        $choices = $response['choices'];
-        if (! isset($choices) || ! is_array($choices)) {
-            return '';
+        if (! is_string($response)) {
+            throw new RuntimeException('Image analyzing is expected to return string, given is an object.');
         }
 
-        $firstChoice = $choices[0];
-        if (! isset($firstChoice['message']) || ! is_array($firstChoice['message'])) {
-            return '';
-        }
+        return $response;
+    }
 
-        $message = $firstChoice['message'];
-        if (! isset($message['content']) || ! is_string($message['content'])) {
-            return '';
-        }
-
-        return $message['content'];
+    private function getUserPromptText(Image $image): string
+    {
+        return <<<TEXT
+        Mit der Information, dass das Bild "{$image->title}" heißt, beschreibe bis ins kleinste Detail jede relevante
+        Information aus diesem Bild. Füge keine Links ein. Schlussfolgerungen möchtest du nicht machen, sondern nur den
+        Inhalt beschreiben. Ziehe Informationen der Funktion novalis_background andhand des Titels zu rate um das Bild
+        noch besser zu bewerten.
+        TEXT;
     }
 }
