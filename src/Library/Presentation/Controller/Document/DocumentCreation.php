@@ -13,6 +13,7 @@ use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemDirectoryReposit
 use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemDocumentRepository;
 use ChronicleKeeper\Shared\Presentation\FlashMessages\Alert;
 use ChronicleKeeper\Shared\Presentation\FlashMessages\HandleFlashMessages;
+use PhpLlm\LlmChain\Message\AssistantMessage;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -97,6 +98,10 @@ class DocumentCreation extends AbstractController
         $foundMessageByIdentifier  = reset($foundMessagesByIdentifier);
 
         if (! $foundMessageByIdentifier instanceof ExtendedMessage) {
+            return '';
+        }
+
+        if (! $foundMessageByIdentifier->message instanceof AssistantMessage) {
             return '';
         }
 

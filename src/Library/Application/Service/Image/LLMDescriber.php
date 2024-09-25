@@ -8,7 +8,7 @@ use ChronicleKeeper\Library\Domain\Entity\Image;
 use ChronicleKeeper\Settings\Application\SettingsHandler;
 use PhpLlm\LlmChain\Message\Role;
 use PhpLlm\LlmChain\OpenAI\Model\Gpt\Version;
-use PhpLlm\LlmChain\OpenAI\Runtime;
+use PhpLlm\LlmChain\OpenAI\Platform;
 
 use function is_array;
 use function is_string;
@@ -16,7 +16,7 @@ use function is_string;
 class LLMDescriber
 {
     public function __construct(
-        private readonly Runtime $runtime,
+        private readonly Platform $runtime,
         private readonly SettingsHandler $settingsHandler,
     ) {
     }

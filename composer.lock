@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "41e917947cd8f1f74bc6ea5050b46de9",
+    "content-hash": "00194fc289f6fcaf1458353823f3994e",
     "packages": [
         {
             "name": "composer/semver",
@@ -1028,16 +1028,16 @@
         },
         {
             "name": "php-llm/llm-chain",
-            "version": "dev-main",
+            "version": "0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-llm/llm-chain.git",
-                "reference": "e443b48c499adfdbe15bf001e4ad0e85e4741f0f"
+                "reference": "ce897978fcfae21a88fc10a08677a1181def57eb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-llm/llm-chain/zipball/e443b48c499adfdbe15bf001e4ad0e85e4741f0f",
-                "reference": "e443b48c499adfdbe15bf001e4ad0e85e4741f0f",
+                "url": "https://api.github.com/repos/php-llm/llm-chain/zipball/ce897978fcfae21a88fc10a08677a1181def57eb",
+                "reference": "ce897978fcfae21a88fc10a08677a1181def57eb",
                 "shasum": ""
             },
             "require": {
@@ -1073,7 +1073,6 @@
                 "symfony/css-selector": "For using the YouTube transcription tool.",
                 "symfony/dom-crawler": "For using the YouTube transcription tool."
             },
-            "default-branch": true,
             "type": "library",
             "autoload": {
                 "psr-4": {
@@ -1093,27 +1092,27 @@
             "description": "A slim PHP component with tooling around LLMs.",
             "support": {
                 "issues": "https://github.com/php-llm/llm-chain/issues",
-                "source": "https://github.com/php-llm/llm-chain/tree/main"
+                "source": "https://github.com/php-llm/llm-chain/tree/0.2"
             },
-            "time": "2024-09-24T07:21:05+00:00"
+            "time": "2024-09-25T16:31:52+00:00"
         },
         {
             "name": "php-llm/llm-chain-bundle",
-            "version": "0.1",
+            "version": "0.2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-llm/llm-chain-bundle.git",
-                "reference": "322011b8355f416955058177dffbb7ffe0a50fc8"
+                "reference": "ed6be06937a24e096f8266be57141eacb87bdf3c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-llm/llm-chain-bundle/zipball/322011b8355f416955058177dffbb7ffe0a50fc8",
-                "reference": "322011b8355f416955058177dffbb7ffe0a50fc8",
+                "url": "https://api.github.com/repos/php-llm/llm-chain-bundle/zipball/ed6be06937a24e096f8266be57141eacb87bdf3c",
+                "reference": "ed6be06937a24e096f8266be57141eacb87bdf3c",
                 "shasum": ""
             },
             "require": {
                 "php": ">=8.2",
-                "php-llm/llm-chain": "dev-main",
+                "php-llm/llm-chain": "^0.2",
                 "symfony/config": "^6.4 || ^7.0",
                 "symfony/dependency-injection": "^6.4 || ^7.0",
                 "symfony/framework-bundle": "^6.4 || ^7.0"
@@ -1141,9 +1140,9 @@
             "description": "Symfony integration bundle for php-llm/llm-chain",
             "support": {
                 "issues": "https://github.com/php-llm/llm-chain-bundle/issues",
-                "source": "https://github.com/php-llm/llm-chain-bundle/tree/0.1"
+                "source": "https://github.com/php-llm/llm-chain-bundle/tree/0.2.1"
             },
-            "time": "2024-09-22T21:30:00+00:00"
+            "time": "2024-09-25T17:13:25+00:00"
         },
         {
             "name": "phpdocumentor/reflection-common",
@@ -9303,10 +9302,7 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "php-llm/llm-chain": 20,
-        "php-llm/llm-chain-bundle": 20
-    },
+    "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {

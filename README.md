@@ -39,11 +39,11 @@ deinen [OpenAI API Key](https://platform.openai.com/api-keys) eintragen. Dann ka
 
 ## License
 
-**ChronicleKeeper** © 2024+, Denis Zunke. Published within a custom license. See LICENSE.
+**Chronicle Keeper** © 2024+, Denis Zunke. Published within a custom license. See LICENSE.
 
 > GitHub [@dzunke](https://github.com/DZunke) &nbsp;&middot;&nbsp;
 > Twitter [@DZunke](https://twitter.com/DZunke)
 
 > Supported by &nbsp;&middot;&nbsp;
 > [PHPDesktop](https://github.com/cztomczak/phpdesktop)&nbsp;&middot;&nbsp;
-> [Tabler Dashboard](https://tabler.io)
+> [Tabler](https://tabler.io)

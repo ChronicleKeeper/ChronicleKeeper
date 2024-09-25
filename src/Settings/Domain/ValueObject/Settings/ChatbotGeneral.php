@@ -19,8 +19,8 @@ readonly class ChatbotGeneral
     public function __construct(
         private int $maxDocumentResponses = 4,
         private int $maxImageResponses = 2,
-        private string $chatbotName = 'Rostbart',
-        private string $chatterName = 'Elias',
+        private string $chatbotName = 'Chronicle Keeper',
+        private string $chatterName = 'Der Unbekannte',
         private bool $showReferencedDocuments = true,
         private bool $showReferencedImages = true,
     ) {

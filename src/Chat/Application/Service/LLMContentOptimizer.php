@@ -7,6 +7,7 @@ namespace ChronicleKeeper\Chat\Application\Service;
 use PhpLlm\LlmChain\LanguageModel;
 use PhpLlm\LlmChain\Message\Message;
 use PhpLlm\LlmChain\Message\MessageBag;
+use PhpLlm\LlmChain\Message\SystemMessage;
 use PhpLlm\LlmChain\OpenAI\Model\Gpt\Version;
 
 class LLMContentOptimizer
@@ -26,7 +27,7 @@ class LLMContentOptimizer
         return (string) $response->getContent();
     }
 
-    private function getSystemPrompt(): Message
+    private function getSystemPrompt(): SystemMessage
     {
         return Message::forSystem(<<<'TEXT'
         You are a proof reader and will simnply correct and reformat text to markdown. Where it is recommended
