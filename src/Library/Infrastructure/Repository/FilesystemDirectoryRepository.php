@@ -9,14 +9,13 @@ use ChronicleKeeper\Library\Domain\RootDirectory;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Serializer\SerializerInterface;
 
 use function array_filter;
 use function file_exists;
 use function file_get_contents;
 use function file_put_contents;
-use function is_array;
 use function is_readable;
-use function json_decode;
 use function json_encode;
 use function json_validate;
 use function strcasecmp;
@@ -24,23 +23,29 @@ use function usort;
 
 use const DIRECTORY_SEPARATOR;
 use const JSON_PRETTY_PRINT;
+use const JSON_THROW_ON_ERROR;
 
 class FilesystemDirectoryRepository
 {
     public function __construct(
         private readonly string $directoryStoragePath,
         private readonly LoggerInterface $logger,
+        private readonly SerializerInterface $serializer,
     ) {
     }
 
     public function store(Directory $directory): void
     {
-        $filename        = $directory->id . '.json';
-        $filepath        = $this->directoryStoragePath . DIRECTORY_SEPARATOR . $filename;
-        $documentAsArray = $directory->toArray();
-        $documentAsJson  = json_encode($documentAsArray, JSON_PRETTY_PRINT);
+        $filename = $directory->id . '.json';
+        $filepath = $this->directoryStoragePath . DIRECTORY_SEPARATOR . $filename;
 
-        file_put_contents($filepath, $documentAsJson);
+        file_put_contents(
+            $filepath,
+            json_encode(
+                $directory->toArray(),
+                JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT,
+            ),
+        );
     }
 
     /** @return list<Directory> */
@@ -63,7 +68,10 @@ class FilesystemDirectoryRepository
 
         usort(
             $directories,
-            static fn (Directory $left, Directory $right) => strcasecmp($left->flattenHierarchyTitle(), $right->flattenHierarchyTitle()),
+            static fn (Directory $left, Directory $right) => strcasecmp(
+                $left->flattenHierarchyTitle(),
+                $right->flattenHierarchyTitle(),
+            ),
         );
 
         return $directories;
@@ -103,17 +111,7 @@ class FilesystemDirectoryRepository
 
     private function convertJsonToDirectory(string $json): Directory
     {
-        $directoryArr = json_decode($json, true);
-
-        if (! is_array($directoryArr) || ! Directory::isDirectoryArray($directoryArr)) {
-            throw new RuntimeException('Document to load contain invalid content.');
-        }
-
-        $directory         = new Directory($directoryArr['title']);
-        $directory->id     = $directoryArr['id'];
-        $directory->parent = $this->findById($directoryArr['parent']);
-
-        return $directory;
+        return $this->serializer->deserialize($json, Directory::class, 'json');
     }
 
     private function getContentOfFile(string $filename): string|null
