@@ -40,7 +40,7 @@ static-analysis: ## runs static analysis
 
 phpunit: ## run phpunit
 	APP_ENV=test php bin/console cache:clear
-	 vendor/bin/phpunit
+	 vendor/bin/phpunit --colors
 
 lint-php: ## linting php files
 	 if find src -name "*.php" -exec php -l {} \; | grep -v "No syntax errors detected"; then exit 1; fi

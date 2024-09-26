@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ChronicleKeeper\Chat\Infrastructure\LLMChain;
 
 use ArrayObject;
+use JsonSerializable;
 use PhpLlm\LlmChain\Message\MessageBag;
 use PhpLlm\LlmChain\Message\MessageInterface;
 
@@ -12,7 +13,7 @@ use function array_map;
 use function array_values;
 
 /** @template-extends ArrayObject<int, ExtendedMessage> */
-final class ExtendedMessageBag extends ArrayObject
+final class ExtendedMessageBag extends ArrayObject implements JsonSerializable
 {
     public function __construct(ExtendedMessage ...$messages)
     {
@@ -25,5 +26,11 @@ final class ExtendedMessageBag extends ArrayObject
             static fn (ExtendedMessage $extendedMessage): MessageInterface => $extendedMessage->message,
             $this->getArrayCopy(),
         ));
+    }
+
+    /** @return list<ExtendedMessage> */
+    public function jsonSerialize(): array
+    {
+        return $this->getArrayCopy();
     }
 }

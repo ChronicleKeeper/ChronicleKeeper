@@ -4,28 +4,19 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Chat\Infrastructure\Repository\Conversation;
 
-use ChronicleKeeper\Chat\Infrastructure\LLMChain\ExtendedMessage;
 use ChronicleKeeper\Chat\Infrastructure\LLMChain\ExtendedMessageBag;
-use PhpLlm\LlmChain\Message\AssistantMessage;
-use PhpLlm\LlmChain\Message\Content\Text;
 use PhpLlm\LlmChain\Message\Message;
-use PhpLlm\LlmChain\Message\Role;
-use PhpLlm\LlmChain\Message\SystemMessage;
-use PhpLlm\LlmChain\Message\UserMessage;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Serializer\Encoder\JsonEncode;
+use Symfony\Component\Serializer\SerializerInterface;
 
-use function array_filter;
-use function array_map;
 use function file_exists;
 use function file_get_contents;
 use function file_put_contents;
-use function is_array;
-use function json_decode;
-use function json_encode;
 use function unlink;
 
 use const JSON_PRETTY_PRINT;
-use const JSON_THROW_ON_ERROR;
+use const JSON_UNESCAPED_UNICODE;
 
 class Storage
 {
@@ -34,6 +25,7 @@ class Storage
     public function __construct(
         private readonly string $lastConversationFilePath,
         private readonly RequestStack $requestStack,
+        private readonly SerializerInterface $serializer,
     ) {
     }
 
@@ -50,7 +42,14 @@ class Storage
             return;
         }
 
-        file_put_contents($this->lastConversationFilePath, json_encode($messages, JSON_PRETTY_PRINT));
+        file_put_contents(
+            $this->lastConversationFilePath,
+            $this->serializer->serialize(
+                $messages,
+                'json',
+                [JsonEncode::OPTIONS => JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT],
+            ),
+        );
     }
 
     public function load(): void
@@ -64,32 +63,8 @@ class Storage
             return;
         }
 
-        $messages = json_decode($conversationContent, true, 512, JSON_THROW_ON_ERROR);
-        if (! is_array($messages)) {
-            return;
-        }
+        $messages = $this->serializer->deserialize($conversationContent, ExtendedMessageBag::class, 'json');
 
-        $messages = array_map(
-            static function (array $messageArr): ExtendedMessage|null {
-                $role    = Role::from($messageArr['message']['role']);
-                $message = null;
-                if ($role === Role::System) {
-                    $message = new SystemMessage($messageArr['message']['content']);
-                } elseif ($role === Role::Assistant) {
-                    $message = new AssistantMessage($messageArr['message']['content']);
-                } elseif ($role === Role::User) {
-                    $message = new UserMessage(new Text($messageArr['message']['content']));
-                }
-
-                if ($message === null) {
-                    return null;
-                }
-
-                return new ExtendedMessage($message);
-            },
-            $messages,
-        );
-
-        $this->requestStack->getSession()->set(self::SESSION_KEY, new ExtendedMessageBag(...array_filter($messages)));
+        $this->requestStack->getSession()->set(self::SESSION_KEY, $messages);
     }
 }

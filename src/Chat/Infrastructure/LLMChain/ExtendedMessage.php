@@ -6,10 +6,19 @@ namespace ChronicleKeeper\Chat\Infrastructure\LLMChain;
 
 use ChronicleKeeper\Library\Domain\Entity\Document;
 use ChronicleKeeper\Library\Domain\Entity\Image;
+use JsonSerializable;
 use PhpLlm\LlmChain\Message\MessageInterface;
 use Symfony\Component\Uid\Uuid;
 
-final class ExtendedMessage
+/**
+ * @phpstan-type ExtendedMessageArray = array{
+ *      message: MessageInterface,
+ *      documents: list<Document>,
+ *      images: list<Image>,
+ *      calledTools: list<array{tool: string, arguments: array<string,mixed>}>
+ *  }
+ */
+final class ExtendedMessage implements JsonSerializable
 {
     public readonly string $id;
 
@@ -25,5 +34,16 @@ final class ExtendedMessage
         public array $calledTools = [],
     ) {
         $this->id = Uuid::v4()->toString();
+    }
+
+    /** @return ExtendedMessageArray */
+    public function jsonSerialize(): array
+    {
+        return [
+            'message' => $this->message,
+            'documents' => $this->documents,
+            'images' => $this->images,
+            'calledTools' => $this->calledTools,
+        ];
     }
 }
