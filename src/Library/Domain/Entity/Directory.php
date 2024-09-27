@@ -7,9 +7,7 @@ namespace ChronicleKeeper\Library\Domain\Entity;
 use ChronicleKeeper\Library\Domain\RootDirectory;
 use Symfony\Component\Uid\Uuid;
 
-use function array_key_exists;
 use function array_reverse;
-use function count;
 use function implode;
 
 /**
@@ -41,19 +39,6 @@ class Directory
         } while ($directory !== null);
 
         return implode(' > ', array_reverse($components));
-    }
-
-    /**
-     * @param mixed[] $array
-     *
-     * @phpstan-return ($array is DirectoryArray ? true : false)
-     */
-    public static function isDirectoryArray(array $array): bool
-    {
-        return count($array) === 3
-            && array_key_exists('id', $array)
-            && array_key_exists('title', $array)
-            && array_key_exists('parent', $array);
     }
 
     /** @return DirectoryArray */

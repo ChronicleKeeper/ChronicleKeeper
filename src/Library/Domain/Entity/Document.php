@@ -10,8 +10,6 @@ use DateTimeInterface;
 use Symfony\Component\String\Slugger\AsciiSlugger;
 use Symfony\Component\Uid\Uuid;
 
-use function array_key_exists;
-use function count;
 use function sha1;
 use function strlen;
 
@@ -35,32 +33,6 @@ class Document
         $this->id        = Uuid::v4()->toString();
         $this->directory = RootDirectory::get();
         $this->updatedAt = new DateTimeImmutable();
-    }
-
-    /** @param DocumentArray $documentArr */
-    public static function fromArray(array $documentArr): Document
-    {
-        $document     = new Document($documentArr['title'], $documentArr['content']);
-        $document->id = $documentArr['id'];
-
-        if (array_key_exists('last_updated', $documentArr)) {
-            $document->updatedAt = new DateTimeImmutable($documentArr['last_updated']);
-        }
-
-        return $document;
-    }
-
-    /**
-     * @param mixed[] $documentArr
-     *
-     * @phpstan-return ($documentArr is DocumentArray ? true : false)
-     */
-    public static function isDocumentArray(array $documentArr): bool
-    {
-        return count($documentArr) >= 3
-            && array_key_exists('id', $documentArr)
-            && array_key_exists('title', $documentArr)
-            && array_key_exists('content', $documentArr);
     }
 
     /** @return DocumentArray */

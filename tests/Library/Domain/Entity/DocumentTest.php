@@ -7,12 +7,10 @@ namespace ChronicleKeeper\Test\Library\Domain\Entity;
 use ChronicleKeeper\Library\Domain\Entity\Document;
 use ChronicleKeeper\Library\Domain\RootDirectory;
 use DateTimeImmutable;
-use DateTimeInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Uid\Uuid;
 
 use function sha1;
 use function strlen;
@@ -32,44 +30,6 @@ class DocumentTest extends TestCase
         self::assertSame($content, $document->content);
         self::assertNotEmpty($document->id);
         self::assertInstanceOf(DateTimeImmutable::class, $document->updatedAt);
-    }
-
-    public function testFromArrayCreatesDocument(): void
-    {
-        $documentArr = [
-            'id' => Uuid::v4()->toString(),
-            'title' => 'Test Title',
-            'content' => 'Test Content',
-            'last_updated' => (new DateTimeImmutable())->format(DateTimeInterface::ATOM),
-        ];
-
-        $document = Document::fromArray($documentArr);
-
-        self::assertSame($documentArr['id'], $document->id);
-        self::assertSame($documentArr['title'], $document->title);
-        self::assertSame($documentArr['content'], $document->content);
-        self::assertSame($documentArr['last_updated'], $document->updatedAt->format(DateTimeInterface::ATOM));
-    }
-
-    public function testIsDocumentArrayReturnsTrueForValidArray(): void
-    {
-        $documentArr = [
-            'id' => Uuid::v4()->toString(),
-            'title' => 'Test Title',
-            'content' => 'Test Content',
-        ];
-
-        self::assertTrue(Document::isDocumentArray($documentArr)); // @phpstan-ignore staticMethod.alreadyNarrowedType
-    }
-
-    public function testIsDocumentArrayReturnsFalseForInvalidArray(): void
-    {
-        $invalidArr = [
-            'title' => 'Test Title',
-            'content' => 'Test Content',
-        ];
-
-        self::assertFalse(Document::isDocumentArray($invalidArr)); // @phpstan-ignore staticMethod.impossibleType
     }
 
     public function testToArrayReturnsCorrectArray(): void
