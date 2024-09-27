@@ -32,7 +32,7 @@ class LLMDescriber
                 Message::forSystem($settings->getChatbotSystemPrompt()->getSystemPrompt()),
                 Message::ofUser(
                     $this->getUserPromptText($imageToAnalyze),
-                    new LLMImage('data:' . $imageToAnalyze->mimeType . ';base64,' . $imageToAnalyze->encodedImage),
+                    new LLMImage($imageToAnalyze->getImageUrl()),
                 ),
             ),
             [
