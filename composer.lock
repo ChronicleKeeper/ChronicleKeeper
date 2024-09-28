@@ -1101,16 +1101,16 @@
         },
         {
             "name": "php-llm/llm-chain-bundle",
-            "version": "0.3.2",
+            "version": "0.3.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-llm/llm-chain-bundle.git",
-                "reference": "a5dc93a90b9d3b130786d834e2a83393edff4d67"
+                "reference": "48d65fb59a767bacbf1a1fe8c21078826675355c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-llm/llm-chain-bundle/zipball/a5dc93a90b9d3b130786d834e2a83393edff4d67",
-                "reference": "a5dc93a90b9d3b130786d834e2a83393edff4d67",
+                "url": "https://api.github.com/repos/php-llm/llm-chain-bundle/zipball/48d65fb59a767bacbf1a1fe8c21078826675355c",
+                "reference": "48d65fb59a767bacbf1a1fe8c21078826675355c",
                 "shasum": ""
             },
             "require": {
@@ -1143,9 +1143,9 @@
             "description": "Symfony integration bundle for php-llm/llm-chain",
             "support": {
                 "issues": "https://github.com/php-llm/llm-chain-bundle/issues",
-                "source": "https://github.com/php-llm/llm-chain-bundle/tree/0.3.2"
+                "source": "https://github.com/php-llm/llm-chain-bundle/tree/0.3.3"
             },
-            "time": "2024-09-27T09:12:54+00:00"
+            "time": "2024-09-27T17:53:11+00:00"
         },
         {
             "name": "phpdocumentor/reflection-common",
