@@ -21,6 +21,7 @@ use Twig\Environment;
 
 use function array_column;
 use function array_filter;
+use function dump;
 use function implode;
 use function is_string;
 
@@ -38,6 +39,9 @@ class Chat extends AbstractController
 
     public function __invoke(Request $request): Response
     {
+        dump($request->getSession()->start());
+        dump($request->getSession());
+
         if ($request->isMethod(Request::METHOD_POST)) {
             $message = $request->get('question', '');
             if (is_string($message) && $message !== '') {

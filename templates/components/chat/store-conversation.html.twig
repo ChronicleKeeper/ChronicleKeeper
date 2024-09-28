@@ -1,0 +1,26 @@
+<div {{ attributes }}>
+    {{ form_start(form, {
+        attr: {
+            'data-action': 'live#action:prevent',
+            'data-live-action-param': 'store'
+        }
+    }) }}
+
+    <div class="modal-header">
+        <h3 class="modal-title">Gespräch Speichern</h3>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    </div>
+
+    <div class="modal-body">
+        {{ form_row(form.title) }}
+        {{ form_row(form.directory) }}
+    </div>
+
+    <div class="modal-footer">
+        <button class="btn btn-primary">Speichern</button>
+    </div>
+
+
+
+    {{ form_end(form) }}
+</div>

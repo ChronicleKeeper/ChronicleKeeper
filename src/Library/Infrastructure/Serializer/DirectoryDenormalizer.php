@@ -12,7 +12,9 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Webmozart\Assert\Assert;
 
+use function array_diff;
 use function array_keys;
+use function dump;
 use function is_string;
 
 #[Autoconfigure(lazy: true)]
@@ -37,7 +39,7 @@ class DirectoryDenormalizer implements DenormalizerInterface, DenormalizerAwareI
         }
 
         Assert::isArray($data);
-        Assert::same(['id', 'title', 'parent'], array_keys($data));
+        Assert::true(array_diff(['id', 'title', 'parent'], array_keys($data)) === []);
 
         $directory         = new Directory($data['title']);
         $directory->id     = $data['id'];
