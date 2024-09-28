@@ -19,6 +19,6 @@ class ChatTest extends WebTestCase
         $client->request('GET', '/');
 
         self::assertResponseIsSuccessful();
-        self::assertSelectorTextContains('h2', 'Schnack mit Rostbart');
+        self::assertSelectorTextContains('h2', 'Schnack mit Chronicle Keeper');
     }
 }
