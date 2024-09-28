@@ -24,6 +24,7 @@ class ResetConversation extends AbstractController
     public function __invoke(Request $request): Response
     {
         $this->storage->resetTemporary();
+        $request->getSession()->remove('last_conversation');
 
         return $this->redirectToRoute('chat');
     }

@@ -43,6 +43,8 @@ class Chat extends AbstractController
 
                 return $this->redirectToRoute('chat');
             }
+
+            $request->getSession()->set('last_conversation', $conversationId);
         }
 
         return new Response($this->environment->render(
