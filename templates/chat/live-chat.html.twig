@@ -6,7 +6,10 @@
     <div class="col-auto ms-auto d-print-none">
         <div class="btn-list">
             <a href="{{ path('reset_conversation') }}" class="btn d-none d-sm-inline-block">
-                {{ ux_icon('tabler:trash') }}Neustart
+                {{ ux_icon('tabler:trash') }}Vergessen
+            </a>
+            <a type="button" class="btn d-none d-sm-inline-block" data-bs-toggle="modal" data-bs-target="#store-conversation-modal">
+                {{ ux_icon('tabler:device-floppy') }}Speichern
             </a>
         </div>
     </div>
@@ -14,21 +17,12 @@
 
 {% block page_content %}
     <div class="container-xl">
-        Foo!
-
-        <a
-            type="button"
-            class="btn btn-primary"
-            data-bs-toggle="modal"
-            data-bs-target="#store-conversation-modal"
-
-        >Speichern
-        </a>
-
-        {% component "Tabler:Modal" with {id: 'store-conversation-modal'} %}
-            {% block modal_full_content %}
-                <twig:Chat:StoreConversation />
-            {% endblock %}
-        {% endcomponent %}
+        <twig:Chat:Chat />
     </div>
+
+    {% component "Tabler:Modal" with {id: 'store-conversation-modal'} %}
+        {% block modal_full_content %}
+            <twig:Chat:StoreConversation />
+        {% endblock %}
+    {% endcomponent %}
 {% endblock %}

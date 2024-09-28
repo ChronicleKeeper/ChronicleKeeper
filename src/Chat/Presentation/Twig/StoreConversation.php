@@ -44,8 +44,6 @@ class StoreConversation extends AbstractController
             'Die Unterhaltung wurde erfolgreich in der Bibliothek hinterlegt.',
         );
 
-        dump($request->getSession());
-
         return $this->redirectToRoute('chat');
     }
 }

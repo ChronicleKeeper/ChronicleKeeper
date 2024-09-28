@@ -14,7 +14,6 @@ use Webmozart\Assert\Assert;
 
 use function array_diff;
 use function array_keys;
-use function dump;
 use function is_string;
 
 #[Autoconfigure(lazy: true)]

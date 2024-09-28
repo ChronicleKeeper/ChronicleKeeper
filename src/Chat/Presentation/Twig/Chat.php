@@ -2,11 +2,10 @@
 
 declare(strict_types=1);
 
-namespace ChronicleKeeper\Chat\Presentation\Controller;
+namespace ChronicleKeeper\Chat\Presentation\Twig;
 
-use ChronicleKeeper\Chat\Application\Service\Chat as ChatTool;
+use ChronicleKeeper\Chat\Application\Service\Chat as ChatService;
 use ChronicleKeeper\Chat\Infrastructure\LLMChain\ExtendedMessage;
-use ChronicleKeeper\Chat\Infrastructure\LLMChain\ExtendedMessageBag;
 use ChronicleKeeper\Settings\Application\SettingsHandler;
 use PhpLlm\LlmChain\Message\AssistantMessage;
 use PhpLlm\LlmChain\Message\Content\ContentInterface;
@@ -14,53 +13,40 @@ use PhpLlm\LlmChain\Message\Content\Text;
 use PhpLlm\LlmChain\Message\Role;
 use PhpLlm\LlmChain\Message\UserMessage;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Attribute\Route;
-use Twig\Environment;
+use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
+use Symfony\UX\LiveComponent\Attribute\LiveAction;
+use Symfony\UX\LiveComponent\Attribute\LiveArg;
+use Symfony\UX\LiveComponent\Attribute\LiveProp;
+use Symfony\UX\LiveComponent\DefaultActionTrait;
 
 use function array_column;
 use function array_filter;
 use function implode;
-use function is_string;
 
 use const PHP_EOL;
 
-#[Route('/', name: 'chat', methods: [Request::METHOD_GET, Request::METHOD_POST])]
+#[AsLiveComponent('Chat:Chat', template: 'components/chat/chat.html.twig')]
 class Chat extends AbstractController
 {
+    use DefaultActionTrait;
+
     public function __construct(
-        private readonly Environment $environment,
-        private readonly ChatTool $chatTool,
+        private readonly ChatService $chat,
         private readonly SettingsHandler $settingsHandler,
     ) {
     }
 
-    public function __invoke(Request $request): Response
-    {
-        if ($request->isMethod(Request::METHOD_POST)) {
-            $message = $request->get('question', '');
-            if (is_string($message) && $message !== '') {
-                $this->chatTool->submitMessage($message);
-            }
-        }
-
-        $messages = $this->chatTool->loadMessages();
-
-        return new Response($this->environment->render(
-            'chat.html.twig',
-            ['messages' => $this->formatMessagesForOutput($messages)],
-        ));
-    }
+    #[LiveProp]
+    public string $message = '';
 
     /** @return list<array{role: string, message: string, extended: ExtendedMessage}> */
-    private function formatMessagesForOutput(ExtendedMessageBag $messageBag): array
+    public function getMessages(): array
     {
         $settings = $this->settingsHandler->get();
 
         $messages = [];
 
-        foreach ($messageBag as $extendedMessage) {
+        foreach ($this->chat->loadMessages() as $extendedMessage) {
             $originMessage = $extendedMessage->message;
 
             if ($originMessage->getRole() !== Role::User && $originMessage->getRole() !== Role::Assistant) {
@@ -91,5 +77,13 @@ class Chat extends AbstractController
         }
 
         return $messages;
+    }
+
+    #[LiveAction]
+    public function submit(
+        #[LiveArg]
+        string $message,
+    ): void {
+        $this->chat->submitMessage($message);
     }
 }

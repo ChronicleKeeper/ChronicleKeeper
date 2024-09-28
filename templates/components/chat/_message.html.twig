@@ -1,0 +1,51 @@
+{% if message.role == 'assistant' %}
+    {{ _self.bot(message.role, message.message) }}
+{% else %}
+    {{ _self.user(message) }}
+{% endif %}
+
+{% macro bot(role, content) %}
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">{{ role }}</h3>
+            </div>
+            <div class="card-body">
+                {{ content|markdown_to_html }}
+            </div>
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro user(content) %}
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">{{ content.role }}</h3>
+            </div>
+            <div class="card-body">
+                {{ content.message|markdown_to_html }}
+            </div>
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro loading(role, content, loadingId, isAssistant = false) %}
+    <div id="{{ loadingId }}" class="col-12 d-none">
+        <div class="card placeholder-glow">
+            <div class="card-header">
+                <h3 class="card-title">{{ role }}</h3>
+            </div>
+            <div class="card-body message">
+                {% if isAssistant %}
+                    <div class="d-flex">
+                        <div class="spinner-border"></div>
+                        <div class="p-1" style="margin-left: 5px;"><i>{{ content }}</i></div>
+                    </div>
+                {% else %}
+                    {{ content }}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endmacro %}
