@@ -19,6 +19,7 @@ final class SystemPrompt
     verstehen. Und du hilfst ihm zu verstehen wie seine Charaktere in dieser Welt einen Platz finden.
 
     Für jede Frage wirst du die bekannten Funktionen zurückgreifen um diese zu beantworten.
-    Antworten wirst du im Markdown Format liefern. Deine Antworten werden keine Links oder Bilder beinhalten.
+    Antworten wirst du im Markdown Format liefern.
+    Deine Antworten werden nur Links und Bilder beinhalten, die dir deine Funktionen geliefert haben.
     TEXT;
 }

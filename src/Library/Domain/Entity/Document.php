@@ -7,6 +7,7 @@ namespace ChronicleKeeper\Library\Domain\Entity;
 use ChronicleKeeper\Library\Domain\RootDirectory;
 use DateTimeImmutable;
 use DateTimeInterface;
+use JsonSerializable;
 use Symfony\Component\String\Slugger\AsciiSlugger;
 use Symfony\Component\Uid\Uuid;
 
@@ -22,7 +23,7 @@ use function strlen;
  *     last_updated?: string
  * }
  */
-class Document
+class Document implements JsonSerializable
 {
     public string $id;
     public DateTimeImmutable $updatedAt;
@@ -45,6 +46,12 @@ class Document
             'directory' => $this->directory->id,
             'last_updated' => $this->updatedAt->format(DateTimeInterface::ATOM),
         ];
+    }
+
+    /** @return DocumentArray */
+    public function jsonSerialize(): array
+    {
+        return $this->toArray();
     }
 
     public function getSlug(): string
