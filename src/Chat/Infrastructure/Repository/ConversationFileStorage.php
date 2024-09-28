@@ -7,9 +7,12 @@ namespace ChronicleKeeper\Chat\Infrastructure\Repository;
 use ChronicleKeeper\Chat\Application\Entity\Conversation;
 use ChronicleKeeper\Settings\Application\SettingsHandler;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Finder\Finder;
 use Symfony\Component\Serializer\Encoder\JsonEncode;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\SerializerInterface;
+
+use function count;
 
 use const DIRECTORY_SEPARATOR;
 use const JSON_PRETTY_PRINT;
@@ -24,6 +27,42 @@ class ConversationFileStorage
         private readonly SerializerInterface $serializer,
         private readonly SettingsHandler $settingsHandler,
     ) {
+    }
+
+    /** @return Conversation[] */
+    public function findLatestConversations(int $maxEntries): array
+    {
+        $finder = $this->createFinder()
+            ->sortByAccessedTime()
+            ->reverseSorting()
+            ->files();
+
+        $conversations = [];
+        foreach ($finder as $file) {
+            $conversations[] = $this->deserialize($file->getRealPath());
+
+            if (count($conversations) === $maxEntries) {
+                break;
+            }
+        }
+
+        return $conversations;
+    }
+
+    private function createFinder(): Finder
+    {
+        return (new Finder())
+            ->ignoreDotFiles(true)
+            ->in($this->conversationStoragePath);
+    }
+
+    private function deserialize(string $file): Conversation
+    {
+        return $this->serializer->deserialize(
+            $this->filesystem->readFile($file),
+            Conversation::class,
+            JsonEncoder::FORMAT,
+        );
     }
 
     public function load(string $id): Conversation|null
