@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ChronicleKeeper\Library\Domain\Entity;
 
 use ChronicleKeeper\Library\Domain\RootDirectory;
+use ChronicleKeeper\Shared\Domain\Sluggable;
 use DateTimeImmutable;
 use DateTimeInterface;
 use JsonSerializable;
@@ -26,7 +27,7 @@ use function strlen;
  *     last_updated: string
  * }
  */
-class Image implements JsonSerializable
+class Image implements JsonSerializable, Sluggable
 {
     public string $id;
     public Directory $directory;

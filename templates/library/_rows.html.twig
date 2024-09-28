@@ -1,0 +1,46 @@
+{% if medium is image %}
+    {{ _self.row_image(medium) }}
+{% elseif medium is document %}
+    {{ _self.row_document(medium) }}
+{% else %}
+    {{ _self.row_conversation(medium) }}
+{% endif %}
+
+{% macro row_image(image) %}
+    <tr>
+        <td>{{ ux_icon('tabler:photo') }} {{ image.title }}</td>
+        <td class="text-secondary">{{ image.size|readable_filesize }}</td>
+        <td class="text-secondary">{{ image.updatedAt|date('d.m.Y H:i:s') }}</td>
+        <td>
+            <a href="{{ path('library_image_view', {'image': image.id}) }}" title="Ansehen">{{ ux_icon('tabler:photo-search') }}</a>
+            <a href="{{ path('library_image_edit', {'image': image.id}) }}" title="Bearbeiten">{{ ux_icon('tabler:photo-edit', {'color': 'var(--tblr-warning)'}) }}</a>
+            <a href="{{ path('library_image_delete', {'image': image.id}) }}" title="Löschen" {{ stimulus_controller('confirm') }}>{{ ux_icon('tabler:photo-minus', {'color': 'var(--tblr-danger)'}) }}</a>
+        </td>
+    </tr>
+{% endmacro %}
+
+{% macro row_document(document) %}
+    <tr>
+        <td>{{ ux_icon('tabler:file') }} {{ document.title }}</td>
+        <td class="text-secondary">{{ document.size|readable_filesize }}</td>
+        <td class="text-secondary">{{ document.updatedAt|date('d.m.Y H:i:s') }}</td>
+        <td>
+            <a href="{{ path('library_document_view', {'document': document.id}) }}" title="Ansehen">{{ ux_icon('tabler:file-text') }}</a>
+            <a href="{{ path('library_document_edit', {'document': document.id}) }}" title="Bearbeiten">{{ ux_icon('tabler:file-pencil', {'color': 'var(--tblr-warning)'}) }}</a>
+            <a href="{{ path('library_document_delete', {'document': document.id}) }}" title="Löschen" {{ stimulus_controller('confirm') }}>{{ ux_icon('tabler:file-x', {'color': 'var(--tblr-danger)'}) }}</a>
+        </td>
+    </tr>
+{% endmacro %}
+
+{% macro row_conversation(conversation) %}
+    <tr>
+        <td>{{ ux_icon('tabler:message') }} {{ conversation.title }}</td>
+        <td class="text-secondary"></td>
+        <td class="text-secondary"></td>
+        <td>
+            <a href="{{ path('chat', {'conversationId': conversation.id}) }}" title="Gespräch fortführen">
+                {{ ux_icon('tabler:message-2-share') }}
+            </a>
+        </td>
+    </tr>
+{% endmacro %}

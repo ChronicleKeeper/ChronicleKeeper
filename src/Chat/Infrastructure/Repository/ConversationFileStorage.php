@@ -5,14 +5,20 @@ declare(strict_types=1);
 namespace ChronicleKeeper\Chat\Infrastructure\Repository;
 
 use ChronicleKeeper\Chat\Application\Entity\Conversation;
+use ChronicleKeeper\Library\Domain\Entity\Directory;
 use ChronicleKeeper\Settings\Application\SettingsHandler;
+use Psr\Log\LoggerInterface;
+use RuntimeException;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Serializer\Encoder\JsonEncode;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\SerializerInterface;
 
+use function array_filter;
 use function count;
+use function strcasecmp;
+use function usort;
 
 use const DIRECTORY_SEPARATOR;
 use const JSON_PRETTY_PRINT;
@@ -26,6 +32,7 @@ class ConversationFileStorage
         private readonly Filesystem $filesystem,
         private readonly SerializerInterface $serializer,
         private readonly SettingsHandler $settingsHandler,
+        private readonly LoggerInterface $logger,
     ) {
     }
 
@@ -45,6 +52,32 @@ class ConversationFileStorage
                 break;
             }
         }
+
+        return $conversations;
+    }
+
+    /** @return Conversation[] */
+    public function findByDirectory(Directory $directory): array
+    {
+        $finder = $this->createFinder()->files();
+
+        $conversations = [];
+        foreach ($finder as $file) {
+            try {
+                $conversations[] = $this->deserialize($file->getRealPath());
+            } catch (RuntimeException $e) {
+                $this->logger->error($e, ['file' => $file]);
+            }
+        }
+
+        $conversations = array_filter($conversations, static function (Conversation $conversation) use ($directory) {
+            return $conversation->directory->id === $directory->id;
+        });
+
+        usort(
+            $conversations,
+            static fn (Conversation $left, Conversation $right) => strcasecmp($left->title, $right->title),
+        );
 
         return $conversations;
     }

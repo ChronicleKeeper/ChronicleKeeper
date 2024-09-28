@@ -10,12 +10,14 @@ use ChronicleKeeper\Chat\Infrastructure\LLMChain\ExtendedMessageBag;
 use ChronicleKeeper\Library\Domain\Entity\Directory;
 use ChronicleKeeper\Library\Domain\RootDirectory;
 use ChronicleKeeper\Settings\Domain\ValueObject\Settings as AppSettings;
+use ChronicleKeeper\Shared\Domain\Sluggable;
 use JsonSerializable;
 use PhpLlm\LlmChain\Message\Message;
 use PhpLlm\LlmChain\OpenAI\Model\Gpt\Version;
+use Symfony\Component\String\Slugger\AsciiSlugger;
 use Symfony\Component\Uid\Uuid;
 
-class Conversation implements JsonSerializable
+class Conversation implements JsonSerializable, Sluggable
 {
     public function __construct(
         public string $id,
@@ -53,6 +55,11 @@ class Conversation implements JsonSerializable
                 new ExtendedMessage(Message::forSystem($settings->getChatbotSystemPrompt()->getSystemPrompt())),
             ),
         );
+    }
+
+    public function getSlug(): string
+    {
+        return (new AsciiSlugger('de'))->slug($this->title)->toString();
     }
 
     /**
