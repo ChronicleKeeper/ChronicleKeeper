@@ -1,6 +1,6 @@
 {% extends 'layout.html.twig' %}
 
-{% block page_title %}Live-Chat UNDER DEVELOPMENT!{% endblock %}
+{% block page_title %}{{ conversation.title ?? 'Neues Gespräch' }}{% endblock %}
 
 {% block page_title_actions %}
     <div class="col-auto ms-auto d-print-none">
@@ -16,15 +16,15 @@
 {% endblock %}
 
 {% block page_content %}
-    <div class="container-xl">
-        {% set chatOptions = conversation is not empty ? {'conversation': conversation} : {} %}
+    {% set chatOptions = conversation is not empty ? {'conversation': conversation} : {} %}
 
+    <div class="container-xl">
         {{ component('Chat:Chat', chatOptions) }}
     </div>
 
     {% component "Tabler:Modal" with {id: 'store-conversation-modal'} %}
         {% block modal_full_content %}
-            <twig:Chat:StoreConversation />
+            {{ component('Chat:StoreConversation', chatOptions) }}
         {% endblock %}
     {% endcomponent %}
 {% endblock %}

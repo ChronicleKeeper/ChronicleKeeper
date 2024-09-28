@@ -17,7 +17,6 @@ use Twig\Environment;
     '/live-chat/{conversationId}',
     name: 'chat_live',
     defaults: ['conversationId' => null],
-    methods: [Request::METHOD_GET],
 )]
 class LiveChat extends AbstractController
 {

@@ -14,6 +14,7 @@ use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
 use Symfony\UX\LiveComponent\Attribute\LiveAction;
 use Symfony\UX\LiveComponent\Attribute\LiveArg;
 use Symfony\UX\LiveComponent\Attribute\LiveProp;
+use Symfony\UX\LiveComponent\ComponentToolsTrait;
 use Symfony\UX\LiveComponent\DefaultActionTrait;
 use Symfony\UX\TwigComponent\Attribute\PostMount;
 
@@ -21,8 +22,9 @@ use Symfony\UX\TwigComponent\Attribute\PostMount;
 class Chat extends AbstractController
 {
     use DefaultActionTrait;
+    use ComponentToolsTrait;
 
-    #[LiveProp(useSerializerForHydration: true, writable: true)]
+    #[LiveProp(writable: true, useSerializerForHydration: true)]
     public Conversation $conversation;
 
     #[LiveProp]
@@ -69,5 +71,7 @@ class Chat extends AbstractController
         }
 
         $this->storage->store($this->conversation);
+
+        $this->emit('conversation_updated', ['conversationId' => $this->conversation->id]);
     }
 }
