@@ -133,6 +133,7 @@ class ExtendedMessageDenormalizerTest extends TestCase
 
         $obj = $this->normalizer->denormalize(
             [
+                'id' => '12345',
                 'message' => ['content' => 'foo'],
                 'documents' => ['document' => 'bar'],
                 'images' => ['image' => 'baz'],
@@ -143,6 +144,7 @@ class ExtendedMessageDenormalizerTest extends TestCase
 
         self::assertInstanceOf(ExtendedMessage::class, $obj);
         self::assertInstanceOf(MessageInterface::class, $obj->message);
+        self::assertSame('12345', $obj->id);
         self::assertSame(['document' => 'bar'], $obj->documents);
         self::assertSame(['image' => 'baz'], $obj->images);
         self::assertSame(['calledTools' => 'qis'], $obj->calledTools);

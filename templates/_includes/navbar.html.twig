@@ -1,6 +1,6 @@
 <div class="container-xl">
     <div class="navbar-brand d-none-navbar-horizontal pe-0 pe-md-3 ">
-        <a href="{{ path('chat') }}">
+        <a href="{{ path('home') }}">
             <img src="{{ asset('images/logo.png') }}" alt="Chronicle Keeper Logo" title="Chronicle Keeper Logo" class="navbar-brand-image" />
         </a>
     </div>
@@ -14,8 +14,7 @@
     <div class="collapse navbar-collapse" id="navbar-menu">
         <div class="d-flex flex-column flex-md-row flex-fill align-items-stretch align-items-md-center">
             <ul class="navbar-nav">
-                <li class="nav-item"><a href="{{ path('chat_live') }}" class="nav-link">{{ ux_icon('tabler:message') }}&nbsp;Live Chat Experimental</a></li>
-                <li class="nav-item"><a href="{{ path('chat') }}" class="nav-link">{{ ux_icon('tabler:message') }}&nbsp;{{ settings_handler.get.chatbotGeneral.chatbotName }}</a></li>
+                <li class="nav-item"><a href="{{ conversation is defined and conversation is not null ? path('chat', {'conversationId': conversation.id }) : path('chat') }}" class="nav-link">{{ ux_icon('tabler:message') }}&nbsp;{{ settings_handler.get.chatbotGeneral.chatbotName }}</a></li>
                 <li class="nav-item"><a href="{{ path('library', {'directory': library_root.get.id }) }}" class="nav-link">{{ ux_icon('tabler:books') }}&nbsp;Bibliothek</a></li>
                 {% block additional_menu %}{% endblock %}
             </ul>

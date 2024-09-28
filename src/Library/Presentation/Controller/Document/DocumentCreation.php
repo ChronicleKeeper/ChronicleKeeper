@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Library\Presentation\Controller\Document;
 
-use ChronicleKeeper\Chat\Application\Service\Chat;
 use ChronicleKeeper\Chat\Infrastructure\LLMChain\ExtendedMessage;
+use ChronicleKeeper\Chat\Infrastructure\Repository\ConversationFileStorage as ChatStorage;
 use ChronicleKeeper\Library\Domain\Entity\Directory;
 use ChronicleKeeper\Library\Domain\Entity\Document;
 use ChronicleKeeper\Library\Domain\RootDirectory;
@@ -42,7 +42,7 @@ class DocumentCreation extends AbstractController
         private readonly RouterInterface $router,
         private readonly FilesystemDocumentRepository $documentRepository,
         private readonly FilesystemDirectoryRepository $directoryRepository,
-        private readonly Chat $chat,
+        private readonly ChatStorage $chatStorage,
     ) {
     }
 
@@ -84,18 +84,28 @@ class DocumentCreation extends AbstractController
 
     private function getTemplateContentFromChatMessagesBag(Request $request): string
     {
-        if (! $request->isMethod(Request::METHOD_GET) || ! $request->query->has('chat_message')) {
+        if (
+            ! $request->isMethod(Request::METHOD_GET)
+            || ! $request->query->has('conversation')
+            || ! $request->query->has('conversation_message')
+        ) {
             return '';
         }
 
-        $chatMessageToTemplateFrom = $request->query->get('chat_message');
+        $conversation = $this->chatStorage->load((string) $request->query->get('conversation'));
+        if ($conversation === null) {
+            $conversation = $this->chatStorage->loadTemporary();
+        }
 
-        $latestMessages            = $this->chat->loadMessages()->getArrayCopy();
+        $chatMessageToTemplateFrom = (string) $request->query->get('conversation_message');
+
+        $latestMessages            = $conversation->messages->getArrayCopy();
         $foundMessagesByIdentifier = array_filter(
             $latestMessages,
             static fn (ExtendedMessage $message) => $message->id === $chatMessageToTemplateFrom,
         );
-        $foundMessageByIdentifier  = reset($foundMessagesByIdentifier);
+
+        $foundMessageByIdentifier = reset($foundMessagesByIdentifier);
 
         if (! $foundMessageByIdentifier instanceof ExtendedMessage) {
             return '';

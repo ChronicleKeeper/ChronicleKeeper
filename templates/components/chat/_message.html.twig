@@ -1,23 +1,28 @@
-{% if message.role == 'assistant' %}
-    {{ _self.bot(message.role, message.message) }}
+{% if message.extended.message.role.value == 'assistant' %}
+    {{ _self.bot(conversation, message) }}
 {% else %}
-    {{ _self.user(message) }}
+    {{ _self.user(conversation, message) }}
 {% endif %}
 
-{% macro bot(role, content) %}
+{% macro bot(conversation, content) %}
     <div class="col-12">
         <div class="card">
             <div class="card-header">
-                <h3 class="card-title">{{ role }}</h3>
+                <h3 class="card-title">{{ content.role }}</h3>
+                <div class="card-actions btn-actions">
+                    <a href="{{ path('library_document_create', {'conversation': conversation.id, 'conversation_message': content.extended.id}) }}" title="Dokument erstellen" class="btn-action">
+                        {{ ux_icon('tabler:file-plus') }}
+                    </a>
+                </div>
             </div>
             <div class="card-body">
-                {{ content|markdown_to_html }}
+                {{ content.message|markdown_to_html }}
             </div>
         </div>
     </div>
 {% endmacro %}
 
-{% macro user(content) %}
+{% macro user(conversation, content) %}
     <div class="col-12">
         <div class="card">
             <div class="card-header">

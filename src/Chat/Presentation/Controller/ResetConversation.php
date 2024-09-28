@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Route('/live-chat-reset', name: 'chat_reset')]
+#[Route('/chat-reset', name: 'chat_reset')]
 class ResetConversation extends AbstractController
 {
     use HandleFlashMessages;
@@ -25,6 +25,6 @@ class ResetConversation extends AbstractController
     {
         $this->storage->resetTemporary();
 
-        return $this->redirectToRoute('chat_live');
+        return $this->redirectToRoute('chat');
     }
 }

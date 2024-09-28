@@ -12,6 +12,7 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Webmozart\Assert\Assert;
 
+use function array_diff;
 use function array_keys;
 
 final class ExtendedMessageDenormalizer implements DenormalizerInterface, DenormalizerAwareInterface
@@ -27,7 +28,12 @@ final class ExtendedMessageDenormalizer implements DenormalizerInterface, Denorm
     public function denormalize(mixed $data, string $type, string|null $format = null, array $context = []): mixed
     {
         Assert::isArray($data);
-        Assert::same(['message', 'documents', 'images', 'calledTools'], array_keys($data));
+        Assert::true(array_diff([
+            'message',
+            'documents',
+            'images',
+            'calledTools',
+        ], array_keys($data)) === []);
 
         $message = $this->denormalizer->denormalize(
             $data['message'],
@@ -39,12 +45,15 @@ final class ExtendedMessageDenormalizer implements DenormalizerInterface, Denorm
         $documents = $this->denormalizer->denormalize($data['documents'], Document::class . '[]', $format, $context);
         $images    = $this->denormalizer->denormalize($data['images'], Image::class . '[]', $format, $context);
 
-        return new ExtendedMessage(
+        $extendedMessage     = new ExtendedMessage(
             $message,
             $documents,
             $images,
             $data['calledTools'],
         );
+        $extendedMessage->id = $data['id'];
+
+        return $extendedMessage;
     }
 
     /** @inheritDoc */

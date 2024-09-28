@@ -25,7 +25,7 @@
 
     <!-- The Messages that are alredy existing ... --->
     {% for message in this.messages|reverse %}
-        {% include 'components/chat/_message.html.twig' with { message } %}
+        {% include 'components/chat/_message.html.twig' with { conversation, message } %}
     {% endfor %}
 
 </div>

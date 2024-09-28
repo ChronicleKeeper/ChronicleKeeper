@@ -16,8 +16,8 @@ class ResetConversationTest extends WebTestCase
     public function testThatRequestingThePageIsOk(): void
     {
         $client = static::createClient();
-        $client->request('GET', '/live-chat-reset');
+        $client->request('GET', '/chat-reset');
 
-        self::assertResponseRedirects('/live-chat');
+        self::assertResponseRedirects('/chat');
     }
 }
