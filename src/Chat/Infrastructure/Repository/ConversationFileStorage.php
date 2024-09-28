@@ -98,6 +98,12 @@ class ConversationFileStorage
         );
     }
 
+    public function delete(Conversation $conversation): void
+    {
+        $filename = $this->conversationStoragePath . DIRECTORY_SEPARATOR . $conversation->id . '.json';
+        $this->filesystem->remove($filename);
+    }
+
     public function load(string $id): Conversation|null
     {
         $filename = $this->conversationStoragePath . DIRECTORY_SEPARATOR . $id . '.json';

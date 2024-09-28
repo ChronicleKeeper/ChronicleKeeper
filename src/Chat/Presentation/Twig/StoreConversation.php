@@ -86,6 +86,6 @@ class StoreConversation extends AbstractController
             'Die Unterhaltung wurde erfolgreich in der Bibliothek gespeichert.',
         );
 
-        return $this->redirectToRoute('chat', ['conversationId' => $this->conversation->id]);
+        return $this->redirectToRoute('chat', ['conversation' => $this->conversation->id]);
     }
 }

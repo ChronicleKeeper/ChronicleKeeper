@@ -16,12 +16,12 @@ use Twig\Environment;
 #[Route(
     '/',
     name: 'home',
-    defaults: ['conversationId' => null],
+    defaults: ['conversation' => null],
 )]
 #[Route(
-    '/chat/{conversationId}',
+    '/chat/{conversation}',
     name: 'chat',
-    defaults: ['conversationId' => null],
+    defaults: ['conversation' => null],
 )]
 class Chat extends AbstractController
 {
@@ -33,18 +33,17 @@ class Chat extends AbstractController
     ) {
     }
 
-    public function __invoke(Request $request, string|null $conversationId): Response
+    public function __invoke(Request $request, string|null $conversation): Response
     {
-        $conversation = null;
-        if ($conversationId !== null) {
-            $conversation = $this->storage->load($conversationId);
+        if ($conversation !== null) {
+            $conversation = $this->storage->load($conversation);
             if ($conversation === null) {
                 $this->addFlashMessage($request, Alert::DANGER, 'Das gesuchte Gespräch ist nicht vorhanden.');
 
                 return $this->redirectToRoute('chat');
             }
 
-            $request->getSession()->set('last_conversation', $conversationId);
+            $request->getSession()->set('last_conversation', $conversation->id);
         }
 
         return new Response($this->environment->render(

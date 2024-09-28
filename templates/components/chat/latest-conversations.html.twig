@@ -17,7 +17,7 @@
                     <tr>
                         <td>{{ entry.title }}</td>
                         <td>
-                            <a href="{{ path('chat', {'conversationId': entry.id}) }}" title="Öffnen">Öffnen</a>
+                            <a href="{{ path('chat', {'conversation': entry.id}) }}" title="Öffnen">Öffnen</a>
                         </td>
                     </tr>
                 {% endfor %}
