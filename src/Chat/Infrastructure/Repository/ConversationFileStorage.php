@@ -11,6 +11,7 @@ use Symfony\Component\Serializer\Encoder\JsonEncode;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\SerializerInterface;
 
+use const DIRECTORY_SEPARATOR;
 use const JSON_PRETTY_PRINT;
 use const JSON_UNESCAPED_UNICODE;
 
@@ -18,10 +19,39 @@ class ConversationFileStorage
 {
     public function __construct(
         private readonly string $conversationTemporaryFile,
+        private readonly string $conversationStoragePath,
         private readonly Filesystem $filesystem,
         private readonly SerializerInterface $serializer,
         private readonly SettingsHandler $settingsHandler,
     ) {
+    }
+
+    public function load(string $id): Conversation|null
+    {
+        $filename = $this->conversationStoragePath . DIRECTORY_SEPARATOR . $id . '.json';
+        if (! $this->filesystem->exists($filename)) {
+            return null;
+        }
+
+        return $this->serializer->deserialize(
+            $this->filesystem->readFile($filename),
+            Conversation::class,
+            JsonEncoder::FORMAT,
+        );
+    }
+
+    public function store(Conversation $conversation): void
+    {
+        $filename = $this->conversationStoragePath . DIRECTORY_SEPARATOR . $conversation->id . '.json';
+
+        $this->filesystem->dumpFile(
+            $filename,
+            $this->serializer->serialize(
+                $conversation,
+                JsonEncoder::FORMAT,
+                [JsonEncode::OPTIONS => JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT],
+            ),
+        );
     }
 
     public function loadTemporary(): Conversation

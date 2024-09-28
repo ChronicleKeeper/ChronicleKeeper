@@ -17,7 +17,9 @@
 
 {% block page_content %}
     <div class="container-xl">
-        <twig:Chat:Chat />
+        {% set chatOptions = conversation is not empty ? {'conversation': conversation} : {} %}
+
+        {{ component('Chat:Chat', chatOptions) }}
     </div>
 
     {% component "Tabler:Modal" with {id: 'store-conversation-modal'} %}

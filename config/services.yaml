@@ -17,6 +17,7 @@ services:
       string $changelogFile: '%kernel.project_dir%/CHANGELOG.md'
       string $libraryImageStoragePath: '%kernel.project_dir%/var/library/images'
       string $conversationTemporaryFile: '%kernel.project_dir%/var/tmp/conversation_temporary.json'
+      string $conversationStoragePath: '%kernel.project_dir%/var/library/conversations'
 
   ChronicleKeeper\:
     resource: '../src/*'

@@ -29,9 +29,6 @@ class Chat extends AbstractController
     public string $message = '';
 
     #[LiveProp(writable: true)]
-    public string $conversationId;
-
-    #[LiveProp(writable: true)]
     public bool $isTemporary = false;
 
     public function __construct(
@@ -48,9 +45,8 @@ class Chat extends AbstractController
             return;
         }
 
-        $this->conversation   = $this->storage->loadTemporary();
-        $this->conversationId = $this->conversation->id;
-        $this->isTemporary    = true;
+        $this->conversation = $this->storage->loadTemporary();
+        $this->isTemporary  = true;
     }
 
     /** @return list<array{role: string, message: string, extended: ExtendedMessage}> */
@@ -72,6 +68,6 @@ class Chat extends AbstractController
             return;
         }
 
-        // TODO: Replace ....
+        $this->storage->store($this->conversation);
     }
 }
