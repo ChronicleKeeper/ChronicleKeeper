@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace ChronicleKeeper\Library\Presentation\Form;
 
 use ChronicleKeeper\Library\Domain\Entity\Directory;
-use ChronicleKeeper\Library\Domain\RootDirectory;
 use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemDirectoryRepository;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -30,7 +29,7 @@ final class DirectoryChoiceType extends AbstractType
                 'label' => 'Verschieben in Verzeichnis ...',
                 'translation_domain' => false,
                 'required' => false,
-                'data' => RootDirectory::get(),
+                // 'data' => RootDirectory::get(), // Rausgenommen, weil ... manchmal setzt das Default und manchmal überschreibt es
                 'choices' => $this->directoryRepository->findAll(),
                 'placeholder' => false,
                 'choice_value' => static fn (Directory $directory): string => $directory->id,

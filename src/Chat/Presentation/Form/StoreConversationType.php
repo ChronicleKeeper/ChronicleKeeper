@@ -22,6 +22,6 @@ final class StoreConversationType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add('title', TextType::class);
-        $builder->add('directory', DirectoryChoiceType::class, ['mapped' => false]);
+        $builder->add('directory', DirectoryChoiceType::class);
     }
 }

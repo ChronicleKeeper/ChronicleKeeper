@@ -67,6 +67,8 @@ class Chat extends AbstractController
         if ($this->isTemporary === true) {
             $this->storage->saveTemporary($this->conversation);
 
+            $this->emit('conversation_updated', ['conversationId' => $this->conversation->id]);
+
             return;
         }
 

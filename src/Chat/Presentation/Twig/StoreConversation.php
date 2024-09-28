@@ -51,7 +51,7 @@ class StoreConversation extends AbstractController
 
     protected function instantiateForm(): FormInterface
     {
-        return $this->createForm(StoreConversationType::class, $this->conversation ?? null);
+        return $this->createForm(StoreConversationType::class, $this->conversation ?? Conversation::createEmpty());
     }
 
     #[LiveListener('conversation_updated')]
@@ -60,7 +60,9 @@ class StoreConversation extends AbstractController
         string $conversationId,
     ): void {
         $conversation = $this->storage->load($conversationId);
-        assert($conversation instanceof Conversation);
+        if ($conversation === null) {
+            $conversation = $this->storage->loadTemporary();
+        }
 
         $this->conversation = $conversation;
         $this->getForm()->setData($this->conversation);
