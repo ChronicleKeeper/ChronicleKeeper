@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace ChronicleKeeper\Chat\Presentation\Twig;
 
 use ChronicleKeeper\Chat\Application\Entity\Conversation;
-use ChronicleKeeper\Chat\Application\Service\Chat as ChatService;
 use ChronicleKeeper\Chat\Application\Service\ChatMessageExecution;
 use ChronicleKeeper\Chat\Infrastructure\LLMChain\ExtendedMessage;
 use ChronicleKeeper\Chat\Infrastructure\Repository\ConversationFileStorage;
@@ -36,10 +35,8 @@ class Chat extends AbstractController
     public bool $isTemporary = false;
 
     public function __construct(
-        private readonly ChatService $chat,
         private readonly ConversationFileStorage $storage,
         private readonly ExtendedMessageBagToViewConverter $messageBagToViewConverter,
-        private readonly ChatMessageExecution $messageExecution,
         private readonly ChatMessageExecution $chatMessageExecution,
     ) {
     }

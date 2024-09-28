@@ -55,5 +55,6 @@ class ConversationFileStorage
     public function resetTemporary(): void
     {
         $this->filesystem->remove($this->conversationTemporaryFile);
+        $this->loadTemporary();
     }
 }

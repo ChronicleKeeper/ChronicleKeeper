@@ -8,6 +8,9 @@
             <a type="button" class="btn d-none d-sm-inline-block" data-bs-toggle="modal" data-bs-target="#store-conversation-modal">
                 {{ ux_icon('tabler:device-floppy') }}Speichern
             </a>
+            <a href="{{ path('chat_reset') }}" type="button" class="btn btn-icon" {{ stimulus_controller('confirm') }}>
+                {{ ux_icon('tabler:trash') }}
+            </a>
         </div>
     </div>
 {% endblock %}
