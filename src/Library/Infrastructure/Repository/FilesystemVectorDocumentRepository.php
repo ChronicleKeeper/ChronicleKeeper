@@ -87,15 +87,15 @@ class FilesystemVectorDocumentRepository
     /**
      * @param list<float> $searchedVectors
      *
-     * @return list<VectorDocument>
+     * @return list<array{vector: VectorDocument, distance: float}>
      */
-    public function findSimilar(array $searchedVectors, int $maxResults = 4): array
+    public function findSimilar(array $searchedVectors, float|null $maxDistance = null, int $maxResults = 4): array
     {
         $distances       = [];
         $vectorDocuments = $this->findAll();
 
         // Maximum of distance an image is allowed to be away from the result
-        $maxDistance = $this->settingsHandler->get()->getChatbotTuning()->getDocumentsMaxDistance();
+        $maxDistance ??= $this->settingsHandler->get()->getChatbotTuning()->getDocumentsMaxDistance();
 
         foreach ($vectorDocuments as $index => $document) {
             if ($document->document->content === '') {
@@ -117,7 +117,10 @@ class FilesystemVectorDocumentRepository
 
         $results = [];
         foreach ($topKIndices as $index) {
-            $results[] = $vectorDocuments[$index];
+            $results[] = [
+                'vector' => $vectorDocuments[$index],
+                'distance' => $distances[$index],
+            ];
         }
 
         return $results;

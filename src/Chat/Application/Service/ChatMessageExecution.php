@@ -30,7 +30,8 @@ class ChatMessageExecution
         $messages   = $conversation->messages;
         $messages[] = new ExtendedMessage(message: Message::ofUser($message));
 
-        // TODO: How to hand over options to tools? - max context documents / max context images
+        $this->libraryDocuments->setOneTimeMaxDistance($conversation->settings->documentsMaxDistance);
+        $this->libraryImages->setOneTimeMaxDistance($conversation->settings->imagesMaxDistance);
 
         $response = $this->chain->call(
             $messages->getLLMChainMessages(),
