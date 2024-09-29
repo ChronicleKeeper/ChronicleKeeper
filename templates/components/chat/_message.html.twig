@@ -15,11 +15,17 @@
                     </a>
                 </div>
             </div>
-            <div class="card-body">
+            <div class="card-body chatbot-message">
                 {{ content.message|markdown_to_html }}
+                {% if settings_handler.get.chatbotFunctions.allowDebugOutput and content.extended.calledTools is not empty %}
+                    {{ _self.bot_debug_output(content) }}
+                {% endif %}
+                {{ _self.bot_used_context(content) }}
             </div>
         </div>
     </div>
+
+
 {% endmacro %}
 
 {% macro user(conversation, content) %}
@@ -28,7 +34,7 @@
             <div class="card-header">
                 <h3 class="card-title">{{ content.role }}</h3>
             </div>
-            <div class="card-body chatbot-message">
+            <div class="card-body">
                 {{ content.message|markdown_to_html }}
             </div>
         </div>
@@ -53,4 +59,90 @@
             </div>
         </div>
     </div>
+{% endmacro %}
+
+{% macro bot_debug_output(content) %}
+    <div class="hr-text text-warning">GPT Functions Debugging Ausgaben</div>
+    <div class="accordion" id="debug-tool-calls">
+        {% for index, call in content.extended.calledTools %}
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="heading-{{ index }}">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-{{ index }}" aria-expanded="true">
+                        Aufgerufene Funktion: {{ call.tool }}
+                    </button>
+                </h2>
+                <div id="collapse-{{ index }}" class="accordion-collapse collapse" data-bs-parent="#debug-tool-calls" style="">
+                    <div class="accordion-body pt-0">
+                        <pre>{{ call.arguments|json_encode(constant('JSON_PRETTY_PRINT')) }}</pre>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endmacro %}
+
+{% macro bot_used_context(content) %}
+    {% set showDocuments = settings_handler.get.chatbotGeneral.showReferencedDocuments %}
+    {% set showImages = settings_handler.get.chatbotGeneral.showReferencedImages %}
+
+    {% set documents = content.extended.documents %}
+    {% set images = content.extended.images %}
+
+    {% if (showDocuments and documents is not empty) or (showImages and images is not empty) %}
+        <div class="hr-text text-warning">GPT Functions Used Information</div>
+        <div class="accordion" id="debug-additional-information-{{ content.extended.id }}">
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="heading-debug-additional-information-{{ content.extended.id }}">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-debug-additional-information-{{ content.extended.id }}" aria-expanded="true">
+                        Ausgewertete Informationen
+                    </button>
+                </h2>
+                <div id="collapse-debug-additional-information-{{ content.extended.id }}" class="accordion-collapse collapse" data-bs-parent="#heading-debug-additional-information-{{ content.extended.id }}" style="">
+                    <div class="accordion-body pt-0">
+                        <div class="row row-cards">
+                            {% if showDocuments and documents is not empty %}
+                                {{ _self.bot_used_context_documents(documents, (showImages is same as(false) or images is empty ? '12' : '6')) }}
+                            {% endif %}
+                            {% if showImages and images is not empty %}
+                                {% set documentsShown = showDocuments is same as(false) or documents is not empty %}
+                                {{ _self.bot_used_context_images(images, (documentsShown ? '6' : '12'), (documentsShown ? '4' : '2')) }}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endmacro %}
+
+{% macro bot_used_context_documents(documents, cols = 6) %}
+    {% if documents is not empty %}
+        <div class="col-{{ cols }}">
+            <div class="card">
+                <div class="list-group list-group-flush">
+                    {% for document in documents %}
+                        <a href="{{ path('library_document_view', {'document': document.id}) }}"
+                           class="list-group-item list-group-item-action"
+                        >{{ document.directory.flattenHierarchyTitle }} > {{ document.title }}</a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endmacro %}
+
+{% macro bot_used_context_images(images, cols = 6, imageColWidth = 2) %}
+    {% if images is not empty %}
+        <div class="col-{{ cols }}">
+            <div class="row row-cols-{{ imageColWidth }} g-3">
+                {% for image in images %}
+                    <div class="col">
+                        <a data-fslightbox="gallery" href="{{ path('library_image_view', {'image': image.id} )}}">
+                            <div class="img-responsive img-responsive-1x1 rounded border" style="background-image: url({{ image.imageUrl }})"></div>
+                        </a>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
 {% endmacro %}

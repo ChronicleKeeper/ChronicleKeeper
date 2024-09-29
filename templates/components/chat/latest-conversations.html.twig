@@ -5,23 +5,28 @@
     </div>
 
     <div class="modal-body">
-        <table class="table table-vcenter">
-            <thead>
-                <tr>
-                    <td>Titel</td>
-                    <td class="w-1">&nbsp;</td>
-                </tr>
-            </thead>
-            <tbody>
-                {% for entry in this.conversations %}
+        {% set conversations = this.conversations %}
+        {% if conversations is empty %}
+            <div class="alert alert-info">Aktuell liegen keine gespeicherten Gespräche vor.</div>
+        {% else %}
+            <table class="table table-vcenter">
+                <thead>
                     <tr>
-                        <td>{{ entry.title }}</td>
-                        <td>
-                            <a href="{{ path('chat', {'conversation': entry.id}) }}" title="Öffnen">Öffnen</a>
-                        </td>
+                        <td>Titel</td>
+                        <td class="w-1">&nbsp;</td>
                     </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    {% for entry in this.conversations %}
+                        <tr>
+                            <td>{{ entry.title }}</td>
+                            <td>
+                                <a href="{{ path('chat', {'conversation': entry.id}) }}" title="Öffnen">Öffnen</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
     </div>
 </div>
