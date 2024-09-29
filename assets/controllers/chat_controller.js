@@ -15,7 +15,6 @@ export default class extends Controller {
 
         const submitButton = document.getElementById('chat-submit');
         submitButton.addEventListener('click', (event) => {
-            // @TODO: validate message
             this.submitMessage();
         });
 
@@ -43,6 +42,10 @@ export default class extends Controller {
     submitMessage() {
         const input = document.getElementById('chat-message');
         const message = input.value;
+
+        if (message === '') {
+            return;
+        }
 
         document
             .getElementById('loading-user-message')
