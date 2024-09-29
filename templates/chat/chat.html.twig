@@ -8,6 +8,9 @@
             <a type="button" class="btn d-none d-sm-inline-block" data-bs-toggle="modal" data-bs-target="#store-conversation-modal">
                 {{ ux_icon('tabler:device-floppy') }}Speichern
             </a>
+            <a type="button" class="btn btn-icon" title="Einstellungen zum Gespräch" data-bs-toggle="modal" data-bs-target="#conversation-settings">
+                {{ ux_icon('tabler:settings') }}
+            </a>
             <a type="button" class="btn btn-icon" title="Letzte Gespräche anzeigen" data-bs-toggle="modal" data-bs-target="#latest-conversation-modal">
                 {{ ux_icon('tabler:history') }}
             </a>
@@ -34,6 +37,12 @@
     {% component "Tabler:Modal" with {id: 'latest-conversation-modal'} %}
         {% block modal_full_content %}
             {{ component('Chat:Latest', {entries: 10}) }}
+        {% endblock %}
+    {% endcomponent %}
+
+    {% component "Tabler:Modal" with {id: 'conversation-settings'} %}
+        {% block modal_full_content %}
+            {{ component('Chat:ConversationSettings', chatOptions) }}
         {% endblock %}
     {% endcomponent %}
 {% endblock %}
