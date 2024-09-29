@@ -20,6 +20,17 @@
                     {% include 'settings/_includes/settings_nav.html.twig' %}
                     <div class="col-12 col-md-9 d-flex flex-column">
                         <div class="card-body">
+                            <div class="alert alert-info">
+                                <p>Diese Tuning-Einstellungen des Chatbot können für jedes Gespräch einzeln eingestellt
+                                werden und dienen damit nur als Grundeinstellung für ein neues Gespräch. Änderungen
+                                werden dabei nicht in bereits vorhandene Gespräche übernommen.</p>
+
+                                <p>Solltest du herausfinden wollen welche Einstellungen am Besten funktionieren könnten
+                                für dich, dann kannst du in den <a href="{{ path('settings', {'section': 'chatbot_functions'}) }}">
+                                Funktionen</a> die Ausgabe der ausgeführten Funktionsaufrufe aktivieren und du bekommst
+                                die Distanzen aus der Suche angezeigt, wenn Daten zu deiner Anfrage verarbeitet wurden.</p>
+                            </div>
+
                             <div class="row g-5 pb-5">
                                 <div class="col-6">
                                     {{ form_row(form.temperature) }}
