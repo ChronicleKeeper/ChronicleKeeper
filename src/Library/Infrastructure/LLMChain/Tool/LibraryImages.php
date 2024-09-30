@@ -18,10 +18,10 @@ use function count;
 use const PHP_EOL;
 
 #[AsTool(
-    'novalis_images',
+    'library_images',
     description: <<<'TEXT'
     Delivers images and pictures from the world of Novalis. For additional background information to the background
-    utilize function "novalis_background". The images and pictures delivered here will help you describing locations,
+    utilize function "library_documents". The images and pictures delivered here will help you describing locations,
     situations and persons from the world of novalis. Feel free to utilize those information if someone is asking for
     information about locations, situations or persons. Found images are embedded as markdown by you.
     TEXT,
@@ -91,7 +91,7 @@ final class LibraryImages
         }
 
         $this->collector->called(
-            'novalis_images',
+            'library_images',
             [
                 'arguments' => ['search' => $search, 'maxDistance' => $this->maxDistance, 'maxResults' => $maxResults],
                 'responses' => $debugResponse,

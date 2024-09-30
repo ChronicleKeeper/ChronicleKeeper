@@ -53,7 +53,7 @@ class LLMDescriber
         return <<<TEXT
         Mit der Information, dass das Bild "{$image->title}" heißt, beschreibe bis ins kleinste Detail jede relevante
         Information aus diesem Bild. Füge keine Links ein. Schlussfolgerungen möchtest du nicht machen, sondern nur den
-        Inhalt beschreiben. Ziehe Informationen der Funktion novalis_background andhand des Titels zu rate um das Bild
+        Inhalt beschreiben. Ziehe Informationen der Funktion library_documents andhand des Titels zu rate um das Bild
         noch besser zu bewerten.
         TEXT;
     }

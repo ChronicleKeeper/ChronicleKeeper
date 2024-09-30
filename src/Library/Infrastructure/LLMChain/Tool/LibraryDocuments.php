@@ -16,8 +16,8 @@ use function count;
 use const PHP_EOL;
 
 #[AsTool(
-    'novalis_background',
-    description: 'Delivers all background information to the world of novalis or characters living in the world. For detailied visual information utilize function "novalis_images".',
+    'library_documents',
+    description: 'Delivers all background information to the world of novalis or characters living in the world. For detailied visual information utilize function "library_images".',
 )]
 final class LibraryDocuments
 {
@@ -76,7 +76,7 @@ final class LibraryDocuments
         }
 
         $this->collector->called(
-            'novalis_background',
+            'library_documents',
             [
                 'arguments' => ['search' => $search, 'maxDistance' => $this->maxDistance, 'maxResults' => $maxResults],
                 'responses' => $debugResponse,
