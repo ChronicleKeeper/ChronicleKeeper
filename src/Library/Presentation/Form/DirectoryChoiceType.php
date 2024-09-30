@@ -29,6 +29,7 @@ final class DirectoryChoiceType extends AbstractType
                 'label' => 'Verschieben in Verzeichnis ...',
                 'translation_domain' => false,
                 'required' => false,
+                // 'data' => RootDirectory::get(), // Rausgenommen, weil ... manchmal setzt das Default und manchmal überschreibt es
                 'choices' => $this->directoryRepository->findAll(),
                 'placeholder' => false,
                 'choice_value' => static fn (Directory $directory): string => $directory->id,

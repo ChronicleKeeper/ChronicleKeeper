@@ -3,3 +3,18 @@ div.chatbot-message img, .markdown img {
     max-width: 400px;
     max-height: 400px;
 }
+
+div.search-loading {
+    animation: placeholder-glow 2s ease-in-out infinite;
+    cursor: wait;
+}
+
+div.search-loading input {
+    pointer-events:none;
+    cursor: wait;
+}
+
+div.search-loading button {
+    pointer-events:none;
+    cursor: wait;
+}

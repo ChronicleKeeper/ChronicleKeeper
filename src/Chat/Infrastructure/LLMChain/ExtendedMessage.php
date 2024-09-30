@@ -12,6 +12,7 @@ use Symfony\Component\Uid\Uuid;
 
 /**
  * @phpstan-type ExtendedMessageArray = array{
+ *      id: string,
  *      message: MessageInterface,
  *      documents: list<Document>,
  *      images: list<Image>,
@@ -20,7 +21,7 @@ use Symfony\Component\Uid\Uuid;
  */
 final class ExtendedMessage implements JsonSerializable
 {
-    public readonly string $id;
+    public string $id;
 
     /**
      * @param list<Document>                                            $documents
@@ -40,6 +41,7 @@ final class ExtendedMessage implements JsonSerializable
     public function jsonSerialize(): array
     {
         return [
+            'id' => $this->id,
             'message' => $this->message,
             'documents' => $this->documents,
             'images' => $this->images,

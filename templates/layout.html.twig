@@ -44,7 +44,10 @@
         {% endblock %}
 
         <div class="page-body">
-            {% block alerts %}{% embed '_includes/alerts.html.twig' %}{% endembed %}{% endblock %}
+            {% block alerts %}
+                {% include '_includes/alerts.html.twig' %}
+                {% include '_includes/flash-messages.html.twig' %}
+            {% endblock %}
             {% block page_content %}{% endblock %}
         </div>
     </div>

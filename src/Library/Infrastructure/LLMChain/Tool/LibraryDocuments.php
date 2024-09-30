@@ -24,6 +24,8 @@ final class LibraryDocuments
     /** @var list<Document> */
     private array $referencedDocuments = [];
 
+    private float|null $maxDistance = null;
+
     public function __construct(
         private readonly FilesystemVectorDocumentRepository $vectorDocumentRepository,
         private readonly EmbeddingModel $embeddings,
@@ -32,15 +34,21 @@ final class LibraryDocuments
     ) {
     }
 
+    public function setOneTimeMaxDistance(float $maxDistance): void
+    {
+        $this->maxDistance = $maxDistance;
+    }
+
     /** @param string $search Contains the question or message the user has sent in reference to novalis. */
     public function __invoke(string $search): string
     {
-        $this->collector->called('novalis_background', ['search' => $search]);
+        $maxResults = $this->settingsHandler->get()->getChatbotGeneral()->getMaxDocumentResponses();
 
         $vector    = $this->embeddings->create($search);
         $documents = $this->vectorDocumentRepository->findSimilar(
             $vector->getData(),
-            maxResults: $this->settingsHandler->get()->getChatbotGeneral()->getMaxDocumentResponses(),
+            maxDistance: $this->maxDistance,
+            maxResults: $maxResults,
         );
 
         $this->referencedDocuments = [];
@@ -48,14 +56,34 @@ final class LibraryDocuments
             return 'There are no matching documents.';
         }
 
+        $debugResponse = [];
+
         $result = 'I have found the following information that are associated to the world of Novalis:' . PHP_EOL;
         foreach ($documents as $document) {
-            $result .= '# Title: ' . $document->document->title . PHP_EOL;
-            $result .= 'Storage Directory: ' . $document->document->directory->flattenHierarchyTitle() . PHP_EOL;
-            $result .= $document->document->content;
+            $libraryDocument = $document['vector']->document;
 
-            $this->referencedDocuments[] = $document->document;
+            $result .= '# Title: ' . $libraryDocument->title . PHP_EOL;
+            $result .= 'Storage Directory: ' . $libraryDocument->directory->flattenHierarchyTitle() . PHP_EOL;
+            $result .= $libraryDocument->content . PHP_EOL . PHP_EOL;
+
+            $this->referencedDocuments[] = $libraryDocument;
+
+            $debugResponse[] = [
+                'document' => $libraryDocument->directory->flattenHierarchyTitle()
+                    . '/' . $libraryDocument->title,
+                'distance' => $document['distance'],
+            ];
         }
+
+        $this->collector->called(
+            'novalis_background',
+            [
+                'arguments' => ['search' => $search, 'maxDistance' => $this->maxDistance, 'maxResults' => $maxResults],
+                'responses' => $debugResponse,
+            ],
+        );
+
+        $this->maxDistance = null;
 
         return $result;
     }

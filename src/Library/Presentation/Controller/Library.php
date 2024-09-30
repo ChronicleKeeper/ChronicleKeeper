@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Library\Presentation\Controller;
 
+use ChronicleKeeper\Chat\Infrastructure\Repository\ConversationFileStorage;
 use ChronicleKeeper\Library\Domain\Entity\Directory;
-use ChronicleKeeper\Library\Domain\Entity\Document;
-use ChronicleKeeper\Library\Domain\Entity\Image;
 use ChronicleKeeper\Library\Domain\RootDirectory;
 use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemDirectoryRepository;
 use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemDocumentRepository;
 use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemImageRepository;
+use ChronicleKeeper\Shared\Domain\Sluggable;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -35,6 +35,7 @@ class Library extends AbstractController
         private readonly FilesystemDocumentRepository $documentRepository,
         private readonly FilesystemDirectoryRepository $directoryRepository,
         private readonly FilesystemImageRepository $imageRepository,
+        private readonly ConversationFileStorage $conversationFileStorage,
     ) {
     }
 
@@ -43,11 +44,12 @@ class Library extends AbstractController
         $directoryContent = array_merge(
             $this->documentRepository->findByDirectory($directory),
             $this->imageRepository->findByDirectory($directory),
+            $this->conversationFileStorage->findByDirectory($directory),
         );
 
         usort(
             $directoryContent,
-            static fn (Image|Document $left, Image|Document $right) => strcasecmp($left->getSlug(), $right->getSlug()),
+            static fn (Sluggable $left, Sluggable $right) => strcasecmp($left->getSlug(), $right->getSlug()),
         );
 
         return new Response($this->environment->render(

@@ -1,0 +1,31 @@
+{% import "components/chat/_message.html.twig" as message_macros %}
+
+<div id="chat-body" class="row row-deck row-cards" {{ attributes.defaults(stimulus_controller('chat')) }}>
+    <!-- The message form to ask questions-->
+    <div id="chat-message-form" class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="input-group mb-2">
+                    <input required id="chat-message" name="message" type="text" class="form-control" placeholder="Was gibt's ... ?">
+                    <button id="chat-submit" class="btn btn-outline-secondary border-0" type="button">Sach an!</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- The Loading State Messages, after message form was sent and we wait for response ... -->
+    {{ message_macros.loading(
+        'Chronicle Keeper',
+        'Knarzend klingen die Dielen und ein staubiger Nebel liegt in der Luft während die Archive durchsucht werden ...',
+        'loading-bot-message',
+        true
+    ) }}
+
+    {{ message_macros.loading('Der Unbekannte', '', 'loading-user-message') }}
+
+    <!-- The Messages that are alredy existing ... --->
+    {% for message in this.messages|reverse %}
+        {% include 'components/chat/_message.html.twig' with { conversation, message } %}
+    {% endfor %}
+
+</div>

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ChronicleKeeper\Library\Domain\Entity;
 
 use ChronicleKeeper\Library\Domain\RootDirectory;
+use JsonSerializable;
 use Symfony\Component\Uid\Uuid;
 
 use function array_reverse;
@@ -17,7 +18,7 @@ use function implode;
  *     parent: string,
  * }
  */
-class Directory
+class Directory implements JsonSerializable
 {
     public string $id;
     public Directory|null $parent;
@@ -49,5 +50,11 @@ class Directory
             'title' => $this->title,
             'parent' => $this->parent?->id ?? RootDirectory::ID,
         ];
+    }
+
+    /** @return DirectoryArray */
+    public function jsonSerialize(): array
+    {
+        return $this->toArray();
     }
 }

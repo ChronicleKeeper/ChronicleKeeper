@@ -12,10 +12,11 @@ services:
       string $directoryStoragePath: '%kernel.project_dir%/var/directories'
       string $vectorDocumentsPath: '%kernel.project_dir%/var/data/document'
       string $vectorImagesPath: '%kernel.project_dir%/var/data/image'
-      string $lastConversationFilePath: '%kernel.project_dir%/var/conversations/last_conversation.json'
       string $settingsFilePath: '%kernel.project_dir%/var/settings.json'
       string $changelogFile: '%kernel.project_dir%/CHANGELOG.md'
       string $libraryImageStoragePath: '%kernel.project_dir%/var/library/images'
+      string $conversationTemporaryFile: '%kernel.project_dir%/var/tmp/conversation_temporary.json'
+      string $conversationStoragePath: '%kernel.project_dir%/var/library/conversations'
 
   ChronicleKeeper\:
     resource: '../src/*'

@@ -18,6 +18,7 @@ class LibraryPruner
         public readonly string $libraryImageStoragePath,
         public readonly string $vectorDocumentsPath,
         public readonly string $vectorImagesPath,
+        public readonly string $conversationStoragePath,
     ) {
     }
 
@@ -28,6 +29,7 @@ class LibraryPruner
         $this->pruneDirectoryContent($this->libraryImageStoragePath);
         $this->pruneDirectoryContent($this->vectorDocumentsPath);
         $this->pruneDirectoryContent($this->vectorImagesPath);
+        $this->pruneDirectoryContent($this->conversationStoragePath);
     }
 
     private function pruneDirectoryContent(string $path): void

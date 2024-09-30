@@ -12,6 +12,8 @@ trait HandleFlashMessages
 {
     private function addFlashMessage(Request $request, Alert $type, string $message): void
     {
+        $request->getSession()->start();
+
         $existingFlashMessages = $request->getSession()->get('flash_messages');
         if (! is_array($existingFlashMessages)) {
             $existingFlashMessages = [];
