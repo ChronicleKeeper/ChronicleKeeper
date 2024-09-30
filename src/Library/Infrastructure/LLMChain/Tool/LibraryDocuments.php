@@ -8,7 +8,7 @@ use ChronicleKeeper\Library\Domain\Entity\Document;
 use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemVectorDocumentRepository;
 use ChronicleKeeper\Settings\Application\SettingsHandler;
 use ChronicleKeeper\Shared\Infrastructure\LLMChain\ToolUsageCollector;
-use PhpLlm\LlmChain\EmbeddingModel;
+use PhpLlm\LlmChain\EmbeddingsModel;
 use PhpLlm\LlmChain\ToolBox\AsTool;
 
 use function count;
@@ -28,7 +28,7 @@ final class LibraryDocuments
 
     public function __construct(
         private readonly FilesystemVectorDocumentRepository $vectorDocumentRepository,
-        private readonly EmbeddingModel $embeddings,
+        private readonly EmbeddingsModel $embeddings,
         private readonly SettingsHandler $settingsHandler,
         private readonly ToolUsageCollector $collector,
     ) {

@@ -8,7 +8,7 @@ use ChronicleKeeper\Library\Domain\Entity\Image;
 use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemVectorImageRepository;
 use ChronicleKeeper\Settings\Application\SettingsHandler;
 use ChronicleKeeper\Shared\Infrastructure\LLMChain\ToolUsageCollector;
-use PhpLlm\LlmChain\EmbeddingModel;
+use PhpLlm\LlmChain\EmbeddingsModel;
 use PhpLlm\LlmChain\ToolBox\AsTool;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
@@ -34,7 +34,7 @@ final class LibraryImages
 
     public function __construct(
         private readonly FilesystemVectorImageRepository $vectorImageRepository,
-        private readonly EmbeddingModel $embeddings,
+        private readonly EmbeddingsModel $embeddings,
         private readonly SettingsHandler $settingsHandler,
         private readonly ToolUsageCollector $collector,
         private readonly RouterInterface $router,

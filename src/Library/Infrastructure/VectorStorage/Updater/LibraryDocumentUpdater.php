@@ -8,7 +8,7 @@ use ChronicleKeeper\Library\Domain\Entity\Document;
 use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemDocumentRepository;
 use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemVectorDocumentRepository;
 use ChronicleKeeper\Library\Infrastructure\VectorStorage\VectorDocument;
-use PhpLlm\LlmChain\EmbeddingModel;
+use PhpLlm\LlmChain\EmbeddingsModel;
 use Psr\Log\LoggerInterface;
 
 use function reset;
@@ -17,7 +17,7 @@ class LibraryDocumentUpdater
 {
     public function __construct(
         private readonly LoggerInterface $logger,
-        private readonly EmbeddingModel $embeddings,
+        private readonly EmbeddingsModel $embeddings,
         private readonly FilesystemDocumentRepository $documentRepository,
         private readonly FilesystemVectorDocumentRepository $vectorDocumentRepository,
     ) {

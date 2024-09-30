@@ -57,7 +57,7 @@ class DocumentUpload extends AbstractController
             $this->addFlashMessage(
                 $request,
                 Alert::SUCCESS,
-                'Das Dokument mit dem Titel "' . $document->title . '" wurde erfolgreich hochgeladen.',
+                'Das Dokument mit dem Titel "' . $document->title . '" wurde erfolgreich hochgeladen. Bitte überprüfe den Text nach einer Optimierung.',
             );
 
             return new RedirectResponse($this->router->generate(

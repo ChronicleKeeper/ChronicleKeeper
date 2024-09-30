@@ -53,10 +53,10 @@ class ImageUpload extends AbstractController
             $this->addFlashMessage(
                 $request,
                 Alert::SUCCESS,
-                'Das Bild mit dem Titel "' . $image->title . '" wurde erfolgreich hochgeladen.',
+                'Das Bild mit dem Titel "' . $image->title . '" wurde erfolgreich hochgeladen. Bitte überprüfe die inhaltliche Beschreibung.',
             );
 
-            return new RedirectResponse($this->router->generate('library', ['directory' => $directory->id]));
+            return new RedirectResponse($this->router->generate('library_image_view', ['image' => $image->id]));
         }
 
         return new Response($this->environment->render(

@@ -30,8 +30,9 @@ class LLMContentOptimizer
     private function getSystemPrompt(): SystemMessage
     {
         return Message::forSystem(<<<'TEXT'
-        You are a proof reader and will simnply correct and reformat text to markdown. Where it is recommended
-        you will add formattings to the text. The response will be given in plain markdown.
+        You are a proof reader and will simnply correct and reformat text to plain markdown. Where it is recommended
+        you will add formattings to the text. The response will be given in plain markdown without escape ticks around
+        the response.
         TEXT);
     }
 }

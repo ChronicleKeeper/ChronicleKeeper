@@ -8,7 +8,7 @@ use ChronicleKeeper\Library\Domain\Entity\Image;
 use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemImageRepository;
 use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemVectorImageRepository;
 use ChronicleKeeper\Library\Infrastructure\VectorStorage\VectorImage;
-use PhpLlm\LlmChain\EmbeddingModel;
+use PhpLlm\LlmChain\EmbeddingsModel;
 use Psr\Log\LoggerInterface;
 
 use function reset;
@@ -17,7 +17,7 @@ class LibraryImageUpdater
 {
     public function __construct(
         private readonly LoggerInterface $logger,
-        private readonly EmbeddingModel $embeddings,
+        private readonly EmbeddingsModel $embeddings,
         private readonly FilesystemImageRepository $imageRepository,
         private readonly FilesystemVectorImageRepository $vectorImageRepository,
     ) {
