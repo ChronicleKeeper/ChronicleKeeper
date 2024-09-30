@@ -17,7 +17,11 @@ use const PHP_EOL;
 
 #[AsTool(
     'library_documents',
-    description: 'Delivers all background information to the world of novalis or characters living in the world. For detailied visual information utilize function "library_images".',
+    <<<'TEXT'
+    Provides textual background information related to the role-playing game world. This includes details on places,
+    characters, religions, and other elements existing within the game universe. For visual representations,
+    consider using the "library_images" function.
+    TEXT,
 )]
 final class LibraryDocuments
 {
@@ -39,7 +43,7 @@ final class LibraryDocuments
         $this->maxDistance = $maxDistance;
     }
 
-    /** @param string $search Contains the question or message the user has sent in reference to novalis. */
+    /** @param string $search The search parameter containing the user's question or relevant keywords related to the information they seek */
     public function __invoke(string $search): string
     {
         $maxResults = $this->settingsHandler->get()->getChatbotGeneral()->getMaxDocumentResponses();
@@ -58,7 +62,7 @@ final class LibraryDocuments
 
         $debugResponse = [];
 
-        $result = 'I have found the following information that are associated to the world of Novalis:' . PHP_EOL;
+        $result = 'I have found the following information that are associated to the question:' . PHP_EOL;
         foreach ($documents as $document) {
             $libraryDocument = $document['vector']->document;
 

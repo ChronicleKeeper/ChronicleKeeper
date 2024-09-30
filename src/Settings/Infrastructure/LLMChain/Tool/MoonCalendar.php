@@ -11,8 +11,15 @@ use PhpLlm\LlmChain\ToolBox\AsTool;
 #[AsTool(
     'moon_calendar',
     description: <<<'TEXT'
-    Liefert Informationen zu den Mondzyklen und dem gesamten Mondkalender in der Welt von Novalis. Für Fragen wie der
-    Mond an einem spezfisichen Tag steht befrage auch die Funktion "current_date" nach dem aktuellen Datum.
+    Provides information about the moon cycles and the entire lunar calendar in the role-playing game world. This is
+    useful for understanding phases of the moon, their effects, and related events. For explicit date-related
+    information, consider referencing the "calendar" and "calendar_holiday" functions. For the current date,
+    refer to "current_date".
+    Examples include:
+    - Current moon phase: "What phase is the moon in today?"
+    - Detailed moon cycles: "What are the phases of the moon?"
+    - Calendar alignment: "How does the lunar calendar align with the regular calendar?"
+    - Specific moon-related events: "When is the next lunar eclipse?"
     TEXT,
 )]
 final class MoonCalendar

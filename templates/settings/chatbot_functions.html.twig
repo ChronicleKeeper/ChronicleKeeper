@@ -28,7 +28,7 @@
                             <div class="alert alert-info">
                                 Die folgenden GPT Funktionen stehen zur Verfügung. Beachte bitte, dass du diese auch in
                                 einer Frage an den Chat auch forcieren kannst, wenn du die Namen der Funktionen mit, zum
-                                Beispiel, der Ansage "Nutze die Funktion background_novalis" an deiner Frage. Es lassen
+                                Beispiel, der Ansage "Nutze die Funktion library_documents" an deiner Frage. Es lassen
                                 sich auch mehrere Funktionen benennen.
                                 <br />
                                 <br />
@@ -46,9 +46,10 @@
                                     </h2>
                                     <div id="collapse-1" class="accordion-collapse collapse show" data-bs-parent="#accordion-example" style="">
                                         <div class="accordion-body pt-0">
-                                            Delivers all background information to the world of novalis or characters
-                                            living in the world. For detailied visual information utilize function
-                                            "library_images".
+                                            Provides textual background information related to the role-playing game
+                                            world. This includes details on places, characters, religions, and other
+                                            elements existing within the game universe. For visual representations,
+                                            consider using the "library_images" function.
                                         </div>
                                     </div>
                                 </div>
@@ -60,10 +61,9 @@
                                     </h2>
                                     <div id="collapse-2" class="accordion-collapse collapse" data-bs-parent="#accordion-example" style="">
                                         <div class="accordion-body pt-0">
-                                            Delivers images and pictures from the world of Novalis. For additional background information to the background
-                                            utilize function "library_documents". The images and pictures delivered here will help you to describe locations,
-                                            situations and persons from the world of novalis. Feel free to utilize those information if someone is asking for
-                                            information about locations, situations or persons.
+                                            Delivers images and pictures from the role-playing game world. For additional background information, consider using
+                                            the "library_documents" function. The images and pictures delivered here will help you describe locations,
+                                            situations, and characters from the game universe.
                                         </div>
                                     </div>
                                 </div>
@@ -75,7 +75,20 @@
                                     </h2>
                                     <div id="collapse-3" class="accordion-collapse collapse" data-bs-parent="#accordion-example" style="">
                                         <div class="accordion-body pt-0">
-                                            Provides the current date and time.
+                                            Provides the current date in the role-playing game world. Use this function to get the exact current date (day,
+                                            month, and year) as it is in the game universe. For understanding the structure of the calendar, such as the names
+                                            of the months, the number of days in each month, or detailed inquiries about the calendar, consider using the
+                                            "calendar" function. For understanding the phases of the moon or lunar-related events, use the "moon_calendar"
+                                            function. For information on holidays and observances, refer to "calendar_holiday". If additional details about the
+                                            calendar system, structure, or related events are requested, ensure to fetch these using the appropriate functions.<br />
+                                            <br />
+                                            Examples include:<br />
+                                            - Today's date: "What is the date today?"<br />
+                                            - Specific event timing: "What is the current date?"<br />
+                                            - Timeline alignment: "Where are we in the year?"<br />
+                                            <br />
+                                            Note: For questions about the broader calendar context, such as calculations with the calendar refer to the known
+                                            functionalities to fetch additional information.
                                         </div>
                                     </div>
                                 </div>
@@ -87,12 +100,15 @@
                                     </h2>
                                     <div id="collapse-4" class="accordion-collapse collapse" data-bs-parent="#accordion-example" style="">
                                         <div class="accordion-body pt-0">
-                                            Diese Funktion liefert Kalenderinformationen zur Welt von Novalis. Sie stellt Informationen bereit um Fragen wie zum
-                                            Beispiel "Welcher Tag ist nächste Woche?" oder "Welche Monate gibt es?" sollten mit dieser Funktion beantwortet werden.
-                                            Es kann auch hilfreich sein sie zu verwenden, wenn generell Fragen zum Kalendersystem aufkommen wie zum Beispiel
-                                            "Wie viele Tage hat ein Jahr?", "Wie viele Tage hat ein Zyklus?" oder "Wie viele Tage hat ein Monat?". Verwende die
-                                            Funktion "current_date" um das aktuelle Datum zu erhalten. Auch "Welche weiteren Monate gibt es?" könnte eine Frage sein
-                                            die du hier beantwortet bekommst.
+                                            Provides information about the calendar system in the role-playing game world. This includes details on the
+                                            structure of the year, month names, the number of days in different cycles, and other relevant calendar
+                                            information. Use this function for general calendar details and to understand the overall structure of the game's
+                                            timeline. For specific dates, refer to "current_date". For holiday-related dates, refer to "calendar_holiday".<br />
+                                            Examples include:<br />
+                                            - Understanding the structure of the year: "How many days are in a year?"<br />
+                                            - Detailing month names: "What are the names of the months?"<br />
+                                            - Number of days in cycles: "How many days are in a month?"<br />
+                                            - General calendar questions: "What is a typical year like?"
                                         </div>
                                     </div>
                                 </div>
@@ -104,9 +120,13 @@
                                     </h2>
                                     <div id="collapse-5" class="accordion-collapse collapse" data-bs-parent="#accordion-example" style="">
                                         <div class="accordion-body pt-0">
-                                            Diese Funktion liefert Informationen über die Feiertage in Novalis. Für die Beziehung der Feiertage zum Kalender
-                                            kann die Funktion "calendar" zusätzliche Informationen ausgeben. Genauso kann die Funktion "current_date" helfen
-                                            die Position der Feiertage zum aktuellen Datum herauszufinden.
+                                            Provides information about holidays in the role-playing game world. Use this function to get details about specific
+                                            holidays and their dates. To understand how holidays fit into the broader calendar, refer to "calendar". For the
+                                            current date, use "current_date".<br />
+                                            Examples include:<br />
+                                            - Specific holiday details: "What holidays are celebrated this month?"<br />
+                                            - Understanding holiday observances: "What are the major holidays in this world?"<br />
+                                            - Aligning holidays in the calendar: "When is the next festival?"
                                         </div>
                                     </div>
                                 </div>
@@ -118,8 +138,15 @@
                                     </h2>
                                     <div id="collapse-6" class="accordion-collapse collapse" data-bs-parent="#accordion-example" style="">
                                         <div class="accordion-body pt-0">
-                                            Liefert Informationen zu den Mondzyklen und dem gesamten Mondkalender in der Welt von Novalis. Für Fragen wie der
-                                            Mond an einem spezfisichen Tag steht befrage auch die Funktion "current_date" nach dem aktuellen Datum.
+                                            Provides information about the moon cycles and the entire lunar calendar in the role-playing game world. This is
+                                            useful for understanding phases of the moon, their effects, and related events. For explicit date-related
+                                            information, consider referencing the "calendar" and "calendar_holiday" functions. For the current date,
+                                            refer to "current_date".<br />
+                                            Examples include:<br />
+                                            - Current moon phase: "What phase is the moon in today?"<br />
+                                            - Detailed moon cycles: "What are the phases of the moon?"<br />
+                                            - Calendar alignment: "How does the lunar calendar align with the regular calendar?"<br />
+                                            - Specific moon-related events: "When is the next lunar eclipse?"<br />
                                         </div>
                                     </div>
                                 </div>

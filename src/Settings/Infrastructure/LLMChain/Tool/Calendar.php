@@ -11,12 +11,15 @@ use PhpLlm\LlmChain\ToolBox\AsTool;
 #[AsTool(
     'calendar',
     description: <<<'TEXT'
-    Diese Funktion liefert Kalenderinformationen zur Welt von Novalis. Sie stellt Informationen bereit um Fragen wie zum
-    Beispiel "Welcher Tag ist nächste Woche?" oder "Welche Monate gibt es?" sollten mit dieser Funktion beantwortet werden.
-    Es kann auch hilfreich sein sie zu verwenden, wenn generell Fragen zum Kalendersystem aufkommen wie zum Beispiel
-    "Wie viele Tage hat ein Jahr?", "Wie viele Tage hat ein Zyklus?" oder "Wie viele Tage hat ein Monat?". Verwende die
-    Funktion "current_date" um das aktuelle Datum zu erhalten. Auch "Welche weiteren Monate gibt es?" könnte eine Frage sein
-    die du hier beantwortet bekommst.
+    Provides information about the calendar system in the role-playing game world. This includes details on the
+    structure of the year, month names, the number of days in different cycles, and other relevant calendar
+    information. Use this function for general calendar details and to understand the overall structure of the game's
+    timeline. For specific dates, refer to "current_date". For holiday-related dates, refer to "calendar_holiday".
+    Examples include:
+    - Understanding the structure of the year: "How many days are in a year?"
+    - Detailing month names: "What are the names of the months?"
+    - Number of days in cycles: "How many days are in a month?"
+    - General calendar questions: "What is a typical year like?"
     TEXT,
 )]
 final class Calendar

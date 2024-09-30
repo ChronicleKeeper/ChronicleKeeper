@@ -20,10 +20,9 @@ use const PHP_EOL;
 #[AsTool(
     'library_images',
     description: <<<'TEXT'
-    Delivers images and pictures from the world of Novalis. For additional background information to the background
-    utilize function "library_documents". The images and pictures delivered here will help you describing locations,
-    situations and persons from the world of novalis. Feel free to utilize those information if someone is asking for
-    information about locations, situations or persons. Found images are embedded as markdown by you.
+    Delivers images and pictures from the role-playing game world. For additional background information, consider using
+    the "library_documents" function. The images and pictures delivered here will help you describe locations,
+    situations, and characters from the game universe.
     TEXT,
 )]
 final class LibraryImages
@@ -46,7 +45,7 @@ final class LibraryImages
         $this->maxDistance = $maxDistance;
     }
 
-    /** @param string $search Contains the question or message the user has sent in reference to novalis. */
+    /** @param string $search Contains the user's question or request related to the game world. */
     public function __invoke(string $search): string
     {
         $maxResults = $this->settingsHandler->get()->getChatbotGeneral()->getMaxImageResponses();
@@ -66,7 +65,7 @@ final class LibraryImages
         $debugResponse = [];
 
         $result  = 'You will embed the found images to your responses as markdown only if the description of the image fits the question.' . PHP_EOL;
-        $result .= 'I have found the following pictures and images that are associated to the world of Novalis:' . PHP_EOL;
+        $result .= 'I have found the following pictures and images that are associated to the question:' . PHP_EOL;
         foreach ($results as $image) {
             $libraryImage = $image['vector']->image;
 

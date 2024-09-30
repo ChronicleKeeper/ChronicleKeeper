@@ -11,9 +11,13 @@ use PhpLlm\LlmChain\ToolBox\AsTool;
 #[AsTool(
     'calendar_holiday',
     description: <<<'TEXT'
-    Diese Funktion liefert Informationen über die Feiertage in Novalis. Für die Beziehung der Feiertage zum Kalender
-    kann die Funktion "calendar" zusätzliche Informationen ausgeben. Genauso kann die Funktion "current_date" helfen
-    die Position der Feiertage zum aktuellen Datum herauszufinden.
+    Provides information about holidays in the role-playing game world. Use this function to get details about specific
+    holidays and their dates. To understand how holidays fit into the broader calendar, refer to "calendar". For the
+    current date, use "current_date".
+    Examples include:
+    - Specific holiday details: "What holidays are celebrated this month?"
+    - Understanding holiday observances: "What are the major holidays in this world?"
+    - Aligning holidays in the calendar: "When is the next festival?"
     TEXT,
 )]
 final class Holiday
