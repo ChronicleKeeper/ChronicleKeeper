@@ -39,10 +39,12 @@ final class ConversationSettingsType extends AbstractType implements DataMapperI
             'version',
             ChoiceType::class,
             [
+                'label' => 'GPT Version',
+                'translation_domain' => false,
+                'required' => false,
                 'choices' => [
                     Version::gpt4oMini()->name => Version::gpt4oMini()->name,
                     Version::gpt4o()->name => Version::gpt4o()->name,
-                    Version::o1Mini()->name => Version::o1Mini()->name,
                 ],
             ],
         );

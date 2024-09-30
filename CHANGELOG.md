@@ -7,6 +7,7 @@
 - Confirmation dialog for resetting settings.
 - Image button in the markdown editor for embedding image links.
 - Error pages for 404 and 500 HTTP status codes. The 500 error page includes debug information for developers.
+- Storable conversations are added to the library. So a stored conversation will be placed in the library.
 
 ### Changed
 - Began project file structure cleanup, moving from prototyping to clean code.
@@ -14,6 +15,8 @@
 - Reverted default GPT model to GPT4o-mini from GPT4o due to lack of improvement.
 - The chatbot now embeds images if their descriptions match the user's request.
 - When uploading images, descriptive context data is now attempted to be retrieved from documents based on the file name.
+- Completely reworked the conversation area to multiple conversations.
+- Import / Export from application is now also containing conversations.
 
 ### Fixed
 - Resolved build process failure caused by a missing content block in the loader component.
