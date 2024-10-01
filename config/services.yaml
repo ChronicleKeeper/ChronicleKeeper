@@ -27,7 +27,6 @@ services:
       string $vectorImagesPath: '%app.data.base_dir%/image'
       string $settingsFilePath: '%app.storage.base_dir%/settings.json'
       string $changelogFile: '%kernel.project_dir%/CHANGELOG.md'
-      string $libraryImageStoragePath: '%app.library.base_dir%/images'
       string $conversationTemporaryFile: '%app.storage.base_dir%/tmp/conversation_temporary.json'
 
   ChronicleKeeper\:

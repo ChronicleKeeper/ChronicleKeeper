@@ -20,12 +20,12 @@ class LibraryPruner
 
     public function prune(): void
     {
-        $this->pruneDirectoryContent($this->pathRegistry->get('app.library.directories_storage'));
-        $this->pruneDirectoryContent($this->pathRegistry->get('app.library.documents_storage'));
-        $this->pruneDirectoryContent($this->pathRegistry->get('app.library.images_storage'));
-        $this->pruneDirectoryContent($this->pathRegistry->get('app.vector.documents_storage'));
-        $this->pruneDirectoryContent($this->pathRegistry->get('app.vector.images_storage'));
-        $this->pruneDirectoryContent($this->pathRegistry->get('app.library.conversations_storage'));
+        $this->pruneDirectoryContent($this->pathRegistry->get('library.directories'));
+        $this->pruneDirectoryContent($this->pathRegistry->get('library.documents'));
+        $this->pruneDirectoryContent($this->pathRegistry->get('library.images'));
+        $this->pruneDirectoryContent($this->pathRegistry->get('vector.documents'));
+        $this->pruneDirectoryContent($this->pathRegistry->get('vector.images'));
+        $this->pruneDirectoryContent($this->pathRegistry->get('library.conversations'));
     }
 
     private function pruneDirectoryContent(string $path): void
