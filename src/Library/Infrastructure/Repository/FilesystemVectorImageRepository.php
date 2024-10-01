@@ -12,6 +12,7 @@ use RuntimeException;
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 use function array_filter;
 use function array_keys;
@@ -155,7 +156,7 @@ class FilesystemVectorImageRepository
             throw new RuntimeException('Image to load contain invalid content.');
         }
 
-        $image = $this->imageRepository->findById($vectorImageArr['imageId']);
+        $image = $this->imageRepository->findById($vectorImageArr['imageId']) ?? throw new NotFoundHttpException();
 
         $vectorImage     = new VectorImage(
             image: $image,

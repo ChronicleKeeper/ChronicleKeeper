@@ -12,6 +12,7 @@ use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Uid\Uuid;
 
 use function is_a;
@@ -39,7 +40,7 @@ class LibraryImageResolver implements ValueResolverInterface
         }
 
         try {
-            $image = $this->imageRepository->findById($imageIdentifier);
+            $image = $this->imageRepository->findById($imageIdentifier) ?? throw new NotFoundHttpException();
         } catch (UnableToReadFile) {
             throw new RuntimeException('Image "' . $imageIdentifier . '" not found.');
         }

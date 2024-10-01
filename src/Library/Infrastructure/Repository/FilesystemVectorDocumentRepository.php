@@ -7,6 +7,7 @@ namespace ChronicleKeeper\Library\Infrastructure\Repository;
 use ChronicleKeeper\Library\Infrastructure\VectorStorage\Distance\CosineDistance;
 use ChronicleKeeper\Library\Infrastructure\VectorStorage\VectorDocument;
 use ChronicleKeeper\Settings\Application\SettingsHandler;
+use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Exception\UnableToReadFile;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
@@ -64,7 +65,7 @@ class FilesystemVectorDocumentRepository
         foreach ($documentFinder as $documentFound) {
             try {
                 $documents[] = $this->convertJsonToVectorDocument($documentFound->getContents());
-            } catch (RuntimeException $e) {
+            } catch (RuntimeException | UnableToReadFile $e) {
                 $this->logger->debug($e);
             }
         }

@@ -6,51 +6,46 @@ namespace ChronicleKeeper\Library\Infrastructure\Repository;
 
 use ChronicleKeeper\Library\Domain\Entity\Directory;
 use ChronicleKeeper\Library\Domain\Entity\Image;
+use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Exception\UnableToReadFile;
+use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\FileAccess;
+use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\PathRegistry;
 use DateTimeImmutable;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Serializer\SerializerInterface;
 
 use function array_filter;
-use function assert;
-use function file_exists;
-use function file_get_contents;
-use function file_put_contents;
-use function is_array;
-use function is_readable;
-use function json_decode;
 use function json_encode;
+use function json_validate;
 use function strcasecmp;
 use function usort;
 
-use const DIRECTORY_SEPARATOR;
 use const JSON_PRETTY_PRINT;
+use const JSON_THROW_ON_ERROR;
 
 #[Autoconfigure(lazy: true)]
 class FilesystemImageRepository
 {
+    private const string STORAGE_NAME = 'library.images';
+
     public function __construct(
-        private readonly string $libraryImageStoragePath,
         private readonly LoggerInterface $logger,
-        private readonly FilesystemDirectoryRepository $directoryRepository,
-        private readonly Filesystem $filesystem,
+        private readonly FileAccess $fileAccess,
+        private readonly SerializerInterface $serializer,
         private readonly FilesystemVectorImageRepository $vectorRepository,
+        private readonly PathRegistry $pathRegistry,
     ) {
     }
 
     public function store(Image $image): void
     {
-        // When stored it is updated! Maybe change later with a change detection ... but yeah .. it is changed for now
         $image->updatedAt = new DateTimeImmutable();
+        $filename         = $this->generateFilename($image->id);
+        $content          = json_encode($image->toArray(), JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT);
 
-        $filename        = $image->id . '.json';
-        $filepath        = $this->libraryImageStoragePath . DIRECTORY_SEPARATOR . $filename;
-        $documentAsArray = $image->toArray();
-        $documentAsJson  = json_encode($documentAsArray, JSON_PRETTY_PRINT);
-
-        file_put_contents($filepath, $documentAsJson);
+        $this->fileAccess->write(self::STORAGE_NAME, $filename, $content);
     }
 
     /** @return list<Image> */
@@ -58,15 +53,15 @@ class FilesystemImageRepository
     {
         $finder = (new Finder())
             ->ignoreDotFiles(true)
-            ->in($this->libraryImageStoragePath)
+            ->in($this->pathRegistry->get(self::STORAGE_NAME))
             ->files();
 
         $images = [];
-        foreach ($finder as $imageFound) {
+        foreach ($finder as $file) {
             try {
-                $images[] = $this->convertJsonToImage($imageFound->getContents());
+                $images[] = $this->serializer->deserialize($file->getContents(), Image::class, 'json');
             } catch (RuntimeException $e) {
-                $this->logger->error($e, ['image' => $imageFound]);
+                $this->logger->error($e, ['file' => $file]);
             }
         }
 
@@ -83,60 +78,40 @@ class FilesystemImageRepository
     {
         $images = $this->findAll();
 
-        return array_filter($images, static fn (Image $document) => $document->directory->id === $directory->id);
+        return array_filter($images, static fn (Image $image) => $image->directory->id === $directory->id);
     }
 
-    public function findById(string $id): Image
+    public function findById(string $id): Image|null
     {
-        $filepath = $this->libraryImageStoragePath . DIRECTORY_SEPARATOR . $id . '.json';
-        $json     = (string) file_get_contents($filepath);
+        $filename = $this->generateFilename($id);
 
         try {
-            return $this->convertJsonToImage($json);
-        } catch (RuntimeException $e) {
-            $this->logger->error($e, ['json' => $json]);
+            $json = $this->fileAccess->read(self::STORAGE_NAME, $filename);
 
-            throw $e;
+            if (! json_validate($json)) {
+                return null;
+            }
+
+            return $this->serializer->deserialize($json, Image::class, 'json');
+        } catch (UnableToReadFile) {
+            return null;
         }
     }
 
     public function remove(Image $image): void
     {
-        $filepath = $this->libraryImageStoragePath . DIRECTORY_SEPARATOR . $image->id . '.json';
-        if (! file_exists($filepath) || ! is_readable($filepath)) {
-            return;
-        }
+        $filename = $this->generateFilename($image->id);
 
         foreach ($this->vectorRepository->findAllByImageId($image->id) as $vectors) {
             $this->vectorRepository->remove($vectors);
         }
 
-        $this->filesystem->remove($filepath);
+        $this->fileAccess->delete(self::STORAGE_NAME, $filename);
     }
 
-    private function convertJsonToImage(string $json): Image
+    /** @return non-empty-string */
+    private function generateFilename(string $id): string
     {
-        $imageArr = json_decode($json, true);
-
-        if (! is_array($imageArr)) {
-            throw new RuntimeException('Document to load contain invalid content.');
-        }
-
-        $image = new Image(
-            $imageArr['title'],
-            $imageArr['mime_type'],
-            $imageArr['encoded_image'],
-            $imageArr['description'],
-        );
-
-        $image->id        = $imageArr['id'];
-        $image->updatedAt = new DateTimeImmutable($imageArr['last_updated']);
-
-        $directory = $this->directoryRepository->findById($imageArr['directory']);
-        assert($directory instanceof Directory);
-
-        $image->directory = $directory;
-
-        return $image;
+        return $id . '.json';
     }
 }
