@@ -9,20 +9,17 @@ use ChronicleKeeper\Settings\Application\Service\Importer\ImportedFile;
 use ChronicleKeeper\Settings\Application\Service\Importer\ImportedFileBag;
 use ChronicleKeeper\Settings\Application\Service\Importer\SingleImport;
 use ChronicleKeeper\Settings\Application\Service\ImportSettings;
+use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\FileAccess;
 use League\Flysystem\FileAttributes;
 use League\Flysystem\Filesystem;
 
 use function assert;
-use function file_exists;
-use function file_put_contents;
 use function str_replace;
-
-use const DIRECTORY_SEPARATOR;
 
 final readonly class ConversationImporter implements SingleImport
 {
     public function __construct(
-        private string $conversationStoragePath,
+        private FileAccess $fileAccess,
     ) {
     }
 
@@ -35,15 +32,18 @@ final readonly class ConversationImporter implements SingleImport
             assert($zippedFile instanceof FileAttributes);
 
             $targetFilename = str_replace($libraryDirectoryPath, '', $zippedFile->path());
-            $targetPath     = $this->conversationStoragePath . DIRECTORY_SEPARATOR . $targetFilename;
+            assert($targetFilename !== '');
 
-            if ($settings->overwriteLibrary === false && file_exists($targetPath)) {
+            if (
+                $settings->overwriteLibrary === false
+                && $this->fileAccess->exists('app.library.conversations_storage', $targetFilename)
+            ) {
                 $importedFileBag->append(ImportedFile::asIgnored($targetFilename, FileType::CHAT_CONVERSATION));
                 continue;
             }
 
             $content = $filesystem->read($zippedFile->path());
-            file_put_contents($targetPath, $content);
+            $this->fileAccess->write('app.library.conversations_storage', $targetFilename, $content);
 
             $importedFileBag->append(ImportedFile::asSuccess($targetFilename, FileType::CHAT_CONVERSATION));
         }

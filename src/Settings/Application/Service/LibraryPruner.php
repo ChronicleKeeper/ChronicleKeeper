@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Settings\Application\Service;
 
+use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\PathRegistry;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
@@ -13,23 +14,18 @@ class LibraryPruner
     public function __construct(
         public readonly Filesystem $filesystem,
         public readonly LoggerInterface $logger,
-        public readonly string $directoryStoragePath,
-        public readonly string $documentStoragePath,
-        public readonly string $libraryImageStoragePath,
-        public readonly string $vectorDocumentsPath,
-        public readonly string $vectorImagesPath,
-        public readonly string $conversationStoragePath,
+        public readonly PathRegistry $pathRegistry,
     ) {
     }
 
     public function prune(): void
     {
-        $this->pruneDirectoryContent($this->directoryStoragePath);
-        $this->pruneDirectoryContent($this->documentStoragePath);
-        $this->pruneDirectoryContent($this->libraryImageStoragePath);
-        $this->pruneDirectoryContent($this->vectorDocumentsPath);
-        $this->pruneDirectoryContent($this->vectorImagesPath);
-        $this->pruneDirectoryContent($this->conversationStoragePath);
+        $this->pruneDirectoryContent($this->pathRegistry->get('app.library.directories_storage'));
+        $this->pruneDirectoryContent($this->pathRegistry->get('app.library.documents_storage'));
+        $this->pruneDirectoryContent($this->pathRegistry->get('app.library.images_storage'));
+        $this->pruneDirectoryContent($this->pathRegistry->get('app.vector.documents_storage'));
+        $this->pruneDirectoryContent($this->pathRegistry->get('app.vector.images_storage'));
+        $this->pruneDirectoryContent($this->pathRegistry->get('app.library.conversations_storage'));
     }
 
     private function pruneDirectoryContent(string $path): void
