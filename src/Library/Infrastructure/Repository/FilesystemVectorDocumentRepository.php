@@ -8,63 +8,60 @@ use ChronicleKeeper\Library\Infrastructure\VectorStorage\Distance\CosineDistance
 use ChronicleKeeper\Library\Infrastructure\VectorStorage\VectorDocument;
 use ChronicleKeeper\Settings\Application\SettingsHandler;
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Exception\UnableToReadFile;
+use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\FileAccess;
+use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\PathRegistry;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 
 use function array_filter;
 use function array_keys;
 use function array_slice;
 use function asort;
-use function file_exists;
-use function file_get_contents;
-use function file_put_contents;
 use function is_array;
-use function is_readable;
 use function json_decode;
 use function json_encode;
 use function json_validate;
 
-use const DIRECTORY_SEPARATOR;
 use const JSON_PRETTY_PRINT;
+use const JSON_THROW_ON_ERROR;
 
 #[Autoconfigure(lazy: true)]
 class FilesystemVectorDocumentRepository
 {
+    private const STORAGE_NAME = 'vector.documents';
+
     public function __construct(
         private readonly LoggerInterface $logger,
         private readonly FilesystemDocumentRepository $documentRepository,
         private readonly CosineDistance $distance,
-        private readonly Filesystem $filesystem,
-        private readonly string $vectorDocumentsPath,
+        private readonly FileAccess $fileAccess,
         private readonly SettingsHandler $settingsHandler,
+        private readonly PathRegistry $pathRegistry,
     ) {
     }
 
     public function store(VectorDocument $vectorDocument): void
     {
-        $filename        = $vectorDocument->id . '.json';
-        $filepath        = $this->vectorDocumentsPath . DIRECTORY_SEPARATOR . $filename;
-        $documentAsArray = $vectorDocument->toArray();
-        $documentAsJson  = json_encode($documentAsArray, JSON_PRETTY_PRINT);
+        $filename = $this->generateFilename($vectorDocument->id);
+        $content  = json_encode($vectorDocument->toArray(), JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT);
 
-        file_put_contents($filepath, $documentAsJson);
+        $this->fileAccess->write(self::STORAGE_NAME, $filename, $content);
     }
 
     /** @return list<VectorDocument> */
     public function findAll(): array
     {
-        $documentFinder = (new Finder())
+        $finder = (new Finder())
             ->ignoreDotFiles(true)
-            ->in($this->vectorDocumentsPath)
+            ->in($this->pathRegistry->get(self::STORAGE_NAME))
             ->files();
 
         $documents = [];
-        foreach ($documentFinder as $documentFound) {
+        foreach ($finder as $file) {
             try {
-                $documents[] = $this->convertJsonToVectorDocument($documentFound->getContents());
+                $documents[] = $this->convertJsonToVectorDocument($file->getContents());
             } catch (RuntimeException | UnableToReadFile $e) {
                 $this->logger->debug($e);
             }
@@ -75,16 +72,14 @@ class FilesystemVectorDocumentRepository
 
     public function findById(string $id): VectorDocument|null
     {
-        $documentJson = $this->getContentOfVectorDocumentFile($id . '.json');
-        if ($documentJson === null || ! json_validate($documentJson)) {
+        $filename = $this->generateFilename($id);
+        $json     = $this->fileAccess->read(self::STORAGE_NAME, $filename);
+
+        if (! json_validate($json)) {
             return null;
         }
 
-        try {
-            return $this->convertJsonToVectorDocument($documentJson);
-        } catch (RuntimeException) {
-            return null;
-        }
+        return $this->convertJsonToVectorDocument($json);
     }
 
     /**
@@ -97,7 +92,6 @@ class FilesystemVectorDocumentRepository
         $distances       = [];
         $vectorDocuments = $this->findAll();
 
-        // Maximum of distance an image is allowed to be away from the result
         $maxDistance ??= $this->settingsHandler->get()->getChatbotTuning()->getDocumentsMaxDistance();
 
         foreach ($vectorDocuments as $index => $document) {
@@ -114,7 +108,7 @@ class FilesystemVectorDocumentRepository
             $distances[$index] = $dist;
         }
 
-        asort($distances); // Sort by distance (ascending).
+        asort($distances);
 
         $topKIndices = array_slice(array_keys($distances), 0, $maxResults, true);
 
@@ -140,12 +134,8 @@ class FilesystemVectorDocumentRepository
 
     public function remove(VectorDocument $vectorDocument): void
     {
-        $filepath = $this->vectorDocumentsPath . DIRECTORY_SEPARATOR . $vectorDocument->id . '.json';
-        if (! file_exists($filepath) || ! is_readable($filepath)) {
-            return;
-        }
-
-        $this->filesystem->remove($filepath);
+        $filename = $this->generateFilename($vectorDocument->id);
+        $this->fileAccess->delete(self::STORAGE_NAME, $filename);
     }
 
     private function convertJsonToVectorDocument(string $json): VectorDocument
@@ -153,7 +143,7 @@ class FilesystemVectorDocumentRepository
         $vectorDocumentArr = json_decode($json, true);
 
         if (! is_array($vectorDocumentArr) || ! VectorDocument::isVectorDocumentArray($vectorDocumentArr)) {
-            throw new RuntimeException('Document to load contain invalid content.');
+            throw new RuntimeException('Document to load contains invalid content.');
         }
 
         $document = $this->documentRepository->findById($vectorDocumentArr['documentId']);
@@ -168,18 +158,9 @@ class FilesystemVectorDocumentRepository
         return $vectorDocument;
     }
 
-    private function getContentOfVectorDocumentFile(string $filename): string|null
+    /** @return non-empty-string */
+    private function generateFilename(string $id): string
     {
-        $filepath = $this->vectorDocumentsPath . DIRECTORY_SEPARATOR . $filename;
-        if (! file_exists($filepath) || ! is_readable($filepath)) {
-            return null;
-        }
-
-        $vectorDocumentJson = file_get_contents($filepath);
-        if ($vectorDocumentJson === false || ! json_validate($vectorDocumentJson)) {
-            return null;
-        }
-
-        return $vectorDocumentJson;
+        return $id . '.json';
     }
 }

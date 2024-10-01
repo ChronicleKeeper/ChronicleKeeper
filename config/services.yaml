@@ -12,7 +12,7 @@ parameters:
   app.library.directories_storage: '%app.storage.base_dir%/directories'
   app.library.conversations_storage: '%app.library.base_dir%/conversations'
 
-  app.vector.documents_storage: '%app.data.base_dir%/documents'
+  app.vector.documents_storage: '%app.data.base_dir%/document'
   app.vector.images_storage: '%app.data.base_dir%/image'
 
 services:
