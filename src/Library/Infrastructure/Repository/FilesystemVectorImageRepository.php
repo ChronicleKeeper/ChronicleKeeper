@@ -9,6 +9,7 @@ use ChronicleKeeper\Library\Infrastructure\VectorStorage\VectorImage;
 use ChronicleKeeper\Settings\Application\SettingsHandler;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
+use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 
@@ -28,6 +29,7 @@ use function json_validate;
 use const DIRECTORY_SEPARATOR;
 use const JSON_PRETTY_PRINT;
 
+#[Autoconfigure(lazy: true)]
 class FilesystemVectorImageRepository
 {
     public function __construct(

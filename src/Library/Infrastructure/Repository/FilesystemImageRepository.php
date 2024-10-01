@@ -9,6 +9,7 @@ use ChronicleKeeper\Library\Domain\Entity\Image;
 use DateTimeImmutable;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
+use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 
@@ -28,6 +29,7 @@ use function usort;
 use const DIRECTORY_SEPARATOR;
 use const JSON_PRETTY_PRINT;
 
+#[Autoconfigure(lazy: true)]
 class FilesystemImageRepository
 {
     public function __construct(
@@ -35,6 +37,7 @@ class FilesystemImageRepository
         private readonly LoggerInterface $logger,
         private readonly FilesystemDirectoryRepository $directoryRepository,
         private readonly Filesystem $filesystem,
+        private readonly FilesystemVectorImageRepository $vectorRepository,
     ) {
     }
 
@@ -112,6 +115,10 @@ class FilesystemImageRepository
         $filepath = $this->libraryImageStoragePath . DIRECTORY_SEPARATOR . $image->id . '.json';
         if (! file_exists($filepath) || ! is_readable($filepath)) {
             return;
+        }
+
+        foreach ($this->vectorRepository->findAllByImageId($image->id) as $vectors) {
+            $this->vectorRepository->remove($vectors);
         }
 
         $this->filesystem->remove($filepath);

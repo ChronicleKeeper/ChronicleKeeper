@@ -5,14 +5,13 @@ declare(strict_types=1);
 namespace ChronicleKeeper\Library\Presentation\Form;
 
 use ChronicleKeeper\Library\Domain\Entity\Directory;
+use ChronicleKeeper\Library\Domain\RootDirectory;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Validator\Constraints\NotNull;
 
-class DirectoryType extends AbstractType
+class DirectoryDeleteOptions extends AbstractType
 {
     public function configureOptions(OptionsResolver $resolver): void
     {
@@ -24,23 +23,23 @@ class DirectoryType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
-            'title',
-            TextType::class,
+            'confirmDeleteAll',
+            CheckboxType::class,
             [
-                'label' => 'Titel',
+                'label' => 'Alle Inhalte Löschen!',
                 'translation_domain' => false,
-                'constraints' => [new NotBlank()],
+                'required' => false,
             ],
         );
 
         $builder->add(
-            'parent',
+            'moveContentTo',
             DirectoryChoiceType::class,
             [
-                'label' => 'In Verzeichnis ...',
+                'label' => 'Inhalt verschieben nach ...',
+                'data' => RootDirectory::get(),
                 'exclude_directories' => $options['exclude_directories'],
                 'translation_domain' => false,
-                'constraints' => [new NotNull()],
             ],
         );
     }

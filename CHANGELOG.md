@@ -12,6 +12,7 @@
 - Verbosity of function debugging in chat output is enhanced with distance calculations from vector search.
 - PDF files are now supported for document upload functionality.
 - Directories can be moved between parent directories. The content within a directory will move with the directory.
+- Directories can now be deleted and one can choose to move or purge the content.
 
 ### Changed
 - Began project file structure cleanup, moving from prototyping to clean code.

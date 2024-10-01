@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Library\Infrastructure\Repository;
 
+use ChronicleKeeper\Chat\Infrastructure\Repository\ConversationFileStorage;
 use ChronicleKeeper\Library\Domain\Entity\Directory;
 use ChronicleKeeper\Library\Domain\RootDirectory;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Serializer\SerializerInterface;
 
@@ -32,6 +34,10 @@ class FilesystemDirectoryRepository
         private readonly string $directoryStoragePath,
         private readonly LoggerInterface $logger,
         private readonly SerializerInterface $serializer,
+        private readonly Filesystem $filesystem,
+        private readonly FilesystemImageRepository $imageRepository,
+        private readonly FilesystemDocumentRepository $documentRepository,
+        private readonly ConversationFileStorage $conversationRepository,
     ) {
     }
 
@@ -47,6 +53,35 @@ class FilesystemDirectoryRepository
                 JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT,
             ),
         );
+    }
+
+    public function remove(Directory $directory): void
+    {
+        $filename = $directory->id . '.json';
+        $filepath = $this->directoryStoragePath . DIRECTORY_SEPARATOR . $filename;
+
+        $this->thePurge($directory);
+        $this->filesystem->remove($filepath);
+    }
+
+    private function thePurge(Directory $sourceDirectory): void
+    {
+        foreach ($this->findByParent($sourceDirectory) as $directory) {
+            $this->thePurge($directory);
+            $this->remove($directory);
+        }
+
+        foreach ($this->documentRepository->findByDirectory($sourceDirectory) as $document) {
+            $this->documentRepository->remove($document);
+        }
+
+        foreach ($this->imageRepository->findByDirectory($sourceDirectory) as $image) {
+            $this->imageRepository->remove($image);
+        }
+
+        foreach ($this->conversationRepository->findByDirectory($sourceDirectory) as $conversation) {
+            $this->conversationRepository->delete($conversation);
+        }
     }
 
     /** @return list<Directory> */

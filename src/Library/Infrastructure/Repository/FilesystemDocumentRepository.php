@@ -9,6 +9,7 @@ use ChronicleKeeper\Library\Domain\Entity\Document;
 use DateTimeImmutable;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
+use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -26,6 +27,7 @@ use function usort;
 use const DIRECTORY_SEPARATOR;
 use const JSON_PRETTY_PRINT;
 
+#[Autoconfigure(lazy: true)]
 class FilesystemDocumentRepository
 {
     public function __construct(
@@ -33,6 +35,7 @@ class FilesystemDocumentRepository
         private readonly Filesystem $filesystem,
         private readonly string $documentStoragePath,
         private readonly SerializerInterface $serializer,
+        private readonly FilesystemVectorDocumentRepository $vectorRepository,
     ) {
     }
 
@@ -100,6 +103,10 @@ class FilesystemDocumentRepository
         $filepath = $this->documentStoragePath . DIRECTORY_SEPARATOR . $document->id . '.json';
         if (! file_exists($filepath) || ! is_readable($filepath)) {
             return;
+        }
+
+        foreach ($this->vectorRepository->findAllByDocumentId($document->id) as $vectors) {
+            $this->vectorRepository->remove($vectors);
         }
 
         $this->filesystem->remove($filepath);

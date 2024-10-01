@@ -52,6 +52,9 @@
                                     </td>
                                     <td>
                                         <a href="{{ path('library_directory_edit', {'directory': directory.id}) }}" title="Verzeichnis bearbeiten">{{ ux_icon('tabler:folder-cog') }}</a>
+                                        <a href="{{ path('library_directory_delete', {'directory': directory.id}) }}" title="Verzeichnis löschen">
+                                            {{ ux_icon('tabler:folder-minus', {'color': 'var(--tblr-danger)'}) }}
+                                        </a>
                                     </td>
                                 </tr>
                             {% endfor %}
@@ -61,7 +64,7 @@
                             {% endif %}
 
                             {% for medium in media %}
-                                {% include 'library/_rows.html.twig' with { medium } %}
+                                {% include 'library/_rows_media.html.twig' with { medium } %}
                             {% endfor %}
 
                             </tbody>

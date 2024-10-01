@@ -1,0 +1,60 @@
+{% extends 'layout.html.twig' %}
+
+{% block page_title %}Verzeichnis "{{ directory.title }}" löschen{% endblock %}
+
+{% block page_content %}
+
+    <form action="{{ path('library_directory_delete', {'directory': directory.id }) }}" method="post">
+
+    <div class="container-xl">
+        <div class="row row-deck row-cards">
+            <div class="col-12">
+                <div class="card card-borderless">
+                    <div class="card-body">
+                        <twig:directoryBreadcrumb directory="{{ directory }}" extraLastNode="Verzeichnis löschen" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-6">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="alert alert-info">
+                            Wähle bitte aus wo die Inhalte das Verzeichnis verschoben werden sollen, wenn du sie erhalten
+                            möchtest bevor das Verzeichnis gelöscht wird.
+                        </div>
+                        {{ form_row(form.moveContentTo) }}
+                    </div>
+                    <div class="card-footer text-end">
+                        <div class="d-flex">
+                            <a href="{{ path('library', {'directory': directory.parent.id }) }}" class="btn btn-link">Abbruch</a>
+                            <button type="submit" class="btn btn-warning ms-auto">Verschieben & Löschen</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-6">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="alert alert-danger">
+                            <strong>Achtung</strong> - Alle Inhalte, die in diesem Verzeichnis liegen werden gelöscht, wenn du dieses
+                            hier bestätigst. Gehe bitte sicher, dass du das wirklicht tun möchtest. Verlorene Inhalte
+                            können nicht wiederhergestellt werden außer du hast eine Sicherung.
+                        </div>
+                        {{ form_row(form.confirmDeleteAll) }}
+                    </div>
+                    <div class="card-footer text-end">
+                        <div class="d-flex">
+                            <a href="{{ path('library', {'directory': directory.parent.id }) }}" class="btn btn-link">Abbruch</a>
+                            <button type="submit" class="btn btn-danger ms-auto">Alles Löschen</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    </form>
+{% endblock %}
