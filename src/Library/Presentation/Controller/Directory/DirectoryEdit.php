@@ -51,7 +51,7 @@ class DirectoryEdit extends AbstractController
         $form = $this->formFactory->create(
             DirectoryType::class,
             ['title' => $directory->title, 'parent' => $directory->parent],
-            ['exclude_directories' => [$directory->id]],
+            ['exclude_directories' => [$directory]],
         );
         $form->handleRequest($request);
 

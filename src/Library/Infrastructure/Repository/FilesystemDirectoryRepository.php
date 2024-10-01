@@ -12,6 +12,7 @@ use Symfony\Component\Finder\Finder;
 use Symfony\Component\Serializer\SerializerInterface;
 
 use function array_filter;
+use function array_merge;
 use function file_exists;
 use function file_get_contents;
 use function file_put_contents;
@@ -75,6 +76,22 @@ class FilesystemDirectoryRepository
         );
 
         return $directories;
+    }
+
+    /** @return list<Directory> */
+    public function fetchFlattenedTree(Directory $root): array
+    {
+        $flattenedTree = [$root];
+
+        $children = $this->findByParent($root);
+        foreach ($children as $child) {
+            $flattenedTree = array_merge(
+                $flattenedTree,
+                $this->fetchFlattenedTree($child),
+            );
+        }
+
+        return $flattenedTree;
     }
 
     /** @return list<Directory> */
