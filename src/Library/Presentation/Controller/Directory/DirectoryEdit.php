@@ -48,14 +48,19 @@ class DirectoryEdit extends AbstractController
             throw new AccessDeniedHttpException();
         }
 
-        $form = $this->formFactory->create(DirectoryType::class, ['title' => $directory->title]);
+        $form = $this->formFactory->create(
+            DirectoryType::class,
+            ['title' => $directory->title, 'parent' => $directory->parent],
+            ['exclude_directories' => [$directory->id]],
+        );
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $directoryArray = $form->getData();
             assert(is_array($directoryArray) && array_key_exists('title', $directoryArray));
 
-            $directory->title = $directoryArray['title'];
+            $directory->title  = $directoryArray['title'];
+            $directory->parent = $directoryArray['parent'];
 
             $this->directoryRepository->store($directory);
 

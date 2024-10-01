@@ -42,7 +42,7 @@ class DirectoryCreation extends AbstractController
 
     public function __invoke(Request $request, Directory $parentDirectory): Response
     {
-        $form = $this->formFactory->create(DirectoryType::class);
+        $form = $this->formFactory->create(DirectoryType::class, ['parent' => $parentDirectory]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {

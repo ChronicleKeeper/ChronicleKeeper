@@ -14,6 +14,7 @@ use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 use function array_key_exists;
+use function array_keys;
 
 class Importer
 {
@@ -30,6 +31,12 @@ class Importer
         foreach ($fileConverters as $converter) {
             $this->addFileConverter($converter);
         }
+    }
+
+    /** @return list<string> */
+    public function getSupportedMimeTypes(): array
+    {
+        return array_keys($this->fileConverters);
     }
 
     public function addFileConverter(FileConverter $converter): void

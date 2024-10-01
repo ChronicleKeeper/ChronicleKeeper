@@ -21,19 +21,22 @@
                                 <div class="col-12">
                                     <div class="alert alert-info">
                                         Das Hochladen von Dokumenten wird aktuell unterstützt für Dateien der Formate
-                                        <b>txt</b>, <b>docx</b>, und <b>md</b>.
+                                        <b>txt</b>, <b>docx</b>, <b>pdf</b> und <b>md</b>.
                                         <br /><br />
                                         <u>Beachte:</u>
                                         <br /><br />
-                                        Bei Dokumenten des Types <b>docx</b> ist es nicht unüblich,
-                                        dass diese sehr Bescheiden von Word formatiert sind in den Quelldateien.
+                                        Bei Dokumenten der Typen <b>docx und pdf</b> ist es nicht unüblich,
+                                        dass diese sehr Bescheiden formatiert sind in den Quelldateien.
                                         Es kommt zum Beispiel sehr häufig vor, dass jeder Buchstabe eines Textes mit
-                                        eigenen Formatierungen und zusätzlichen "Umbrüchen" ausgestattet ist, die du in
-                                        Word gar nicht siehst. Die Konvertierung führt dazu, dass die Dokumente sehr
+                                        eigenen Formatierungen und zusätzlichen "Umbrüchen" ausgestattet ist, die du im
+                                        Reader gar nicht siehst. Die Konvertierung führt dazu, dass die Dokumente sehr
                                         zerrissen aussehen können. Es wird also empfohlen die automatische Optimierung
                                         der Dokumente zu nutzen um ein halbwegs anständiges Dokument zu bekommen.<br>
                                         Inhaltlich sollte sich an den Dokumenten nichts ändern, wenn sie dann auch nicht
-                                        mehr so aussehen und formuliert sind wie du sie importieren wolltest.
+                                        mehr so aussehen und formuliert sind wie du sie importieren wolltest.<br />
+                                        Bitte sende dabei keine Sokumente, die dynamische Formulare beinhalten. Diese
+                                        Daten können nicht extrahiert werden. Du solltest das Dokument dann bitte mit
+                                        eingegebenen Daten, zum Beispiel, über das Drucken als PDF speichern.
                                     </div>
                                     {{ form_row(form.document) }}
                                     {{ form_row(form.optimize) }}

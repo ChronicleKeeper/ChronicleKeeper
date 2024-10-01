@@ -10,6 +10,8 @@
 - Completely reworked the conversation area to multiple conversations with custom settings and storage per conversation.
 - Storable conversations are added to the library. So a stored conversation will be placed in the library.
 - Verbosity of function debugging in chat output is enhanced with distance calculations from vector search.
+- PDF files are now supported for document upload functionality.
+- Directories can be moved between parent directories. The content within a directory will move with the directory.
 
 ### Changed
 - Began project file structure cleanup, moving from prototyping to clean code.

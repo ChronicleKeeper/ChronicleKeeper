@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Library\Presentation\Controller\Document;
 
+use ChronicleKeeper\Library\Application\Service\Document\Exception\PDFHasEmptyContent;
 use ChronicleKeeper\Library\Application\Service\Document\Importer;
 use ChronicleKeeper\Library\Domain\Entity\Directory;
 use ChronicleKeeper\Library\Presentation\Form\DocumentUploadType;
@@ -46,24 +47,32 @@ class DocumentUpload extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $documentUploaded = $form->get('document')->getData();
-            assert($documentUploaded instanceof UploadedFile);
+            try {
+                $documentUploaded = $form->get('document')->getData();
+                assert($documentUploaded instanceof UploadedFile);
 
-            $optimize = $form->get('optimize')->getData();
-            assert(is_bool($optimize));
+                $optimize = $form->get('optimize')->getData();
+                assert(is_bool($optimize));
 
-            $document = $this->importer->import($documentUploaded, $directory, $optimize);
+                $document = $this->importer->import($documentUploaded, $directory, $optimize);
 
-            $this->addFlashMessage(
-                $request,
-                Alert::SUCCESS,
-                'Das Dokument mit dem Titel "' . $document->title . '" wurde erfolgreich hochgeladen. Bitte überprüfe den Text nach einer Optimierung.',
-            );
+                $this->addFlashMessage(
+                    $request,
+                    Alert::SUCCESS,
+                    'Das Dokument mit dem Titel "' . $document->title . '" wurde erfolgreich hochgeladen. Bitte überprüfe den Text nach einer Optimierung.',
+                );
 
-            return new RedirectResponse($this->router->generate(
-                'library_document_view',
-                ['document' => $document->id],
-            ));
+                return new RedirectResponse($this->router->generate(
+                    'library_document_view',
+                    ['document' => $document->id],
+                ));
+            } catch (PDFHasEmptyContent) {
+                $this->addFlashMessage(
+                    $request,
+                    Alert::WARNING,
+                    'Der Inhalt der PDF ist leider nicht lesbar. Bitte versuche es mit einem anderen Dokument.',
+                );
+            }
         }
 
         return new Response($this->environment->render(

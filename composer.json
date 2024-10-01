@@ -30,6 +30,7 @@
         "php-llm/llm-chain": "^0.5",
         "php-llm/llm-chain-bundle": "^0.5",
         "phpoffice/phpword": "^1.3",
+        "smalot/pdfparser": "^2.11",
         "symfony/asset": "^7.1",
         "symfony/asset-mapper": "^7.1",
         "symfony/clock": "^7.1",
