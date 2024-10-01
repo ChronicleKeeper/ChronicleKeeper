@@ -51,5 +51,7 @@ frontend: ## run symfony frontend build commands
 	php bin/console importmap:install
 	php bin/console ux:icons:lock
 
+rector: ## Exectute all rector rules
+	php vendor/bin/rector
 
 build: lint-php check-cs static-analysis phpunit

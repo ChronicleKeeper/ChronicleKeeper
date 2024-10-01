@@ -27,11 +27,11 @@ use PhpLlm\LlmChain\ToolBox\AsTool;
     functionalities to fetch additional information.
     TEXT,
 )]
-final class CurrentDate
+final readonly class CurrentDate
 {
     public function __construct(
-        private readonly SettingsHandler $settingsHandler,
-        private readonly ToolUsageCollector $collector,
+        private SettingsHandler $settingsHandler,
+        private ToolUsageCollector $collector,
     ) {
     }
 

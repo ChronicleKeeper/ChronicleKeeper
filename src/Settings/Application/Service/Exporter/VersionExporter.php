@@ -9,10 +9,10 @@ use ZipArchive;
 use function file_get_contents;
 use function preg_match_all;
 
-final class VersionExporter implements SingleExport
+final readonly class VersionExporter implements SingleExport
 {
     public function __construct(
-        private readonly string $changelogFile,
+        private string $changelogFile,
     ) {
     }
 

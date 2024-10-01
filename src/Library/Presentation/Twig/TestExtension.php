@@ -15,8 +15,8 @@ class TestExtension extends AbstractExtension
     public function getTests(): array
     {
         return [
-            new TwigTest('image', [$this, 'isImage']),
-            new TwigTest('document', [$this, 'isDocument']),
+            new TwigTest('image', $this->isImage(...)),
+            new TwigTest('document', $this->isDocument(...)),
         ];
     }
 

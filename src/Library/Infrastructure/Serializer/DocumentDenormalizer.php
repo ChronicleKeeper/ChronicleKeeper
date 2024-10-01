@@ -8,7 +8,6 @@ use ChronicleKeeper\Library\Domain\Entity\Directory;
 use ChronicleKeeper\Library\Domain\Entity\Document;
 use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemDocumentRepository;
 use DateTimeImmutable;
-use InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 use Symfony\Component\Serializer\Normalizer\DenormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
@@ -35,7 +34,7 @@ class DocumentDenormalizer implements DenormalizerInterface, DenormalizerAwareIn
     public function denormalize(mixed $data, string $type, string|null $format = null, array $context = []): Document
     {
         if (is_string($data)) {
-            return $this->documentRepository->findById($data) ?? throw new InvalidArgumentException('Not found!');
+            return $this->documentRepository->findById($data);
         }
 
         Assert::isArray($data);

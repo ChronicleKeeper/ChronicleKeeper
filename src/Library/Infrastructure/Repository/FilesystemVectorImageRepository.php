@@ -156,9 +156,6 @@ class FilesystemVectorImageRepository
         }
 
         $image = $this->imageRepository->findById($vectorImageArr['imageId']);
-        if ($image === null) {
-            throw new RuntimeException('The vector image "' . $vectorImageArr['id'] . '" have an invalid link to a image.');
-        }
 
         $vectorImage     = new VectorImage(
             image: $image,

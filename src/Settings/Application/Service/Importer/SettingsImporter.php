@@ -11,10 +11,10 @@ use League\Flysystem\Filesystem;
 use function file_exists;
 use function file_put_contents;
 
-final class SettingsImporter implements SingleImport
+final readonly class SettingsImporter implements SingleImport
 {
     public function __construct(
-        private readonly string $settingsFilePath,
+        private string $settingsFilePath,
     ) {
     }
 

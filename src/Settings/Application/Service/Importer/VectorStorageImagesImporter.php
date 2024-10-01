@@ -16,10 +16,10 @@ use function str_replace;
 
 use const DIRECTORY_SEPARATOR;
 
-final class VectorStorageImagesImporter implements SingleImport
+final readonly class VectorStorageImagesImporter implements SingleImport
 {
     public function __construct(
-        private readonly string $vectorImagesPath,
+        private string $vectorImagesPath,
     ) {
     }
 

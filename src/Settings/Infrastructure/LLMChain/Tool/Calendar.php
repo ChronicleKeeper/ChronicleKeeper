@@ -22,11 +22,11 @@ use PhpLlm\LlmChain\ToolBox\AsTool;
     - General calendar questions: "What is a typical year like?"
     TEXT,
 )]
-final class Calendar
+final readonly class Calendar
 {
     public function __construct(
-        private readonly SettingsHandler $settingsHandler,
-        private readonly ToolUsageCollector $collector,
+        private SettingsHandler $settingsHandler,
+        private ToolUsageCollector $collector,
     ) {
     }
 

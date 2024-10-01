@@ -22,7 +22,6 @@ use function is_array;
 use function is_readable;
 use function json_decode;
 use function json_encode;
-use function json_validate;
 use function strcasecmp;
 use function usort;
 
@@ -84,29 +83,20 @@ class FilesystemImageRepository
     {
         $images = $this->findAll();
 
-        return array_filter($images, static function (Image $document) use ($directory) {
-            return $document->directory->id === $directory->id;
-        });
+        return array_filter($images, static fn (Image $document) => $document->directory->id === $directory->id);
     }
 
-    public function findById(string $id): Image|null
+    public function findById(string $id): Image
     {
         $filepath = $this->libraryImageStoragePath . DIRECTORY_SEPARATOR . $id . '.json';
-        if (! file_exists($filepath) || ! is_readable($filepath)) {
-            return null;
-        }
-
-        $json = file_get_contents($filepath);
-        if ($json === false || ! json_validate($json)) {
-            return null;
-        }
+        $json     = (string) file_get_contents($filepath);
 
         try {
             return $this->convertJsonToImage($json);
         } catch (RuntimeException $e) {
             $this->logger->error($e, ['json' => $json]);
 
-            return null;
+            throw $e;
         }
     }
 

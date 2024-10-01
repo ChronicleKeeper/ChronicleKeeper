@@ -22,11 +22,11 @@ use PhpLlm\LlmChain\ToolBox\AsTool;
     - Specific moon-related events: "When is the next lunar eclipse?"
     TEXT,
 )]
-final class MoonCalendar
+final readonly class MoonCalendar
 {
     public function __construct(
-        private readonly SettingsHandler $settingsHandler,
-        private readonly ToolUsageCollector $collector,
+        private SettingsHandler $settingsHandler,
+        private ToolUsageCollector $collector,
     ) {
     }
 

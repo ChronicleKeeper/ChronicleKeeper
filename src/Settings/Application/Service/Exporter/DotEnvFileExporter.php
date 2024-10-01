@@ -6,10 +6,10 @@ namespace ChronicleKeeper\Settings\Application\Service\Exporter;
 
 use ZipArchive;
 
-final class DotEnvFileExporter implements SingleExport
+final readonly class DotEnvFileExporter implements SingleExport
 {
     public function __construct(
-        private readonly string $dotEnvFile,
+        private string $dotEnvFile,
     ) {
     }
 

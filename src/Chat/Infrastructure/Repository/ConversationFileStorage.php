@@ -7,32 +7,35 @@ namespace ChronicleKeeper\Chat\Infrastructure\Repository;
 use ChronicleKeeper\Chat\Application\Entity\Conversation;
 use ChronicleKeeper\Library\Domain\Entity\Directory;
 use ChronicleKeeper\Settings\Application\SettingsHandler;
+use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
+use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Exception\UnableToReadFile;
+use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\PathRegistry;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Serializer\Encoder\JsonEncode;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\SerializerInterface;
+use Webmozart\Assert\Assert;
 
 use function array_filter;
 use function count;
 use function strcasecmp;
 use function usort;
 
-use const DIRECTORY_SEPARATOR;
 use const JSON_PRETTY_PRINT;
 use const JSON_UNESCAPED_UNICODE;
 
 class ConversationFileStorage
 {
+    private const string STORAGE_NAME = 'library.conversations';
+
     public function __construct(
-        private readonly string $conversationTemporaryFile,
-        private readonly string $conversationStoragePath,
-        private readonly Filesystem $filesystem,
+        private readonly FileAccess $fileAccess,
         private readonly SerializerInterface $serializer,
         private readonly SettingsHandler $settingsHandler,
         private readonly LoggerInterface $logger,
+        private readonly PathRegistry $pathRegistry,
     ) {
     }
 
@@ -46,7 +49,7 @@ class ConversationFileStorage
 
         $conversations = [];
         foreach ($finder as $file) {
-            $conversations[] = $this->deserialize($file->getRealPath());
+            $conversations[] = $this->deserialize($file->getFilename());
 
             if (count($conversations) === $maxEntries) {
                 break;
@@ -64,15 +67,16 @@ class ConversationFileStorage
         $conversations = [];
         foreach ($finder as $file) {
             try {
-                $conversations[] = $this->deserialize($file->getRealPath());
+                $conversations[] = $this->deserialize($file->getFilename());
             } catch (RuntimeException $e) {
                 $this->logger->error($e, ['file' => $file]);
             }
         }
 
-        $conversations = array_filter($conversations, static function (Conversation $conversation) use ($directory) {
-            return $conversation->directory->id === $directory->id;
-        });
+        $conversations = array_filter(
+            $conversations,
+            static fn (Conversation $conversation) => $conversation->directory->id === $directory->id,
+        );
 
         usort(
             $conversations,
@@ -86,13 +90,15 @@ class ConversationFileStorage
     {
         return (new Finder())
             ->ignoreDotFiles(true)
-            ->in($this->conversationStoragePath);
+            ->in($this->pathRegistry->get(self::STORAGE_NAME));
     }
 
     private function deserialize(string $file): Conversation
     {
+        Assert::notEmpty($file, 'The given file must not be empty.');
+
         return $this->serializer->deserialize(
-            $this->filesystem->readFile($file),
+            $this->fileAccess->read(self::STORAGE_NAME, $file),
             Conversation::class,
             JsonEncoder::FORMAT,
         );
@@ -100,19 +106,18 @@ class ConversationFileStorage
 
     public function delete(Conversation $conversation): void
     {
-        $filename = $this->conversationStoragePath . DIRECTORY_SEPARATOR . $conversation->id . '.json';
-        $this->filesystem->remove($filename);
+        $this->fileAccess->delete(self::STORAGE_NAME, $conversation->id . '.json');
     }
 
     public function load(string $id): Conversation|null
     {
-        $filename = $this->conversationStoragePath . DIRECTORY_SEPARATOR . $id . '.json';
-        if (! $this->filesystem->exists($filename)) {
+        $filename = $id . '.json';
+        if (! $this->fileAccess->exists(self::STORAGE_NAME, $filename)) {
             return null;
         }
 
         return $this->serializer->deserialize(
-            $this->filesystem->readFile($filename),
+            $this->fileAccess->read(self::STORAGE_NAME, $filename),
             Conversation::class,
             JsonEncoder::FORMAT,
         );
@@ -120,10 +125,9 @@ class ConversationFileStorage
 
     public function store(Conversation $conversation): void
     {
-        $filename = $this->conversationStoragePath . DIRECTORY_SEPARATOR . $conversation->id . '.json';
-
-        $this->filesystem->dumpFile(
-            $filename,
+        $this->fileAccess->write(
+            self::STORAGE_NAME,
+            $conversation->id . '.json',
             $this->serializer->serialize(
                 $conversation,
                 JsonEncoder::FORMAT,
@@ -134,24 +138,27 @@ class ConversationFileStorage
 
     public function loadTemporary(): Conversation
     {
-        if ($this->filesystem->exists($this->conversationTemporaryFile)) {
+        try {
             return $this->serializer->deserialize(
-                $this->filesystem->readFile($this->conversationTemporaryFile),
+                $this->fileAccess->read('temp', 'conversation_temporary.json'),
                 Conversation::class,
                 JsonEncoder::FORMAT,
             );
+        } catch (UnableToReadFile) {
+            // All is fine, file not exists ... we create it.
+
+            $conversation = Conversation::createFromSettings($this->settingsHandler->get());
+            $this->saveTemporary($conversation);
+
+            return $conversation;
         }
-
-        $conversation = Conversation::createFromSettings($this->settingsHandler->get());
-        $this->saveTemporary($conversation);
-
-        return $conversation;
     }
 
     public function saveTemporary(Conversation $conversation): void
     {
-        $this->filesystem->dumpFile(
-            $this->conversationTemporaryFile,
+        $this->fileAccess->write(
+            'temp',
+            'conversation_temporary.json',
             $this->serializer->serialize(
                 $conversation,
                 JsonEncoder::FORMAT,
@@ -162,7 +169,7 @@ class ConversationFileStorage
 
     public function resetTemporary(): void
     {
-        $this->filesystem->remove($this->conversationTemporaryFile);
+        $this->fileAccess->delete('temp', 'conversation_temporary.json');
         $this->loadTemporary();
     }
 }

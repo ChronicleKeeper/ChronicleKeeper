@@ -6,11 +6,12 @@ namespace ChronicleKeeper\Chat\Infrastructure\ValueResolver;
 
 use ChronicleKeeper\Chat\Application\Entity\Conversation;
 use ChronicleKeeper\Chat\Infrastructure\Repository\ConversationFileStorage;
-use RuntimeException;
+use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Exception\UnableToReadFile;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Uid\Uuid;
 
 use function is_a;
@@ -24,7 +25,7 @@ class ConversationValueResolver implements ValueResolverInterface
     ) {
     }
 
-    /** @return iterable<Conversation> */
+    /** @return list<Conversation> */
     public function resolve(Request $request, ArgumentMetadata $argument): iterable
     {
         $argumentType = $argument->getType();
@@ -37,9 +38,10 @@ class ConversationValueResolver implements ValueResolverInterface
             return [];
         }
 
-        $conversation = $this->conversationFileStorage->load($identifier);
-        if ($conversation === null) {
-            throw new RuntimeException('Conversation "' . $identifier . '" not found.');
+        try {
+            $conversation = $this->conversationFileStorage->load($identifier) ?? throw new NotFoundHttpException();
+        } catch (UnableToReadFile) {
+            throw new NotFoundHttpException('Conversation "' . $identifier . '" not found.');
         }
 
         return [$conversation];

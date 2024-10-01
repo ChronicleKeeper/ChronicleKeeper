@@ -16,10 +16,10 @@ use function str_replace;
 
 use const DIRECTORY_SEPARATOR;
 
-final class LibraryDirectoryImporter implements SingleImport
+final readonly class LibraryDirectoryImporter implements SingleImport
 {
     public function __construct(
-        private readonly string $directoryStoragePath,
+        private string $directoryStoragePath,
     ) {
     }
 

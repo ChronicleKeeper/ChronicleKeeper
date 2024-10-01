@@ -9,10 +9,10 @@ use function explode;
 use function file_get_contents;
 use function preg_match_all;
 
-final class Version
+final readonly class Version
 {
     public function __construct(
-        private readonly string $changelogFile,
+        private string $changelogFile,
     ) {
     }
 

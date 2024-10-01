@@ -9,10 +9,10 @@ use Symfony\Component\Mime\MimeTypes;
 
 use function array_merge;
 
-final class PlainTextConverter implements FileConverter
+final readonly class PlainTextConverter implements FileConverter
 {
     public function __construct(
-        private readonly Filesystem $filesystem,
+        private Filesystem $filesystem,
     ) {
     }
 

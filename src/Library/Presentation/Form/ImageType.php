@@ -9,7 +9,7 @@ use ChronicleKeeper\Library\Domain\Entity\Image;
 use DateTimeImmutable;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\DataMapperInterface;
-use Symfony\Component\Form\Exception;
+use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -70,7 +70,7 @@ class ImageType extends AbstractType implements DataMapperInterface
         }
 
         if (! $viewData instanceof Image) {
-            throw new Exception\UnexpectedTypeException($viewData, Image::class);
+            throw new UnexpectedTypeException($viewData, Image::class);
         }
 
         /** @var FormInterface[] $forms */
@@ -85,7 +85,7 @@ class ImageType extends AbstractType implements DataMapperInterface
     public function mapFormsToData(Traversable $forms, mixed &$viewData): void
     {
         if (! $viewData instanceof Image) {
-            throw new Exception\UnexpectedTypeException($viewData, Image::class);
+            throw new UnexpectedTypeException($viewData, Image::class);
         }
 
         $viewData->updatedAt = new DateTimeImmutable();

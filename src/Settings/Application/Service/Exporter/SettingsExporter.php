@@ -9,11 +9,11 @@ use ZipArchive;
 
 use function file_exists;
 
-final class SettingsExporter implements SingleExport
+final readonly class SettingsExporter implements SingleExport
 {
     public function __construct(
-        private readonly string $settingsFilePath,
-        private readonly SettingsHandler $settingsHandler,
+        private string $settingsFilePath,
+        private SettingsHandler $settingsHandler,
     ) {
     }
 

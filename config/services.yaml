@@ -2,21 +2,34 @@ parameters:
   router.request_context.scheme: 'https'
   asset.request_context.secure: true
 
+  app.storage.base_dir: '%kernel.project_dir%/var'
+  app.data.base_dir: '%kernel.project_dir%/var/data'
+  app.tmp.base_dir: '%kernel.project_dir%/var/tmp'
+  app.library.base_dir: '%kernel.project_dir%/var/library'
+
+  app.library.documents_storage: '%app.storage.base_dir%/documents'
+  app.library.images_storage: '%app.library.base_dir%/images'
+  app.library.directories_storage: '%app.storage.base_dir%/directories'
+  app.library.conversations_storage: '%app.library.base_dir%/conversations'
+
+  app.vector.documents_storage: '%app.data.base_dir%/documents'
+  app.vector.images_storage: '%app.data.base_dir%/image'
+
 services:
   _defaults:
     autowire: true
     autoconfigure: true
     bind:
       string $dotEnvFile: '%kernel.project_dir%/.env'
-      string $documentStoragePath: '%kernel.project_dir%/var/documents'
-      string $directoryStoragePath: '%kernel.project_dir%/var/directories'
-      string $vectorDocumentsPath: '%kernel.project_dir%/var/data/document'
-      string $vectorImagesPath: '%kernel.project_dir%/var/data/image'
-      string $settingsFilePath: '%kernel.project_dir%/var/settings.json'
+      string $documentStoragePath: '%app.storage.base_dir%/documents'
+      string $directoryStoragePath: '%app.storage.base_dir%/directories'
+      string $vectorDocumentsPath: '%app.data.base_dir%/document'
+      string $vectorImagesPath: '%app.data.base_dir%/image'
+      string $settingsFilePath: '%app.storage.base_dir%/settings.json'
       string $changelogFile: '%kernel.project_dir%/CHANGELOG.md'
-      string $libraryImageStoragePath: '%kernel.project_dir%/var/library/images'
-      string $conversationTemporaryFile: '%kernel.project_dir%/var/tmp/conversation_temporary.json'
-      string $conversationStoragePath: '%kernel.project_dir%/var/library/conversations'
+      string $libraryImageStoragePath: '%app.library.base_dir%/images'
+      string $conversationTemporaryFile: '%app.storage.base_dir%/tmp/conversation_temporary.json'
+      string $conversationStoragePath: '%app.library.base_dir%/conversations'
 
   ChronicleKeeper\:
     resource: '../src/*'
@@ -27,3 +40,20 @@ services:
 
   League\CommonMark\Extension\Table\TableExtension:
     tags: [ 'twig.markdown.league_extension' ]
+
+  ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\PathRegistry:
+    calls:
+      - method: add
+        arguments: [ 'library.documents', '%app.library.documents_storage%' ]
+      - method: add
+        arguments: [ 'library.images', '%app.library.images_storage%' ]
+      - method: add
+        arguments: [ 'library.directories', '%app.library.directories_storage%' ]
+      - method: add
+        arguments: [ 'library.conversations', '%app.library.conversations_storage%' ]
+      - method: add
+        arguments: [ 'vector.documents', '%app.vector.documents_storage%' ]
+      - method: add
+        arguments: [ 'vector.images', '%app.vector.images_storage%' ]
+      - method: add
+        arguments: [ 'temp', '%app.tmp.base_dir%' ]

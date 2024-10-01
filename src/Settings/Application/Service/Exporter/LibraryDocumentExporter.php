@@ -7,10 +7,10 @@ namespace ChronicleKeeper\Settings\Application\Service\Exporter;
 use Symfony\Component\Finder\Finder;
 use ZipArchive;
 
-final class LibraryDocumentExporter implements SingleExport
+final readonly class LibraryDocumentExporter implements SingleExport
 {
     public function __construct(
-        private readonly string $documentStoragePath,
+        private string $documentStoragePath,
     ) {
     }
 

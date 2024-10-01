@@ -19,10 +19,10 @@ use function str_replace;
 
 use const DIRECTORY_SEPARATOR;
 
-final class ConversationImporter implements SingleImport
+final readonly class ConversationImporter implements SingleImport
 {
     public function __construct(
-        private readonly string $conversationStoragePath,
+        private string $conversationStoragePath,
     ) {
     }
 

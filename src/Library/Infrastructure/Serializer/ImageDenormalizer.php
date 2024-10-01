@@ -8,7 +8,6 @@ use ChronicleKeeper\Library\Domain\Entity\Directory;
 use ChronicleKeeper\Library\Domain\Entity\Image;
 use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemImageRepository;
 use DateTimeImmutable;
-use InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 use Symfony\Component\Serializer\Normalizer\DenormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
@@ -36,7 +35,7 @@ class ImageDenormalizer implements DenormalizerInterface, DenormalizerAwareInter
     public function denormalize(mixed $data, string $type, string|null $format = null, array $context = []): Image
     {
         if (is_string($data)) {
-            return $this->imageRepository->findById($data) ?? throw new InvalidArgumentException('Not found!');
+            return $this->imageRepository->findById($data);
         }
 
         Assert::isArray($data);

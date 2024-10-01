@@ -8,10 +8,10 @@ use ChronicleKeeper\Settings\Application\Service\Exporter\SingleExport;
 use Symfony\Component\Finder\Finder;
 use ZipArchive;
 
-final class ConversationExporter implements SingleExport
+final readonly class ConversationExporter implements SingleExport
 {
     public function __construct(
-        private readonly string $conversationStoragePath,
+        private string $conversationStoragePath,
     ) {
     }
 

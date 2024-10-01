@@ -156,9 +156,6 @@ class FilesystemVectorDocumentRepository
         }
 
         $document = $this->documentRepository->findById($vectorDocumentArr['documentId']);
-        if ($document === null) {
-            throw new RuntimeException('The vector document "' . $vectorDocumentArr['id'] . '" have an invalid link to a document.');
-        }
 
         $vectorDocument     = new VectorDocument(
             document: $document,

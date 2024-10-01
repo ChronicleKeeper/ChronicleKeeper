@@ -7,61 +7,56 @@ namespace ChronicleKeeper\Library\Infrastructure\Repository;
 use ChronicleKeeper\Chat\Infrastructure\Repository\ConversationFileStorage;
 use ChronicleKeeper\Library\Domain\Entity\Directory;
 use ChronicleKeeper\Library\Domain\RootDirectory;
+use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Exception\UnableToReadFile;
+use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\FileAccess;
+use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\PathRegistry;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Serializer\SerializerInterface;
+use Throwable;
 
 use function array_filter;
 use function array_merge;
-use function file_exists;
-use function file_get_contents;
-use function file_put_contents;
-use function is_readable;
 use function json_encode;
-use function json_validate;
 use function strcasecmp;
 use function usort;
 
-use const DIRECTORY_SEPARATOR;
 use const JSON_PRETTY_PRINT;
 use const JSON_THROW_ON_ERROR;
 
 class FilesystemDirectoryRepository
 {
+    private const string STORAGE_NAME = 'library.directories';
+
     public function __construct(
-        private readonly string $directoryStoragePath,
         private readonly LoggerInterface $logger,
         private readonly SerializerInterface $serializer,
-        private readonly Filesystem $filesystem,
+        private readonly FileAccess $fileAccess,
         private readonly FilesystemImageRepository $imageRepository,
         private readonly FilesystemDocumentRepository $documentRepository,
         private readonly ConversationFileStorage $conversationRepository,
+        private readonly PathRegistry $pathRegistry,
     ) {
     }
 
     public function store(Directory $directory): void
     {
         $filename = $directory->id . '.json';
-        $filepath = $this->directoryStoragePath . DIRECTORY_SEPARATOR . $filename;
-
-        file_put_contents(
-            $filepath,
-            json_encode(
-                $directory->toArray(),
-                JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT,
-            ),
+        $content  = json_encode(
+            $directory->toArray(),
+            JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT,
         );
+
+        $this->fileAccess->write(self::STORAGE_NAME, $filename, $content);
     }
 
     public function remove(Directory $directory): void
     {
         $filename = $directory->id . '.json';
-        $filepath = $this->directoryStoragePath . DIRECTORY_SEPARATOR . $filename;
 
         $this->thePurge($directory);
-        $this->filesystem->remove($filepath);
+        $this->fileAccess->delete(self::STORAGE_NAME, $filename);
     }
 
     private function thePurge(Directory $sourceDirectory): void
@@ -89,7 +84,7 @@ class FilesystemDirectoryRepository
     {
         $finder = (new Finder())
             ->ignoreDotFiles(true)
-            ->in($this->directoryStoragePath)
+            ->in($this->pathRegistry->get(self::STORAGE_NAME))
             ->files();
 
         $directories   = [];
@@ -146,38 +141,23 @@ class FilesystemDirectoryRepository
             return RootDirectory::get();
         }
 
-        $json = $this->getContentOfFile($id . '.json');
-
-        if ($json === null || ! json_validate($json)) {
+        try {
+            $json = $this->fileAccess->read(self::STORAGE_NAME, $id . '.json');
+        } catch (UnableToReadFile) {
             return null;
         }
 
         try {
             return $this->convertJsonToDirectory($json);
-        } catch (RuntimeException $e) {
+        } catch (Throwable $e) {
             $this->logger->error($e, ['json' => $json]);
 
-            return null;
+            throw $e;
         }
     }
 
     private function convertJsonToDirectory(string $json): Directory
     {
         return $this->serializer->deserialize($json, Directory::class, 'json');
-    }
-
-    private function getContentOfFile(string $filename): string|null
-    {
-        $filepath = $this->directoryStoragePath . DIRECTORY_SEPARATOR . $filename;
-        if (! file_exists($filepath) || ! is_readable($filepath)) {
-            return null;
-        }
-
-        $directoryJson = file_get_contents($filepath);
-        if ($directoryJson === false || ! json_validate($directoryJson)) {
-            return null;
-        }
-
-        return $directoryJson;
     }
 }
