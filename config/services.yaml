@@ -11,11 +11,6 @@ services:
   _defaults:
     autowire: true
     autoconfigure: true
-    bind:
-      string $dotEnvFile: '%kernel.project_dir%/.env'
-      string $settingsFilePath: '%app.storage.base_dir%/settings.json'
-      string $changelogFile: '%kernel.project_dir%/CHANGELOG.md'
-      string $conversationTemporaryFile: '%app.storage.base_dir%/tmp/conversation_temporary.json'
 
   ChronicleKeeper\:
     resource: '../src/*'
@@ -29,6 +24,10 @@ services:
 
   ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\PathRegistry:
     calls:
+      - method: add
+        arguments: [ 'storage', '%app.storage.base_dir%' ]
+      - method: add
+        arguments: [ 'general.project', '%kernel.project_dir%' ]
       - method: add
         arguments: [ 'library.documents', '%app.storage.base_dir%/documents' ]
       - method: add

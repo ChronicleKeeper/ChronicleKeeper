@@ -4,24 +4,24 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Settings\Application\Service;
 
+use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
+
+use function assert;
 use function end;
 use function explode;
-use function file_get_contents;
 use function preg_match_all;
 
 final readonly class Version
 {
     public function __construct(
-        private string $changelogFile,
+        private FileAccess $fileAccess,
     ) {
     }
 
     public function getCurrentVersion(): string
     {
-        $changelog = file_get_contents($this->changelogFile);
-        if ($changelog === false) {
-            return 'dev'; // default version
-        }
+        $changelog = $this->fileAccess->read('general.project', 'CHANGELOG.md');
+        assert($changelog !== '');
 
         preg_match_all('/\[(.*?)\]/', $changelog, $foundVersions);
 

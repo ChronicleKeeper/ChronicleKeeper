@@ -11,6 +11,8 @@ use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Exception\Unabl
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
 
+use const DIRECTORY_SEPARATOR;
+
 class FileAccess implements FileAccessContract
 {
     public function __construct(
@@ -70,6 +72,6 @@ class FileAccess implements FileAccessContract
 
     private function buildPath(string $type, string $filename): string
     {
-        return $this->pathRegistry->get($type) . '/' . $filename;
+        return $this->pathRegistry->get($type) . DIRECTORY_SEPARATOR . $filename;
     }
 }

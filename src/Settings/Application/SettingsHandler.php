@@ -5,18 +5,15 @@ declare(strict_types=1);
 namespace ChronicleKeeper\Settings\Application;
 
 use ChronicleKeeper\Settings\Domain\ValueObject\Settings;
+use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
 
-use function file_exists;
-use function file_get_contents;
-use function file_put_contents;
 use function is_array;
-use function is_readable;
 use function json_decode;
 use function json_encode;
 use function json_validate;
-use function unlink;
 
 use const JSON_PRETTY_PRINT;
+use const JSON_THROW_ON_ERROR;
 
 class SettingsHandler
 {
@@ -24,7 +21,7 @@ class SettingsHandler
     private Settings $settings;
 
     public function __construct(
-        private readonly string $settingsFilePath,
+        private readonly FileAccess $fileAccess,
     ) {
         $this->settings = new Settings();
     }
@@ -40,16 +37,25 @@ class SettingsHandler
 
     public function store(): void
     {
-        file_put_contents($this->settingsFilePath, json_encode($this->settings->toArray(), JSON_PRETTY_PRINT));
+        $this->fileAccess->write(
+            'storage',
+            'settings.json',
+            json_encode($this->settings->toArray(), JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT),
+        );
+    }
+
+    private function exists(): bool
+    {
+        return $this->fileAccess->exists('storage', 'settings.json');
     }
 
     public function reset(): void
     {
-        if (! file_exists($this->settingsFilePath)) {
+        if (! $this->exists()) {
             return;
         }
 
-        unlink($this->settingsFilePath);
+        $this->fileAccess->delete('storage', 'settings.json');
 
         $this->loaded   = false;
         $this->settings = new Settings();
@@ -57,16 +63,16 @@ class SettingsHandler
 
     private function loadSettings(): void
     {
-        if (! file_exists($this->settingsFilePath) || ! is_readable($this->settingsFilePath)) {
+        if (! $this->exists()) {
             return;
         }
 
-        $settingsFileContent = file_get_contents($this->settingsFilePath);
-        if ($settingsFileContent === false || ! json_validate($settingsFileContent)) {
+        $settingsFileContent = $this->fileAccess->read('storage', 'settings.json');
+        if ($settingsFileContent === '' || ! json_validate($settingsFileContent)) {
             return;
         }
 
-        $settingsArr = json_decode($settingsFileContent, true);
+        $settingsArr = json_decode($settingsFileContent, true, 512, JSON_THROW_ON_ERROR);
         if (! is_array($settingsArr)) {
             return;
         }

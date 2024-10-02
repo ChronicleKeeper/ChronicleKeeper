@@ -6,27 +6,31 @@ namespace ChronicleKeeper\Settings\Application\Service\Importer;
 
 use ChronicleKeeper\Settings\Application\Service\FileType;
 use ChronicleKeeper\Settings\Application\Service\ImportSettings;
+use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
+use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\PathRegistry;
 use League\Flysystem\Filesystem;
 
-use function file_exists;
-use function file_put_contents;
+use const DIRECTORY_SEPARATOR;
 
 final readonly class SettingsImporter implements SingleImport
 {
     public function __construct(
-        private string $settingsFilePath,
+        private FileAccess $fileAccess,
+        private PathRegistry $pathRegistry,
     ) {
     }
 
     public function import(Filesystem $filesystem, ImportSettings $settings): ImportedFileBag
     {
-        if ($settings->overwriteSettings === false && file_exists($this->settingsFilePath)) {
-            return new ImportedFileBag(ImportedFile::asIgnored($this->settingsFilePath, FileType::SETTINGS));
+        $file = $this->pathRegistry->get('storage') . DIRECTORY_SEPARATOR . 'settings.json';
+
+        if ($settings->overwriteSettings === false && $this->fileAccess->exists('storage', 'settings.json')) {
+            return new ImportedFileBag(ImportedFile::asIgnored($file, FileType::SETTINGS));
         }
 
         $content = $filesystem->read('settings.json');
-        file_put_contents($this->settingsFilePath, $content);
+        $this->fileAccess->write('storage', 'settings.json', $content);
 
-        return new ImportedFileBag(ImportedFile::asSuccess($this->settingsFilePath, FileType::SETTINGS));
+        return new ImportedFileBag(ImportedFile::asSuccess($file, FileType::SETTINGS));
     }
 }
