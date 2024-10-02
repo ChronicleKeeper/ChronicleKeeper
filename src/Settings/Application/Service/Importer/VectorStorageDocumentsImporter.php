@@ -6,20 +6,17 @@ namespace ChronicleKeeper\Settings\Application\Service\Importer;
 
 use ChronicleKeeper\Settings\Application\Service\FileType;
 use ChronicleKeeper\Settings\Application\Service\ImportSettings;
+use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
 use League\Flysystem\FileAttributes;
 use League\Flysystem\Filesystem;
 
 use function assert;
-use function file_exists;
-use function file_put_contents;
 use function str_replace;
-
-use const DIRECTORY_SEPARATOR;
 
 final readonly class VectorStorageDocumentsImporter implements SingleImport
 {
     public function __construct(
-        private string $vectorDocumentsPath,
+        private FileAccess $fileAccess,
     ) {
     }
 
@@ -31,18 +28,18 @@ final readonly class VectorStorageDocumentsImporter implements SingleImport
         foreach ($filesystem->listContents($libraryDirectoryPath) as $zippedFile) {
             assert($zippedFile instanceof FileAttributes);
 
-            $targetFilename = str_replace($libraryDirectoryPath, '', $zippedFile->path());
-            $targetPath     = $this->vectorDocumentsPath . DIRECTORY_SEPARATOR . $targetFilename;
+            $filename = str_replace($libraryDirectoryPath, '', $zippedFile->path());
+            assert($filename !== '');
 
-            if ($settings->overwriteLibrary === false && file_exists($targetPath)) {
-                $importedFileBag->append(ImportedFile::asIgnored($targetFilename, FileType::VECTOR_STORAGE_DOCUMENT));
+            if ($settings->overwriteLibrary === false && $this->fileAccess->exists('vector.documents', $filename)) {
+                $importedFileBag->append(ImportedFile::asIgnored($filename, FileType::VECTOR_STORAGE_DOCUMENT));
                 continue;
             }
 
             $content = $filesystem->read($zippedFile->path());
-            file_put_contents($targetPath, $content);
+            $this->fileAccess->write('vector.documents', $filename, $content);
 
-            $importedFileBag->append(ImportedFile::asSuccess($targetFilename, FileType::VECTOR_STORAGE_DOCUMENT));
+            $importedFileBag->append(ImportedFile::asSuccess($filename, FileType::VECTOR_STORAGE_DOCUMENT));
         }
 
         return $importedFileBag;

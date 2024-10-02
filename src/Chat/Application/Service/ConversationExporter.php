@@ -20,7 +20,7 @@ final readonly class ConversationExporter implements SingleExport
     {
         $finder = (new Finder())
             ->ignoreDotFiles(true)
-            ->in($this->pathRegistry->get('app.library.conversations_storage'))
+            ->in($this->pathRegistry->get('library.conversations'))
             ->files();
 
         foreach ($finder as $file) {

@@ -7,24 +7,12 @@ parameters:
   app.tmp.base_dir: '%kernel.project_dir%/var/tmp'
   app.library.base_dir: '%kernel.project_dir%/var/library'
 
-  app.library.documents_storage: '%app.storage.base_dir%/documents'
-  app.library.images_storage: '%app.library.base_dir%/images'
-  app.library.directories_storage: '%app.storage.base_dir%/directories'
-  app.library.conversations_storage: '%app.library.base_dir%/conversations'
-
-  app.vector.documents_storage: '%app.data.base_dir%/document'
-  app.vector.images_storage: '%app.data.base_dir%/image'
-
 services:
   _defaults:
     autowire: true
     autoconfigure: true
     bind:
       string $dotEnvFile: '%kernel.project_dir%/.env'
-      string $documentStoragePath: '%app.storage.base_dir%/documents'
-      string $directoryStoragePath: '%app.storage.base_dir%/directories'
-      string $vectorDocumentsPath: '%app.data.base_dir%/document'
-      string $vectorImagesPath: '%app.data.base_dir%/image'
       string $settingsFilePath: '%app.storage.base_dir%/settings.json'
       string $changelogFile: '%kernel.project_dir%/CHANGELOG.md'
       string $conversationTemporaryFile: '%app.storage.base_dir%/tmp/conversation_temporary.json'
@@ -42,16 +30,16 @@ services:
   ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\PathRegistry:
     calls:
       - method: add
-        arguments: [ 'library.documents', '%app.library.documents_storage%' ]
+        arguments: [ 'library.documents', '%app.storage.base_dir%/documents' ]
       - method: add
-        arguments: [ 'library.images', '%app.library.images_storage%' ]
+        arguments: [ 'library.images', '%app.library.base_dir%/images' ]
       - method: add
-        arguments: [ 'library.directories', '%app.library.directories_storage%' ]
+        arguments: [ 'library.directories', '%app.storage.base_dir%/directories' ]
       - method: add
-        arguments: [ 'library.conversations', '%app.library.conversations_storage%' ]
+        arguments: [ 'library.conversations', '%app.library.base_dir%/conversations' ]
       - method: add
-        arguments: [ 'vector.documents', '%app.vector.documents_storage%' ]
+        arguments: [ 'vector.documents', '%app.data.base_dir%/document' ]
       - method: add
-        arguments: [ 'vector.images', '%app.vector.images_storage%' ]
+        arguments: [ 'vector.images', '%app.data.base_dir%/image' ]
       - method: add
         arguments: [ 'temp', '%app.tmp.base_dir%' ]

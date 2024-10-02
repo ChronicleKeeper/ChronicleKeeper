@@ -6,8 +6,8 @@ namespace ChronicleKeeper\Library\Infrastructure\Repository;
 
 use ChronicleKeeper\Library\Domain\Entity\Directory;
 use ChronicleKeeper\Library\Domain\Entity\Image;
+use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Exception\UnableToReadFile;
-use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\FileAccess;
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\PathRegistry;
 use DateTimeImmutable;
 use Psr\Log\LoggerInterface;

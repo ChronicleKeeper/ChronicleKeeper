@@ -9,7 +9,7 @@ use ChronicleKeeper\Settings\Application\Service\Importer\ImportedFile;
 use ChronicleKeeper\Settings\Application\Service\Importer\ImportedFileBag;
 use ChronicleKeeper\Settings\Application\Service\Importer\SingleImport;
 use ChronicleKeeper\Settings\Application\Service\ImportSettings;
-use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\FileAccess;
+use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
 use League\Flysystem\FileAttributes;
 use League\Flysystem\Filesystem;
 
@@ -36,14 +36,14 @@ final readonly class ConversationImporter implements SingleImport
 
             if (
                 $settings->overwriteLibrary === false
-                && $this->fileAccess->exists('app.library.conversations_storage', $targetFilename)
+                && $this->fileAccess->exists('library.conversations', $targetFilename)
             ) {
                 $importedFileBag->append(ImportedFile::asIgnored($targetFilename, FileType::CHAT_CONVERSATION));
                 continue;
             }
 
             $content = $filesystem->read($zippedFile->path());
-            $this->fileAccess->write('app.library.conversations_storage', $targetFilename, $content);
+            $this->fileAccess->write('library.conversations', $targetFilename, $content);
 
             $importedFileBag->append(ImportedFile::asSuccess($targetFilename, FileType::CHAT_CONVERSATION));
         }

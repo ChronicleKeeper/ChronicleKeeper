@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Settings\Application\Service\Exporter;
 
+use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\PathRegistry;
 use Symfony\Component\Finder\Finder;
 use ZipArchive;
 
 final readonly class LibraryDirectoryExporter implements SingleExport
 {
     public function __construct(
-        private string $directoryStoragePath,
+        private PathRegistry $pathRegistry,
     ) {
     }
 
@@ -18,7 +19,7 @@ final readonly class LibraryDirectoryExporter implements SingleExport
     {
         $finder = (new Finder())
             ->ignoreDotFiles(true)
-            ->in($this->directoryStoragePath)
+            ->in($this->pathRegistry->get('library.directories'))
             ->files();
 
         foreach ($finder as $directory) {

@@ -57,6 +57,14 @@ final class LibraryDocuments
 
         $this->referencedDocuments = [];
         if (count($documents) === 0) {
+            $this->collector->called(
+                'library_documents',
+                [
+                    'arguments' => ['search' => $search, 'maxDistance' => $this->maxDistance, 'maxResults' => $maxResults],
+                    'responses' => [],
+                ],
+            );
+
             return 'There are no matching documents.';
         }
 

@@ -6,7 +6,7 @@ namespace ChronicleKeeper\Settings\Application\Service\Importer;
 
 use ChronicleKeeper\Settings\Application\Service\FileType;
 use ChronicleKeeper\Settings\Application\Service\ImportSettings;
-use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\FileAccess;
+use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
 use League\Flysystem\FileAttributes;
 use League\Flysystem\Filesystem;
 
