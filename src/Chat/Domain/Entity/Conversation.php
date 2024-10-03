@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace ChronicleKeeper\Chat\Domain\Entity;
 
 use ChronicleKeeper\Chat\Domain\ValueObject\Settings;
-use ChronicleKeeper\Chat\Infrastructure\LLMChain\ExtendedMessage;
-use ChronicleKeeper\Chat\Infrastructure\LLMChain\ExtendedMessageBag;
 use ChronicleKeeper\Library\Domain\Entity\Directory;
 use ChronicleKeeper\Library\Domain\RootDirectory;
 use ChronicleKeeper\Settings\Domain\ValueObject\Settings as AppSettings;

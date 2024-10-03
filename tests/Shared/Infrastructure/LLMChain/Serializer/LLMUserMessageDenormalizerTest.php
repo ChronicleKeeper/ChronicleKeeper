@@ -15,7 +15,7 @@ use PhpLlm\LlmChain\Message\UserMessage;
 use PhpLlm\LlmChain\Response\ToolCall;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
-use PHPUnit\Framework\Attributes\UsesClass;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use stdClass;
@@ -23,13 +23,6 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Webmozart\Assert\InvalidArgumentException;
 
 #[CoversClass(LLMUserMessageDenormalizer::class)]
-#[UsesClass(SystemMessage::class)]
-#[UsesClass(AssistantMessage::class)]
-#[UsesClass(ToolCallMessage::class)]
-#[UsesClass(UserMessage::class)]
-#[UsesClass(Text::class)]
-#[UsesClass(Image::class)]
-#[UsesClass(ToolCall::class)]
 #[Small]
 class LLMUserMessageDenormalizerTest extends TestCase
 {
@@ -49,37 +42,43 @@ class LLMUserMessageDenormalizerTest extends TestCase
         unset($this->denormalizer, $this->normalizer);
     }
 
-    public function testThatItSupportsTheCorrectTypesWithNullFormat(): void
+    #[Test]
+    public function itSupportsTheCorrectTypesWithNullFormat(): void
     {
         self::assertSame([MessageInterface::class => true], $this->normalizer->getSupportedTypes(null));
     }
 
-    public function testThatItSupportsTheCorrectTypesWithStringFormat(): void
+    #[Test]
+    public function itSupportsTheCorrectTypesWithStringFormat(): void
     {
         self::assertSame([MessageInterface::class => true], $this->normalizer->getSupportedTypes('json'));
     }
 
-    public function testThatItSupportsTheCorrectTypeOnRuntimeCheck(): void
+    #[Test]
+    public function itSupportsTheCorrectTypeOnRuntimeCheck(): void
     {
         self::assertTrue($this->normalizer->supportsDenormalization([], MessageInterface::class));
         self::assertFalse($this->normalizer->supportsDenormalization([], stdClass::class));
     }
 
-    public function testThatDenormalizationFailsOnNonArrayInput(): void
+    #[Test]
+    public function theDenormalizationFailsOnNonArrayInput(): void
     {
         $this->expectException(InvalidArgumentException::class);
 
         $this->normalizer->denormalize('', UserMessage::class);
     }
 
-    public function testThatDenormalizationFailsOnArrayMissingContent(): void
+    #[Test]
+    public function theDenormalizationFailsOnArrayMissingContent(): void
     {
         $this->expectException(InvalidArgumentException::class);
 
         $this->normalizer->denormalize(['foo'], UserMessage::class);
     }
 
-    public function testThatTheNormalizationOfJustAStringWorks(): void
+    #[Test]
+    public function theNormalizationOfJustAStringWorks(): void
     {
         $obj = $this->normalizer->denormalize(['role' => 'user', 'content' => 'foo bar baz'], UserMessage::class);
 
@@ -89,7 +88,8 @@ class LLMUserMessageDenormalizerTest extends TestCase
         self::assertSame('foo bar baz', $obj->content[0]->text);
     }
 
-    public function testThatNormalizationOfMixedContentWorks(): void
+    #[Test]
+    public function thatNormalizationOfMixedContentWorks(): void
     {
         $content = [
             'role' => 'user',
@@ -111,7 +111,8 @@ class LLMUserMessageDenormalizerTest extends TestCase
         self::assertSame('baz foo bar', $obj->content[1]->url);
     }
 
-    public function testThatASystemMessageIsDenormalized(): void
+    #[Test]
+    public function aSystemMessageIsDenormalized(): void
     {
         $this->denormalizer->expects($this->once())
             ->method('denormalize')
@@ -135,7 +136,8 @@ class LLMUserMessageDenormalizerTest extends TestCase
         self::assertInstanceOf(SystemMessage::class, $obj);
     }
 
-    public function testThatAnAssistantMessageIsDenormalized(): void
+    #[Test]
+    public function anAssistantMessageIsDenormalized(): void
     {
         $this->denormalizer->expects($this->once())
             ->method('denormalize')
@@ -159,7 +161,8 @@ class LLMUserMessageDenormalizerTest extends TestCase
         self::assertInstanceOf(AssistantMessage::class, $obj);
     }
 
-    public function testThatAToolCallMesageMessageIsDenormalized(): void
+    #[Test]
+    public function aToolCallMesageMessageIsDenormalized(): void
     {
         $this->denormalizer->expects($this->once())
             ->method('denormalize')

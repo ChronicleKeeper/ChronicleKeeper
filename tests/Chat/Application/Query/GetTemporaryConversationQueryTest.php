@@ -8,10 +8,6 @@ use ChronicleKeeper\Chat\Application\Command\StoreTemporaryConversation;
 use ChronicleKeeper\Chat\Application\Query\GetTemporaryConversationParameters;
 use ChronicleKeeper\Chat\Application\Query\GetTemporaryConversationQuery;
 use ChronicleKeeper\Chat\Domain\Entity\Conversation;
-use ChronicleKeeper\Chat\Domain\ValueObject\Settings as ChatSettings;
-use ChronicleKeeper\Chat\Infrastructure\LLMChain\ExtendedMessage;
-use ChronicleKeeper\Chat\Infrastructure\LLMChain\ExtendedMessageBag;
-use ChronicleKeeper\Library\Domain\RootDirectory;
 use ChronicleKeeper\Settings\Application\SettingsHandler;
 use ChronicleKeeper\Settings\Domain\ValueObject\Settings;
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
@@ -20,7 +16,6 @@ use ChronicleKeeper\Test\Chat\Domain\Entity\ConversationBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\Attributes\Test;
-use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 use Symfony\Component\Messenger\Envelope;
@@ -29,19 +24,11 @@ use Symfony\Component\Serializer\SerializerInterface;
 
 #[CoversClass(GetTemporaryConversationQuery::class)]
 #[CoversClass(GetTemporaryConversationParameters::class)]
-#[UsesClass(UnableToReadFile::class)]
-#[UsesClass(RootDirectory::class)]
-#[UsesClass(Conversation::class)]
-#[UsesClass(Settings::class)]
-#[UsesClass(ExtendedMessageBag::class)]
-#[UsesClass(ExtendedMessage::class)]
-#[UsesClass(ChatSettings::class)]
-#[UsesClass(StoreTemporaryConversation::class)]
 #[Small]
 class GetTemporaryConversationQueryTest extends TestCase
 {
     #[Test]
-    public function testQueryReturnsConversation(): void
+    public function queryReturnsConversation(): void
     {
         $fileAccessMock      = $this->createMock(FileAccess::class);
         $serializerMock      = $this->createMock(SerializerInterface::class);
@@ -68,7 +55,7 @@ class GetTemporaryConversationQueryTest extends TestCase
     }
 
     #[Test]
-    public function testQueryHandlesFileNotFound(): void
+    public function queryHandlesFileNotFound(): void
     {
         $fileAccessMock      = $this->createMock(FileAccess::class);
         $serializerMock      = $this->createMock(SerializerInterface::class);
@@ -100,7 +87,7 @@ class GetTemporaryConversationQueryTest extends TestCase
     }
 
     #[Test]
-    public function testParameters(): void
+    public function parameters(): void
     {
         $parameters = new GetTemporaryConversationParameters();
 

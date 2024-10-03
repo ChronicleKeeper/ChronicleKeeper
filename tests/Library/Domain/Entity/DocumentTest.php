@@ -5,22 +5,21 @@ declare(strict_types=1);
 namespace ChronicleKeeper\Test\Library\Domain\Entity;
 
 use ChronicleKeeper\Library\Domain\Entity\Document;
-use ChronicleKeeper\Library\Domain\RootDirectory;
 use DateTimeImmutable;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
-use PHPUnit\Framework\Attributes\UsesClass;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 use function sha1;
 use function strlen;
 
 #[CoversClass(Document::class)]
-#[UsesClass(RootDirectory::class)]
 #[Small]
 class DocumentTest extends TestCase
 {
-    public function testConstructorInitializesProperties(): void
+    #[Test]
+    public function constructorInitializesProperties(): void
     {
         $title    = 'Test Title';
         $content  = 'Test Content';
@@ -32,7 +31,8 @@ class DocumentTest extends TestCase
         self::assertInstanceOf(DateTimeImmutable::class, $document->updatedAt);
     }
 
-    public function testToArrayReturnsCorrectArray(): void
+    #[Test]
+    public function toArrayReturnsCorrectArray(): void
     {
         $title       = 'Test Title';
         $content     = 'Test Content';
@@ -50,7 +50,8 @@ class DocumentTest extends TestCase
         );
     }
 
-    public function testGetSizeReturnsCorrectLength(): void
+    #[Test]
+    public function getSizeReturnsCorrectLength(): void
     {
         $content  = 'Test Content';
         $document = new Document('Test Title', $content);
@@ -58,7 +59,8 @@ class DocumentTest extends TestCase
         self::assertSame(strlen($content), $document->getSize());
     }
 
-    public function testGetContentHashReturnsCorrectHash(): void
+    #[Test]
+    public function getContentHashReturnsCorrectHash(): void
     {
         $content  = 'Test Content';
         $document = new Document('Test Title', $content);

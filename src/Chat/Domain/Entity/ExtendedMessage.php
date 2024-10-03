@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ChronicleKeeper\Chat\Infrastructure\LLMChain;
+namespace ChronicleKeeper\Chat\Domain\Entity;
 
 use ChronicleKeeper\Library\Domain\Entity\Document;
 use ChronicleKeeper\Library\Domain\Entity\Image;
@@ -19,7 +19,7 @@ use Symfony\Component\Uid\Uuid;
  *      calledTools: list<array{tool: string, arguments: array<string,mixed>}>
  *  }
  */
-final class ExtendedMessage implements JsonSerializable
+class ExtendedMessage implements JsonSerializable
 {
     public string $id;
 

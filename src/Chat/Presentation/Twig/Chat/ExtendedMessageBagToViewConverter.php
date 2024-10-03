@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Chat\Presentation\Twig\Chat;
 
-use ChronicleKeeper\Chat\Infrastructure\LLMChain\ExtendedMessage;
-use ChronicleKeeper\Chat\Infrastructure\LLMChain\ExtendedMessageBag;
+use ChronicleKeeper\Chat\Domain\Entity\ExtendedMessage;
+use ChronicleKeeper\Chat\Domain\Entity\ExtendedMessageBag;
 use ChronicleKeeper\Settings\Application\SettingsHandler;
 use PhpLlm\LlmChain\Message\AssistantMessage;
 use PhpLlm\LlmChain\Message\Content\ContentInterface;

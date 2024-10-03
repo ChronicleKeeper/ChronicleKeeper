@@ -9,7 +9,7 @@ use ChronicleKeeper\Chat\Application\Command\StoreTemporaryConversation;
 use ChronicleKeeper\Chat\Application\Query\GetTemporaryConversationParameters;
 use ChronicleKeeper\Chat\Application\Service\ChatMessageExecution;
 use ChronicleKeeper\Chat\Domain\Entity\Conversation;
-use ChronicleKeeper\Chat\Infrastructure\LLMChain\ExtendedMessage;
+use ChronicleKeeper\Chat\Domain\Entity\ExtendedMessage;
 use ChronicleKeeper\Chat\Presentation\Twig\Chat\ExtendedMessageBagToViewConverter;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;

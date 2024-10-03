@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Test\Chat\Infrastructure\Serializer;
 
-use ChronicleKeeper\Chat\Infrastructure\LLMChain\ExtendedMessage;
+use ChronicleKeeper\Chat\Domain\Entity\ExtendedMessage;
 use ChronicleKeeper\Chat\Infrastructure\Serializer\ExtendedMessageDenormalizer;
 use ChronicleKeeper\Library\Domain\Entity\Document;
 use ChronicleKeeper\Library\Domain\Entity\Image;
@@ -12,7 +12,7 @@ use PhpLlm\LlmChain\Message\MessageInterface;
 use PhpLlm\LlmChain\Message\SystemMessage;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
-use PHPUnit\Framework\Attributes\UsesClass;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use stdClass;
@@ -20,8 +20,6 @@ use Symfony\Component\Serializer\Serializer;
 use Webmozart\Assert\InvalidArgumentException;
 
 #[CoversClass(ExtendedMessageDenormalizer::class)]
-#[UsesClass(ExtendedMessage::class)]
-#[UsesClass(SystemMessage::class)]
 #[Small]
 class ExtendedMessageDenormalizerTest extends TestCase
 {
@@ -41,37 +39,43 @@ class ExtendedMessageDenormalizerTest extends TestCase
         unset($this->serializer, $this->normalizer);
     }
 
-    public function testThatItSupportsTheCorrectTypesWithNullFormat(): void
+    #[Test]
+    public function itSupportsTheCorrectTypesWithNullFormat(): void
     {
         self::assertSame([ExtendedMessage::class => true], $this->normalizer->getSupportedTypes(null));
     }
 
-    public function testThatItSupportsTheCorrectTypesWithStringFormat(): void
+    #[Test]
+    public function itSupportsTheCorrectTypesWithStringFormat(): void
     {
         self::assertSame([ExtendedMessage::class => true], $this->normalizer->getSupportedTypes('json'));
     }
 
-    public function testThatItSupportsTheCorrectTypeOnRuntimeCheck(): void
+    #[Test]
+    public function itSupportsTheCorrectTypeOnRuntimeCheck(): void
     {
         self::assertTrue($this->normalizer->supportsDenormalization([], ExtendedMessage::class));
         self::assertFalse($this->normalizer->supportsDenormalization([], stdClass::class));
     }
 
-    public function testThatItFailsOnNonArrayInput(): void
+    #[Test]
+    public function itFailsOnNonArrayInput(): void
     {
         $this->expectException(InvalidArgumentException::class);
 
         $this->normalizer->denormalize('', ExtendedMessage::class);
     }
 
-    public function testThatItFailsOnIncompleteArray(): void
+    #[Test]
+    public function itFailsOnIncompleteArray(): void
     {
         $this->expectException(InvalidArgumentException::class);
 
         $this->normalizer->denormalize(['foo'], ExtendedMessage::class);
     }
 
-    public function testThatTheNormalizationWorksAsExcepted(): void
+    #[Test]
+    public function theNormalizationWorksAsExcepted(): void
     {
         $invoker = $this->any();
 

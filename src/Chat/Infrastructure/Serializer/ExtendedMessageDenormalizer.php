@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Chat\Infrastructure\Serializer;
 
-use ChronicleKeeper\Chat\Infrastructure\LLMChain\ExtendedMessage;
+use ChronicleKeeper\Chat\Domain\Entity\ExtendedMessage;
 use ChronicleKeeper\Library\Domain\Entity\Document;
 use ChronicleKeeper\Library\Domain\Entity\Image;
 use PhpLlm\LlmChain\Message\MessageInterface;
