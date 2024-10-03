@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Chat\Presentation\Controller;
 
-use ChronicleKeeper\Chat\Application\Entity\Conversation;
-use ChronicleKeeper\Chat\Infrastructure\Repository\ConversationFileStorage;
+use ChronicleKeeper\Chat\Application\Command\DeleteConversation;
+use ChronicleKeeper\Chat\Domain\Entity\Conversation;
 use ChronicleKeeper\Shared\Presentation\FlashMessages\Alert;
 use ChronicleKeeper\Shared\Presentation\FlashMessages\HandleFlashMessages;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Requirement\Requirement;
 
@@ -24,7 +25,7 @@ class ConversationDelete extends AbstractController
     use HandleFlashMessages;
 
     public function __construct(
-        private readonly ConversationFileStorage $conversationFileStorage,
+        private readonly MessageBusInterface $bus,
     ) {
     }
 
@@ -40,7 +41,7 @@ class ConversationDelete extends AbstractController
             return $this->redirectToRoute('library', ['directory' => $conversation->directory->id]);
         }
 
-        $this->conversationFileStorage->delete($conversation);
+        $this->bus->dispatch(new DeleteConversation($conversation->id));
 
         $this->addFlashMessage(
             $request,

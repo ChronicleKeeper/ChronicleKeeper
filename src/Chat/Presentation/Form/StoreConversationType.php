@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Chat\Presentation\Form;
 
-use ChronicleKeeper\Chat\Application\Entity\Conversation;
+use ChronicleKeeper\Chat\Domain\Entity\Conversation;
 use ChronicleKeeper\Library\Presentation\Form\DirectoryChoiceType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;

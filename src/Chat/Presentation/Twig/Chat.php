@@ -4,12 +4,16 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Chat\Presentation\Twig;
 
-use ChronicleKeeper\Chat\Application\Entity\Conversation;
+use ChronicleKeeper\Chat\Application\Command\StoreConversation as StoreConversationCommand;
+use ChronicleKeeper\Chat\Application\Command\StoreTemporaryConversation;
+use ChronicleKeeper\Chat\Application\Query\GetTemporaryConversationParameters;
 use ChronicleKeeper\Chat\Application\Service\ChatMessageExecution;
+use ChronicleKeeper\Chat\Domain\Entity\Conversation;
 use ChronicleKeeper\Chat\Infrastructure\LLMChain\ExtendedMessage;
-use ChronicleKeeper\Chat\Infrastructure\Repository\ConversationFileStorage;
 use ChronicleKeeper\Chat\Presentation\Twig\Chat\ExtendedMessageBagToViewConverter;
+use ChronicleKeeper\Shared\Application\Query\QueryService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
 use Symfony\UX\LiveComponent\Attribute\LiveAction;
 use Symfony\UX\LiveComponent\Attribute\LiveArg;
@@ -34,9 +38,10 @@ class Chat extends AbstractController
     public bool $isTemporary = false;
 
     public function __construct(
-        private readonly ConversationFileStorage $storage,
         private readonly ExtendedMessageBagToViewConverter $messageBagToViewConverter,
         private readonly ChatMessageExecution $chatMessageExecution,
+        private readonly MessageBusInterface $bus,
+        private readonly QueryService $queryService,
     ) {
     }
 
@@ -47,7 +52,7 @@ class Chat extends AbstractController
             return;
         }
 
-        $this->conversation = $this->storage->loadTemporary();
+        $this->conversation = $this->queryService->query(new GetTemporaryConversationParameters());
         $this->isTemporary  = true;
     }
 
@@ -65,14 +70,14 @@ class Chat extends AbstractController
         $this->chatMessageExecution->execute($message, $this->conversation);
 
         if ($this->isTemporary === true) {
-            $this->storage->saveTemporary($this->conversation);
+            $this->bus->dispatch(new StoreTemporaryConversation($this->conversation));
 
             $this->emit('conversation_updated', ['conversationId' => $this->conversation->id]);
 
             return;
         }
 
-        $this->storage->store($this->conversation);
+        $this->bus->dispatch(new StoreConversationCommand($this->conversation));
 
         $this->emit('conversation_updated', ['conversationId' => $this->conversation->id]);
     }

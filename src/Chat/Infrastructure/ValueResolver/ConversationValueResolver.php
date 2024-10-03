@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Chat\Infrastructure\ValueResolver;
 
-use ChronicleKeeper\Chat\Application\Entity\Conversation;
-use ChronicleKeeper\Chat\Infrastructure\Repository\ConversationFileStorage;
+use ChronicleKeeper\Chat\Application\Query\FindConversationByIdParameters;
+use ChronicleKeeper\Chat\Domain\Entity\Conversation;
+use ChronicleKeeper\Shared\Application\Query\QueryService;
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Exception\UnableToReadFile;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,7 +22,7 @@ use function is_string;
 class ConversationValueResolver implements ValueResolverInterface
 {
     public function __construct(
-        private readonly ConversationFileStorage $conversationFileStorage,
+        private readonly QueryService $queryService,
     ) {
     }
 
@@ -39,7 +40,7 @@ class ConversationValueResolver implements ValueResolverInterface
         }
 
         try {
-            $conversation = $this->conversationFileStorage->load($identifier) ?? throw new NotFoundHttpException();
+            $conversation = $this->queryService->query(new FindConversationByIdParameters($identifier)) ?? throw new NotFoundHttpException();
         } catch (UnableToReadFile) {
             throw new NotFoundHttpException('Conversation "' . $identifier . '" not found.');
         }

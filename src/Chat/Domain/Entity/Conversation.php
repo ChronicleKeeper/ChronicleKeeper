@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace ChronicleKeeper\Chat\Application\Entity;
+namespace ChronicleKeeper\Chat\Domain\Entity;
 
-use ChronicleKeeper\Chat\Application\ValueObject\Settings;
+use ChronicleKeeper\Chat\Domain\ValueObject\Settings;
 use ChronicleKeeper\Chat\Infrastructure\LLMChain\ExtendedMessage;
 use ChronicleKeeper\Chat\Infrastructure\LLMChain\ExtendedMessageBag;
 use ChronicleKeeper\Library\Domain\Entity\Directory;

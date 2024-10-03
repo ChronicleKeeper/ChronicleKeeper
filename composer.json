@@ -39,6 +39,7 @@
         "symfony/finder": "^7.1",
         "symfony/form": "^7.1",
         "symfony/framework-bundle": "^7.1",
+        "symfony/messenger": "^7.1",
         "symfony/mime": "^7.1",
         "symfony/monolog-bundle": "^3.10",
         "symfony/property-info": "^7.1",

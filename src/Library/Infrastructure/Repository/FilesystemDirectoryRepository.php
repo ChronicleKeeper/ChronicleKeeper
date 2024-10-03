@@ -4,15 +4,18 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Library\Infrastructure\Repository;
 
-use ChronicleKeeper\Chat\Infrastructure\Repository\ConversationFileStorage;
+use ChronicleKeeper\Chat\Application\Command\DeleteConversation;
+use ChronicleKeeper\Chat\Application\Query\FindConversationsByDirectoryParameters;
 use ChronicleKeeper\Library\Domain\Entity\Directory;
 use ChronicleKeeper\Library\Domain\RootDirectory;
+use ChronicleKeeper\Shared\Application\Query\QueryService;
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Exception\UnableToReadFile;
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\PathRegistry;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 use Throwable;
 
@@ -35,8 +38,9 @@ class FilesystemDirectoryRepository
         private readonly FileAccess $fileAccess,
         private readonly FilesystemImageRepository $imageRepository,
         private readonly FilesystemDocumentRepository $documentRepository,
-        private readonly ConversationFileStorage $conversationRepository,
         private readonly PathRegistry $pathRegistry,
+        private readonly QueryService $queryService,
+        private readonly MessageBusInterface $bus,
     ) {
     }
 
@@ -74,8 +78,8 @@ class FilesystemDirectoryRepository
             $this->imageRepository->remove($image);
         }
 
-        foreach ($this->conversationRepository->findByDirectory($sourceDirectory) as $conversation) {
-            $this->conversationRepository->delete($conversation);
+        foreach ($this->queryService->query(new FindConversationsByDirectoryParameters($sourceDirectory)) as $conversation) {
+            $this->bus->dispatch(new DeleteConversation($conversation->id));
         }
     }
 

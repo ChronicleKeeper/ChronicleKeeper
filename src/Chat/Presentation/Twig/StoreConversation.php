@@ -4,15 +4,20 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Chat\Presentation\Twig;
 
-use ChronicleKeeper\Chat\Application\Entity\Conversation;
-use ChronicleKeeper\Chat\Infrastructure\Repository\ConversationFileStorage;
+use ChronicleKeeper\Chat\Application\Command\ResetTemporaryConversation;
+use ChronicleKeeper\Chat\Application\Command\StoreConversation as StoreConversationCommand;
+use ChronicleKeeper\Chat\Application\Query\FindConversationByIdParameters;
+use ChronicleKeeper\Chat\Application\Query\GetTemporaryConversationParameters;
+use ChronicleKeeper\Chat\Domain\Entity\Conversation;
 use ChronicleKeeper\Chat\Presentation\Form\StoreConversationType;
+use ChronicleKeeper\Shared\Application\Query\QueryService;
 use ChronicleKeeper\Shared\Presentation\FlashMessages\Alert;
 use ChronicleKeeper\Shared\Presentation\FlashMessages\HandleFlashMessages;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
 use Symfony\UX\LiveComponent\Attribute\LiveAction;
 use Symfony\UX\LiveComponent\Attribute\LiveArg;
@@ -32,7 +37,8 @@ class StoreConversation extends AbstractController
     use ComponentWithFormTrait;
 
     public function __construct(
-        private readonly ConversationFileStorage $storage,
+        private readonly QueryService $queryService,
+        private readonly MessageBusInterface $bus,
     ) {
     }
 
@@ -46,7 +52,7 @@ class StoreConversation extends AbstractController
             return;
         }
 
-        $this->conversation = $this->storage->loadTemporary();
+        $this->conversation = $this->queryService->query(new GetTemporaryConversationParameters());
     }
 
     protected function instantiateForm(): FormInterface
@@ -59,9 +65,9 @@ class StoreConversation extends AbstractController
         #[LiveArg]
         string $conversationId,
     ): void {
-        $conversation = $this->storage->load($conversationId);
+        $conversation = $this->queryService->query(new FindConversationByIdParameters($conversationId));
         if ($conversation === null) {
-            $conversation = $this->storage->loadTemporary();
+            $conversation = $this->queryService->query(new GetTemporaryConversationParameters());
         }
 
         $this->conversation = $conversation;
@@ -77,8 +83,8 @@ class StoreConversation extends AbstractController
 
         assert($conversationData instanceof Conversation);
 
-        $this->storage->store($conversationData);
-        $this->storage->resetTemporary();
+        $this->bus->dispatch(new StoreConversationCommand($conversationData));
+        $this->bus->dispatch(new ResetTemporaryConversation());
 
         $this->addFlashMessage(
             $request,

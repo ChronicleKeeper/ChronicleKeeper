@@ -4,19 +4,22 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Library\Presentation\Controller\Directory;
 
-use ChronicleKeeper\Chat\Infrastructure\Repository\ConversationFileStorage;
+use ChronicleKeeper\Chat\Application\Command\StoreConversation;
+use ChronicleKeeper\Chat\Application\Query\FindConversationsByDirectoryParameters;
 use ChronicleKeeper\Library\Domain\Entity\Directory;
 use ChronicleKeeper\Library\Domain\RootDirectory;
 use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemDirectoryRepository;
 use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemDocumentRepository;
 use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemImageRepository;
 use ChronicleKeeper\Library\Presentation\Form\DirectoryDeleteOptions;
+use ChronicleKeeper\Shared\Application\Query\QueryService;
 use ChronicleKeeper\Shared\Presentation\FlashMessages\Alert;
 use ChronicleKeeper\Shared\Presentation\FlashMessages\HandleFlashMessages;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Requirement\Requirement;
 
@@ -33,7 +36,8 @@ class DirectoryDelete extends AbstractController
         private readonly FilesystemDirectoryRepository $directoryRepository,
         private readonly FilesystemDocumentRepository $documentRepository,
         private readonly FilesystemImageRepository $imageRepository,
-        private readonly ConversationFileStorage $conversationRepository,
+        private readonly QueryService $queryService,
+        private readonly MessageBusInterface $bus,
     ) {
     }
 
@@ -100,9 +104,9 @@ class DirectoryDelete extends AbstractController
             $this->imageRepository->store($image);
         }
 
-        foreach ($this->conversationRepository->findByDirectory($sourceDirectory) as $conversation) {
+        foreach ($this->queryService->query(new FindConversationsByDirectoryParameters($sourceDirectory)) as $conversation) {
             $conversation->directory = $targetDirectory;
-            $this->conversationRepository->store($conversation);
+            $this->bus->dispatch(new StoreConversation($conversation));
         }
     }
 }
