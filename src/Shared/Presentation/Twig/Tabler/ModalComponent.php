@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ChronicleKeeper\Shared\Twig\Tabler;
+namespace ChronicleKeeper\Shared\Presentation\Twig\Tabler;
 
 use Symfony\UX\TwigComponent\Attribute\AsTwigComponent;
 

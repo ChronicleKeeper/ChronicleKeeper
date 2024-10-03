@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Chat\Presentation\Form;
 
-use ChronicleKeeper\Chat\Application\ValueObject\Settings;
+use ChronicleKeeper\Chat\Domain\ValueObject\Settings;
 use PhpLlm\LlmChain\OpenAI\Model\Gpt\Version;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\DataMapperInterface;

@@ -4,13 +4,18 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Chat\Presentation\Twig;
 
-use ChronicleKeeper\Chat\Application\Entity\Conversation;
-use ChronicleKeeper\Chat\Application\ValueObject\Settings;
-use ChronicleKeeper\Chat\Infrastructure\Repository\ConversationFileStorage;
+use ChronicleKeeper\Chat\Application\Command\StoreConversation as StoreConversationCommand;
+use ChronicleKeeper\Chat\Application\Command\StoreTemporaryConversation;
+use ChronicleKeeper\Chat\Application\Query\FindConversationByIdParameters;
+use ChronicleKeeper\Chat\Application\Query\GetTemporaryConversationParameters;
+use ChronicleKeeper\Chat\Domain\Entity\Conversation;
+use ChronicleKeeper\Chat\Domain\ValueObject\Settings;
 use ChronicleKeeper\Chat\Presentation\Form\ConversationSettingsType;
+use ChronicleKeeper\Shared\Application\Query\QueryService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
 use Symfony\UX\LiveComponent\Attribute\LiveAction;
 use Symfony\UX\LiveComponent\Attribute\LiveArg;
@@ -31,7 +36,8 @@ class ConversationSettings extends AbstractController
     use ComponentToolsTrait;
 
     public function __construct(
-        private readonly ConversationFileStorage $storage,
+        private readonly QueryService $queryService,
+        private readonly MessageBusInterface $bus,
     ) {
     }
 
@@ -48,7 +54,7 @@ class ConversationSettings extends AbstractController
             return;
         }
 
-        $this->conversation = $this->storage->loadTemporary();
+        $this->conversation = $this->queryService->query(new GetTemporaryConversationParameters());
         $this->isTemporary  = true;
     }
 
@@ -69,9 +75,9 @@ class ConversationSettings extends AbstractController
         #[LiveArg]
         string $conversationId,
     ): void {
-        $conversation = $this->storage->load($conversationId);
+        $conversation = $this->queryService->query(new FindConversationByIdParameters($conversationId));
         if ($conversation === null) {
-            $conversation = $this->storage->loadTemporary();
+            $conversation = $this->queryService->query(new GetTemporaryConversationParameters());
         }
 
         $this->conversation = $conversation;
@@ -90,12 +96,12 @@ class ConversationSettings extends AbstractController
         $this->conversation->settings = $settings;
 
         if ($this->isTemporary === true) {
-            $this->storage->saveTemporary($this->conversation);
+            $this->bus->dispatch(new StoreTemporaryConversation($this->conversation));
 
             return $this->redirectToRoute('chat');
         }
 
-        $this->storage->store($this->conversation);
+        $this->bus->dispatch(new StoreConversationCommand($this->conversation));
 
         return $this->redirectToRoute('chat', ['conversation' => $this->conversation->id]);
     }

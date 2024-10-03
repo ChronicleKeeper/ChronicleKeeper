@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Library\Presentation\Controller;
 
-use ChronicleKeeper\Chat\Infrastructure\Repository\ConversationFileStorage;
+use ChronicleKeeper\Chat\Application\Query\FindConversationsByDirectoryParameters;
 use ChronicleKeeper\Library\Domain\Entity\Directory;
 use ChronicleKeeper\Library\Domain\RootDirectory;
 use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemDirectoryRepository;
 use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemDocumentRepository;
 use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemImageRepository;
+use ChronicleKeeper\Shared\Application\Query\QueryService;
 use ChronicleKeeper\Shared\Domain\Sluggable;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -35,7 +36,7 @@ class Library extends AbstractController
         private readonly FilesystemDocumentRepository $documentRepository,
         private readonly FilesystemDirectoryRepository $directoryRepository,
         private readonly FilesystemImageRepository $imageRepository,
-        private readonly ConversationFileStorage $conversationFileStorage,
+        private readonly QueryService $queryService,
     ) {
     }
 
@@ -44,7 +45,7 @@ class Library extends AbstractController
         $directoryContent = array_merge(
             $this->documentRepository->findByDirectory($directory),
             $this->imageRepository->findByDirectory($directory),
-            $this->conversationFileStorage->findByDirectory($directory),
+            $this->queryService->query(new FindConversationsByDirectoryParameters($directory)),
         );
 
         usort(

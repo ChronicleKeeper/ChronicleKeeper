@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Chat\Presentation\Controller;
 
-use ChronicleKeeper\Chat\Infrastructure\Repository\ConversationFileStorage;
+use ChronicleKeeper\Chat\Application\Query\FindConversationByIdParameters;
+use ChronicleKeeper\Shared\Application\Query\QueryService;
 use ChronicleKeeper\Shared\Presentation\FlashMessages\Alert;
 use ChronicleKeeper\Shared\Presentation\FlashMessages\HandleFlashMessages;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -29,14 +30,14 @@ class Chat extends AbstractController
 
     public function __construct(
         private readonly Environment $environment,
-        private readonly ConversationFileStorage $storage,
+        private readonly QueryService $queryService,
     ) {
     }
 
     public function __invoke(Request $request, string|null $conversation): Response
     {
         if ($conversation !== null) {
-            $conversation = $this->storage->load($conversation);
+            $conversation = $this->queryService->query(new FindConversationByIdParameters($conversation));
             if ($conversation === null) {
                 $this->addFlashMessage($request, Alert::DANGER, 'Das gesuchte Gespräch ist nicht vorhanden.');
 

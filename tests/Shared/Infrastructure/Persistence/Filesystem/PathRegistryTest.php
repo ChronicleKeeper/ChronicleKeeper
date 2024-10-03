@@ -10,9 +10,11 @@ use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(PathRegistry::class)]
+#[UsesClass(PathNotRegistered::class)]
 #[Small]
 class PathRegistryTest extends TestCase
 {

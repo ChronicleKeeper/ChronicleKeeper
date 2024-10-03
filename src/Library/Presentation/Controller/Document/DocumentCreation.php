@@ -4,13 +4,15 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Library\Presentation\Controller\Document;
 
+use ChronicleKeeper\Chat\Application\Query\FindConversationByIdParameters;
+use ChronicleKeeper\Chat\Application\Query\GetTemporaryConversationParameters;
 use ChronicleKeeper\Chat\Infrastructure\LLMChain\ExtendedMessage;
-use ChronicleKeeper\Chat\Infrastructure\Repository\ConversationFileStorage as ChatStorage;
 use ChronicleKeeper\Library\Domain\Entity\Directory;
 use ChronicleKeeper\Library\Domain\Entity\Document;
 use ChronicleKeeper\Library\Domain\RootDirectory;
 use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemDirectoryRepository;
 use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemDocumentRepository;
+use ChronicleKeeper\Shared\Application\Query\QueryService;
 use ChronicleKeeper\Shared\Presentation\FlashMessages\Alert;
 use ChronicleKeeper\Shared\Presentation\FlashMessages\HandleFlashMessages;
 use PhpLlm\LlmChain\Message\AssistantMessage;
@@ -42,7 +44,7 @@ class DocumentCreation extends AbstractController
         private readonly RouterInterface $router,
         private readonly FilesystemDocumentRepository $documentRepository,
         private readonly FilesystemDirectoryRepository $directoryRepository,
-        private readonly ChatStorage $chatStorage,
+        private readonly QueryService $queryService,
     ) {
     }
 
@@ -92,9 +94,11 @@ class DocumentCreation extends AbstractController
             return '';
         }
 
-        $conversation = $this->chatStorage->load((string) $request->query->get('conversation'));
+        $conversation = $this->queryService->query(
+            new FindConversationByIdParameters((string) $request->query->get('conversation')),
+        );
         if ($conversation === null) {
-            $conversation = $this->chatStorage->loadTemporary();
+            $conversation = $this->queryService->query(new GetTemporaryConversationParameters());
         }
 
         $chatMessageToTemplateFrom = (string) $request->query->get('conversation_message');

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ChronicleKeeper\Chat\Application\ValueObject;
+namespace ChronicleKeeper\Chat\Domain\ValueObject;
 
 use PhpLlm\LlmChain\OpenAI\Model\Gpt\Version;
 

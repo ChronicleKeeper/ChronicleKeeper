@@ -18,6 +18,7 @@ use Webmozart\Assert\InvalidArgumentException;
 
 #[CoversClass(ExtendedMessageBagDenormalizer::class)]
 #[UsesClass(ExtendedMessage::class)]
+#[UsesClass(ExtendedMessageBag::class)]
 #[Small]
 class ExtendedMessageBagDenormalizerTest extends TestCase
 {
