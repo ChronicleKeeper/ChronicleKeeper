@@ -6,16 +6,11 @@ namespace ChronicleKeeper\Test\Chat\Application\Command;
 
 use ChronicleKeeper\Chat\Application\Command\StoreConversation;
 use ChronicleKeeper\Chat\Application\Command\StoreConversationHandler;
-use ChronicleKeeper\Chat\Domain\Entity\Conversation;
-use ChronicleKeeper\Chat\Domain\ValueObject\Settings;
-use ChronicleKeeper\Chat\Infrastructure\LLMChain\ExtendedMessageBag;
-use ChronicleKeeper\Library\Domain\RootDirectory;
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
 use ChronicleKeeper\Test\Chat\Domain\Entity\ConversationBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\Attributes\Test;
-use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\SerializerInterface;
 
@@ -24,10 +19,6 @@ use const JSON_UNESCAPED_UNICODE;
 
 #[CoversClass(StoreConversationHandler::class)]
 #[CoversClass(StoreConversation::class)]
-#[UsesClass(Conversation::class)]
-#[UsesClass(Settings::class)]
-#[UsesClass(RootDirectory::class)]
-#[UsesClass(ExtendedMessageBag::class)]
 #[Small]
 class StoreConversationHandlerTest extends TestCase
 {

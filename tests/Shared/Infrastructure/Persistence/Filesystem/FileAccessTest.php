@@ -12,16 +12,12 @@ use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\PathRegistry;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\Attributes\Test;
-use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
 
 #[CoversClass(FileAccess::class)]
-#[UsesClass(UnableToReadFile::class)]
-#[UsesClass(UnableToDeleteFile::class)]
-#[UsesClass(UnableToWriteFile::class)]
 #[Small]
 class FileAccessTest extends TestCase
 {

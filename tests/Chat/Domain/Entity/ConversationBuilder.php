@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace ChronicleKeeper\Test\Chat\Domain\Entity;
 
 use ChronicleKeeper\Chat\Domain\Entity\Conversation;
+use ChronicleKeeper\Chat\Domain\Entity\ExtendedMessageBag;
 use ChronicleKeeper\Chat\Domain\ValueObject\Settings;
-use ChronicleKeeper\Chat\Infrastructure\LLMChain\ExtendedMessageBag;
 use ChronicleKeeper\Library\Domain\Entity\Directory;
 use ChronicleKeeper\Library\Domain\RootDirectory;
 use Symfony\Component\Uid\Uuid;

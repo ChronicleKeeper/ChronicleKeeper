@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace ChronicleKeeper\Chat\Application\Service;
 
 use ChronicleKeeper\Chat\Domain\Entity\Conversation;
-use ChronicleKeeper\Chat\Infrastructure\LLMChain\ExtendedMessage;
+use ChronicleKeeper\Chat\Domain\Entity\ExtendedMessage;
 use ChronicleKeeper\Library\Infrastructure\LLMChain\Tool\LibraryDocuments;
 use ChronicleKeeper\Library\Infrastructure\LLMChain\Tool\LibraryImages;
 use ChronicleKeeper\Shared\Infrastructure\LLMChain\ToolUsageCollector;

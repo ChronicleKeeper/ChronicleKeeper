@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ChronicleKeeper\Chat\Infrastructure\LLMChain;
+namespace ChronicleKeeper\Chat\Domain\Entity;
 
 use ArrayObject;
 use JsonSerializable;

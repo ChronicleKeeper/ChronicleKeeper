@@ -12,12 +12,10 @@ use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileA
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\Attributes\Test;
-use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(ResetTemporaryConversationHandler::class)]
 #[CoversClass(ResetTemporaryConversation::class)]
-#[UsesClass(GetTemporaryConversationParameters::class)]
 #[Small]
 class ResetTemporaryConversationHandlerTest extends TestCase
 {

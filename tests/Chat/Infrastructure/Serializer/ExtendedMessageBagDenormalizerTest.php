@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Test\Chat\Infrastructure\Serializer;
 
-use ChronicleKeeper\Chat\Infrastructure\LLMChain\ExtendedMessage;
-use ChronicleKeeper\Chat\Infrastructure\LLMChain\ExtendedMessageBag;
+use ChronicleKeeper\Chat\Domain\Entity\ExtendedMessage;
+use ChronicleKeeper\Chat\Domain\Entity\ExtendedMessageBag;
 use ChronicleKeeper\Chat\Infrastructure\Serializer\ExtendedMessageBagDenormalizer;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
-use PHPUnit\Framework\Attributes\UsesClass;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use stdClass;
@@ -17,8 +17,6 @@ use Symfony\Component\Serializer\Serializer;
 use Webmozart\Assert\InvalidArgumentException;
 
 #[CoversClass(ExtendedMessageBagDenormalizer::class)]
-#[UsesClass(ExtendedMessage::class)]
-#[UsesClass(ExtendedMessageBag::class)]
 #[Small]
 class ExtendedMessageBagDenormalizerTest extends TestCase
 {
@@ -38,30 +36,35 @@ class ExtendedMessageBagDenormalizerTest extends TestCase
         unset($this->serializer, $this->normalizer);
     }
 
-    public function testThatItSupportsTheCorrectTypesWithNullFormat(): void
+    #[Test]
+    public function itSupportsTheCorrectTypesWithNullFormat(): void
     {
         self::assertSame([ExtendedMessageBag::class => true], $this->normalizer->getSupportedTypes(null));
     }
 
-    public function testThatItSupportsTheCorrectTypesWithStringFormat(): void
+    #[Test]
+    public function itSupportsTheCorrectTypesWithStringFormat(): void
     {
         self::assertSame([ExtendedMessageBag::class => true], $this->normalizer->getSupportedTypes('json'));
     }
 
-    public function testThatItSupportsTheCorrectTypeOnRuntimeCheck(): void
+    #[Test]
+    public function itSupportsTheCorrectTypeOnRuntimeCheck(): void
     {
         self::assertTrue($this->normalizer->supportsDenormalization([], ExtendedMessageBag::class));
         self::assertFalse($this->normalizer->supportsDenormalization([], stdClass::class));
     }
 
-    public function testThatDenormalizationFailsOnNonArrayInput(): void
+    #[Test]
+    public function theDenormalizationFailsOnNonArrayInput(): void
     {
         $this->expectException(InvalidArgumentException::class);
 
         $this->normalizer->denormalize('', ExtendedMessageBag::class);
     }
 
-    public function testThatTheNormalizerIsExecutingTheNormalizer(): void
+    #[Test]
+    public function theNormalizerIsExecutingTheNormalizer(): void
     {
         $this->serializer->expects($this->once())
             ->method('denormalize')
