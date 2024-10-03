@@ -37,7 +37,7 @@ class DocumentUploadType extends AbstractType
                 'label' => 'Automatisches optimieren des importieren Dokumentes',
                 'translation_domain' => false,
                 'required' => false,
-                'empty_data' => true,
+                'data' => true,
             ],
         );
     }

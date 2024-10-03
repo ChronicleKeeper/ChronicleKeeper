@@ -6,11 +6,13 @@ namespace ChronicleKeeper\Library\Infrastructure\ValueResolver;
 
 use ChronicleKeeper\Library\Domain\Entity\Image;
 use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemImageRepository;
+use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Exception\UnableToReadFile;
 use RuntimeException;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Uid\Uuid;
 
 use function is_a;
@@ -24,7 +26,7 @@ class LibraryImageResolver implements ValueResolverInterface
     ) {
     }
 
-    /** @return iterable<Image> */
+    /** @return list<Image> */
     public function resolve(Request $request, ArgumentMetadata $argument): iterable
     {
         $argumentType = $argument->getType();
@@ -37,8 +39,9 @@ class LibraryImageResolver implements ValueResolverInterface
             return [];
         }
 
-        $image = $this->imageRepository->findById($imageIdentifier);
-        if ($image === null) {
+        try {
+            $image = $this->imageRepository->findById($imageIdentifier) ?? throw new NotFoundHttpException();
+        } catch (UnableToReadFile) {
             throw new RuntimeException('Image "' . $imageIdentifier . '" not found.');
         }
 

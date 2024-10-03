@@ -6,3 +6,4 @@ twig:
     globals:
       settings_handler: '@ChronicleKeeper\Settings\Application\SettingsHandler'
       library_root: '@ChronicleKeeper\Library\Domain\RootDirectory'
+      version: '@ChronicleKeeper\Settings\Application\Service\Version'

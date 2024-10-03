@@ -2,21 +2,15 @@ parameters:
   router.request_context.scheme: 'https'
   asset.request_context.secure: true
 
+  app.storage.base_dir: '%kernel.project_dir%/var'
+  app.data.base_dir: '%kernel.project_dir%/var/data'
+  app.tmp.base_dir: '%kernel.project_dir%/var/tmp'
+  app.library.base_dir: '%kernel.project_dir%/var/library'
+
 services:
   _defaults:
     autowire: true
     autoconfigure: true
-    bind:
-      string $dotEnvFile: '%kernel.project_dir%/.env'
-      string $documentStoragePath: '%kernel.project_dir%/var/documents'
-      string $directoryStoragePath: '%kernel.project_dir%/var/directories'
-      string $vectorDocumentsPath: '%kernel.project_dir%/var/data/document'
-      string $vectorImagesPath: '%kernel.project_dir%/var/data/image'
-      string $settingsFilePath: '%kernel.project_dir%/var/settings.json'
-      string $changelogFile: '%kernel.project_dir%/CHANGELOG.md'
-      string $libraryImageStoragePath: '%kernel.project_dir%/var/library/images'
-      string $conversationTemporaryFile: '%kernel.project_dir%/var/tmp/conversation_temporary.json'
-      string $conversationStoragePath: '%kernel.project_dir%/var/library/conversations'
 
   ChronicleKeeper\:
     resource: '../src/*'
@@ -27,3 +21,24 @@ services:
 
   League\CommonMark\Extension\Table\TableExtension:
     tags: [ 'twig.markdown.league_extension' ]
+
+  ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\PathRegistry:
+    calls:
+      - method: add
+        arguments: [ 'storage', '%app.storage.base_dir%' ]
+      - method: add
+        arguments: [ 'general.project', '%kernel.project_dir%' ]
+      - method: add
+        arguments: [ 'library.documents', '%app.storage.base_dir%/documents' ]
+      - method: add
+        arguments: [ 'library.images', '%app.library.base_dir%/images' ]
+      - method: add
+        arguments: [ 'library.directories', '%app.storage.base_dir%/directories' ]
+      - method: add
+        arguments: [ 'library.conversations', '%app.library.base_dir%/conversations' ]
+      - method: add
+        arguments: [ 'vector.documents', '%app.data.base_dir%/document' ]
+      - method: add
+        arguments: [ 'vector.images', '%app.data.base_dir%/image' ]
+      - method: add
+        arguments: [ 'temp', '%app.tmp.base_dir%' ]

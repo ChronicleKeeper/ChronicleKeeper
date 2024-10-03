@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use League\FlysystemBundle\FlysystemBundle;
 use PhpLlm\LlmChainBundle\LlmChainBundle;
 use Symfony\Bundle\DebugBundle\DebugBundle;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;

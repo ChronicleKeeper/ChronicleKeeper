@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Test\Library\Presentation\Controller\Document;
 
-use ChronicleKeeper\Library\Presentation\Controller\Document\DocumentCreation;
+use ChronicleKeeper\Library\Presentation\Controller\Document\DocumentDeletion;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Large;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -12,7 +12,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Uid\Uuid;
 
-#[CoversClass(DocumentCreation::class)]
+#[CoversClass(DocumentDeletion::class)]
 #[Large]
 class DocumentDeletionTest extends WebTestCase
 {

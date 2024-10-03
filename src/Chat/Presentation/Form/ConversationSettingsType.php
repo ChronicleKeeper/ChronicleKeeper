@@ -8,7 +8,7 @@ use ChronicleKeeper\Chat\Application\ValueObject\Settings;
 use PhpLlm\LlmChain\OpenAI\Model\Gpt\Version;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\DataMapperInterface;
-use Symfony\Component\Form\Exception;
+use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -103,7 +103,7 @@ final class ConversationSettingsType extends AbstractType implements DataMapperI
         }
 
         if (! $viewData instanceof Settings) {
-            throw new Exception\UnexpectedTypeException($viewData, Settings::class);
+            throw new UnexpectedTypeException($viewData, Settings::class);
         }
 
         /** @var FormInterface[] $forms */
@@ -128,22 +128,22 @@ final class ConversationSettingsType extends AbstractType implements DataMapperI
 
             $version = $forms['version']->getData();
             if (! is_string($version)) {
-                throw new Exception\UnexpectedTypeException($version, 'string');
+                throw new UnexpectedTypeException($version, 'string');
             }
 
             $temperature = $forms['temperature']->getData();
             if (! is_float($temperature)) {
-                throw new Exception\UnexpectedTypeException($temperature, 'float');
+                throw new UnexpectedTypeException($temperature, 'float');
             }
 
             $imagesMaxDistance = $forms['imagesMaxDistance']->getData();
             if (! is_float($imagesMaxDistance)) {
-                throw new Exception\UnexpectedTypeException($imagesMaxDistance, 'float');
+                throw new UnexpectedTypeException($imagesMaxDistance, 'float');
             }
 
             $documentsMaxDistance = $forms['documentsMaxDistance']->getData();
             if (! is_float($documentsMaxDistance)) {
-                throw new Exception\UnexpectedTypeException($documentsMaxDistance, 'float');
+                throw new UnexpectedTypeException($documentsMaxDistance, 'float');
             }
 
             $viewData = new Settings($version, $temperature, $imagesMaxDistance, $documentsMaxDistance);

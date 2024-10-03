@@ -9,5 +9,9 @@
     <file>src</file>
     <file>tests</file>
 
-    <rule ref="Doctrine"/>
+    <rule ref="Doctrine">
+        <properties>
+            <property name="line_length" value="140"/>
+        </properties>
+    </rule>
 </ruleset>

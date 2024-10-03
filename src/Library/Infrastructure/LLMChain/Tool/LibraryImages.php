@@ -59,6 +59,14 @@ final class LibraryImages
 
         $this->referencedImages = [];
         if (count($results) === 0) {
+            $this->collector->called(
+                'library_images',
+                [
+                    'arguments' => ['search' => $search, 'maxDistance' => $this->maxDistance, 'maxResults' => $maxResults],
+                    'responses' => [],
+                ],
+            );
+
             return 'There are no matching images.';
         }
 

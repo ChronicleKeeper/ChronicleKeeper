@@ -1,0 +1,3 @@
+#services:
+#  ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess:
+#    class: ChronicleKeeper\Test\Shared\Infrastructure\Persistence\Filesystem\FileAccessDouble

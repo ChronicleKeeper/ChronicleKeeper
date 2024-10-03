@@ -6,11 +6,13 @@ namespace ChronicleKeeper\Library\Infrastructure\ValueResolver;
 
 use ChronicleKeeper\Library\Domain\Entity\Directory;
 use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemDirectoryRepository;
+use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Exception\UnableToReadFile;
 use RuntimeException;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Uid\Uuid;
 
 use function is_a;
@@ -37,8 +39,9 @@ class LibraryDirectoryResolver implements ValueResolverInterface
             return [];
         }
 
-        $directory = $this->directoryRepository->findById($directoryIdentifier);
-        if ($directory === null) {
+        try {
+            $directory = $this->directoryRepository->findById($directoryIdentifier) ?? throw new NotFoundHttpException();
+        } catch (UnableToReadFile) {
             throw new RuntimeException('Directory "' . $directoryIdentifier . '" not found.');
         }
 

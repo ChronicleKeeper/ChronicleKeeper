@@ -20,11 +20,11 @@ use PhpLlm\LlmChain\ToolBox\AsTool;
     - Aligning holidays in the calendar: "When is the next festival?"
     TEXT,
 )]
-final class Holiday
+final readonly class Holiday
 {
     public function __construct(
-        private readonly SettingsHandler $settingsHandler,
-        private readonly ToolUsageCollector $collector,
+        private SettingsHandler $settingsHandler,
+        private ToolUsageCollector $collector,
     ) {
     }
 

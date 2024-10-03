@@ -5,13 +5,14 @@ declare(strict_types=1);
 namespace ChronicleKeeper\Chat\Application\Service;
 
 use ChronicleKeeper\Settings\Application\Service\Exporter\SingleExport;
+use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\PathRegistry;
 use Symfony\Component\Finder\Finder;
 use ZipArchive;
 
-final class ConversationExporter implements SingleExport
+final readonly class ConversationExporter implements SingleExport
 {
     public function __construct(
-        private readonly string $conversationStoragePath,
+        private PathRegistry $pathRegistry,
     ) {
     }
 
@@ -19,7 +20,7 @@ final class ConversationExporter implements SingleExport
     {
         $finder = (new Finder())
             ->ignoreDotFiles(true)
-            ->in($this->conversationStoragePath)
+            ->in($this->pathRegistry->get('library.conversations'))
             ->files();
 
         foreach ($finder as $file) {

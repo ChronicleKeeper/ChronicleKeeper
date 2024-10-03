@@ -6,6 +6,7 @@ namespace ChronicleKeeper\Library\Infrastructure\ValueResolver;
 
 use ChronicleKeeper\Library\Domain\Entity\Document;
 use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemDocumentRepository;
+use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Exception\UnableToReadFile;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
@@ -37,8 +38,9 @@ class LibraryDocumentResolver implements ValueResolverInterface
             return [];
         }
 
-        $document = $this->documentRepository->findById($documentIdentifier);
-        if ($document === null) {
+        try {
+            $document = $this->documentRepository->findById($documentIdentifier);
+        } catch (UnableToReadFile) {
             throw new NotFoundHttpException('Document "' . $documentIdentifier . '" not found.');
         }
 

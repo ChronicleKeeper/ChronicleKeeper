@@ -4,34 +4,18 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Settings\Application\Service\Exporter;
 
+use ChronicleKeeper\Settings\Application\Service\Version;
 use ZipArchive;
 
-use function file_get_contents;
-use function preg_match_all;
-
-final class VersionExporter implements SingleExport
+final readonly class VersionExporter implements SingleExport
 {
     public function __construct(
-        private readonly string $changelogFile,
+        private Version $version,
     ) {
     }
 
     public function export(ZipArchive $archive): void
     {
-        $archive->addFromString('VERSION', $this->parseVersionFromChangelog());
-    }
-
-    private function parseVersionFromChangelog(): string
-    {
-        $changelog = file_get_contents($this->changelogFile);
-        if ($changelog === false) {
-            return 'latest'; // default version
-        }
-
-        preg_match_all('/\[(.*?)\]/', $changelog, $foundVersions);
-
-        $foundVersions = $foundVersions[1];
-
-        return $foundVersions[0];
+        $archive->addFromString('VERSION', $this->version->getCurrentVersion());
     }
 }
