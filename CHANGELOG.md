@@ -29,6 +29,7 @@
 ### Fixed
 - Resolved build process failure caused by a missing content block in the loader component.
 - Disabled unnecessary Turbo streams activation.
+- Utilize 64bit PHP insteaf of 32bit for Windows Desktop build to fix twig cache problems utilizing large integers.
 
 ## [alpha-0.3] - Images will rule the world
 

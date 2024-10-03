@@ -16,6 +16,7 @@ use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\SerializerInterface;
 use Webmozart\Assert\Assert;
 
+use function array_filter;
 use function assert;
 use function strcasecmp;
 use function usort;
@@ -44,6 +45,11 @@ class FindConversationsByDirectoryQuery implements Query
                 $this->logger->error($e, ['file' => $file]);
             }
         }
+
+        $conversations = array_filter(
+            $conversations,
+            static fn (Conversation $conversation) => $conversation->directory->id === $parameters->directory->id,
+        );
 
         usort(
             $conversations,
