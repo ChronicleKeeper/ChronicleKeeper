@@ -14,9 +14,9 @@ phpdesktop: ## build phpdesktop release
 	cd build/www; rm -rf *
 	cd build; rm -rf php/*
 	cd build; mv php-desktop.exe ChronicleKeeper.exe
-	cd build/php; wget https://windows.php.net/downloads/releases/latest/php-8.3-nts-Win32-vs16-x86-latest.zip
-	cd build/php; unzip php-8.3-nts-Win32-vs16-x86-latest.zip
-	cd build/php; rm php-8.3-nts-Win32-vs16-x86-latest.zip
+	cd build/php; wget https://windows.php.net/downloads/releases/latest/php-8.3-nts-Win32-vs16-x64-latest.zip
+	cd build/php; unzip php-8.3-nts-Win32-vs16-x64-latest.zip
+	cd build/php; rm php-8.3-nts-Win32-vs16-x64-latest.zip
 
 	git archive HEAD | (cd build/www; tar x)
 	cd build/www; mv config/phpdesktop/php.ini ../php
