@@ -1,5 +1,12 @@
 # Changelog
 
+## [alpha-0.5] - Fun with images
+
+### Fixed
+- Resolved importing from alpha-0.2 does not assign all files and images to a directory.
+- Fixed import library archives being limited to 10 MB.
+- Fixed various spelling errors.
+
 ## [alpha-0.4] - Conversations will save the world
 
 ### Added
