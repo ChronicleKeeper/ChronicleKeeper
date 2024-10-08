@@ -18,14 +18,15 @@
                     </div>
                 </div>
 
-            {% for image in images %}
+            {% for message in messages|reverse %}
+                {% dump(message) %}
                 <div class="col-12">
                     <div class="card">
                         <div class="card-header">
-                            <h3 class="card-title">Generated Image</h3>
+                            <h3 class="card-title">{{ message.role }}</h3>
                         </div>
                         <div class="card-body">
-                            <div class="img-responsive img-responsive-1x1 rounded border" style="background-image: url({{ image.imageUrl }})"></div>
+                            {{ message.message|markdown_to_html }}
                         </div>
                     </div>
                 </div>

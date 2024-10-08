@@ -30,6 +30,7 @@ class ChatMessageExecution
         $messages   = $conversation->messages;
         $messages[] = new ExtendedMessage(message: Message::ofUser($message));
 
+        // Set Maximum distances in tools
         $this->libraryDocuments->setOneTimeMaxDistance($conversation->settings->documentsMaxDistance);
         $this->libraryImages->setOneTimeMaxDistance($conversation->settings->imagesMaxDistance);
 
@@ -41,6 +42,10 @@ class ChatMessageExecution
             ],
         );
         assert(is_string($response));
+
+        // Remove maximum distances in tools after the response ... just for saftey of the request
+        $this->libraryDocuments->setOneTimeMaxDistance($conversation->settings->documentsMaxDistance);
+        $this->libraryImages->setOneTimeMaxDistance($conversation->settings->imagesMaxDistance);
 
         $response = new ExtendedMessage(message: Message::ofAssistant($response));
 

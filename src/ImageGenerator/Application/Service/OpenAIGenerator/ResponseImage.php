@@ -7,6 +7,7 @@ namespace ChronicleKeeper\ImageGenerator\Application\Service\OpenAIGenerator;
 class ResponseImage
 {
     public function __construct(
+        public string $prompt,
         public string $mimeType,
         public string $encodedImage,
     ) {
