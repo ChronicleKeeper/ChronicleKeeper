@@ -37,9 +37,15 @@ class GeneratedImages extends AbstractController
     }
 
     #[LiveAction]
-    public function generate(Request $request): void
+    public function generate(): void
     {
         $this->generatorRequest[] = $this->generator->generate($this->generatorRequest->prompt->prompt);
         $this->bus->dispatch(new StoreGeneratorRequest($this->generatorRequest));
+    }
+
+    #[LiveAction]
+    public function toLibrary(): void
+    {
+        sleep(5);
     }
 }

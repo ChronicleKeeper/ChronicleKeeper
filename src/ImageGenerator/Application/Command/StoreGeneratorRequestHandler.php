@@ -12,6 +12,10 @@ use Symfony\Component\Serializer\Encoder\JsonEncode;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\SerializerInterface;
 
+use function array_shift;
+use function array_values;
+use function count;
+
 use const JSON_PRETTY_PRINT;
 use const JSON_UNESCAPED_UNICODE;
 
@@ -30,6 +34,18 @@ class StoreGeneratorRequestHandler
         if ($request->request->prompt === null) {
             $optimizedPrompt          = $this->promptOptimizer->optimize($request->request->userInput->prompt);
             $request->request->prompt = new OptimizedPrompt($optimizedPrompt);
+        }
+
+        $maxItems = 2;
+        if ($request->request->count() > $maxItems) {
+            // Remove all images that are over the allowed count value
+            $images = $request->request->getArrayCopy();
+
+            do {
+                array_shift($images);
+            } while (count($images) > $maxItems);
+
+            $request->request->exchangeArray(array_values($images));
         }
 
         $this->fileAccess->write(

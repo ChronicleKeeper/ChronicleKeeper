@@ -3,7 +3,7 @@
     <div class="col-12">
         <div class="card">
             <div class="card-header">
-                <h3 class="card-title">Kunstgallerie</h3>
+                <h3 class="card-title">Kunstgalerie</h3>
                 <div class="card-actions">
                     <button
                         data-loading="addAttribute(disabled)"
@@ -13,30 +13,46 @@
                     >{{ ux_icon('tabler:square-rounded-plus') }}Neuer Versuch</button>
                 </div>
             </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    Bitte beachte, dass die Galerie maximal 2 Bilder enthält. Das alteste Bild wird immer verworfen,
+                    wenn du einen erneuten Versuch ausführst.
+                </div>
+            </div>
         </div>
     </div>
 
-    <div class="row row-cols-2 g-2">
-        <div id="image-loder" data-loading="removeClass(d-none)" class="col d-none">
-            <div class="card placeholder-glow">
-                <div class="ratio ratio-4x3 card-img-top placeholder"></div>
+    <div id="image-loder" data-loading="removeClass(d-none)" class="col-6 d-none">
+        <div class="card placeholder-glow">
+            <div class="ratio ratio-4x3 card-img -top placeholder"></div>
+            <div class="card-body">
+                <div class="d-flex">
+                    <div class="spinner-border"></div>
+                    <div class="p-1" style="margin-left: 5px;"><i>Das Atelier wird stimmungsvoll gedimmt, die Staffelei aufgestellt, der Pinsel fliegt ...</i></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% for image in this.images|reverse %}
+
+        <div class="col-6">
+            <div class="card">
+                <img src="{{ image.imageUrl }}" class="card-img-top" />
                 <div class="card-body">
-                    <div class="d-flex">
-                        <div class="spinner-border"></div>
-                        <div class="p-1" style="margin-left: 5px;"><i>Das Atelier wird stimmungsvoll gedimmt, die Staffelei aufgestellt, der Pinsel fliegt ...</i></div>
+                    <div class="d-flex flex-row justify-content-end">
+                        {% if image.image is defined and image.image is null %}
+                            <a href="#"
+                                data-loading="addClass(disabled)"
+                                class="btn d-none d-sm-inline-block"
+                            >{{ ux_icon('tabler:photo-plus') }}In die Bibliothek!</a>
+                        {% endif %}
                     </div>
                 </div>
             </div>
         </div>
 
-        {% for image in this.images|reverse %}
+    {% endfor %}
 
-            <div class="col">
-                <div class="img-responsive img-responsive-1x1 rounded border" style="background-image: url({{ image.imageUrl }})"></div>
-            </div>
-
-        {% endfor %}
-
-    </div>
 
 </div>
