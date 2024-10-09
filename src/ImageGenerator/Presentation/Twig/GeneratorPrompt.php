@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\ImageGenerator\Presentation\Twig;
 
+use ChronicleKeeper\ImageGenerator\Application\Command\StoreGeneratorRequest;
 use ChronicleKeeper\ImageGenerator\Domain\Entity\GeneratorRequest;
 use ChronicleKeeper\ImageGenerator\Presentation\Form\GeneratorRequestType;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
@@ -30,33 +31,34 @@ class GeneratorPrompt extends AbstractController
     use ComponentWithFormTrait;
 
     public function __construct(
-        private readonly QueryService $queryService,
         private readonly MessageBusInterface $bus,
-    ) {
+    )
+    {
+
     }
 
     #[LiveProp(writable: true, useSerializerForHydration: true)]
-    public GeneratorRequest $generatorRequest;
+    public GeneratorRequest $initialFormData;
 
     protected function instantiateForm(): FormInterface
     {
-        return $this->createForm(GeneratorRequestType::class, $this->generatorRequest);
+        return $this->createForm(GeneratorRequestType::class, $this->initialFormData);
     }
 
     #[LiveAction]
-    public function store(Request $request): Response
+    public function store(Request $request): void
     {
         $this->submitForm();
         $generatorRequest = $this->getForm()->getData();
         $this->resetForm();
-
         assert($generatorRequest instanceof GeneratorRequest);
 
-        $this->addFlash(
-            'success',
+        $this->bus->dispatch(new StoreGeneratorRequest($generatorRequest));
+
+        $this->addFlashMessage(
+            $request,
+            Alert::SUCCESS,
             'Der Auftrag wurde erfolgreich gespeichert.',
         );
-
-        return $this->redirectToRoute('image_generator_generator', ['generatorRequest' => $generatorRequest->id]);
     }
 }
