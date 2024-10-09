@@ -16,7 +16,13 @@
 
     <div class="container-xl">
 
-        {{ component('ImageGenerator:Prompt', { initialFormData: request }) }}
+        <div class="row">
+            {{ component('ImageGenerator:Prompt', { initialFormData: request }) }}
+        </div>
+
+        <div class="row">
+            {{ component('ImageGenerator:Images', { generatorRequest: request }) }}
+        </div>
 
     </div>
 

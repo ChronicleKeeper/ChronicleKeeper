@@ -11,7 +11,7 @@ class GeneratorResult implements JsonSerializable
 {
     public function __construct(
         public string $encodedImage,
-        public Image|null $image, // Not null when already taken to library
+        public Image|null $image = null, // Not null when already taken to library
         public string $mimeType = 'image/png',
     ) {
     }

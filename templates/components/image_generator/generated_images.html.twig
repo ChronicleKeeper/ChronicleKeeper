@@ -1,0 +1,42 @@
+<div class="row row-deck row-cards" {{ attributes }}>
+
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Kunstgallerie</h3>
+                <div class="card-actions">
+                    <button
+                        data-loading="addAttribute(disabled)"
+                        class="btn d-none d-sm-inline-block"
+                        data-action="live#action"
+                        data-live-action-param="generate"
+                    >{{ ux_icon('tabler:square-rounded-plus') }}Neuer Versuch</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row row-cols-2 g-2">
+        <div id="image-loder" data-loading="removeClass(d-none)" class="col d-none">
+            <div class="card placeholder-glow">
+                <div class="ratio ratio-4x3 card-img-top placeholder"></div>
+                <div class="card-body">
+                    <div class="d-flex">
+                        <div class="spinner-border"></div>
+                        <div class="p-1" style="margin-left: 5px;"><i>Das Atelier wird stimmungsvoll gedimmt, die Staffelei aufgestellt, der Pinsel fliegt ...</i></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% for image in this.images|reverse %}
+
+            <div class="col">
+                <div class="img-responsive img-responsive-1x1 rounded border" style="background-image: url({{ image.imageUrl }})"></div>
+            </div>
+
+        {% endfor %}
+
+    </div>
+
+</div>
