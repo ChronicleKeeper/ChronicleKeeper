@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ChronicleKeeper\ImageGenerator\Presentation\Form;
 
 use ChronicleKeeper\ImageGenerator\Domain\Entity\GeneratorRequest;
+use ChronicleKeeper\ImageGenerator\Domain\ValueObject\OptimizedPrompt;
 use ChronicleKeeper\ImageGenerator\Domain\ValueObject\UserInput;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\DataMapperInterface;
@@ -55,6 +56,17 @@ class GeneratorRequestType extends AbstractType implements DataMapperInterface
                 'constraints' => [new NotBlank()],
             ],
         );
+
+        // TODO: Add Constraint with additional validation group for generator page, so it is not executed on create page
+        $builder->add(
+            'prompt',
+            TextareaType::class,
+            [
+                'label' => 'Detailbeschreibung des Auftrages',
+                'translation_domain' => false,
+                'required' => true,
+            ],
+        );
     }
 
     /** @param Traversable<FormInterface> $forms */
@@ -73,6 +85,7 @@ class GeneratorRequestType extends AbstractType implements DataMapperInterface
 
         $forms['title']->setData($viewData->title);
         $forms['userInput']->setData($viewData->userInput->prompt);
+        $forms['prompt']->setData($viewData->prompt->prompt);
     }
 
     /** @param Traversable<FormInterface> $forms */
@@ -94,6 +107,11 @@ class GeneratorRequestType extends AbstractType implements DataMapperInterface
             $userInput = $forms['userInput']->getData();
             if (is_string($userInput)) {
                 $viewData->userInput = new UserInput($userInput);
+            }
+
+            $optimizedPrompt = $forms['prompt']->getData();
+            if (is_string($optimizedPrompt)) {
+                $viewData->prompt = new OptimizedPrompt($optimizedPrompt);
             }
         } catch (Throwable) {
             return;

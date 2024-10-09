@@ -14,7 +14,6 @@ use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Attribute\Route;
 
 use function assert;
-use function dump;
 
 #[Route('/image_generator/create', name: 'image_generator_create')]
 final class Create extends AbstractController
@@ -30,8 +29,7 @@ final class Create extends AbstractController
 
             $bus->dispatch(new StoreGeneratorRequest($data));
 
-            dump('FOO');
-            exit;
+            return $this->redirectToRoute('image_generator_generator', ['generatorRequest' => $data->id]);
         }
 
         return $this->render('image_generator/create.html.twig', ['form' => $form->createView()]);

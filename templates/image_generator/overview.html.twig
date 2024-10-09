@@ -35,7 +35,9 @@
                                 <tr>
                                     <td>{{ request.title }}</td>
                                     <td>{{ request|length }}</td>
-                                    <td>&nbsp;</td>
+                                    <td>
+                                        <a href="{{ path('image_generator_generator', {'generatorRequest': request.id}) }}" title="Mechthilds Atelier">{{ ux_icon('tabler:photo-ai') }}</a>
+                                    </td>
                                 </tr>
 
                             {% else %}
