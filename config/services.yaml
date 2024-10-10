@@ -41,6 +41,8 @@ services:
       - method: add
         arguments: [ 'vector.images', '%app.data.base_dir%/image' ]
       - method: add
-        arguments: [ 'generator.images', '%app.storage.base_dir%/generated_images' ]
+        arguments: [ 'generator.requests', '%app.storage.base_dir%/generated_images' ]
+      - method: add
+        arguments: [ 'generator.images', '%app.storage.base_dir%/generated_images/images' ]
       - method: add
         arguments: [ 'temp', '%app.tmp.base_dir%' ]

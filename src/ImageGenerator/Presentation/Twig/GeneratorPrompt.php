@@ -7,7 +7,6 @@ namespace ChronicleKeeper\ImageGenerator\Presentation\Twig;
 use ChronicleKeeper\ImageGenerator\Application\Command\StoreGeneratorRequest;
 use ChronicleKeeper\ImageGenerator\Domain\Entity\GeneratorRequest;
 use ChronicleKeeper\ImageGenerator\Presentation\Form\GeneratorRequestType;
-use ChronicleKeeper\Shared\Presentation\FlashMessages\Alert;
 use ChronicleKeeper\Shared\Presentation\FlashMessages\HandleFlashMessages;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormInterface;
@@ -51,10 +50,14 @@ class GeneratorPrompt extends AbstractController
 
         $this->bus->dispatch(new StoreGeneratorRequest($generatorRequest));
 
-        $this->addFlashMessage(
+       /*
+
+       $this->addFlashMessage(
             $request,
             Alert::SUCCESS,
             'Der Auftrag wurde erfolgreich gespeichert.',
         );
+
+       */
     }
 }

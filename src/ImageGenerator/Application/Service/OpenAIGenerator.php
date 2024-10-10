@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\ImageGenerator\Application\Service;
 
-use ChronicleKeeper\ImageGenerator\Domain\ValueObject\GeneratorResult;
+use ChronicleKeeper\ImageGenerator\Domain\Entity\GeneratorResult;
 use PhpLlm\LlmChain\OpenAI\Platform;
 use RuntimeException;
 

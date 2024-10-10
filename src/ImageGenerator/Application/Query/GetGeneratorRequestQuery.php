@@ -26,7 +26,7 @@ final class GetGeneratorRequestQuery implements Query
         assert($parameters instanceof GetGeneratorRequest);
 
         return $this->serializer->deserialize(
-            $content = $this->fileAccess->read('generator.images', $parameters->id . '.json'),
+            $content = $this->fileAccess->read('generator.requests', $parameters->id . '.json'),
             GeneratorRequest::class,
             JsonEncoder::FORMAT,
         );

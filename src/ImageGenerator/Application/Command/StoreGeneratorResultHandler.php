@@ -5,18 +5,18 @@ declare(strict_types=1);
 namespace ChronicleKeeper\ImageGenerator\Application\Command;
 
 use ChronicleKeeper\ImageGenerator\Application\Service\PromptOptimizer;
-use ChronicleKeeper\ImageGenerator\Domain\ValueObject\OptimizedPrompt;
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Serializer\Encoder\JsonEncode;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\SerializerInterface;
 
+use const DIRECTORY_SEPARATOR;
 use const JSON_PRETTY_PRINT;
 use const JSON_UNESCAPED_UNICODE;
 
 #[AsMessageHandler]
-class StoreGeneratorRequestHandler
+class StoreGeneratorResultHandler
 {
     public function __construct(
         public readonly FileAccess $fileAccess,
@@ -25,18 +25,15 @@ class StoreGeneratorRequestHandler
     ) {
     }
 
-    public function __invoke(StoreGeneratorRequest $request): void
+    public function __invoke(StoreGeneratorResult $request): void
     {
-        if ($request->request->prompt === null) {
-            $optimizedPrompt          = $this->promptOptimizer->optimize($request->request->userInput->prompt);
-            $request->request->prompt = new OptimizedPrompt($optimizedPrompt);
-        }
+        $requestImagesDirectory = DIRECTORY_SEPARATOR . $request->requestId;
 
         $this->fileAccess->write(
-            'generator.requests',
-            $request->request->id . '.json',
+            'generator.images',
+            $requestImagesDirectory . DIRECTORY_SEPARATOR . $request->generatorResult->id . '.json',
             $this->serializer->serialize(
-                $request->request,
+                $request->generatorResult,
                 JsonEncoder::FORMAT,
                 [JsonEncode::OPTIONS => JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT],
             ),

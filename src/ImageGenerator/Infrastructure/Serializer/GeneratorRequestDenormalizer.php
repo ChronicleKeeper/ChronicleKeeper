@@ -5,21 +5,12 @@ declare(strict_types=1);
 namespace ChronicleKeeper\ImageGenerator\Infrastructure\Serializer;
 
 use ChronicleKeeper\ImageGenerator\Domain\Entity\GeneratorRequest;
-use ChronicleKeeper\ImageGenerator\Domain\ValueObject\GeneratorResult;
 use ChronicleKeeper\ImageGenerator\Domain\ValueObject\OptimizedPrompt;
 use ChronicleKeeper\ImageGenerator\Domain\ValueObject\UserInput;
-use Symfony\Component\Serializer\Normalizer\DenormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
-final class GeneratorRequestDenormalizer implements DenormalizerInterface, DenormalizerAwareInterface
+final class GeneratorRequestDenormalizer implements DenormalizerInterface
 {
-    private DenormalizerInterface $denormalizer;
-
-    public function setDenormalizer(DenormalizerInterface $denormalizer): void
-    {
-        $this->denormalizer = $denormalizer;
-    }
-
     /** @inheritDoc */
     public function denormalize(
         mixed $data,
@@ -33,13 +24,6 @@ final class GeneratorRequestDenormalizer implements DenormalizerInterface, Denor
         if ($data['prompt'] !== null) {
             $request->prompt = new OptimizedPrompt($data['prompt']);
         }
-
-        $request->exchangeArray($this->denormalizer->denormalize(
-            $data['results'],
-            GeneratorResult::class . '[]',
-            $format,
-            $context,
-        ));
 
         return $request;
     }

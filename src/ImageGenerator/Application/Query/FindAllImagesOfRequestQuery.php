@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\ImageGenerator\Application\Query;
 
-use ChronicleKeeper\ImageGenerator\Domain\Entity\GeneratorRequest;
+use ChronicleKeeper\ImageGenerator\Domain\Entity\GeneratorResult;
 use ChronicleKeeper\Shared\Application\Query\Query;
 use ChronicleKeeper\Shared\Application\Query\QueryParameters;
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
@@ -15,7 +15,9 @@ use Symfony\Component\Serializer\SerializerInterface;
 
 use function assert;
 
-final class FindAllGeneratorRequestsQuery implements Query
+use const DIRECTORY_SEPARATOR;
+
+final class FindAllImagesOfRequestQuery implements Query
 {
     public function __construct(
         private readonly PathRegistry $pathRegistry,
@@ -25,28 +27,35 @@ final class FindAllGeneratorRequestsQuery implements Query
     ) {
     }
 
-    /** @return list<GeneratorRequest> */
+    /** @return list<GeneratorResult> */
     public function query(QueryParameters $parameters): array
     {
-        $files = $this->finder->findFilesInDirectory(
-            $this->pathRegistry->get('generator.requests'),
+        assert($parameters instanceof FindAllImagesOfRequest);
+
+        $requestImagesDirectory = DIRECTORY_SEPARATOR . $parameters->requestId;
+
+        $files = $this->finder->findFilesInDirectoryOrderedByAccessTimestamp(
+            $this->pathRegistry->get('generator.images') . $requestImagesDirectory,
         );
 
-        $requests = [];
+        $images = [];
         foreach ($files as $file) {
             $filename = $file->getFilename();
             assert($filename !== '');
 
-            $content = $this->fileAccess->read('generator.requests', $filename);
+            $content = $this->fileAccess->read(
+                'generator.images',
+                $requestImagesDirectory . DIRECTORY_SEPARATOR . $filename,
+            );
             assert($content !== '');
 
-            $requests[] = $this->serializer->deserialize(
+            $images[] = $this->serializer->deserialize(
                 $content,
-                GeneratorRequest::class,
+                GeneratorResult::class,
                 JsonEncoder::FORMAT,
             );
         }
 
-        return $requests;
+        return $images;
     }
 }

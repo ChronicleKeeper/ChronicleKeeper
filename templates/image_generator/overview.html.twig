@@ -24,7 +24,6 @@
                         <thead>
                             <tr>
                                 <th>Titel</th>
-                                <th class="w-3">Anzahl Bilder</th>
                                 <th class="w-8">&nbsp;</th>
                             </tr>
                         </thead>
@@ -34,7 +33,6 @@
 
                                 <tr>
                                     <td>{{ request.title }}</td>
-                                    <td>{{ request|length }}</td>
                                     <td>
                                         <a href="{{ path('image_generator_generator', {'generatorRequest': request.id}) }}" title="Mechthilds Atelier">{{ ux_icon('tabler:photo-ai') }}</a>
                                     </td>

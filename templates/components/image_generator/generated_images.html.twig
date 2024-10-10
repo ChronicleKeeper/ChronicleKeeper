@@ -13,12 +13,6 @@
                     >{{ ux_icon('tabler:square-rounded-plus') }}Neuer Versuch</button>
                 </div>
             </div>
-            <div class="card-body">
-                <div class="alert alert-info">
-                    Bitte beachte, dass die Galerie maximal 2 Bilder enthält. Das alteste Bild wird immer verworfen,
-                    wenn du einen erneuten Versuch ausführst.
-                </div>
-            </div>
         </div>
     </div>
 
@@ -34,7 +28,7 @@
         </div>
     </div>
 
-    {% for image in this.images|reverse %}
+    {% for image in this.images %}
 
         <div class="col-6">
             <div class="card">
