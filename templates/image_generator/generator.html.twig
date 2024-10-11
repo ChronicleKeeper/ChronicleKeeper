@@ -6,7 +6,10 @@
     <div class="col-auto ms-auto d-print-none">
         <div class="btn-list">
             <a href="{{ path('image_generator_overview') }}" class="btn d-none d-sm-inline-block">
-                {{ ux_icon('tabler:photo-ai') }} Zurück zur Übersicht
+                {{ ux_icon('tabler:photo-ai') }} Übersicht
+            </a>
+            <a href="{{ path('image_generator_delete', {'generatorRequestId': request.id }) }}" class="btn btn-icon btn-danger" {{ stimulus_controller('confirm') }}>
+                {{ ux_icon('tabler:photo-minus') }}
             </a>
         </div>
     </div>
@@ -16,13 +19,11 @@
 
     <div class="container-xl">
 
-        <div class="row">
-            {{ component('ImageGenerator:Prompt', { initialFormData: request }) }}
-        </div>
+        {{ component('ImageGenerator:Prompt', { initialFormData: request }) }}
 
-        <div class="row">
-            {{ component('ImageGenerator:Images', { generatorRequest: request }) }}
-        </div>
+        <div class="col-12">&nbsp;</div>
+
+        {{ component('ImageGenerator:Images', { generatorRequest: request }) }}
 
     </div>
 

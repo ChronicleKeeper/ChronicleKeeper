@@ -15,6 +15,8 @@ use RuntimeException;
 
 use function is_string;
 
+use const PHP_EOL;
+
 class LLMDescriber
 {
     public function __construct(
@@ -27,14 +29,25 @@ class LLMDescriber
     {
         $settings = $this->settingsHandler->get();
 
+        $messageBag = new MessageBag(Message::forSystem($settings->getChatbotSystemPrompt()->getSystemPrompt()));
+
+        $userPromptText = $this->getUserPromptText($imageToAnalyze);
+        if ($imageToAnalyze->description !== '') {
+            /**
+             * If the image already has a description we will also give it as context to the
+             * message, so it will taken as context
+             */
+            $userPromptText .= PHP_EOL . '### Some additional information about the image.' . PHP_EOL;
+            $userPromptText .= $imageToAnalyze->description;
+        }
+
+        $messageBag[] = Message::ofUser(
+            $userPromptText,
+            new LLMImage($imageToAnalyze->getImageUrl()),
+        );
+
         $response = $this->chain->call(
-            new MessageBag(
-                Message::forSystem($settings->getChatbotSystemPrompt()->getSystemPrompt()),
-                Message::ofUser(
-                    $this->getUserPromptText($imageToAnalyze),
-                    new LLMImage($imageToAnalyze->getImageUrl()),
-                ),
-            ),
+            $messageBag,
             [
                 'model' => Version::gpt4o()->name,
                 'temperature' => $settings->getChatbotTuning()->getTemperature(),

@@ -25,10 +25,11 @@ class GeneratorResult implements JsonSerializable
         return 'data:' . $this->mimeType . ';base64,' . $this->encodedImage;
     }
 
-    /** @return array{encodedImage: string, mimeType: string, image: string|null} */
+    /** @return array{id: string, encodedImage: string, mimeType: string, image: string|null} */
     public function jsonSerialize(): array
     {
         return [
+            'id' => $this->id,
             'encodedImage' => $this->encodedImage,
             'mimeType' => $this->mimeType,
             'image' => $this->image?->id,

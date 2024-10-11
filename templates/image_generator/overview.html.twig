@@ -35,6 +35,7 @@
                                     <td>{{ request.title }}</td>
                                     <td>
                                         <a href="{{ path('image_generator_generator', {'generatorRequest': request.id}) }}" title="Mechthilds Atelier">{{ ux_icon('tabler:photo-ai') }}</a>
+                                        <a href="{{ path('image_generator_delete', {'generatorRequestId': request.id}) }}" title="In den Müll mit der Kunst" {{ stimulus_controller('confirm') }}>{{ ux_icon('tabler:photo-minus', {'color': 'var(--tblr-danger)'}) }}</a>
                                     </td>
                                 </tr>
 

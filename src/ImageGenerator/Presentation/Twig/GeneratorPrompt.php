@@ -11,6 +11,7 @@ use ChronicleKeeper\Shared\Presentation\FlashMessages\HandleFlashMessages;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
 use Symfony\UX\LiveComponent\Attribute\LiveAction;
@@ -41,7 +42,7 @@ class GeneratorPrompt extends AbstractController
     }
 
     #[LiveAction]
-    public function store(Request $request): void
+    public function store(Request $request): Response
     {
         $this->submitForm();
         $generatorRequest = $this->getForm()->getData();
@@ -50,14 +51,6 @@ class GeneratorPrompt extends AbstractController
 
         $this->bus->dispatch(new StoreGeneratorRequest($generatorRequest));
 
-       /*
-
-       $this->addFlashMessage(
-            $request,
-            Alert::SUCCESS,
-            'Der Auftrag wurde erfolgreich gespeichert.',
-        );
-
-       */
+        return $this->redirectToRoute('image_generator_generator', ['generatorRequest' => $generatorRequest->id]);
     }
 }

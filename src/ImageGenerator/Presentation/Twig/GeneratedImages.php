@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ChronicleKeeper\ImageGenerator\Presentation\Twig;
 
 use ChronicleKeeper\ImageGenerator\Application\Command\StoreGeneratorResult;
+use ChronicleKeeper\ImageGenerator\Application\Command\StoreImageToLibrary;
 use ChronicleKeeper\ImageGenerator\Application\Query\FindAllImagesOfRequest;
 use ChronicleKeeper\ImageGenerator\Application\Service\OpenAIGenerator;
 use ChronicleKeeper\ImageGenerator\Domain\Entity\GeneratorRequest;
@@ -16,11 +17,11 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
 use Symfony\UX\LiveComponent\Attribute\LiveAction;
+use Symfony\UX\LiveComponent\Attribute\LiveArg;
 use Symfony\UX\LiveComponent\Attribute\LiveProp;
 use Symfony\UX\LiveComponent\DefaultActionTrait;
 
 use function assert;
-use function sleep;
 
 #[AsLiveComponent('ImageGenerator:Images', template: 'components/image_generator/generated_images.html.twig')]
 class GeneratedImages extends AbstractController
@@ -57,8 +58,12 @@ class GeneratedImages extends AbstractController
     }
 
     #[LiveAction]
-    public function toLibrary(): void
-    {
-        sleep(5);
+    public function toLibrary(
+        #[LiveArg]
+        string $requestId,
+        #[LiveArg]
+        string $imageId,
+    ): void {
+        $this->bus->dispatch(new StoreImageToLibrary($requestId, $imageId));
     }
 }
