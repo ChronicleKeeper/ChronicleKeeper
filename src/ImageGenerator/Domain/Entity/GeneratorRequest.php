@@ -7,8 +7,10 @@ namespace ChronicleKeeper\ImageGenerator\Domain\Entity;
 use ChronicleKeeper\ImageGenerator\Domain\ValueObject\OptimizedPrompt;
 use ChronicleKeeper\ImageGenerator\Domain\ValueObject\UserInput;
 use JsonSerializable;
+use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 use Symfony\Component\Uid\Uuid;
 
+#[Autoconfigure(autowire: false)]
 class GeneratorRequest implements JsonSerializable
 {
     public string $id;
@@ -21,6 +23,14 @@ class GeneratorRequest implements JsonSerializable
         $this->id = Uuid::v4()->toString();
     }
 
+    /**
+     * @return array{
+     *     id: string,
+     *     prompt: string|null,
+     *     title: string,
+     *     userInput: string,
+     * }
+     */
     public function jsonSerialize(): array
     {
         return [

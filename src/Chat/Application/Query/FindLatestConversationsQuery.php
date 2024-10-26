@@ -8,8 +8,8 @@ use ChronicleKeeper\Chat\Domain\Entity\Conversation;
 use ChronicleKeeper\Shared\Application\Query\Query;
 use ChronicleKeeper\Shared\Application\Query\QueryParameters;
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
+use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\Finder;
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\PathRegistry;
-use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\SymfonyFinder;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\SerializerInterface;
 
@@ -22,7 +22,7 @@ class FindLatestConversationsQuery implements Query
         private readonly PathRegistry $pathRegistry,
         private readonly FileAccess $fileAccess,
         private readonly SerializerInterface $serializer,
-        private readonly SymfonyFinder $finder,
+        private readonly Finder $finder,
     ) {
     }
 

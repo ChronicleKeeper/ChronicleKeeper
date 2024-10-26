@@ -15,11 +15,11 @@ use function assert;
 
 use const DIRECTORY_SEPARATOR;
 
-final class GetImageOfGeneratorRequestQuery implements Query
+final readonly class GetImageOfGeneratorRequestQuery implements Query
 {
     public function __construct(
-        private readonly FileAccess $fileAccess,
-        private readonly SerializerInterface $serializer,
+        private FileAccess $fileAccess,
+        private SerializerInterface $serializer,
     ) {
     }
 

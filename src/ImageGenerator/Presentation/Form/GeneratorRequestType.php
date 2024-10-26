@@ -57,7 +57,6 @@ class GeneratorRequestType extends AbstractType implements DataMapperInterface
             ],
         );
 
-        // TODO: Add Constraint with additional validation group for generator page, so it is not executed on create page
         $builder->add(
             'prompt',
             TextareaType::class,
@@ -85,7 +84,7 @@ class GeneratorRequestType extends AbstractType implements DataMapperInterface
 
         $forms['title']->setData($viewData->title);
         $forms['userInput']->setData($viewData->userInput->prompt);
-        $forms['prompt']->setData($viewData->prompt->prompt);
+        $forms['prompt']->setData((string) $viewData->prompt?->prompt);
     }
 
     /** @param Traversable<FormInterface> $forms */

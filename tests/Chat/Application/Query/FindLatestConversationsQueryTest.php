@@ -8,8 +8,8 @@ use ArrayIterator;
 use ChronicleKeeper\Chat\Application\Query\FindLatestConversationsParameters;
 use ChronicleKeeper\Chat\Application\Query\FindLatestConversationsQuery;
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
+use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\Finder;
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\PathRegistry;
-use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\SymfonyFinder;
 use ChronicleKeeper\Test\Chat\Domain\Entity\ConversationBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
@@ -29,7 +29,7 @@ class FindLatestConversationsQueryTest extends TestCase
         $fileAccessMock   = $this->createMock(FileAccess::class);
         $serializerMock   = $this->createMock(SerializerInterface::class);
         $pathRegistryMock = $this->createMock(PathRegistry::class);
-        $finderMock       = $this->createMock(SymfonyFinder::class);
+        $finderMock       = $this->createMock(Finder::class);
 
         $pathRegistryMock->method('get')->willReturn('/some/directory');
 

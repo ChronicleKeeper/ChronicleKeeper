@@ -13,11 +13,11 @@ use Symfony\Component\Serializer\SerializerInterface;
 
 use function assert;
 
-final class GetGeneratorRequestQuery implements Query
+final readonly class GetGeneratorRequestQuery implements Query
 {
     public function __construct(
-        private readonly FileAccess $fileAccess,
-        private readonly SerializerInterface $serializer,
+        private FileAccess $fileAccess,
+        private SerializerInterface $serializer,
     ) {
     }
 

@@ -18,7 +18,10 @@ use Symfony\Component\Uid\Uuid;
 use function is_a;
 use function is_string;
 
-#[AutoconfigureTag('controller.argument_value_resolver', ['name' => 'image_generator_generator_request', 'priority' => 250])]
+#[AutoconfigureTag(
+    'controller.argument_value_resolver',
+    ['name' => 'image_generator_generator_request', 'priority' => 250],
+)]
 class GeneratorRequestValueResolver implements ValueResolverInterface
 {
     public function __construct(
@@ -40,7 +43,9 @@ class GeneratorRequestValueResolver implements ValueResolverInterface
         }
 
         try {
-            $generatorRequest = $this->queryService->query(new GetGeneratorRequest($identifier)) ?? throw new NotFoundHttpException();
+            $generatorRequest = $this->queryService->query(
+                new GetGeneratorRequest($identifier),
+            ) ?? throw new NotFoundHttpException();
         } catch (UnableToReadFile) {
             throw new NotFoundHttpException('Generator Request "' . $identifier . '" not found.');
         }

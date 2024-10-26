@@ -8,8 +8,8 @@ use ChronicleKeeper\ImageGenerator\Domain\Entity\GeneratorResult;
 use ChronicleKeeper\Shared\Application\Query\Query;
 use ChronicleKeeper\Shared\Application\Query\QueryParameters;
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
+use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\Finder as FinderContract;
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\PathRegistry;
-use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\SymfonyFinder;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\SerializerInterface;
 
@@ -17,13 +17,13 @@ use function assert;
 
 use const DIRECTORY_SEPARATOR;
 
-final class FindAllImagesOfRequestQuery implements Query
+final readonly class FindAllImagesOfRequestQuery implements Query
 {
     public function __construct(
-        private readonly PathRegistry $pathRegistry,
-        private readonly FileAccess $fileAccess,
-        private readonly SerializerInterface $serializer,
-        private readonly SymfonyFinder $finder,
+        private PathRegistry $pathRegistry,
+        private FileAccess $fileAccess,
+        private SerializerInterface $serializer,
+        private FinderContract $finder,
     ) {
     }
 

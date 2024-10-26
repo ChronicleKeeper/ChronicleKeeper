@@ -23,6 +23,7 @@ final class Delete extends AbstractController
 {
     use HandleFlashMessages;
 
+    /** @param non-empty-string $generatorRequestId */
     public function __invoke(Request $request, MessageBusInterface $bus, string $generatorRequestId): Response
     {
         if ($request->get('confirm', 0) === 0) {

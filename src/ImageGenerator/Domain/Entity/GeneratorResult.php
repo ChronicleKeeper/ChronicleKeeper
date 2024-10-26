@@ -6,8 +6,10 @@ namespace ChronicleKeeper\ImageGenerator\Domain\Entity;
 
 use ChronicleKeeper\Library\Domain\Entity\Image;
 use JsonSerializable;
+use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 use Symfony\Component\Uid\Uuid;
 
+#[Autoconfigure(autowire: false)]
 class GeneratorResult implements JsonSerializable
 {
     public string $id;

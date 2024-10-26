@@ -12,7 +12,7 @@ use function is_dir;
 
 class SymfonyFinder implements FinderContract
 {
-    /** @return Finder<SplFileInfo> */
+    /** @return iterable<SplFileInfo> */
     public function findFilesInDirectory(string $directory, bool $withDotFiles = true): iterable
     {
         if (! is_dir($directory)) {

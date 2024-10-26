@@ -8,9 +8,9 @@ use SplFileInfo;
 
 interface Finder
 {
-    /** @return \Symfony\Component\Finder\Finder<SplFileInfo> */
+    /** @return iterable<SplFileInfo> */
     public function findFilesInDirectory(string $directory): iterable;
 
-    /** @return \Symfony\Component\Finder\Finder<SplFileInfo> */
+    /** @return iterable<SplFileInfo> */
     public function findFilesInDirectoryOrderedByAccessTimestamp(string $directory, bool $withDotFiles = true): iterable;
 }

@@ -7,10 +7,10 @@ namespace ChronicleKeeper\ImageGenerator\Application\Query;
 use ChronicleKeeper\Shared\Application\Query\QueryParameters;
 use Webmozart\Assert\Assert;
 
-final class GetGeneratorRequest implements QueryParameters
+final readonly class GetGeneratorRequest implements QueryParameters
 {
     public function __construct(
-        public readonly string $id,
+        public string $id,
     ) {
         Assert::uuid($this->id);
     }

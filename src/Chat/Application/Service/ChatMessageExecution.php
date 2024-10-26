@@ -25,8 +25,12 @@ class ChatMessageExecution
     ) {
     }
 
-    public function execute(string $message, Conversation $conversation): void
-    {
+    public function execute(
+        string $message,
+        Conversation $conversation,
+        string $useModel = 'gpt-4o',
+        float $useTemperature = 1.0,
+    ): void {
         $messages   = $conversation->messages;
         $messages[] = new ExtendedMessage(message: Message::ofUser($message));
 
@@ -37,8 +41,8 @@ class ChatMessageExecution
         $response = $this->chain->call(
             $messages->getLLMChainMessages(),
             [
-                'model' => $conversation->settings->version,
-                'temperature' => $conversation->settings->temperature,
+                'model' => $useModel,
+                'temperature' => $useTemperature,
             ],
         );
         assert(is_string($response));
