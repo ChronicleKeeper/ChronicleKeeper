@@ -9,7 +9,7 @@ use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemVectorImageRepos
 use ChronicleKeeper\Settings\Application\SettingsHandler;
 use ChronicleKeeper\Shared\Infrastructure\LLMChain\ToolUsageCollector;
 use PhpLlm\LlmChain\EmbeddingsModel;
-use PhpLlm\LlmChain\ToolBox\AsTool;
+use PhpLlm\LlmChain\ToolBox\Attribute\AsTool;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 

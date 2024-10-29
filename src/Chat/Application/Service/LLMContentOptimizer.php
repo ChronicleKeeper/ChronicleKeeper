@@ -9,6 +9,9 @@ use PhpLlm\LlmChain\Message\Message;
 use PhpLlm\LlmChain\Message\MessageBag;
 use PhpLlm\LlmChain\Message\SystemMessage;
 use PhpLlm\LlmChain\OpenAI\Model\Gpt\Version;
+use PhpLlm\LlmChain\Response\Response;
+
+use function assert;
 
 class LLMContentOptimizer
 {
@@ -23,6 +26,7 @@ class LLMContentOptimizer
             new MessageBag($this->getSystemPrompt(), Message::ofUser($content)),
             ['model' => Version::gpt4oMini()->name, 'temperature' => 0.75],
         );
+        assert($response instanceof Response);
 
         return (string) $response->getContent();
     }

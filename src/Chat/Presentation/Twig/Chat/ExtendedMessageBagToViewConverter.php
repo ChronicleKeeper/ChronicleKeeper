@@ -8,7 +8,7 @@ use ChronicleKeeper\Chat\Domain\Entity\ExtendedMessage;
 use ChronicleKeeper\Chat\Domain\Entity\ExtendedMessageBag;
 use ChronicleKeeper\Settings\Application\SettingsHandler;
 use PhpLlm\LlmChain\Message\AssistantMessage;
-use PhpLlm\LlmChain\Message\Content\ContentInterface;
+use PhpLlm\LlmChain\Message\Content\Content;
 use PhpLlm\LlmChain\Message\Content\Text;
 use PhpLlm\LlmChain\Message\Role;
 use PhpLlm\LlmChain\Message\UserMessage;
@@ -48,7 +48,7 @@ class ExtendedMessageBagToViewConverter
             if ($originMessage instanceof UserMessage) {
                 $contentText = array_filter(
                     $originMessage->content,
-                    static fn (ContentInterface $entry) => $entry instanceof Text,
+                    static fn (Content $entry) => $entry instanceof Text,
                 );
                 $content     = implode(PHP_EOL, array_column($contentText, 'text'));
             } elseif ($originMessage instanceof AssistantMessage) {

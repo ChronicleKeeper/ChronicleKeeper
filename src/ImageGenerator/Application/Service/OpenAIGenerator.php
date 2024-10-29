@@ -9,6 +9,7 @@ use PhpLlm\LlmChain\OpenAI\Platform;
 use RuntimeException;
 
 use function ini_set;
+use function is_array;
 
 class OpenAIGenerator
 {
@@ -30,7 +31,7 @@ class OpenAIGenerator
 
         $response = $this->platform->request('images/generations', $body);
 
-        if (! isset($response['data'][0])) {
+        if (! is_array($response) || ! isset($response['data'][0])) {
             throw new RuntimeException('No image generated.');
         }
 
