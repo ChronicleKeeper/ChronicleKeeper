@@ -1,0 +1,52 @@
+<html lang="en"><head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="{{ asset('favicon.ico') }}" type="image/x-icon">
+    <title>Der Chronicle Keeper - Rollenspiel Chatbot - Wissenbewahrer</title>
+
+    <!-- CSS files -->
+    <script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta21/dist/js/tabler.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta21/dist/css/tabler.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta21/dist/css/tabler-vendors.min.css">
+
+    {% block stylesheets %}
+    {% endblock %}
+
+    {% block javascripts %}
+        {% block importmap %}{{ importmap('app') }}{% endblock %}
+    {% endblock %}
+
+</head>
+<body class=" d-flex flex-column" data-bs-theme="dark">
+<div class="page page-center">
+    <div class="container container-tight py-4">
+        <div class="card card-md">
+            <div class="card-body">
+                <h2 class="mb-3">Willkommen beim Chronicle Keeper</h2>
+
+                <p class="text-secondary mb-4">
+                    Um mit der Verwendung des Chronicle Keeper zu beginnen müssen einige grundlegende Einstellungen
+                    vorgenommen werden. Vorallem benötigst du einen OpenAI API Key um das Programm verwenden zu
+                    können.
+                </p>
+
+                <p class="text-secondary mb-4">Dir stehen folgende Optionen zur Verfügung.</p>
+
+                <div class="my-4">
+                    <a href="{{ path('settings', {'section': 'application'}) }}" class="btn btn-outline-primary w-100">Manuelle Einstellungen</a>
+                </div>
+
+                <div class="my-4">
+                    <a href="{{ path('application_import') }}" class="btn btn-outline-secondary w-100">Archiv Importieren</a>
+                </div>
+
+                <p class="text-secondary">
+                    Solltest du keinen OpenAI API Key haben findest du mehr Informationen auf der
+                    <a href="https://openai.com">OpenAI Webseite</a>.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body></html>

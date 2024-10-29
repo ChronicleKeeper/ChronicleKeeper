@@ -47,6 +47,7 @@ class Import extends AbstractController
             assert(is_array($fullFormData));
 
             $this->importer->import($archive->getRealPath(), ImportSettings::fromArray($fullFormData));
+            $request->getSession()->clear();
 
             return new RedirectResponse($this->router->generate('library'));
         }

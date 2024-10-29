@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ChronicleKeeper\Settings\Presentation\Controller;
 
 use ChronicleKeeper\Settings\Application\SettingsHandler;
+use ChronicleKeeper\Settings\Presentation\Form\ApplicationType;
 use ChronicleKeeper\Settings\Presentation\Form\CalendarGeneralType;
 use ChronicleKeeper\Settings\Presentation\Form\CalendarHolidayType;
 use ChronicleKeeper\Settings\Presentation\Form\CalendarMoonType;
@@ -32,6 +33,7 @@ class ChangeSettings extends AbstractController
     use HandleFlashMessages;
 
     private const array FORM_MAPPING = [
+        'application' => ApplicationType::class,
         'chatbot_general' => ChatbotGeneralType::class,
         'chatbot_system_prompt' => ChatbotSystemPromptType::class,
         'chatbot_tuning' => ChatbotTuningType::class,
@@ -42,10 +44,10 @@ class ChangeSettings extends AbstractController
     ];
 
     public function __construct(
-        private Environment $environment,
-        private SettingsHandler $settingsHandler,
-        private RouterInterface $router,
-        private FormFactoryInterface $formFactory,
+        private readonly Environment $environment,
+        private readonly SettingsHandler $settingsHandler,
+        private readonly RouterInterface $router,
+        private readonly FormFactoryInterface $formFactory,
     ) {
     }
 

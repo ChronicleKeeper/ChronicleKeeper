@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Rector\Config\RectorConfig;
+use Rector\Php82\Rector\Class_\ReadOnlyClassRector;
 use Rector\PHPUnit\CodeQuality\Rector\Class_\PreferPHPUnitSelfCallRector;
 use Rector\PHPUnit\CodeQuality\Rector\Class_\PreferPHPUnitThisCallRector;
 use Rector\PHPUnit\Set\PHPUnitSetList;
@@ -23,6 +24,7 @@ return RectorConfig::configure()
         PreferPHPUnitSelfCallRector::class,
     ])
     ->withSkip([
+        ReadOnlyClassRector::class,
         PreferPHPUnitThisCallRector::class,
     ])
     ->withImportNames(importShortClasses: false, removeUnusedImports: true)
