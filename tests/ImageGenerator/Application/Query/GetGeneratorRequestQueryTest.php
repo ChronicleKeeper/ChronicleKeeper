@@ -23,10 +23,7 @@ class GetGeneratorRequestQueryTest extends TestCase
     #[Test]
     public function correctQueryClassIsliked(): void
     {
-        self::assertSame(
-            GetGeneratorRequestQuery::class,
-            (new GetGeneratorRequest('b06bd1f2-f7bb-43ca-948e-7fe38956667e'))->getQueryClass(),
-        );
+        self::assertSame(GetGeneratorRequestQuery::class, (new GetGeneratorRequest('b06bd1f2-f7bb-43ca-948e-7fe38956667e'))->getQueryClass());
     }
 
     #[Test]
@@ -65,9 +62,7 @@ class GetGeneratorRequestQueryTest extends TestCase
                 return self::createStub(GeneratorRequest::class);
             });
 
-        $response = (new GetGeneratorRequestQuery($fileAccess, $serializer))
+        (new GetGeneratorRequestQuery($fileAccess, $serializer))
             ->query(new GetGeneratorRequest($identifier));
-
-        self::assertInstanceOf(GeneratorRequest::class, $response);
     }
 }

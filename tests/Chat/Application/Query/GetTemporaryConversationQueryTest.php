@@ -7,7 +7,6 @@ namespace ChronicleKeeper\Test\Chat\Application\Query;
 use ChronicleKeeper\Chat\Application\Command\StoreTemporaryConversation;
 use ChronicleKeeper\Chat\Application\Query\GetTemporaryConversationParameters;
 use ChronicleKeeper\Chat\Application\Query\GetTemporaryConversationQuery;
-use ChronicleKeeper\Chat\Domain\Entity\Conversation;
 use ChronicleKeeper\Settings\Application\SettingsHandler;
 use ChronicleKeeper\Settings\Domain\ValueObject\Settings;
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
@@ -50,7 +49,6 @@ class GetTemporaryConversationQueryTest extends TestCase
 
         $result = $query->query($parameters);
 
-        self::assertInstanceOf(Conversation::class, $result);
         self::assertSame($conversation, $result);
     }
 
@@ -81,16 +79,6 @@ class GetTemporaryConversationQueryTest extends TestCase
             $settingsHandlerMock,
         );
 
-        $result = $query->query(new GetTemporaryConversationParameters());
-
-        self::assertInstanceOf(Conversation::class, $result);
-    }
-
-    #[Test]
-    public function parameters(): void
-    {
-        $parameters = new GetTemporaryConversationParameters();
-
-        self::assertInstanceOf(GetTemporaryConversationParameters::class, $parameters);
+        $query->query(new GetTemporaryConversationParameters());
     }
 }

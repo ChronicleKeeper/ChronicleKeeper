@@ -58,7 +58,6 @@ class FindConversationsByDirectoryQueryTest extends TestCase
 
         $result = $query->query($parameters);
 
-        self::assertIsArray($result);
         self::assertCount(1, $result);
         self::assertSame($conversation, $result[0]);
     }
@@ -97,7 +96,6 @@ class FindConversationsByDirectoryQueryTest extends TestCase
 
         $result = $query->query($parameters);
 
-        self::assertIsArray($result);
         self::assertCount(0, $result);
     }
 

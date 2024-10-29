@@ -83,8 +83,6 @@ class ExtendedMessageBagDenormalizerTest extends TestCase
             )
             ->willReturn([]);
 
-        $obj = $this->normalizer->denormalize(['foo'], ExtendedMessageBag::class);
-
-        self::assertInstanceOf(ExtendedMessageBag::class, $obj);
+         $this->normalizer->denormalize(['foo'], ExtendedMessageBag::class);
     }
 }

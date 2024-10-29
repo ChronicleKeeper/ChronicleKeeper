@@ -69,7 +69,10 @@ class FindAllImagesOfRequestQueryTest extends TestCase
                 $file2 = self::createStub(SplFileInfo::class);
                 $file2->method('getFilename')->willReturn('bar');
 
-                return [$file1, $file2];
+                return [
+                    $file1,
+                    $file2,
+                ];
             });
 
         $fileAccess        = $this->createMock(FileAccess::class);
@@ -115,7 +118,6 @@ class FindAllImagesOfRequestQueryTest extends TestCase
         $response = (new FindAllImagesOfRequestQuery($pathRegistry, $fileAccess, $serializer, $finder))
             ->query(new FindAllImagesOfRequest($requestId));
 
-        self::assertIsArray($response);
         self::assertCount(2, $response);
     }
 }

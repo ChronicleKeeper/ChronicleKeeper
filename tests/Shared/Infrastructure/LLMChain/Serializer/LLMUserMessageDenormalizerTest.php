@@ -82,7 +82,6 @@ class LLMUserMessageDenormalizerTest extends TestCase
     {
         $obj = $this->normalizer->denormalize(['role' => 'user', 'content' => 'foo bar baz'], UserMessage::class);
 
-        self::assertInstanceOf(UserMessage::class, $obj);
         self::assertCount(1, $obj->content);
         self::assertInstanceOf(Text::class, $obj->content[0]);
         self::assertSame('foo bar baz', $obj->content[0]->text);
@@ -101,7 +100,6 @@ class LLMUserMessageDenormalizerTest extends TestCase
 
         $obj = $this->normalizer->denormalize($content, UserMessage::class);
 
-        self::assertInstanceOf(UserMessage::class, $obj);
         self::assertCount(2, $obj->content);
 
         self::assertInstanceOf(Text::class, $obj->content[0]);

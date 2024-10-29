@@ -17,6 +17,8 @@ use PHPUnit\Framework\TestCase;
 use SplFileInfo;
 use Symfony\Component\Serializer\SerializerInterface;
 
+use function array_map;
+
 #[CoversClass(FindAllGeneratorRequestsQuery::class)]
 #[CoversClass(FindAllGeneratorRequests::class)]
 #[Small]
@@ -25,7 +27,10 @@ class FindAllGeneratorRequestsQueryTest extends TestCase
     #[Test]
     public function correctQueryClassIsliked(): void
     {
-        self::assertSame(FindAllGeneratorRequestsQuery::class, (new FindAllGeneratorRequests())->getQueryClass());
+        self::assertSame(
+            FindAllGeneratorRequestsQuery::class,
+            (new FindAllGeneratorRequests())->getQueryClass(),
+        );
     }
 
     #[Test]
@@ -54,7 +59,10 @@ class FindAllGeneratorRequestsQueryTest extends TestCase
                 $file2 = self::createStub(SplFileInfo::class);
                 $file2->method('getFilename')->willReturn('bar');
 
-                return [$file1, $file2];
+                return [
+                    $file1,
+                    $file2,
+                ];
             });
 
         $fileAccess        = $this->createMock(FileAccess::class);
@@ -93,14 +101,21 @@ class FindAllGeneratorRequestsQueryTest extends TestCase
                         default => 'Kind'
                     };
 
-                    return self::createStub(GeneratorRequest::class);
+                    $stub        = self::createStub(GeneratorRequest::class);
+                    $stub->title = $fileContent;
+
+                    return $stub;
                 },
             );
 
         $response = (new FindAllGeneratorRequestsQuery($pathRegistry, $fileAccess, $serializer, $finder))
             ->query(new FindAllGeneratorRequests());
 
-        self::assertIsArray($response);
         self::assertCount(2, $response);
+        self::assertSame(
+            ['{"bar": true}', '{"foo": true}'],
+            array_map(static fn (GeneratorRequest $request): string => $request->title, $response),
+            'Requests are not in the correct alphabetical order',
+        );
     }
 }

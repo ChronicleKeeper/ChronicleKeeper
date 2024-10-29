@@ -28,7 +28,7 @@ class ExtendedMessageTest extends TestCase
 
         $extendedMessage = new ExtendedMessage($message, $documents, $images, $calledTools);
 
-        self::assertInstanceOf(Uuid::class, Uuid::fromString($extendedMessage->id));
+        self::assertTrue(Uuid::isValid($extendedMessage->id));
         self::assertSame($message, $extendedMessage->message);
         self::assertSame($documents, $extendedMessage->documents);
         self::assertSame($images, $extendedMessage->images);

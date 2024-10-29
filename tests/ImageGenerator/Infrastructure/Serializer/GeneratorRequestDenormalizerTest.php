@@ -33,14 +33,6 @@ class GeneratorRequestDenormalizerTest extends TestCase
     }
 
     #[Test]
-    public function objectIsCreatable(): void
-    {
-        $denormalizer = new GeneratorRequestDenormalizer();
-
-        self::assertInstanceOf(GeneratorRequestDenormalizer::class, $denormalizer);
-    }
-
-    #[Test]
     public function denormalizeWithoutOptimizedPrompt(): void
     {
         $data = [
@@ -52,7 +44,6 @@ class GeneratorRequestDenormalizerTest extends TestCase
 
         $obj = (new GeneratorRequestDenormalizer())->denormalize($data, GeneratorRequest::class);
 
-        self::assertInstanceOf(GeneratorRequest::class, $obj);
         self::assertSame('foo', $obj->title);
         self::assertSame('bar', $obj->userInput->prompt);
         self::assertSame('123-123', $obj->id);
@@ -71,7 +62,6 @@ class GeneratorRequestDenormalizerTest extends TestCase
 
         $obj = (new GeneratorRequestDenormalizer())->denormalize($data, GeneratorRequest::class);
 
-        self::assertInstanceOf(GeneratorRequest::class, $obj);
         self::assertSame('foo', $obj->title);
         self::assertSame('bar', $obj->userInput->prompt);
         self::assertSame('123-123', $obj->id);

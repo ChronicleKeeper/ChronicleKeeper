@@ -29,9 +29,6 @@ class ResponseImageTest extends TestCase
     {
         $responseImage = new ResponseImage('foo', 'bar', 'baz');
 
-        self::assertSame(
-            'data:bar;base64,baz',
-            $responseImage->getImageUrl(),
-        );
+        self::assertSame('data:bar;base64,baz', $responseImage->getImageUrl());
     }
 }

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace ChronicleKeeper\ImageGenerator\Application\Query;
 
 use ChronicleKeeper\ImageGenerator\Domain\Entity\GeneratorRequest;
-use ChronicleKeeper\Library\Domain\Entity\Document;
 use ChronicleKeeper\Shared\Application\Query\Query;
 use ChronicleKeeper\Shared\Application\Query\QueryParameters;
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;

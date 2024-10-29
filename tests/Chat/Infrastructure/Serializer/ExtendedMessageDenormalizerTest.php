@@ -146,11 +146,9 @@ class ExtendedMessageDenormalizerTest extends TestCase
             ExtendedMessage::class,
         );
 
-        self::assertInstanceOf(ExtendedMessage::class, $obj);
-        self::assertInstanceOf(MessageInterface::class, $obj->message);
         self::assertSame('12345', $obj->id);
-        self::assertSame(['document' => 'bar'], $obj->documents);
-        self::assertSame(['image' => 'baz'], $obj->images);
-        self::assertSame(['calledTools' => 'qis'], $obj->calledTools);
+        self::assertSame(['document' => 'bar'], $obj->documents); // @phpstan-ignore staticMethod.impossibleType
+        self::assertSame(['image' => 'baz'], $obj->images); // @phpstan-ignore staticMethod.impossibleType
+        self::assertSame(['calledTools' => 'qis'], $obj->calledTools); // @phpstan-ignore staticMethod.impossibleType
     }
 }

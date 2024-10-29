@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace ChronicleKeeper\Test\Library\Domain\Entity;
 
 use ChronicleKeeper\Library\Domain\Entity\Document;
-use DateTimeImmutable;
+use DateTimeInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\Attributes\Test;
@@ -28,7 +28,6 @@ class DocumentTest extends TestCase
         self::assertSame($title, $document->title);
         self::assertSame($content, $document->content);
         self::assertNotEmpty($document->id);
-        self::assertInstanceOf(DateTimeImmutable::class, $document->updatedAt);
     }
 
     #[Test]
@@ -44,10 +43,7 @@ class DocumentTest extends TestCase
         self::assertSame($content, $documentArr['content']);
 
         self::assertArrayHasKey('last_updated', $documentArr);
-        self::assertSame(
-            $document->updatedAt->format(DateTimeImmutable::ATOM),
-            $documentArr['last_updated'], // @phpstan-ignore offsetAccess.notFound
-        );
+        self::assertSame($document->updatedAt->format(DateTimeInterface::ATOM), $documentArr['last_updated']);
     }
 
     #[Test]

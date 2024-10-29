@@ -7,7 +7,6 @@ namespace ChronicleKeeper\Test\Chat\Domain\Entity;
 use ChronicleKeeper\Chat\Domain\Entity\Conversation;
 use ChronicleKeeper\Chat\Domain\Entity\ExtendedMessageBag;
 use ChronicleKeeper\Chat\Domain\ValueObject\Settings;
-use ChronicleKeeper\Library\Domain\Entity\Directory;
 use ChronicleKeeper\Library\Domain\RootDirectory;
 use ChronicleKeeper\Test\Settings\Domain\ValueObject\SettingsBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -27,9 +26,6 @@ class ConversationTest extends TestCase
 
         self::assertNotEmpty($conversation->id);
         self::assertSame('Ungespeichert', $conversation->title);
-        self::assertInstanceOf(Directory::class, $conversation->directory);
-        self::assertInstanceOf(Settings::class, $conversation->settings);
-        self::assertInstanceOf(ExtendedMessageBag::class, $conversation->messages);
     }
 
     #[Test]
@@ -40,9 +36,6 @@ class ConversationTest extends TestCase
 
         self::assertNotEmpty($conversation->id);
         self::assertSame('Ungespeichert', $conversation->title);
-        self::assertInstanceOf(Directory::class, $conversation->directory);
-        self::assertInstanceOf(Settings::class, $conversation->settings);
-        self::assertInstanceOf(ExtendedMessageBag::class, $conversation->messages);
     }
 
     #[Test]
@@ -62,20 +55,25 @@ class ConversationTest extends TestCase
     #[Test]
     public function jsonSerialize(): void
     {
-        $conversation = new Conversation(
-            Uuid::v4()->toString(),
-            'Test Title',
-            RootDirectory::get(),
-            new Settings(),
-            new ExtendedMessageBag(),
+        $conversation   = new Conversation(
+            $id         = Uuid::v4()->toString(),
+            $title      = 'Test Title',
+            $directory  = RootDirectory::get(),
+            $settings   = new Settings(),
+            $messageBag = new ExtendedMessageBag(),
         );
 
         $json = $conversation->jsonSerialize();
 
-        self::assertArrayHasKey('id', $json);
-        self::assertArrayHasKey('title', $json);
-        self::assertArrayHasKey('directory', $json);
-        self::assertArrayHasKey('settings', $json);
-        self::assertArrayHasKey('messages', $json);
+        self::assertSame(
+            [
+                'id' => $id,
+                'title' => $title,
+                'directory' => $directory->id,
+                'settings' => $settings,
+                'messages' => $messageBag,
+            ],
+            $json,
+        );
     }
 }

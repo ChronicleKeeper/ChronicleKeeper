@@ -11,6 +11,8 @@ use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
+use const PHP_FLOAT_EPSILON;
+
 #[CoversClass(Settings::class)]
 #[Small]
 class SettingsTest extends TestCase
@@ -21,9 +23,9 @@ class SettingsTest extends TestCase
         $settings = new Settings();
 
         self::assertSame(Version::gpt4oMini()->name, $settings->version);
-        self::assertSame(0.7, $settings->temperature);
-        self::assertSame(0.7, $settings->imagesMaxDistance);
-        self::assertSame(0.85, $settings->documentsMaxDistance);
+        self::assertEqualsWithDelta(0.7, $settings->temperature, PHP_FLOAT_EPSILON);
+        self::assertEqualsWithDelta(0.7, $settings->imagesMaxDistance, PHP_FLOAT_EPSILON);
+        self::assertEqualsWithDelta(0.85, $settings->documentsMaxDistance, PHP_FLOAT_EPSILON);
     }
 
     #[Test]
@@ -32,8 +34,8 @@ class SettingsTest extends TestCase
         $settings = new Settings('customVersion', 0.9, 0.8, 0.9);
 
         self::assertSame('customVersion', $settings->version);
-        self::assertSame(0.9, $settings->temperature);
-        self::assertSame(0.8, $settings->imagesMaxDistance);
-        self::assertSame(0.9, $settings->documentsMaxDistance);
+        self::assertEqualsWithDelta(0.9, $settings->temperature, PHP_FLOAT_EPSILON);
+        self::assertEqualsWithDelta(0.8, $settings->imagesMaxDistance, PHP_FLOAT_EPSILON);
+        self::assertEqualsWithDelta(0.9, $settings->documentsMaxDistance, PHP_FLOAT_EPSILON);
     }
 }

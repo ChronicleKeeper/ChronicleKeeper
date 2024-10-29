@@ -52,7 +52,6 @@ class FindLatestConversationsQueryTest extends TestCase
 
         $result = $query->query($parameters);
 
-        self::assertIsArray($result);
         self::assertCount(1, $result);
         self::assertSame($conversation, $result[0]);
     }

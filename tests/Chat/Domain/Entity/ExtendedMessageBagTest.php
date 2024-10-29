@@ -61,7 +61,6 @@ class ExtendedMessageBagTest extends TestCase
         $extendedMessageBag = new ExtendedMessageBag($extendedMessage1, $extendedMessage2);
         $serialized         = $extendedMessageBag->jsonSerialize();
 
-        self::assertIsArray($serialized);
         self::assertCount(2, $serialized);
         self::assertSame($extendedMessage1, $serialized[0]);
         self::assertSame($extendedMessage2, $serialized[1]);

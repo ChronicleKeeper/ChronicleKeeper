@@ -54,4 +54,8 @@ frontend: ## run symfony frontend build commands
 rector: ## Exectute all rector rules
 	php vendor/bin/rector
 
+fix-all: ## fix all code issues
+	make rector
+	make fix-cs
+
 build: lint-php check-cs static-analysis phpunit

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace ChronicleKeeper\Test\ImageGenerator\Application\Service;
 
 use ChronicleKeeper\ImageGenerator\Application\Service\OpenAIGenerator;
-use ChronicleKeeper\ImageGenerator\Domain\Entity\GeneratorResult;
 use PhpLlm\LlmChain\OpenAI\Platform;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
@@ -47,10 +46,6 @@ class OpenAIGeneratorTest extends TestCase
 
         $generatorResult = (new OpenAIGenerator($platform))->generate('bar');
 
-        self::assertInstanceOf(GeneratorResult::class, $generatorResult);
-        self::assertSame(
-            'foo',
-            $generatorResult->encodedImage,
-        );
+        self::assertSame('foo', $generatorResult->encodedImage);
     }
 }

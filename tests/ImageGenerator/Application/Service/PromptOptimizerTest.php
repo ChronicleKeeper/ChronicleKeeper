@@ -39,9 +39,6 @@ class PromptOptimizerTest extends TestCase
                 }),
             );
 
-        self::assertSame(
-            'Success!',
-            (new PromptOptimizer($chatMessageExecution))->optimize('Foo Bar Baz'),
-        );
+        self::assertSame('Success!', (new PromptOptimizer($chatMessageExecution))->optimize('Foo Bar Baz'));
     }
 }

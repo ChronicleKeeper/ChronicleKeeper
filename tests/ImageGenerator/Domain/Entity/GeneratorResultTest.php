@@ -10,6 +10,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Uid\Uuid;
 
 #[CoversClass(GeneratorResult::class)]
 #[Small]
@@ -20,7 +21,7 @@ class GeneratorResultTest extends TestCase
     {
         $generatorResult = new GeneratorResult('foo');
 
-        self::assertNotNull($generatorResult->id);
+        self::assertTrue(Uuid::isValid($generatorResult->id));
         self::assertSame('foo', $generatorResult->encodedImage);
         self::assertNull($generatorResult->image);
         self::assertSame('image/png', $generatorResult->mimeType);
@@ -31,10 +32,7 @@ class GeneratorResultTest extends TestCase
     {
         $generatorResult = new GeneratorResult('foo');
 
-        self::assertSame(
-            'data:image/png;base64,foo',
-            $generatorResult->getImageUrl(),
-        );
+        self::assertSame('data:image/png;base64,foo', $generatorResult->getImageUrl());
     }
 
     #[Test]
@@ -42,15 +40,12 @@ class GeneratorResultTest extends TestCase
     {
         $generatorResult = new GeneratorResult('foo');
 
-        self::assertSame(
-            [
-                'id' => $generatorResult->id,
-                'encodedImage' => 'foo',
-                'mimeType' => 'image/png',
-                'image' => null,
-            ],
-            $generatorResult->jsonSerialize(),
-        );
+        self::assertSame([
+            'id' => $generatorResult->id,
+            'encodedImage' => 'foo',
+            'mimeType' => 'image/png',
+            'image' => null,
+        ], $generatorResult->jsonSerialize());
     }
 
     #[Test]
@@ -59,7 +54,7 @@ class GeneratorResultTest extends TestCase
         $image           = self::createStub(Image::class);
         $generatorResult = new GeneratorResult('foo', $image);
 
-        self::assertNotNull($generatorResult->id);
+        self::assertTrue(Uuid::isValid($generatorResult->id));
         self::assertSame('foo', $generatorResult->encodedImage);
         self::assertSame($image, $generatorResult->image);
         self::assertSame('image/png', $generatorResult->mimeType);

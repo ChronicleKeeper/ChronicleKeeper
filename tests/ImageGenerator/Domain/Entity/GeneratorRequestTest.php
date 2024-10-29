@@ -11,6 +11,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Uid\Uuid;
 
 #[CoversClass(GeneratorRequest::class)]
 #[Small]
@@ -22,7 +23,7 @@ class GeneratorRequestTest extends TestCase
         $userInput        = new UserInput('bar');
         $generatorRequest = new GeneratorRequest('foo', $userInput);
 
-        self::assertNotNull($generatorRequest->id);
+        self::assertTrue(Uuid::isValid($generatorRequest->id));
         self::assertSame('foo', $generatorRequest->title);
         self::assertSame($userInput, $generatorRequest->userInput);
         self::assertNull($generatorRequest->prompt);
@@ -42,14 +43,11 @@ class GeneratorRequestTest extends TestCase
     {
         $generatorRequest = new GeneratorRequest('foo', new UserInput('bar'));
 
-        self::assertSame(
-            [
-                'id' => $generatorRequest->id,
-                'prompt' => null,
-                'title' => 'foo',
-                'userInput' => 'bar',
-            ],
-            $generatorRequest->jsonSerialize(),
-        );
+        self::assertSame([
+            'id' => $generatorRequest->id,
+            'prompt' => null,
+            'title' => 'foo',
+            'userInput' => 'bar',
+        ], $generatorRequest->jsonSerialize());
     }
 }
