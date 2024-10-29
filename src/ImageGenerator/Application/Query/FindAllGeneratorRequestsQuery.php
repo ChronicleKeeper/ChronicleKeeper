@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ChronicleKeeper\ImageGenerator\Application\Query;
 
 use ChronicleKeeper\ImageGenerator\Domain\Entity\GeneratorRequest;
+use ChronicleKeeper\Library\Domain\Entity\Document;
 use ChronicleKeeper\Shared\Application\Query\Query;
 use ChronicleKeeper\Shared\Application\Query\QueryParameters;
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
@@ -14,6 +15,8 @@ use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\SerializerInterface;
 
 use function assert;
+use function strcasecmp;
+use function usort;
 
 final readonly class FindAllGeneratorRequestsQuery implements Query
 {
@@ -46,6 +49,11 @@ final readonly class FindAllGeneratorRequestsQuery implements Query
                 JsonEncoder::FORMAT,
             );
         }
+
+        usort(
+            $requests,
+            static fn (GeneratorRequest $left, GeneratorRequest $right) => strcasecmp($left->title, $right->title),
+        );
 
         return $requests;
     }
