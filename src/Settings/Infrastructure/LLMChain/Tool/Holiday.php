@@ -6,7 +6,7 @@ namespace ChronicleKeeper\Settings\Infrastructure\LLMChain\Tool;
 
 use ChronicleKeeper\Settings\Application\SettingsHandler;
 use ChronicleKeeper\Shared\Infrastructure\LLMChain\ToolUsageCollector;
-use PhpLlm\LlmChain\ToolBox\AsTool;
+use PhpLlm\LlmChain\ToolBox\Attribute\AsTool;
 
 #[AsTool(
     'calendar_holiday',

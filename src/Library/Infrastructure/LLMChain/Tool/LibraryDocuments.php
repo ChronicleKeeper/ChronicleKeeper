@@ -9,7 +9,7 @@ use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemVectorDocumentRe
 use ChronicleKeeper\Settings\Application\SettingsHandler;
 use ChronicleKeeper\Shared\Infrastructure\LLMChain\ToolUsageCollector;
 use PhpLlm\LlmChain\EmbeddingsModel;
-use PhpLlm\LlmChain\ToolBox\AsTool;
+use PhpLlm\LlmChain\ToolBox\Attribute\AsTool;
 
 use function count;
 

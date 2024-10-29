@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace ChronicleKeeper\Shared\Infrastructure\LLMChain\Serializer;
 
 use PhpLlm\LlmChain\Message\AssistantMessage;
-use PhpLlm\LlmChain\Message\Content\ContentInterface;
+use PhpLlm\LlmChain\Message\Content\Content;
 use PhpLlm\LlmChain\Message\Content\Image;
 use PhpLlm\LlmChain\Message\Content\Text;
 use PhpLlm\LlmChain\Message\MessageInterface;
@@ -46,7 +46,7 @@ final class LLMUserMessageDenormalizer implements DenormalizerInterface, Denorma
             return new UserMessage(new Text($data['content']));
         }
 
-        $content = array_map(static function (array $content): ContentInterface|null {
+        $content = array_map(static function (array $content): Content|null {
             if ($content['type'] === 'text') {
                 return new Text($content['text']);
             }
