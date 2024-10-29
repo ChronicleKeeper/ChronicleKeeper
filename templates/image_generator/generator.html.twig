@@ -1,0 +1,30 @@
+{% extends 'layout.html.twig' %}
+
+{% block page_title %}Mechthilds Atelier - {{ request.title }}{% endblock %}
+
+{% block page_title_actions %}
+    <div class="col-auto ms-auto d-print-none">
+        <div class="btn-list">
+            <a href="{{ path('image_generator_overview') }}" class="btn d-none d-sm-inline-block">
+                {{ ux_icon('tabler:photo-ai') }} Übersicht
+            </a>
+            <a href="{{ path('image_generator_delete', {'generatorRequestId': request.id }) }}" class="btn btn-icon btn-danger" {{ stimulus_controller('confirm') }}>
+                {{ ux_icon('tabler:photo-minus') }}
+            </a>
+        </div>
+    </div>
+{% endblock %}
+
+{% block page_content %}
+
+    <div class="container-xl">
+
+        {{ component('ImageGenerator:Prompt', { initialFormData: request }) }}
+
+        <div class="col-12">&nbsp;</div>
+
+        {{ component('ImageGenerator:Images', { generatorRequest: request }) }}
+
+    </div>
+
+{% endblock %}

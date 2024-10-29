@@ -40,7 +40,7 @@ final class LibraryImages
     ) {
     }
 
-    public function setOneTimeMaxDistance(float $maxDistance): void
+    public function setOneTimeMaxDistance(float|null $maxDistance): void
     {
         $this->maxDistance = $maxDistance;
     }
@@ -104,8 +104,6 @@ final class LibraryImages
                 'responses' => $debugResponse,
             ],
         );
-
-        $this->maxDistance = null;
 
         return $result;
     }

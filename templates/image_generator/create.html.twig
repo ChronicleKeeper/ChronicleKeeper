@@ -1,0 +1,45 @@
+{% extends 'layout.html.twig' %}
+
+{% block page_title %}Künste der Mechthild - Neuer Auftrag{% endblock %}
+
+{% block page_content %}
+
+<form action="{{ path('image_generator_create') }}" method="post">
+
+    <div class="container-xl">
+        <div class="row row-deck row-cards">
+
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="alert alert-info">
+                            Es wird nach deiner Beschreibung nach allerlei Stichworten gesucht und dir dann eine weitgehend
+                            optimierte Fassung im nächsten Schritt vorgeschlagen. Du musst dich also nicht selbst darum
+                            kümmern alle nötigen Informationen aus deiner Bibliothek herauszusuchen. Dies wird nur einmalig
+                            getan. Solltest du deine Bibliothek danach erweitern wird nicht erneut gesucht.
+                        </div>
+
+                        <div class="row g-5">
+                            <div class="col-12">{{ form_row(form.title) }}</div>
+                            <div class="col-12">
+                                {{ form_label(form.userInput) }}
+                                <twig:markdownEditor name="generator_request[userInput]" content="{{ form.userInput.vars.value }}" />
+                                {{ form_errors(form.userInput) }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer text-end">
+                        <div class="d-flex">
+                            <a href="{{ path('image_generator_overview') }}" class="btn btn-link">Abbruch</a>
+                            <button type="submit" class="btn btn-primary ms-auto">Weiter</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</form>
+
+{% endblock %}

@@ -30,7 +30,11 @@ export default class extends Controller {
         });
 
         editor.on('change', function () {
-            $formElement.value = editor.getMarkdown();
+            let markdown = editor.getMarkdown();
+            $formElement.value = markdown;
+            $formElement.innerHTML = markdown;
+
+            $formElement.dispatchEvent(new Event('change', { bubbles: true }));
         });
 
         /**

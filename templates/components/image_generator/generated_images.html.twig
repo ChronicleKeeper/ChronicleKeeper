@@ -1,0 +1,67 @@
+<div class="row row-deck row-cards" {{ attributes }}>
+
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Kunstgalerie</h3>
+                <div class="card-actions">
+                    <button
+                        data-loading="addAttribute(disabled)"
+                        class="btn d-none d-sm-inline-block"
+                        data-action="live#action"
+                        data-live-action-param="generate"
+                    >{{ ux_icon('tabler:square-rounded-plus') }}Neuer Versuch</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="image-loder" data-loading="action(generate)|removeClass(d-none)" class="col-6 d-none">
+        <div class="card placeholder-glow">
+            <div class="ratio ratio-4x3 card-img -top placeholder"></div>
+            <div class="card-body">
+                <div class="d-flex">
+                    <div class="spinner-border"></div>
+                    <div class="p-1" style="margin-left: 5px;"><i>Das Atelier wird stimmungsvoll gedimmt, die Staffelei aufgestellt, der Pinsel fliegt ...</i></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% for image in this.images %}
+
+        <div class="col-6">
+            <div class="card" data-loading="action(toLibrary)|addClass(placeholder-glow)">
+                <img src="{{ image.imageUrl }}" class="card-img-top" data-loading="action(toLibrary)|addClass(placeholder)" />
+                {% if image.image is defined and image.image is not null %}
+                    <div class="card-status-start bg-green"></div>
+                {% endif %}
+                <div class="card-body">
+                    <div class="d-flex flex-row justify-content-end">
+                        {% if image.image is defined and image.image is null %}
+                            <a href="#"
+                               data-loading="addClass(disabled)"
+                               class="btn d-none d-sm-inline-block no-loader"
+                               data-action="live#action"
+                               data-live-action-param="toLibrary"
+
+                               data-live-request-id-param="{{ generatorRequest.id }}"
+                               data-live-image-id-param="{{ image.id }}"
+
+                            >{{ ux_icon('tabler:photo-plus') }}In die Bibliothek!</a>
+                        {% else %}
+                            <a href="{{ path('library_image_view', {'image': image.image.id}) }}"
+                               title="Zum Bild"
+                               class="btn btn-outline-success d-none d-sm-inline-block">
+                                {{ ux_icon('tabler:photo') }}Zum Bild
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    {% endfor %}
+
+
+</div>

@@ -25,22 +25,31 @@ class ChatMessageExecution
     ) {
     }
 
-    public function execute(string $message, Conversation $conversation): void
-    {
+    public function execute(
+        string $message,
+        Conversation $conversation,
+        string $useModel = 'gpt-4o',
+        float $useTemperature = 1.0,
+    ): void {
         $messages   = $conversation->messages;
         $messages[] = new ExtendedMessage(message: Message::ofUser($message));
 
+        // Set Maximum distances in tools
         $this->libraryDocuments->setOneTimeMaxDistance($conversation->settings->documentsMaxDistance);
         $this->libraryImages->setOneTimeMaxDistance($conversation->settings->imagesMaxDistance);
 
         $response = $this->chain->call(
             $messages->getLLMChainMessages(),
             [
-                'model' => $conversation->settings->version,
-                'temperature' => $conversation->settings->temperature,
+                'model' => $useModel,
+                'temperature' => $useTemperature,
             ],
         );
         assert(is_string($response));
+
+        // Remove maximum distances in tools after the response ... just for saftey of the request
+        $this->libraryDocuments->setOneTimeMaxDistance($conversation->settings->documentsMaxDistance);
+        $this->libraryImages->setOneTimeMaxDistance($conversation->settings->imagesMaxDistance);
 
         $response = new ExtendedMessage(message: Message::ofAssistant($response));
 

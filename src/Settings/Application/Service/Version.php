@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ChronicleKeeper\Settings\Application\Service;
 
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
+use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Exception\UnableToReadFile;
 
 use function assert;
 use function end;
@@ -20,14 +21,18 @@ final readonly class Version
 
     public function getCurrentVersion(): string
     {
-        $changelog = $this->fileAccess->read('general.project', 'CHANGELOG.md');
-        assert($changelog !== '');
+        try {
+            $changelog = $this->fileAccess->read('general.project', 'CHANGELOG.md');
+            assert($changelog !== '');
 
-        preg_match_all('/\[(.*?)\]/', $changelog, $foundVersions);
+            preg_match_all('/\[(.*?)\]/', $changelog, $foundVersions);
 
-        $foundVersions = $foundVersions[1];
+            $foundVersions = $foundVersions[1];
 
-        return $foundVersions[0];
+            return $foundVersions[0];
+        } catch (UnableToReadFile) {
+            return '0.0.0';
+        }
     }
 
     public function getCurrentNumericVersion(): string

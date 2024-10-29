@@ -17,10 +17,10 @@ use function json_encode;
 use const JSON_PRETTY_PRINT;
 use const JSON_THROW_ON_ERROR;
 
-final class FixEmptyDirectory implements FileMigration
+final readonly class FixEmptyDirectory implements FileMigration
 {
     public function __construct(
-        private readonly Filesystem $filesystem,
+        private Filesystem $filesystem,
     ) {
     }
 

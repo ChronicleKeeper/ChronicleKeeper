@@ -38,7 +38,7 @@ final class LibraryDocuments
     ) {
     }
 
-    public function setOneTimeMaxDistance(float $maxDistance): void
+    public function setOneTimeMaxDistance(float|null $maxDistance): void
     {
         $this->maxDistance = $maxDistance;
     }
@@ -94,8 +94,6 @@ final class LibraryDocuments
                 'responses' => $debugResponse,
             ],
         );
-
-        $this->maxDistance = null;
 
         return $result;
     }
