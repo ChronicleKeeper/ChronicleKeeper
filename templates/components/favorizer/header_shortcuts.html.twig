@@ -1,14 +1,15 @@
-<div class="nav-item dropdown d-none d-md-flex me-3 dropdown-center">
-    <a class="nav-link px-0 no-loader dropdown-toggle" data-bs-toggle="dropdown" href="#" title="Favoriten">{{ ux_icon('tabler:star') }}</a>
+<div class="nav-item dropdown d-none d-md-flex me-3 dropdown-center" {{ attributes }}>
+    <a class="nav-link px-0 no-loader dropdown-toggle text-yellow" data-loading="addClass(icon-tada)" data-bs-toggle="dropdown" href="#" title="Favoriten">{{ ux_icon('tabler:star') }}</a>
     <div class="dropdown-menu">
         <span class="dropdown-header">Deine Favoriten</span>
-        <a class="dropdown-item" href="#">
-            {{ ux_icon('tabler:file-search', {'class': 'icon dropdown-item-icon icon-tabler text-white'}) }} Mein Bild
-        </a>
-        <a class="dropdown-item" href="#">
-            {{ ux_icon('tabler:photo-search', {'class': 'icon dropdown-item-icon icon-tabler text-white'}) }} Mein Dokument
-        </a>
-        <div class="dropdown-divider"></div>
-        <a class="dropdown-item" href="#">Verwalten</a>
+
+        {% for shortcut in this.shortcuts %}
+            <a class="dropdown-item" href="{{ shortcut.url }}">
+                {{ ux_icon(shortcut.icon, {'class': 'icon dropdown-item-icon icon-tabler text-white', 'style': 'opacity: 1;'}) }} {{ shortcut.title }}
+            </a>
+        {% endfor %}
+
+        <!-- <div class="dropdown-divider"></div>
+        <a class="dropdown-item" href="#">Verwalten</a> -->
     </div>
 </div>

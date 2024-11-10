@@ -1,0 +1,15 @@
+<div {{ attributes }} class="d-inline">
+
+    <a class="no-loader text-yellow {{ asButton ? 'btn btn-icon' }}"
+       href="#"
+       title="Zu Favoriten hinzufügen"
+       data-loading="addClass(d-none)"
+       {{ live_action('favorize') }}
+    >
+        {{ this.exists ? ux_icon('tabler:star-filled') : ux_icon('tabler:star') }}
+    </a>
+
+    <div class="spinner-border spinner-border-sm text-yellow d-none {{ asButton ? 'btn btn-icon' }}" data-loading="removeClass(d-none)" role="status"></div>
+</div>
+
+

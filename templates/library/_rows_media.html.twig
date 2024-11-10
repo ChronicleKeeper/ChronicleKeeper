@@ -13,6 +13,7 @@
         <td class="text-secondary">{{ image.updatedAt|date('d.m.Y H:i:s') }}</td>
         <td>
             <a href="{{ path('library_image_view', {'image': image.id}) }}" title="Ansehen">{{ ux_icon('tabler:photo-search') }}</a>
+            <twig:Favorizer:AddToShortcuts id="{{ image.id }}" type="{{ constant('class', image) }}" />
             <a href="{{ path('library_image_edit', {'image': image.id}) }}" title="Bearbeiten">{{ ux_icon('tabler:photo-edit', {'color': 'var(--tblr-warning)'}) }}</a>
             <a href="{{ path('library_image_delete', {'image': image.id}) }}" title="Löschen" {{ stimulus_controller('confirm') }}>{{ ux_icon('tabler:photo-minus', {'color': 'var(--tblr-danger)'}) }}</a>
         </td>
@@ -26,6 +27,7 @@
         <td class="text-secondary">{{ document.updatedAt|date('d.m.Y H:i:s') }}</td>
         <td>
             <a href="{{ path('library_document_view', {'document': document.id}) }}" title="Ansehen">{{ ux_icon('tabler:file-search') }}</a>
+            <twig:Favorizer:AddToShortcuts id="{{ document.id }}" type="{{ constant('class', document) }}" />
             <a href="{{ path('library_document_edit', {'document': document.id}) }}" title="Bearbeiten">{{ ux_icon('tabler:file-pencil', {'color': 'var(--tblr-warning)'}) }}</a>
             <a href="{{ path('library_document_delete', {'document': document.id}) }}" title="Löschen" {{ stimulus_controller('confirm') }}>{{ ux_icon('tabler:file-minus', {'color': 'var(--tblr-danger)'}) }}</a>
         </td>
@@ -41,6 +43,7 @@
             <a href="{{ path('chat', {'conversation': conversation.id}) }}" title="Gespräch fortführen">
                 {{ ux_icon('tabler:message-2-share') }}
             </a>
+            <twig:Favorizer:AddToShortcuts id="{{ conversation.id }}" type="{{ constant('class', conversation) }}" />
             <a href="{{ path('chat_delete', {'conversation': conversation.id}) }}" title="Gespräch Löschen" {{ stimulus_controller('confirm') }}>
                 {{ ux_icon('tabler:message-2-off', {'color': 'var(--tblr-danger)'}) }}
             </a>
