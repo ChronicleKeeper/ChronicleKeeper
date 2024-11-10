@@ -2,7 +2,7 @@
 
     <a class="no-loader text-yellow {{ asButton ? 'btn btn-icon' }}"
        href="#"
-       title="Zu Favoriten hinzufügen"
+       title="{{ this.exists ? 'Von Favoriten entfernen' : 'Zu Favoriten hinzufügen' }}"
        data-loading="addClass(d-none)"
        {{ live_action('favorize') }}
     >

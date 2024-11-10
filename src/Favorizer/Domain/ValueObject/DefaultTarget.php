@@ -6,6 +6,7 @@ namespace ChronicleKeeper\Favorizer\Domain\ValueObject;
 
 use JsonSerializable;
 use ReflectionClass;
+use Webmozart\Assert\Assert;
 
 abstract class DefaultTarget implements Target, JsonSerializable
 {
@@ -13,6 +14,8 @@ abstract class DefaultTarget implements Target, JsonSerializable
         private readonly string $id,
         private readonly string $title,
     ) {
+        Assert::uuid($this->id);
+        Assert::notEmpty($this->title);
     }
 
     public function getId(): string
