@@ -38,7 +38,7 @@ class Migrator
                 continue;
             }
 
-            $migration->migrate($path);
+            $migration->migrate($path, $type);
             $this->logger->debug('Migration for "' . $path . '" done.', ['migration' => $migration::class]);
         }
     }

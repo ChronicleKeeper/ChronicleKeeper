@@ -24,7 +24,7 @@ final class AddShowReferencedImage implements FileMigration
         return $type === FileType::SETTINGS && $fileVersion === '0.2';
     }
 
-    public function migrate(string $file): void
+    public function migrate(string $file, FileType $type): void
     {
         $fileContent = file_get_contents($file);
         if ($fileContent === false) {

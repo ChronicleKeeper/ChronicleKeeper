@@ -12,5 +12,5 @@ interface FileMigration
 {
     public function isSupporting(FileType $type, string $fileVersion): bool;
 
-    public function migrate(string $file): void;
+    public function migrate(string $file, FileType $type): void;
 }

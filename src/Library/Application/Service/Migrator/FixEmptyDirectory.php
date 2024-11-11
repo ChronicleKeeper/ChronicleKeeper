@@ -7,9 +7,10 @@ namespace ChronicleKeeper\Library\Application\Service\Migrator;
 use ChronicleKeeper\Library\Domain\RootDirectory;
 use ChronicleKeeper\Settings\Application\Service\FileType;
 use ChronicleKeeper\Settings\Application\Service\Migrator\FileMigration;
-use Symfony\Component\Filesystem\Filesystem;
+use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
 
 use function array_key_exists;
+use function assert;
 use function is_array;
 use function json_decode;
 use function json_encode;
@@ -20,7 +21,7 @@ use const JSON_THROW_ON_ERROR;
 final readonly class FixEmptyDirectory implements FileMigration
 {
     public function __construct(
-        private Filesystem $filesystem,
+        private FileAccess $fileAccess,
     ) {
     }
 
@@ -31,10 +32,17 @@ final readonly class FixEmptyDirectory implements FileMigration
             || $type === FileType::LIBRARY_IMAGE;
     }
 
-    public function migrate(string $file): void
+    public function migrate(string $file, FileType $type): void
     {
-        $fileContent = $this->filesystem->readFile($file);
-        $jsonArr     = json_decode($fileContent, true, 512, JSON_THROW_ON_ERROR);
+        assert($file !== ''); // Ensured before calling this method
+
+        if ($type === FileType::LIBRARY_DOCUMENT) {
+            $fileContent = $this->fileAccess->read('library.documents', $file);
+        } else {
+            $fileContent = $this->fileAccess->read('library.images', $file);
+        }
+
+        $jsonArr = json_decode($fileContent, true, 512, JSON_THROW_ON_ERROR);
 
         if (
             ! is_array($jsonArr)
@@ -46,6 +54,11 @@ final readonly class FixEmptyDirectory implements FileMigration
 
         $jsonArr['directory'] = RootDirectory::ID;
 
-        $this->filesystem->dumpFile($file, json_encode($jsonArr, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT));
+        $content = json_encode($jsonArr, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT);
+        if ($type === FileType::LIBRARY_DOCUMENT) {
+            $this->fileAccess->write('library.documents', $file, $content);
+        } else {
+            $this->fileAccess->write('library.images', $file, $content);
+        }
     }
 }

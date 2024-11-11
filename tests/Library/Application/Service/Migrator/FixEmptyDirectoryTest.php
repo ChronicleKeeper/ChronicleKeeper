@@ -6,13 +6,13 @@ namespace ChronicleKeeper\Test\Library\Application\Service\Migrator;
 
 use ChronicleKeeper\Library\Application\Service\Migrator\FixEmptyDirectory;
 use ChronicleKeeper\Settings\Application\Service\FileType;
+use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
 use Generator;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Filesystem\Filesystem;
 
 #[CoversClass(FixEmptyDirectory::class)]
 #[Small]
@@ -22,7 +22,7 @@ class FixEmptyDirectoryTest extends TestCase
     #[DataProvider('provideSupportingTests')]
     public function migratorSupportsCorrectFiletypes(FileType $type, bool $expected): void
     {
-        $migrator = new FixEmptyDirectory(self::createStub(Filesystem::class));
+        $migrator = new FixEmptyDirectory(self::createStub(FileAccess::class));
         $return   = $migrator->isSupporting($type, 'dev');
 
         if ($expected === true) {
@@ -46,31 +46,32 @@ class FixEmptyDirectoryTest extends TestCase
     #[Test]
     public function theFileIsNotOverwrittenWhenDirectoryAlreadyInThere(): void
     {
-        $filesystem = $this->createMock(Filesystem::class);
+        $filesystem = $this->createMock(FileAccess::class);
         $filesystem->expects($this->once())
-            ->method('readFile')
-            ->with('foo')
+            ->method('read')
+            ->with('library.documents', 'foo')
             ->willReturn('{"directory": "123-123-123-123"}');
-        $filesystem->expects($this->never())->method('dumpFile');
+
+        $filesystem->expects($this->never())->method('write');
 
         $migrator = new FixEmptyDirectory($filesystem);
-        $migrator->migrate('foo');
+        $migrator->migrate('foo', FileType::LIBRARY_DOCUMENT);
     }
 
     #[Test]
     public function theRootDirectoryIsAddedToTheDocumentWhenNoDirectoryInThere(): void
     {
-        $filesystem = $this->createMock(Filesystem::class);
+        $filesystem = $this->createMock(FileAccess::class);
         $filesystem->expects($this->once())
-            ->method('readFile')
-            ->with('foo')
+            ->method('read')
+            ->with('library.documents', 'foo')
             ->willReturn('{}');
 
         $filesystem->expects($this->once())
-            ->method('dumpFile')
-            ->with('foo', "{\n    \"directory\": \"caf93493-9072-44e2-a6db-4476985a849d\"\n}");
+            ->method('write')
+            ->with('library.documents', 'foo', "{\n    \"directory\": \"caf93493-9072-44e2-a6db-4476985a849d\"\n}");
 
         $migrator = new FixEmptyDirectory($filesystem);
-        $migrator->migrate('foo');
+        $migrator->migrate('foo', FileType::LIBRARY_DOCUMENT);
     }
 }
