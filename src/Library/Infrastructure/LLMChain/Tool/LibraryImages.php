@@ -13,6 +13,7 @@ use PhpLlm\LlmChain\ToolBox\Attribute\AsTool;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 
+use function array_values;
 use function count;
 
 use const PHP_EOL;
@@ -27,7 +28,7 @@ use const PHP_EOL;
 )]
 final class LibraryImages
 {
-    /** @var list<Image> */
+    /** @var array<string, Image> */
     private array $referencedImages = [];
     private float|null $maxDistance = null;
 
@@ -86,14 +87,15 @@ final class LibraryImages
             $result .= '# Image Name: ' . $libraryImage->title . PHP_EOL;
             $result .= 'Direct Link to the image: ' . $imageUrl . PHP_EOL;
             $result .= 'The image is described as the following: ' . PHP_EOL;
-            $result .= $libraryImage->description . PHP_EOL . PHP_EOL;
+            $result .= $image['vector']->content . PHP_EOL . PHP_EOL;
 
-            $this->referencedImages[] = $libraryImage;
+            $this->referencedImages[$libraryImage->id] = $libraryImage;
 
             $debugResponse[] = [
                 'image' => $libraryImage->directory->flattenHierarchyTitle()
                     . '/' . $libraryImage->title,
                 'distance' => $image['distance'],
+                'content' => $image['vector']->content,
             ];
         }
 
@@ -111,7 +113,7 @@ final class LibraryImages
     /** @return list<Image> */
     public function getReferencedImages(): array
     {
-        $images                 = $this->referencedImages;
+        $images                 = array_values($this->referencedImages);
         $this->referencedImages = [];
 
         return $images;

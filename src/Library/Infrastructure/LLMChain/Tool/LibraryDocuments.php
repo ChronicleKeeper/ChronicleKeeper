@@ -11,6 +11,7 @@ use ChronicleKeeper\Shared\Infrastructure\LLMChain\ToolUsageCollector;
 use PhpLlm\LlmChain\EmbeddingsModel;
 use PhpLlm\LlmChain\ToolBox\Attribute\AsTool;
 
+use function array_values;
 use function count;
 
 use const PHP_EOL;
@@ -25,7 +26,7 @@ use const PHP_EOL;
 )]
 final class LibraryDocuments
 {
-    /** @var list<Document> */
+    /** @var array<string, Document> */
     private array $referencedDocuments = [];
 
     private float|null $maxDistance = null;
@@ -76,14 +77,15 @@ final class LibraryDocuments
 
             $result .= '# Title: ' . $libraryDocument->title . PHP_EOL;
             $result .= 'Storage Directory: ' . $libraryDocument->directory->flattenHierarchyTitle() . PHP_EOL;
-            $result .= $libraryDocument->content . PHP_EOL . PHP_EOL;
+            $result .= $document['vector']->content . PHP_EOL . PHP_EOL;
 
-            $this->referencedDocuments[] = $libraryDocument;
+            $this->referencedDocuments[$libraryDocument->id] = $libraryDocument;
 
             $debugResponse[] = [
                 'document' => $libraryDocument->directory->flattenHierarchyTitle()
                     . '/' . $libraryDocument->title,
                 'distance' => $document['distance'],
+                'content' => $document['vector']->content,
             ];
         }
 
@@ -101,7 +103,7 @@ final class LibraryDocuments
     /** @return list<Document> */
     public function getReferencedDocuments(): array
     {
-        $documents                 = $this->referencedDocuments;
+        $documents                 = array_values($this->referencedDocuments);
         $this->referencedDocuments = [];
 
         return $documents;

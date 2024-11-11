@@ -11,10 +11,17 @@ use ChronicleKeeper\Library\Infrastructure\VectorStorage\VectorDocument;
 use PhpLlm\LlmChain\EmbeddingsModel;
 use Psr\Log\LoggerInterface;
 
+use function count;
 use function reset;
+use function strlen;
+use function substr;
+use function Symfony\Component\String\u;
+use function trim;
 
 class LibraryDocumentUpdater
 {
+    private const int VECTOR_CONTENT_LENGTH = 800;
+
     public function __construct(
         private readonly LoggerInterface $logger,
         private readonly EmbeddingsModel $embeddings,
@@ -40,33 +47,60 @@ class LibraryDocumentUpdater
             return;
         }
 
-        // Update
-        $originalVectorDocument = reset($existingStorage);
-
-        if ($originalVectorDocument->vectorContentHash === $document->getContentHash()) {
+        // Check the existing storage content hash and update only if necessary
+        $singleOriginalVectorDocument = reset($existingStorage);
+        if ($singleOriginalVectorDocument->vectorContentHash === $document->getContentHash()) {
             $this->logger->debug('Vector storage for document is up to date.', ['document' => $document]);
 
             return;
         }
 
-        $originalVectorDocument->vectorContentHash = $document->getContentHash();
-        $originalVectorDocument->vector            = $this->embeddings->create($document->content)->getData();
+        // Clean Vector Storage
+        foreach ($existingStorage as $vectorDocument) {
+            $this->vectorDocumentRepository->remove($vectorDocument);
+        }
 
-        $this->vectorDocumentRepository->store($originalVectorDocument);
+        $this->logger->debug('Vector storage for document was cleared.', ['document' => $document]);
 
-        $this->logger->debug('Vector storage for document was updated.', ['document' => $document]);
+        // Re-Create the Storage
+        $this->createVectorDocument($document);
     }
 
     private function createVectorDocument(Document $document): void
     {
-        $vectorDocument = new VectorDocument(
-            document: $document,
-            vectorContentHash: $document->getContentHash(),
-            vector: $this->embeddings->create($document->content)->getData(),
+        $vectorDocuments = $this->splitDocumentInVectorDocuments($document, self::VECTOR_CONTENT_LENGTH);
+        foreach ($vectorDocuments as $vectorDocument) {
+            $this->vectorDocumentRepository->store($vectorDocument);
+        }
+
+        $this->logger->debug(
+            'Vector storage for document was created.',
+            ['document' => $document, 'vectorDocumentsAmount' => count($vectorDocuments)],
         );
+    }
 
-        $this->vectorDocumentRepository->store($vectorDocument);
+    /** @return VectorDocument[] */
+    private function splitDocumentInVectorDocuments(
+        Document $document,
+        int $vectorContentLength,
+    ): array {
+        $content         = $document->content;
+        $vectorDocuments = [];
 
-        $this->logger->debug('Vector storage for document was created.', ['document' => $document]);
+        do {
+            $vectorContent = u($content)->truncate($vectorContentLength, '', false)->toString();
+            $content       = substr($content, strlen($vectorContent));
+
+            $vectorDocument = new VectorDocument(
+                document: $document,
+                content: trim($vectorContent),
+                vectorContentHash: $document->getContentHash(),
+                vector: $this->embeddings->create($vectorContent)->getData(),
+            );
+
+            $vectorDocuments[] = $vectorDocument;
+        } while ($content !== '');
+
+        return $vectorDocuments;
     }
 }

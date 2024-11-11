@@ -14,6 +14,7 @@ use function count;
  * @phpstan-type VectorDocumentArray = array{
  *     id: string,
  *     documentId: string,
+ *     content: string,
  *     vectorContentHash: string,
  *     vector: list<float>
  * }
@@ -25,6 +26,7 @@ class VectorDocument
     /** @param list<float> $vector */
     public function __construct(
         public Document $document,
+        public string $content,
         public string $vectorContentHash,
         public array $vector,
     ) {
@@ -37,6 +39,7 @@ class VectorDocument
         return [
             'id' => $this->id,
             'documentId' => $this->document->id,
+            'content' => $this->content,
             'vectorContentHash' => $this->vectorContentHash,
             'vector' => $this->vector,
         ];
@@ -49,9 +52,10 @@ class VectorDocument
      */
     public static function isVectorDocumentArray(array $array): bool
     {
-        return count($array) === 4
+        return count($array) === 5
             && array_key_exists('id', $array)
             && array_key_exists('documentId', $array)
+            && array_key_exists('content', $array)
             && array_key_exists('vectorContentHash', $array)
             && array_key_exists('vector', $array);
     }
