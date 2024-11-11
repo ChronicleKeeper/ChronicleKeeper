@@ -17,8 +17,8 @@ namespace ChronicleKeeper\Settings\Domain\ValueObject\Settings;
 readonly class ChatbotGeneral
 {
     public function __construct(
-        private int $maxDocumentResponses = 6,
-        private int $maxImageResponses = 4,
+        private int $maxDocumentResponses = 20,
+        private int $maxImageResponses = 15,
         private string $chatbotName = 'Chronicle Keeper',
         private string $chatterName = 'Der Unbekannte',
         private bool $showReferencedDocuments = false,

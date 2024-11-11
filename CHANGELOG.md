@@ -8,6 +8,7 @@
 - There is now a "notifications" event in UX available for live action notifications.
 - Splitting the searchable embeddings of documents into 800 string length chunks for better search results which also allows more document responses.
 - Splitting the searchable embeddings of image descriptions into 800 string length chunks for better search results which also allows more image responses.
+- Raised default library responses to ChatGPT to 20 documents and 15 images.
 
 ### Fixed
 - Resolved importing from alpha-0.2 does not assign all files and images to a directory.
