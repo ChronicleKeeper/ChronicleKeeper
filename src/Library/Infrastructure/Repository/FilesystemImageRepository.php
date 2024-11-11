@@ -6,6 +6,7 @@ namespace ChronicleKeeper\Library\Infrastructure\Repository;
 
 use ChronicleKeeper\Library\Domain\Entity\Directory;
 use ChronicleKeeper\Library\Domain\Entity\Image;
+use ChronicleKeeper\Library\Domain\Event\ImageDeleted;
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Exception\UnableToReadFile;
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\PathRegistry;
@@ -15,6 +16,7 @@ use RuntimeException;
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 use function array_filter;
 use function json_encode;
@@ -36,6 +38,7 @@ class FilesystemImageRepository
         private readonly SerializerInterface $serializer,
         private readonly FilesystemVectorImageRepository $vectorRepository,
         private readonly PathRegistry $pathRegistry,
+        private readonly EventDispatcherInterface $eventDispatcher,
     ) {
     }
 
@@ -107,6 +110,8 @@ class FilesystemImageRepository
         }
 
         $this->fileAccess->delete(self::STORAGE_NAME, $filename);
+
+        $this->eventDispatcher->dispatch(new ImageDeleted($image->id));
     }
 
     /** @return non-empty-string */

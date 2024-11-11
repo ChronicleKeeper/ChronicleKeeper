@@ -122,3 +122,9 @@
         transform: rotate(360deg);
     }
 }
+
+a.disabled {
+    pointer-events: none;
+    cursor: default;
+    opacity: 0.4;
+}

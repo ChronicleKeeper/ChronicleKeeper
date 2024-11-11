@@ -4,6 +4,8 @@
 
 ### Added
 - Mechtild, the new image artist, is now available for image generation based on Dall-E 3.
+- Add shortcuts to the navigation for quick access to the images, documents, and conversations.
+- There is now a "notifications" event in UX available for live action notifications.
 
 ### Fixed
 - Resolved importing from alpha-0.2 does not assign all files and images to a directory.

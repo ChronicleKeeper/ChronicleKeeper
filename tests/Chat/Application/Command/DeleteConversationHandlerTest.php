@@ -6,11 +6,13 @@ namespace ChronicleKeeper\Test\Chat\Application\Command;
 
 use ChronicleKeeper\Chat\Application\Command\DeleteConversation;
 use ChronicleKeeper\Chat\Application\Command\DeleteConversationHandler;
+use ChronicleKeeper\Chat\Domain\Event\ConversationDeleted;
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Webmozart\Assert\InvalidArgumentException as WebmozartInvalidArgumentException;
 
 #[CoversClass(DeleteConversationHandler::class)]
@@ -29,7 +31,12 @@ class DeleteConversationHandlerTest extends TestCase
             ->method('delete')
             ->with('library.conversations', $conversationId . '.json');
 
-        $handler = new DeleteConversationHandler($fileAccess);
+        $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
+        $eventDispatcher->expects($this->once())
+            ->method('dispatch')
+            ->with(self::isInstanceOf(ConversationDeleted::class));
+
+        $handler = new DeleteConversationHandler($fileAccess, $eventDispatcher);
         $handler($message);
     }
 

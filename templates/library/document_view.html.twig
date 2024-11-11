@@ -5,6 +5,7 @@
 {% block page_title_actions %}
     <div class="col-auto ms-auto d-print-none">
         <div class="btn-list">
+            <twig:Favorizer:AddToShortcuts id="{{ document.id }}" type="{{ constant('class', document) }}" asButton="true" />
             <a href="{{ path('library_document_edit', {'document': document.id }) }}" class="btn btn-icon btn-warning">
                 {{ ux_icon('tabler:file-pencil') }}
             </a>

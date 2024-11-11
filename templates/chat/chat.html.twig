@@ -11,6 +11,9 @@
             <a type="button" class="btn btn-icon" title="Einstellungen zum Gespräch" data-bs-toggle="modal" data-bs-target="#conversation-settings">
                 {{ ux_icon('tabler:settings') }}
             </a>
+            {% if conversation is not empty %}
+                <twig:Favorizer:AddToShortcuts id="{{ conversation.id }}" type="{{ constant('class', conversation) }}" asButton="true" />
+            {% endif %}
             <a type="button" class="btn btn-icon" title="Letzte Gespräche anzeigen" data-bs-toggle="modal" data-bs-target="#latest-conversation-modal">
                 {{ ux_icon('tabler:history') }}
             </a>
