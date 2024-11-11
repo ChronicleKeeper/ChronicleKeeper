@@ -12,6 +12,7 @@ use ChronicleKeeper\Shared\Application\Query\QueryService;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
 use Symfony\UX\LiveComponent\Attribute\LiveAction;
+use Symfony\UX\LiveComponent\Attribute\LiveListener;
 use Symfony\UX\LiveComponent\Attribute\LiveProp;
 use Symfony\UX\LiveComponent\ComponentToolsTrait;
 use Symfony\UX\LiveComponent\DefaultActionTrait;
@@ -56,6 +57,11 @@ class AddToShortcuts
         $favorizeTarget = $this->targetFactory->create($this->id, $this->type);
 
         return $this->targetBag->exists($favorizeTarget);
+    }
+
+    #[LiveListener('favorites_updated')]
+    public function refresh(): void
+    {
     }
 
     #[LiveAction]
