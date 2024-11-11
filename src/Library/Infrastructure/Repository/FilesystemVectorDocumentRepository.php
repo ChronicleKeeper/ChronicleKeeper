@@ -150,6 +150,7 @@ class FilesystemVectorDocumentRepository
 
         $vectorDocument     = new VectorDocument(
             document: $document,
+            content: $vectorDocumentArr['content'],
             vectorContentHash: $vectorDocumentArr['vectorContentHash'],
             vector: $vectorDocumentArr['vector'],
         );

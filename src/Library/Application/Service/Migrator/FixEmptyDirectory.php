@@ -27,6 +27,8 @@ final readonly class FixEmptyDirectory implements FileMigration
 
     public function isSupporting(FileType $type, string $fileVersion): bool
     {
+        return false;
+
         // Do it on every import for documents and images
         return $type === FileType::LIBRARY_DOCUMENT
             || $type === FileType::LIBRARY_IMAGE;
