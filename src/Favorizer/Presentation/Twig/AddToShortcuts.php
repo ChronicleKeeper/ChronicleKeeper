@@ -38,6 +38,15 @@ class AddToShortcuts
     ) {
     }
 
+    public function maxFavoritesReached(): bool
+    {
+        if (! isset($this->targetBag)) {
+            $this->targetBag = $this->queryService->query(new GetTargetBag());
+        }
+
+        return $this->targetBag->isLimitReached();
+    }
+
     public function exists(): bool
     {
         if (! isset($this->targetBag)) {
@@ -61,6 +70,18 @@ class AddToShortcuts
             // Remove the entry if it is already favorized
             $this->targetBag->remove($favorizeTarget);
         } else {
+            if ($this->targetBag->isLimitReached()) {
+                $this->emit(
+                    'notification',
+                    [
+                        'type' => 'warning',
+                        'message' => 'Die maximale Anzahl von 10 Favoriten ist erreicht, bitte entferne zuerst einen Favoriten.',
+                    ],
+                );
+
+                return;
+            }
+
             // Add the entry if it is not favorized yet
             $this->targetBag[] = $favorizeTarget;
         }

@@ -47,6 +47,7 @@
             {% block alerts %}
                 {% include '_includes/alerts.html.twig' %}
                 {% include '_includes/flash-messages.html.twig' %}
+                <twig:Notifications />
             {% endblock %}
             {% block page_content %}{% endblock %}
         </div>

@@ -1,6 +1,6 @@
 <div {{ attributes }} class="d-inline">
 
-    <a class="no-loader text-yellow {{ asButton ? 'btn btn-icon' }}"
+    <a class="no-loader text-yellow{{ asButton ? ' btn btn-icon' }}{{ this.maxFavoritesReached and this.exists is same as false ? ' disabled'}}"
        href="#"
        title="{{ this.exists ? 'Von Favoriten entfernen' : 'Zu Favoriten hinzufügen' }}"
        data-loading="addClass(d-none)"

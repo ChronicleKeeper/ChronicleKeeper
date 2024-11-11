@@ -10,6 +10,7 @@ use ChronicleKeeper\Shared\Application\Query\QueryParameters;
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\Finder as FinderContract;
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\PathRegistry;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\SerializerInterface;
 
@@ -49,11 +50,19 @@ final readonly class FindAllImagesOfRequestQuery implements Query
             );
             assert($content !== '');
 
-            $images[] = $this->serializer->deserialize(
-                $content,
-                GeneratorResult::class,
-                JsonEncoder::FORMAT,
-            );
+            try {
+                $images[] = $this->serializer->deserialize(
+                    $content,
+                    GeneratorResult::class,
+                    JsonEncoder::FORMAT,
+                );
+            } catch (NotFoundHttpException) {
+                // The File could not be converted, maybe the connected image is not existing anymore delete it
+                $this->fileAccess->delete(
+                    'generator.images',
+                    $requestImagesDirectory . DIRECTORY_SEPARATOR . $filename,
+                );
+            }
         }
 
         return $images;
