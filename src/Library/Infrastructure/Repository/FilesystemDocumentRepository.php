@@ -6,9 +6,11 @@ namespace ChronicleKeeper\Library\Infrastructure\Repository;
 
 use ChronicleKeeper\Library\Domain\Entity\Directory;
 use ChronicleKeeper\Library\Domain\Entity\Document;
+use ChronicleKeeper\Library\Domain\Event\DocumentDeleted;
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\PathRegistry;
 use DateTimeImmutable;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
@@ -34,6 +36,7 @@ class FilesystemDocumentRepository
         private readonly SerializerInterface $serializer,
         private readonly FilesystemVectorDocumentRepository $vectorRepository,
         private readonly PathRegistry $pathRegistry,
+        private readonly EventDispatcherInterface $eventDispatcher,
     ) {
     }
 
@@ -96,6 +99,8 @@ class FilesystemDocumentRepository
         }
 
         $this->fileAccess->delete(self::STORAGE_NAME, $filename);
+
+        $this->eventDispatcher->dispatch(new DocumentDeleted($document->id));
     }
 
     /** @return non-empty-string */
