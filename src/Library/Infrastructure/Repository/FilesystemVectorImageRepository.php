@@ -151,6 +151,7 @@ class FilesystemVectorImageRepository
 
         $vectorImage     = new VectorImage(
             image: $image,
+            content: $vectorImageArr['content'],
             vectorContentHash: $vectorImageArr['vectorContentHash'],
             vector: $vectorImageArr['vector'],
         );

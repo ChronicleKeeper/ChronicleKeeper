@@ -95,7 +95,7 @@ class LibraryDocumentUpdater
                 document: $document,
                 content: trim($vectorContent),
                 vectorContentHash: $document->getContentHash(),
-                vector: $this->embeddings->create($document->content)->getData(),
+                vector: $this->embeddings->create($vectorContent)->getData(),
             );
 
             $vectorDocuments[] = $vectorDocument;

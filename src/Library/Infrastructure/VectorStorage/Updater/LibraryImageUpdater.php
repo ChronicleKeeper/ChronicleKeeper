@@ -11,10 +11,17 @@ use ChronicleKeeper\Library\Infrastructure\VectorStorage\VectorImage;
 use PhpLlm\LlmChain\EmbeddingsModel;
 use Psr\Log\LoggerInterface;
 
+use function count;
 use function reset;
+use function strlen;
+use function substr;
+use function Symfony\Component\String\u;
+use function trim;
 
 class LibraryImageUpdater
 {
+    private const int VECTOR_CONTENT_LENGTH = 800;
+
     public function __construct(
         private readonly LoggerInterface $logger,
         private readonly EmbeddingsModel $embeddings,
@@ -40,33 +47,60 @@ class LibraryImageUpdater
             return;
         }
 
-        // Update
-        $originalVectorDocument = reset($existingStorage);
-
-        if ($originalVectorDocument->vectorContentHash === $image->getDescriptionHash()) {
+        // Check the existing storage content hash and update only if necessary
+        $singleOriginalVectorDocument = reset($existingStorage);
+        if ($singleOriginalVectorDocument->vectorContentHash === $image->getDescriptionHash()) {
             $this->logger->debug('Vector storage for image is up to date.', ['image' => $image]);
 
             return;
         }
 
-        $originalVectorDocument->vectorContentHash = $image->getDescriptionHash();
-        $originalVectorDocument->vector            = $this->embeddings->create($image->description)->getData();
+        // Clean Vector Storage
+        foreach ($existingStorage as $vectorDocument) {
+            $this->vectorImageRepository->remove($vectorDocument);
+        }
 
-        $this->vectorImageRepository->store($originalVectorDocument);
+        $this->logger->debug('Vector storage for document was cleared.', ['image' => $image]);
 
-        $this->logger->debug('Vector storage for image was updated.', ['image' => $image]);
+        // Re-Create the Storage
+        $this->createVectorDocument($image);
     }
 
     private function createVectorDocument(Image $image): void
     {
-        $vectorDocument = new VectorImage(
-            image: $image,
-            vectorContentHash: $image->getDescriptionHash(),
-            vector: $this->embeddings->create($image->description)->getData(),
+        $vectorDocuments = $this->splitImageDescriptionInVectorDocuments($image, self::VECTOR_CONTENT_LENGTH);
+        foreach ($vectorDocuments as $vectorDocument) {
+            $this->vectorImageRepository->store($vectorDocument);
+        }
+
+        $this->logger->debug(
+            'Vector storage for image was created.',
+            ['image' => $image, 'vectorDocumentsAmount' => count($vectorDocuments)],
         );
+    }
 
-        $this->vectorImageRepository->store($vectorDocument);
+    /** @return VectorImage[] */
+    private function splitImageDescriptionInVectorDocuments(
+        Image $image,
+        int $vectorContentLength,
+    ): array {
+        $content         = $image->description;
+        $vectorDocuments = [];
 
-        $this->logger->debug('Vector storage for image was created.', ['image' => $image]);
+        do {
+            $vectorContent = u($content)->truncate($vectorContentLength, '', false)->toString();
+            $content       = substr($content, strlen($vectorContent));
+
+            $vectorDocument = new VectorImage(
+                image: $image,
+                content: trim($vectorContent),
+                vectorContentHash: $image->getDescriptionHash(),
+                vector: $this->embeddings->create($vectorContent)->getData(),
+            );
+
+            $vectorDocuments[] = $vectorDocument;
+        } while ($content !== '');
+
+        return $vectorDocuments;
     }
 }
