@@ -11,11 +11,12 @@ use ChronicleKeeper\Library\Infrastructure\VectorStorage\VectorDocument;
 use PhpLlm\LlmChain\EmbeddingsModel;
 use Psr\Log\LoggerInterface;
 
-use function ceil;
 use function count;
 use function reset;
 use function strlen;
 use function substr;
+use function Symfony\Component\String\u;
+use function trim;
 
 class LibraryDocumentUpdater
 {
@@ -67,7 +68,7 @@ class LibraryDocumentUpdater
 
     private function createVectorDocument(Document $document): void
     {
-        $vectorDocuments = $this->splitDocumentInVectorDocuments($document);
+        $vectorDocuments = $this->splitDocumentInVectorDocuments($document, self::VECTOR_CONTENT_LENGTH);
         foreach ($vectorDocuments as $vectorDocument) {
             $this->vectorDocumentRepository->store($vectorDocument);
         }
@@ -79,21 +80,26 @@ class LibraryDocumentUpdater
     }
 
     /** @return VectorDocument[] */
-    private function splitDocumentInVectorDocuments(Document $document): array
-    {
+    private function splitDocumentInVectorDocuments(
+        Document $document,
+        int $vectorContentLength,
+    ): array {
         $content         = $document->content;
         $vectorDocuments = [];
-        for ($i = 0; $i < ceil(strlen($content) / self::VECTOR_CONTENT_LENGTH); $i++) {
-            $vectorContent  = substr($content, $i * self::VECTOR_CONTENT_LENGTH, self::VECTOR_CONTENT_LENGTH);
+
+        do {
+            $vectorContent = u($content)->truncate($vectorContentLength, '', false)->toString();
+            $content       = substr($content, strlen($vectorContent));
+
             $vectorDocument = new VectorDocument(
                 document: $document,
-                content: $vectorContent,
+                content: trim($vectorContent),
                 vectorContentHash: $document->getContentHash(),
                 vector: $this->embeddings->create($document->content)->getData(),
             );
 
             $vectorDocuments[] = $vectorDocument;
-        }
+        } while ($content !== '');
 
         return $vectorDocuments;
     }

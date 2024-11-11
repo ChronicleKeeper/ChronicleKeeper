@@ -52,7 +52,7 @@ class VectorDocument
      */
     public static function isVectorDocumentArray(array $array): bool
     {
-        return count($array) === 4
+        return count($array) === 5
             && array_key_exists('id', $array)
             && array_key_exists('documentId', $array)
             && array_key_exists('content', $array)

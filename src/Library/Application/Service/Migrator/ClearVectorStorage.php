@@ -6,14 +6,15 @@ namespace ChronicleKeeper\Library\Application\Service\Migrator;
 
 use ChronicleKeeper\Settings\Application\Service\FileType;
 use ChronicleKeeper\Settings\Application\Service\Migrator\FileMigration;
-use Symfony\Component\Filesystem\Filesystem;
+use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
 
+use function assert;
 use function version_compare;
 
 final readonly class ClearVectorStorage implements FileMigration
 {
     public function __construct(
-        private Filesystem $filesystem,
+        private FileAccess $fileAccess,
     ) {
     }
 
@@ -29,7 +30,12 @@ final readonly class ClearVectorStorage implements FileMigration
 
     public function migrate(string $file, FileType $type): void
     {
-        // Just remove the file because we want a re-index triggered
-        $this->filesystem->remove($file);
+        assert($file !== '');
+
+        if ($type === FileType::VECTOR_STORAGE_DOCUMENT) {
+            $this->fileAccess->delete('vector.documents', $file);
+        } else {
+            $this->fileAccess->delete('vector.images', $file);
+        }
     }
 }

@@ -14,6 +14,7 @@ use RuntimeException;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
+use function dump;
 use function unlink;
 use function version_compare;
 
@@ -35,6 +36,8 @@ class Importer
         $filesystem                = new Filesystem($adapter);
         $currentApplicationVersion = $this->version->getCurrentNumericVersion();
         $versionOfArchive          = $this->version->parseToNumericVersion($filesystem->read('VERSION'));
+        dump($currentApplicationVersion);
+        dump($versionOfArchive);
 
         // Wenn die Version NEUER ist als diese hier .... NIX DA!
         if (version_compare($versionOfArchive, $currentApplicationVersion, '>')) {
