@@ -8,8 +8,8 @@ use ChronicleKeeper\Chat\Domain\Entity\Conversation;
 use ChronicleKeeper\Chat\Domain\Entity\ExtendedMessage;
 use ChronicleKeeper\Library\Infrastructure\LLMChain\Tool\LibraryDocuments;
 use ChronicleKeeper\Library\Infrastructure\LLMChain\Tool\LibraryImages;
+use ChronicleKeeper\Shared\Infrastructure\LLMChain\LLMChainFactory;
 use ChronicleKeeper\Shared\Infrastructure\LLMChain\ToolUsageCollector;
-use PhpLlm\LlmChain\Chain;
 use PhpLlm\LlmChain\Message\Message;
 
 use function assert;
@@ -18,7 +18,7 @@ use function is_string;
 class ChatMessageExecution
 {
     public function __construct(
-        private readonly Chain $chain,
+        private readonly LLMChainFactory $chain,
         private readonly LibraryDocuments $libraryDocuments,
         private readonly LibraryImages $libraryImages,
         private readonly ToolUsageCollector $collector,
@@ -38,7 +38,7 @@ class ChatMessageExecution
         $this->libraryDocuments->setOneTimeMaxDistance($conversation->settings->documentsMaxDistance);
         $this->libraryImages->setOneTimeMaxDistance($conversation->settings->imagesMaxDistance);
 
-        $response = $this->chain->call(
+        $response = $this->chain->create()->call(
             $messages->getLLMChainMessages(),
             [
                 'model' => $useModel,

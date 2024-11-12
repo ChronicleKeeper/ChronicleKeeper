@@ -11,6 +11,8 @@ services:
   _defaults:
     autowire: true
     autoconfigure: true
+    bind:
+      string $environment: '%env(string:APP_ENV)%'
 
   ChronicleKeeper\:
     resource: '../src/*'

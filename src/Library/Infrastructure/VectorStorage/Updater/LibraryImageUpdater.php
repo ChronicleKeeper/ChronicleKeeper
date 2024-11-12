@@ -8,7 +8,7 @@ use ChronicleKeeper\Library\Domain\Entity\Image;
 use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemImageRepository;
 use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemVectorImageRepository;
 use ChronicleKeeper\Library\Infrastructure\VectorStorage\VectorImage;
-use PhpLlm\LlmChain\EmbeddingsModel;
+use ChronicleKeeper\Shared\Infrastructure\LLMChain\LLMChainFactory;
 use Psr\Log\LoggerInterface;
 
 use function count;
@@ -24,7 +24,7 @@ class LibraryImageUpdater
 
     public function __construct(
         private readonly LoggerInterface $logger,
-        private readonly EmbeddingsModel $embeddings,
+        private readonly LLMChainFactory $embeddings,
         private readonly FilesystemImageRepository $imageRepository,
         private readonly FilesystemVectorImageRepository $vectorImageRepository,
     ) {
@@ -95,7 +95,7 @@ class LibraryImageUpdater
                 image: $image,
                 content: trim($vectorContent),
                 vectorContentHash: $image->getDescriptionHash(),
-                vector: $this->embeddings->create($vectorContent)->getData(),
+                vector: $this->embeddings->createEmbeddings()->create($vectorContent)->getData(),
             );
 
             $vectorDocuments[] = $vectorDocument;

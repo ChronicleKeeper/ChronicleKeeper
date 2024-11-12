@@ -55,10 +55,14 @@ class SettingsHandler
             return;
         }
 
+        $existingSettings = $this->get();
         $this->fileAccess->delete('storage', 'settings.json');
 
-        $this->loaded   = false;
+        // Create new settings but keep the Application General Settings with the OpenAI Key
         $this->settings = new Settings();
+        $this->settings->setApplication(clone $existingSettings->getApplication());
+
+        $this->store();
     }
 
     private function loadSettings(): void

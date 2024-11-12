@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Settings\Domain\ValueObject;
 
+use ChronicleKeeper\Settings\Domain\ValueObject\Settings\Application;
 use ChronicleKeeper\Settings\Domain\ValueObject\Settings\Calendar;
 use ChronicleKeeper\Settings\Domain\ValueObject\Settings\ChatbotFunctions;
 use ChronicleKeeper\Settings\Domain\ValueObject\Settings\ChatbotGeneral;
@@ -13,6 +14,7 @@ use ChronicleKeeper\Settings\Domain\ValueObject\Settings\Holiday;
 use ChronicleKeeper\Settings\Domain\ValueObject\Settings\MoonCalendar;
 
 /**
+ * @phpstan-import-type ApplicationSettings from Application
  * @phpstan-import-type ChatbotGeneralSettings from ChatbotGeneral
  * @phpstan-import-type ChatbotSystemPromptSettings from ChatbotSystemPrompt
  * @phpstan-import-type ChatbotTuningArray from ChatbotTuning
@@ -21,6 +23,7 @@ use ChronicleKeeper\Settings\Domain\ValueObject\Settings\MoonCalendar;
  * @phpstan-import-type MoonCalendarSettings from MoonCalendar
  * @phpstan-import-type HolidaySettings from Holiday
  * @phpstan-type SettingsArray = array{
+ *     application?: ApplicationSettings,
  *     chatbot: array{
  *         general: ChatbotGeneralSettings,
  *         system_prompt: ChatbotSystemPromptSettings,
@@ -36,6 +39,7 @@ use ChronicleKeeper\Settings\Domain\ValueObject\Settings\MoonCalendar;
  */
 class Settings
 {
+    private Application $application;
     private ChatbotGeneral $chatbotGeneral;
     private ChatbotSystemPrompt $chatbotSystemPrompt;
     private ChatbotTuning $chatbotTuning;
@@ -46,6 +50,7 @@ class Settings
 
     public function __construct()
     {
+        $this->application         = new Application();
         $this->chatbotGeneral      = new ChatbotGeneral();
         $this->chatbotSystemPrompt = new ChatbotSystemPrompt();
         $this->chatbotTuning       = new ChatbotTuning();
@@ -59,6 +64,9 @@ class Settings
     public static function fromArray(array $settingsArray): Settings
     {
         $settings = new Settings();
+        $settings->setApplication(Application::fromArray(
+            $settingsArray['application'] ?? ['open_ai_api_key' => ''],
+        ));
         $settings->setChatbotGeneral(ChatbotGeneral::fromArray($settingsArray['chatbot']['general']));
         $settings->setChatbotSystemPrompt(ChatbotSystemPrompt::fromArray($settingsArray['chatbot']['system_prompt']));
         $settings->setChatbotTuning(ChatbotTuning::fromArray($settingsArray['chatbot']['tuning']));
@@ -74,6 +82,7 @@ class Settings
     public function toArray(): array
     {
         return [
+            'application' => $this->application->toArray(),
             'chatbot' => [
                 'general' => $this->chatbotGeneral->toArray(),
                 'system_prompt' => $this->chatbotSystemPrompt->toArray(),
@@ -86,6 +95,16 @@ class Settings
                 'holiday' => $this->holiday->toArray(),
             ],
         ];
+    }
+
+    public function getApplication(): Application
+    {
+        return $this->application;
+    }
+
+    public function setApplication(Application $application): void
+    {
+        $this->application = $application;
     }
 
     public function getChatbotGeneral(): ChatbotGeneral

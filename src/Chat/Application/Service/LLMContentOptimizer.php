@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Chat\Application\Service;
 
-use PhpLlm\LlmChain\LanguageModel;
+use ChronicleKeeper\Shared\Infrastructure\LLMChain\LLMChainFactory;
 use PhpLlm\LlmChain\Message\Message;
 use PhpLlm\LlmChain\Message\MessageBag;
 use PhpLlm\LlmChain\Message\SystemMessage;
@@ -16,13 +16,13 @@ use function assert;
 class LLMContentOptimizer
 {
     public function __construct(
-        private readonly LanguageModel $llm,
+        private readonly LLMChainFactory $llmChainFactory,
     ) {
     }
 
     public function optimize(string $content): string
     {
-        $response = $this->llm->call(
+        $response = $this->llmChainFactory->create()->call(
             new MessageBag($this->getSystemPrompt(), Message::ofUser($content)),
             ['model' => Version::gpt4oMini()->name, 'temperature' => 0.75],
         );

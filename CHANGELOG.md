@@ -3,14 +3,16 @@
 ## [alpha-0.5] - Fun with images
 
 ### Added
-- Mechtild, the new image artist, is now available for image generation based on Dall-E 3.
-- Added shortcuts to the navigation for quick access to the images, documents, and conversations.
-- Added a "notifications" event in UX available for live action notifications.
-- Splitting the searchable embeddings of documents into 800 string length chunks for better search results which also allows more document responses.
-- Splitting the searchable embeddings of image descriptions into 800 string length chunks for better search results which also allows more image responses.
+- Mechtild, the new image artist, is now available for image generation based on DALL-E 3.
+- Added shortcuts to the navigation for quick access to images, documents, and conversations.
+- Added a "notifications" event in UX available for live-action notifications.
+- Split the searchable embeddings of documents into 800 string length chunks for better search results, which also allows more document responses.
+- Split the searchable embeddings of image descriptions into 800 string length chunks for better search results, which also allows more image responses.
+- There is a welcome page now when the system starts first without settings - choose between import or manual configuration.
 
 ### Changed
 - Raised default library responses to ChatGPT to 20 documents and 15 images within the default settings.
+- The OpenAI API key is now set up in application settings instead of the environment.
 
 ### Fixed
 - Resolved importing from alpha-0.2 does not assign all files and images to a directory.
