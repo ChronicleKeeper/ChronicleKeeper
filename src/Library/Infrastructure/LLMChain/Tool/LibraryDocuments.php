@@ -7,8 +7,8 @@ namespace ChronicleKeeper\Library\Infrastructure\LLMChain\Tool;
 use ChronicleKeeper\Library\Domain\Entity\Document;
 use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemVectorDocumentRepository;
 use ChronicleKeeper\Settings\Application\SettingsHandler;
+use ChronicleKeeper\Shared\Infrastructure\LLMChain\LLMChainFactory;
 use ChronicleKeeper\Shared\Infrastructure\LLMChain\ToolUsageCollector;
-use PhpLlm\LlmChain\EmbeddingsModel;
 use PhpLlm\LlmChain\ToolBox\Attribute\AsTool;
 
 use function array_values;
@@ -33,7 +33,7 @@ final class LibraryDocuments
 
     public function __construct(
         private readonly FilesystemVectorDocumentRepository $vectorDocumentRepository,
-        private readonly EmbeddingsModel $embeddings,
+        private readonly LLMChainFactory $embeddings,
         private readonly SettingsHandler $settingsHandler,
         private readonly ToolUsageCollector $collector,
     ) {
@@ -49,7 +49,7 @@ final class LibraryDocuments
     {
         $maxResults = $this->settingsHandler->get()->getChatbotGeneral()->getMaxDocumentResponses();
 
-        $vector    = $this->embeddings->create($search);
+        $vector    = $this->embeddings->createEmbeddings()->create($search);
         $documents = $this->vectorDocumentRepository->findSimilar(
             $vector->getData(),
             maxDistance: $this->maxDistance,

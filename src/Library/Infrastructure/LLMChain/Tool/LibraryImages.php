@@ -7,8 +7,8 @@ namespace ChronicleKeeper\Library\Infrastructure\LLMChain\Tool;
 use ChronicleKeeper\Library\Domain\Entity\Image;
 use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemVectorImageRepository;
 use ChronicleKeeper\Settings\Application\SettingsHandler;
+use ChronicleKeeper\Shared\Infrastructure\LLMChain\LLMChainFactory;
 use ChronicleKeeper\Shared\Infrastructure\LLMChain\ToolUsageCollector;
-use PhpLlm\LlmChain\EmbeddingsModel;
 use PhpLlm\LlmChain\ToolBox\Attribute\AsTool;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
@@ -34,7 +34,7 @@ final class LibraryImages
 
     public function __construct(
         private readonly FilesystemVectorImageRepository $vectorImageRepository,
-        private readonly EmbeddingsModel $embeddings,
+        private readonly LLMChainFactory $embeddings,
         private readonly SettingsHandler $settingsHandler,
         private readonly ToolUsageCollector $collector,
         private readonly RouterInterface $router,
@@ -51,7 +51,7 @@ final class LibraryImages
     {
         $maxResults = $this->settingsHandler->get()->getChatbotGeneral()->getMaxImageResponses();
 
-        $vector  = $this->embeddings->create($search);
+        $vector  = $this->embeddings->createEmbeddings()->create($search);
         $results = $this->vectorImageRepository->findSimilar(
             $vector->getData(),
             maxDistance: $this->maxDistance,

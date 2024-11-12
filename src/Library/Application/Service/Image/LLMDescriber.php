@@ -6,7 +6,7 @@ namespace ChronicleKeeper\Library\Application\Service\Image;
 
 use ChronicleKeeper\Library\Domain\Entity\Image;
 use ChronicleKeeper\Settings\Application\SettingsHandler;
-use PhpLlm\LlmChain\Chain;
+use ChronicleKeeper\Shared\Infrastructure\LLMChain\LLMChainFactory;
 use PhpLlm\LlmChain\Message\Content\Image as LLMImage;
 use PhpLlm\LlmChain\Message\Message;
 use PhpLlm\LlmChain\Message\MessageBag;
@@ -21,7 +21,7 @@ class LLMDescriber
 {
     public function __construct(
         private readonly SettingsHandler $settingsHandler,
-        private readonly Chain $chain,
+        private readonly LLMChainFactory $chain,
     ) {
     }
 
@@ -46,7 +46,7 @@ class LLMDescriber
             new LLMImage($imageToAnalyze->getImageUrl()),
         );
 
-        $response = $this->chain->call(
+        $response = $this->chain->create()->call(
             $messageBag,
             [
                 'model' => Version::gpt4o()->name,

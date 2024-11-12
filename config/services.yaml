@@ -13,7 +13,6 @@ services:
     autoconfigure: true
     bind:
       string $environment: '%env(string:APP_ENV)%'
-      string $openAIKey: '%env(string:OPENAI_API_KEY)%'
 
   ChronicleKeeper\:
     resource: '../src/*'

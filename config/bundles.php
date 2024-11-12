@@ -2,8 +2,6 @@
 
 declare(strict_types=1);
 
-use League\FlysystemBundle\FlysystemBundle;
-use PhpLlm\LlmChainBundle\LlmChainBundle;
 use Symfony\Bundle\DebugBundle\DebugBundle;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\MonologBundle\MonologBundle;
@@ -21,7 +19,6 @@ return [
     FrameworkBundle::class => ['all' => true],
     MonologBundle::class => ['all' => true],
     TwigBundle::class => ['all' => true],
-    LlmChainBundle::class => ['all' => true],
     TwigExtraBundle::class => ['all' => true],
 
     // Frontend Packages

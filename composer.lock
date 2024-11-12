@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f4fc561163ddd303fda1933fb827586b",
+    "content-hash": "84f11e25d21469d80eeefa63d588687d",
     "packages": [
         {
             "name": "composer/semver",
@@ -1105,55 +1105,6 @@
                 "source": "https://github.com/php-llm/llm-chain/tree/0.7.1"
             },
             "time": "2024-10-04T09:47:21+00:00"
-        },
-        {
-            "name": "php-llm/llm-chain-bundle",
-            "version": "0.7",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/php-llm/llm-chain-bundle.git",
-                "reference": "ba527bf3b44949f8d91a915e23530ca4922cdbd6"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/php-llm/llm-chain-bundle/zipball/ba527bf3b44949f8d91a915e23530ca4922cdbd6",
-                "reference": "ba527bf3b44949f8d91a915e23530ca4922cdbd6",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=8.2",
-                "php-llm/llm-chain": "^0.7",
-                "symfony/config": "^6.4 || ^7.0",
-                "symfony/dependency-injection": "^6.4 || ^7.0",
-                "symfony/framework-bundle": "^6.4 || ^7.0"
-            },
-            "require-dev": {
-                "php-cs-fixer/shim": "^3.64",
-                "phpstan/phpstan": "^1.12",
-                "phpunit/phpunit": "^11.3"
-            },
-            "type": "symfony-bundle",
-            "autoload": {
-                "psr-4": {
-                    "PhpLlm\\LlmChainBundle\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Christopher Hertel",
-                    "email": "mail@christopher-hertel.de"
-                }
-            ],
-            "description": "Symfony integration bundle for php-llm/llm-chain",
-            "support": {
-                "issues": "https://github.com/php-llm/llm-chain-bundle/issues",
-                "source": "https://github.com/php-llm/llm-chain-bundle/tree/0.7"
-            },
-            "time": "2024-10-03T22:56:24+00:00"
         },
         {
             "name": "phpdocumentor/reflection-common",

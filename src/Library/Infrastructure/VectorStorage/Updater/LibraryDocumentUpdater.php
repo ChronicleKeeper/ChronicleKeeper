@@ -8,7 +8,7 @@ use ChronicleKeeper\Library\Domain\Entity\Document;
 use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemDocumentRepository;
 use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemVectorDocumentRepository;
 use ChronicleKeeper\Library\Infrastructure\VectorStorage\VectorDocument;
-use PhpLlm\LlmChain\EmbeddingsModel;
+use ChronicleKeeper\Shared\Infrastructure\LLMChain\LLMChainFactory;
 use Psr\Log\LoggerInterface;
 
 use function count;
@@ -24,7 +24,7 @@ class LibraryDocumentUpdater
 
     public function __construct(
         private readonly LoggerInterface $logger,
-        private readonly EmbeddingsModel $embeddings,
+        private readonly LLMChainFactory $embeddings,
         private readonly FilesystemDocumentRepository $documentRepository,
         private readonly FilesystemVectorDocumentRepository $vectorDocumentRepository,
     ) {
@@ -95,7 +95,7 @@ class LibraryDocumentUpdater
                 document: $document,
                 content: trim($vectorContent),
                 vectorContentHash: $document->getContentHash(),
-                vector: $this->embeddings->create($vectorContent)->getData(),
+                vector: $this->embeddings->createEmbeddings()->create($vectorContent)->getData(),
             );
 
             $vectorDocuments[] = $vectorDocument;

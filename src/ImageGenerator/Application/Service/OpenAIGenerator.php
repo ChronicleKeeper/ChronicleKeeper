@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace ChronicleKeeper\ImageGenerator\Application\Service;
 
 use ChronicleKeeper\ImageGenerator\Domain\Entity\GeneratorResult;
-use PhpLlm\LlmChain\OpenAI\Platform;
+use ChronicleKeeper\Shared\Infrastructure\LLMChain\LLMChainFactory;
 use RuntimeException;
 
 use function ini_set;
@@ -14,7 +14,7 @@ use function is_array;
 class OpenAIGenerator
 {
     public function __construct(
-        private readonly Platform $platform,
+        private readonly LLMChainFactory $llmChainFactory,
     ) {
     }
 
@@ -29,7 +29,7 @@ class OpenAIGenerator
             'response_format' => 'b64_json',
         ];
 
-        $response = $this->platform->request('images/generations', $body);
+        $response = $this->llmChainFactory->createPlatform()->request('images/generations', $body);
 
         if (! is_array($response) || ! isset($response['data'][0])) {
             throw new RuntimeException('No image generated.');
