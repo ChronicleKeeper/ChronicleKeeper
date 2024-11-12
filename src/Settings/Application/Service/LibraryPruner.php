@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Settings\Application\Service;
 
-use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemDocumentRepository;
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\PathRegistry;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Filesystem\Filesystem;
