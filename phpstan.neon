@@ -4,6 +4,7 @@ includes:
     - vendor/phpstan/phpstan-symfony/rules.neon
     - vendor/phpstan/phpstan-webmozart-assert/extension.neon
     - vendor/phpstan/phpstan-phpunit/extension.neon
+    - vendor/spaze/phpstan-disallowed-calls/extension.neon
 
 parameters:
     level: 8
@@ -11,3 +12,17 @@ parameters:
         - public/index.php
         - src
         - tests
+
+    disallowedFunctionCalls:
+        -
+            function: 'var_dump()'
+            message: 'please use a logger instead.'
+        -
+            function: 'print_r()'
+            message: 'please use a logger instead.'
+        -
+            function: 'dump()'
+            message: 'please use a logger instead.'
+        -
+            function: 'dd()'
+            message: 'please use a logger instead.'
