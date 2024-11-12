@@ -87,6 +87,7 @@ class LibraryDocumentUpdater
         $content         = $document->content;
         $vectorDocuments = [];
 
+        $embeddingModel = $this->embeddings->createEmbeddings();
         do {
             $vectorContent = u($content)->truncate($vectorContentLength, '', false)->toString();
             $content       = substr($content, strlen($vectorContent));
@@ -95,7 +96,7 @@ class LibraryDocumentUpdater
                 document: $document,
                 content: trim($vectorContent),
                 vectorContentHash: $document->getContentHash(),
-                vector: $this->embeddings->createEmbeddings()->create($vectorContent)->getData(),
+                vector: $embeddingModel->create($vectorContent)->getData(),
             );
 
             $vectorDocuments[] = $vectorDocument;

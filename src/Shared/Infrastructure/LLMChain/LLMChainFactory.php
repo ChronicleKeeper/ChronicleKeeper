@@ -9,6 +9,7 @@ use PhpLlm\LlmChain\Chain;
 use PhpLlm\LlmChain\EmbeddingsModel;
 use PhpLlm\LlmChain\OpenAI\Model\Embeddings;
 use PhpLlm\LlmChain\OpenAI\Model\Gpt as GptModel;
+use PhpLlm\LlmChain\OpenAI\Platform;
 use PhpLlm\LlmChain\OpenAI\Platform\OpenAI;
 use PhpLlm\LlmChain\ToolBox\ChainProcessor;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -37,7 +38,7 @@ class LLMChainFactory
         return $this->chain;
     }
 
-    public function createPlatform(): OpenAI
+    public function createPlatform(): Platform
     {
         $settings = $this->settingsHandler->get();
 

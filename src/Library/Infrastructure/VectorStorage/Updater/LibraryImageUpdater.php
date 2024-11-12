@@ -87,6 +87,7 @@ class LibraryImageUpdater
         $content         = $image->description;
         $vectorDocuments = [];
 
+        $embeddingModel = $this->embeddings->createEmbeddings();
         do {
             $vectorContent = u($content)->truncate($vectorContentLength, '', false)->toString();
             $content       = substr($content, strlen($vectorContent));
@@ -95,7 +96,7 @@ class LibraryImageUpdater
                 image: $image,
                 content: trim($vectorContent),
                 vectorContentHash: $image->getDescriptionHash(),
-                vector: $this->embeddings->createEmbeddings()->create($vectorContent)->getData(),
+                vector: $embeddingModel->create($vectorContent)->getData(),
             );
 
             $vectorDocuments[] = $vectorDocument;
