@@ -128,3 +128,7 @@ a.disabled {
     cursor: default;
     opacity: 0.4;
 }
+
+.dropdown-item {
+    min-width: 15em;
+}
