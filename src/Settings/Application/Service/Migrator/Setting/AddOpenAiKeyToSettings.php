@@ -13,6 +13,8 @@ use function file_put_contents;
 use function json_decode;
 use function json_encode;
 
+use function version_compare;
+
 use const JSON_PRETTY_PRINT;
 use const JSON_THROW_ON_ERROR;
 
@@ -25,7 +27,7 @@ final class AddOpenAiKeyToSettings implements FileMigration
 
     public function isSupporting(FileType $type, string $fileVersion): bool
     {
-        return $type === FileType::SETTINGS && $fileVersion < '0.5';
+        return $type === FileType::SETTINGS && version_compare($fileVersion, '0.5', '<');
     }
 
     public function migrate(string $file, FileType $type): void

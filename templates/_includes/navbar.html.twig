@@ -10,7 +10,9 @@
         </a>
     </div>
     <div class="navbar-nav flex-row order-md-last">
-        <twig:Favorizer:HeaderShortcuts />
+        {% if not isFirstStart%}
+            <twig:Favorizer:HeaderShortcuts />
+        {% endif %}
         <div class="nav-item d-none d-md-flex">
             <a type="button" class="nav-link px-0" href="{{ path('settings', {'section': 'chatbot_general'}) }}" title="Einstellungen">
                 {{ ux_icon('tabler:settings') }}
