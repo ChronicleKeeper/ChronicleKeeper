@@ -26,8 +26,11 @@ phpdesktop: ## build phpdesktop release
 	cd build/www; APP_ENV=prod php bin/console cache:warmup
 	cd build/www; rm composer.lock composer.json
 
-serve-web: ## start dev webserver
+serve-symfony: ## start dev webserver with symfony cli
 	symfony local:server:start --no-tls
+
+serve-frankenphp: ## start dev webserver with frankenphp cli
+	frankenphp php-server -l 127.0.0.1:8000 -r public
 
 check-cs: ## check coding standards
 	vendor/bin/phpcs -n
