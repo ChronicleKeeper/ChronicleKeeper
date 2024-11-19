@@ -38,11 +38,12 @@ class GeneratorResultTest extends TestCase
     #[Test]
     public function jsonSerializationIsCorrect(): void
     {
-        $generatorResult = new GeneratorResult('foo');
+        $generatorResult = new GeneratorResult('foo', 'A fancy image!');
 
         self::assertSame([
             'id' => $generatorResult->id,
             'encodedImage' => 'foo',
+            'revisedPrompt' => 'A fancy image!',
             'mimeType' => 'image/png',
             'image' => null,
         ], $generatorResult->jsonSerialize());
@@ -52,7 +53,7 @@ class GeneratorResultTest extends TestCase
     public function objectIsCreatableWithImage(): void
     {
         $image           = self::createStub(Image::class);
-        $generatorResult = new GeneratorResult('foo', $image);
+        $generatorResult = new GeneratorResult(encodedImage: 'foo', image: $image);
 
         self::assertTrue(Uuid::isValid($generatorResult->id));
         self::assertSame('foo', $generatorResult->encodedImage);

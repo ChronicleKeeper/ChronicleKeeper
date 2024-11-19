@@ -48,7 +48,7 @@ class OpenAIGeneratorTest extends TestCase
                 'images/generations',
                 ['prompt' => 'bar', 'model' => 'dall-e-3', 'response_format' => 'b64_json'],
             )
-            ->willReturn(['data' => [['b64_json' => 'foo']]]);
+            ->willReturn(['data' => [['b64_json' => 'foo', 'revised_prompt' => 'bar']]]);
 
         $chainFactory = $this->createMock(LLMChainFactory::class);
         $chainFactory->expects($this->once())
@@ -58,5 +58,6 @@ class OpenAIGeneratorTest extends TestCase
         $generatorResult = (new OpenAIGenerator($chainFactory))->generate('bar');
 
         self::assertSame('foo', $generatorResult->encodedImage);
+        self::assertSame('bar', $generatorResult->revisedPrompt);
     }
 }

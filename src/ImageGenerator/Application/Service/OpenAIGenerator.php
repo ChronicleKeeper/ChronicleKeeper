@@ -35,6 +35,8 @@ class OpenAIGenerator
             throw new RuntimeException('No image generated.');
         }
 
-        return new GeneratorResult($response['data'][0]['b64_json']);
+        $image = $response['data'][0];
+
+        return new GeneratorResult($image['b64_json'], $image['revised_prompt']);
     }
 }
