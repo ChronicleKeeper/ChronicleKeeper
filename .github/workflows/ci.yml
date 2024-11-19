@@ -55,3 +55,6 @@ jobs:
                 uses: codecov/codecov-action@v5
                 with:
                   files: coverage.xml
+
+            - name: Send Test Results
+              uses: codecov/test-results-action@v1

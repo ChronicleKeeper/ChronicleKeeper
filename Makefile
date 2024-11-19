@@ -46,7 +46,7 @@ phpunit: ## run phpunit
 	 vendor/bin/phpunit --colors
 
 coverage: ## run phpunit with generating coverage report
-	XDEBUG_MODE=coverage vendor/bin/phpunit --coverage-html=coverage --coverage-clover=coverage.xml
+	XDEBUG_MODE=coverage vendor/bin/phpunit --coverage-html=coverage --coverage-clover=coverage.xml --log-junit junit.xml
 
 lint-php: ## linting php files
 	 if find src -name "*.php" -exec php -l {} \; | grep -v "No syntax errors detected"; then exit 1; fi
