@@ -10,19 +10,28 @@ use ChronicleKeeper\Library\Domain\Entity\Image;
 class GeneratorResultBuilder
 {
     private string $encodedImage;
+    private string $revisedPrompt;
     private Image|null $image;
     private string $mimeType;
 
     public function __construct()
     {
-        $this->encodedImage = 'defaultEncodedImage';
-        $this->image        = null;
-        $this->mimeType     = 'image/png';
+        $this->encodedImage  = 'defaultEncodedImage';
+        $this->revisedPrompt = 'I am the prompt that the server built from the user given prompt';
+        $this->image         = null;
+        $this->mimeType      = 'image/png';
     }
 
     public function withEncodedImage(string $encodedImage): self
     {
         $this->encodedImage = $encodedImage;
+
+        return $this;
+    }
+
+    public function withRevisedPrompt(string $revisedPrompt): self
+    {
+        $this->revisedPrompt = $revisedPrompt;
 
         return $this;
     }
@@ -43,6 +52,6 @@ class GeneratorResultBuilder
 
     public function build(): GeneratorResult
     {
-        return new GeneratorResult($this->encodedImage, $this->image, $this->mimeType);
+        return new GeneratorResult($this->encodedImage, $this->revisedPrompt, $this->image, $this->mimeType);
     }
 }

@@ -16,6 +16,7 @@ class GeneratorResult implements JsonSerializable
 
     public function __construct(
         public string $encodedImage,
+        public string $revisedPrompt = '', // Contains the prompt that the server used to generate the image
         public Image|null $image = null, // Not null when already taken to library
         public string $mimeType = 'image/png',
     ) {
@@ -27,12 +28,13 @@ class GeneratorResult implements JsonSerializable
         return 'data:' . $this->mimeType . ';base64,' . $this->encodedImage;
     }
 
-    /** @return array{id: string, encodedImage: string, mimeType: string, image: string|null} */
+    /** @return array{id: string, encodedImage: string, revisedPrompt: string, mimeType: string, image: string|null} */
     public function jsonSerialize(): array
     {
         return [
             'id' => $this->id,
             'encodedImage' => $this->encodedImage,
+            'revisedPrompt' => $this->revisedPrompt,
             'mimeType' => $this->mimeType,
             'image' => $this->image?->id,
         ];
