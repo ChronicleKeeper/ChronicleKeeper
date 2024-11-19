@@ -46,3 +46,12 @@ jobs:
             -   name: PHPUnit
                 run: make phpunit
                 continue-on-error: ${{ matrix.experimental }}
+
+            -   name: PHPUnit Coverage Report
+                run: make coverage
+                continue-on-error: ${{ matrix.experimental }}
+
+            -   name: Send Coverage Report
+                uses: codecov/codecov-action@v5
+                with:
+                  files: coverage.xml

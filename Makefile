@@ -45,6 +45,9 @@ phpunit: ## run phpunit
 	APP_ENV=test php bin/console cache:clear
 	 vendor/bin/phpunit --colors
 
+coverage: ## run phpunit with generating coverage report
+	XDEBUG_MODE=coverage vendor/bin/phpunit --coverage-html=coverage --coverage-clover=coverage.xml
+
 lint-php: ## linting php files
 	 if find src -name "*.php" -exec php -l {} \; | grep -v "No syntax errors detected"; then exit 1; fi
 	 if find tests -name "*.php" -exec php -l {} \; | grep -v "No syntax errors detected"; then exit 1; fi
