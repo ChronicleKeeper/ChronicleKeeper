@@ -10,6 +10,7 @@
 - Split the searchable embeddings of image descriptions into 800 string length chunks for better search results, which also allows more image responses.
 - There is a welcome page now when the system starts first without settings - choose between import or manual configuration.
 - Added a button for markdown editor to toggle fullscreen mode.
+- Implemented that descriptions for chatbot functions are editable within the settings.
 
 ### Changed
 - Raised default library responses to ChatGPT to 20 documents and 15 images within the default settings.

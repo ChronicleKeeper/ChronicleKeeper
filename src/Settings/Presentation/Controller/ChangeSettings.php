@@ -9,7 +9,6 @@ use ChronicleKeeper\Settings\Presentation\Form\ApplicationType;
 use ChronicleKeeper\Settings\Presentation\Form\CalendarGeneralType;
 use ChronicleKeeper\Settings\Presentation\Form\CalendarHolidayType;
 use ChronicleKeeper\Settings\Presentation\Form\CalendarMoonType;
-use ChronicleKeeper\Settings\Presentation\Form\ChatbotFunctionsType;
 use ChronicleKeeper\Settings\Presentation\Form\ChatbotGeneralType;
 use ChronicleKeeper\Settings\Presentation\Form\ChatbotSystemPromptType;
 use ChronicleKeeper\Settings\Presentation\Form\ChatbotTuningType;
@@ -27,7 +26,7 @@ use Twig\Environment;
 
 use function is_string;
 
-#[Route('/settings/{section}', name: 'settings', defaults: ['section' => 'chatbot_general'])]
+#[Route('/settings/{section}', name: 'settings', defaults: ['section' => 'chatbot_general'], priority: 0)]
 class ChangeSettings extends AbstractController
 {
     use HandleFlashMessages;
@@ -37,7 +36,6 @@ class ChangeSettings extends AbstractController
         'chatbot_general' => ChatbotGeneralType::class,
         'chatbot_system_prompt' => ChatbotSystemPromptType::class,
         'chatbot_tuning' => ChatbotTuningType::class,
-        'chatbot_functions' => ChatbotFunctionsType::class,
         'calendar_general' => CalendarGeneralType::class,
         'calendar_holiday' => CalendarHolidayType::class,
         'calendar_moon' => CalendarMoonType::class,
