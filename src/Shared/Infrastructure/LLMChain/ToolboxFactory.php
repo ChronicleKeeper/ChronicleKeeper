@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Shared\Infrastructure\LLMChain;
 
+use ChronicleKeeper\Settings\Application\SettingsHandler;
 use PhpLlm\LlmChain\ToolBox\ToolAnalyzer;
 use PhpLlm\LlmChain\ToolBox\ToolBox;
 use PhpLlm\LlmChain\ToolBox\ToolBoxInterface;
@@ -21,6 +22,7 @@ class ToolboxFactory
 
     /** @param object[] $tools */
     public function __construct(
+        private readonly SettingsHandler $settingsHandler,
         #[AutowireIterator('llm_chain.tool')]
         iterable $tools = [],
     ) {
@@ -29,6 +31,9 @@ class ToolboxFactory
 
     public function create(): ToolBoxInterface
     {
-        return new ToolBox(new ToolAnalyzer(), $this->tools);
+        return new SettingsToolBox(
+            $this->settingsHandler,
+            new ToolBox(new ToolAnalyzer(), $this->tools),
+        );
     }
 }

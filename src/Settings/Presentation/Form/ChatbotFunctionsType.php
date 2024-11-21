@@ -6,11 +6,14 @@ namespace ChronicleKeeper\Settings\Presentation\Form;
 
 use ChronicleKeeper\Settings\Domain\ValueObject\Settings;
 use ChronicleKeeper\Settings\Domain\ValueObject\Settings\ChatbotFunctions;
+use ChronicleKeeper\Shared\Infrastructure\LLMChain\ToolboxFactory;
+use PhpLlm\LlmChain\ToolBox\Metadata;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\DataMapperInterface;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -19,14 +22,23 @@ use Traversable;
 
 use function is_bool;
 use function iterator_to_array;
+use function preg_replace;
 use function time;
 
 final class ChatbotFunctionsType extends AbstractType implements DataMapperInterface
 {
+    /** @var Metadata[] */
+    private readonly array $tools;
+
+    public function __construct(
+        private readonly ToolboxFactory $toolboxFactory,
+    ) {
+        $this->tools = $this->toolboxFactory->create()->getMap();
+    }
+
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefault('data_class', Settings::class);
-        $resolver->setDefault('twig_view', 'settings/chatbot_functions.html.twig');
     }
 
     /** @inheritDoc */
@@ -43,6 +55,19 @@ final class ChatbotFunctionsType extends AbstractType implements DataMapperInter
                 'required' => false,
             ],
         );
+
+        foreach ($this->tools as $tool) {
+            $builder->add(
+                $tool->name,
+                TextareaType::class,
+                [
+                    'label' => $tool->name,
+                    'translation_domain' => false,
+                    'required' => false,
+                    'empty_data' => '',
+                ],
+            );
+        }
 
         $builder->add('timestamp', HiddenType::class, ['mapped' => false, 'data' => time()]);
     }
@@ -62,6 +87,11 @@ final class ChatbotFunctionsType extends AbstractType implements DataMapperInter
         $forms = iterator_to_array($forms);
 
         $forms['allowDebugOutput']->setData($viewData->getChatbotFunctions()->isAllowDebugOutput());
+
+        $descriptions = $viewData->getChatbotFunctions()->getFunctionDescriptions();
+        foreach ($this->tools as $tool) {
+            $forms[$tool->name]->setData($descriptions[$tool->name] ?? $tool->description);
+        }
     }
 
     /** @param Traversable<FormInterface> $forms */
@@ -80,7 +110,21 @@ final class ChatbotFunctionsType extends AbstractType implements DataMapperInter
                 throw new UnexpectedTypeException($allowDebugOutput, 'bool');
             }
 
-            $viewData->setChatbotFunctions(new ChatbotFunctions($allowDebugOutput));
+            $descriptions = [];
+            foreach ($this->tools as $tool) {
+                $formData = $forms[$tool->name]->getData();
+                $formData = preg_replace("/\r|\n/", "\n", (string) $formData); // From windows to linux line breaks
+
+                $formDataWithoutWhitespaces        = preg_replace("/\r|\n/", '', (string) $formData);
+                $toolDescriptionWithoutWhitespaces = preg_replace("/\r|\n/", '', $tool->description);
+                if ($formData === '' || $formDataWithoutWhitespaces === $toolDescriptionWithoutWhitespaces) {
+                    continue;
+                }
+
+                $descriptions[$tool->name] = $forms[$tool->name]->getData() ?? '';
+            }
+
+            $viewData->setChatbotFunctions(new ChatbotFunctions($allowDebugOutput, $descriptions));
         } catch (Throwable) {
             return;
         }
