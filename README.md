@@ -28,14 +28,26 @@ Gefährte zur Seite.
 - Umfangreiche Konfiguration zum Verhalten des Chronicle Keeper im Gespräch.
 - Konfigurierbare Kalender mit Feiertagen und Mondzyklen, unabhängig vom realen Kalender und dem realen Zeitablauf.
 
-## Installation für Benutzer
+## Windows-Installation
 
-Um den Chronicle Keeper in deiner Runde zu nutzen, musst du keine Taverne aufsuchen oder einen Dungeon durchforsten. 
-Lade die ZIP-Datei des [aktuellsten Releases](https://github.com/ChronicleKeeper/ChronicleKeeper/releases/latest) herunter. 
+Voraussetzungen:
+
+- Windows 10 oder höher
+- [OpenAI API Key](https://platform.openai.com/api-keys)
+- Mutige Helden auf einer Reise durch eine aufregende Welt
+
+Um den Chronicle Keeper in deiner Runde zu nutzen, musst du keine Taverne aufsuchen oder einen Dungeon durchforsten.
+Lade die ZIP-Datei des [aktuellsten Releases](https://github.com/ChronicleKeeper/ChronicleKeeper/releases/latest) herunter.
 Diese enthält die vollständige Desktop-Variante.
 
-Nach dem Entpacken des Verzeichnisses musst du die Datei `www/.env` anpassen und 
-deinen [OpenAI API Key](https://platform.openai.com/api-keys) eintragen. Dann kannst du sofort loslegen.
+Nach dem Entpacken des Verzeichnisses kannst du einfach loslegen und den Chronicle Keeper starten. Es wird dich ein kleiner
+Willkommensbildschirm anlachen mit weiteren Hinweisen. Du kannst hier entweder zum Import eines bestehenden Archivs
+aus einer vorherigen Version wechseln oder direkt in die Konfiguration weitergeleitet werden, um einen
+[OpenAI API Key](https://platform.openai.com/api-keys) einzutragen.
+
+## Anwenderdokumentation
+
+Eine ausführliche Dokumentation findest du unter [https://chroniclekeeper.github.io/docs/](https://chroniclekeeper.github.io/docs/).
 
 ## License
 
