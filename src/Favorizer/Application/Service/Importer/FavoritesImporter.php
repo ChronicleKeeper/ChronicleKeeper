@@ -11,6 +11,7 @@ use ChronicleKeeper\Settings\Application\Service\Importer\SingleImport;
 use ChronicleKeeper\Settings\Application\Service\ImportSettings;
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
 use League\Flysystem\Filesystem;
+use League\Flysystem\UnableToReadFile;
 
 final readonly class FavoritesImporter implements SingleImport
 {
@@ -21,7 +22,13 @@ final readonly class FavoritesImporter implements SingleImport
 
     public function import(Filesystem $filesystem, ImportSettings $settings): ImportedFileBag
     {
-        $content = $filesystem->read('favorites.json');
+        try {
+            $content = $filesystem->read('favorites.json');
+        } catch (UnableToReadFile) {
+            // It is totally fine, when the file is not available during import
+            return new ImportedFileBag(ImportedFile::asIgnored('favorites.json', FileType::FAVORITES));
+        }
+
         $this->fileAccess->write('storage', 'favorites.json', $content);
 
         return new ImportedFileBag(ImportedFile::asSuccess('favorites.json', FileType::FAVORITES));
