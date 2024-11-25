@@ -15,7 +15,7 @@ use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemDocumentReposito
 use ChronicleKeeper\Shared\Application\Query\QueryService;
 use ChronicleKeeper\Shared\Presentation\FlashMessages\Alert;
 use ChronicleKeeper\Shared\Presentation\FlashMessages\HandleFlashMessages;
-use PhpLlm\LlmChain\Message\AssistantMessage;
+use PhpLlm\LlmChain\Model\Message\AssistantMessage;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;

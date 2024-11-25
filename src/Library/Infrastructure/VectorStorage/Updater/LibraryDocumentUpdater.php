@@ -9,8 +9,10 @@ use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemDocumentReposito
 use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemVectorDocumentRepository;
 use ChronicleKeeper\Library\Infrastructure\VectorStorage\VectorDocument;
 use ChronicleKeeper\Shared\Infrastructure\LLMChain\LLMChainFactory;
+use PhpLlm\LlmChain\Model\Response\VectorResponse;
 use Psr\Log\LoggerInterface;
 
+use function assert;
 use function count;
 use function reset;
 use function strlen;
@@ -87,16 +89,23 @@ class LibraryDocumentUpdater
         $content         = $document->content;
         $vectorDocuments = [];
 
-        $embeddingModel = $this->embeddings->createEmbeddings();
+        $platform = $this->embeddings->createPlatform();
         do {
             $vectorContent = u($content)->truncate($vectorContentLength, '', false)->toString();
             $content       = substr($content, strlen($vectorContent));
+
+            $vector = $platform->request(
+                model: $this->embeddings->createEmbeddingsModel(),
+                input: $vectorContent,
+            );
+            assert($vector instanceof VectorResponse);
+            $vector = $vector->getContent()[0];
 
             $vectorDocument = new VectorDocument(
                 document: $document,
                 content: trim($vectorContent),
                 vectorContentHash: $document->getContentHash(),
-                vector: $embeddingModel->create($vectorContent)->getData(),
+                vector: $vector->getData(),
             );
 
             $vectorDocuments[] = $vectorDocument;

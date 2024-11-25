@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace ChronicleKeeper\Shared\Infrastructure\LLMChain;
 
 use ChronicleKeeper\Settings\Application\SettingsHandler;
-use PhpLlm\LlmChain\Response\ToolCall;
-use PhpLlm\LlmChain\ToolBox\Metadata;
-use PhpLlm\LlmChain\ToolBox\ToolBoxInterface;
+use PhpLlm\LlmChain\Chain\ToolBox\Metadata;
+use PhpLlm\LlmChain\Chain\ToolBox\ToolBoxInterface;
+use PhpLlm\LlmChain\Model\Response\ToolCall;
 
 use function array_key_exists;
 

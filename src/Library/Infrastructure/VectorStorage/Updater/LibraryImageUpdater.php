@@ -9,8 +9,10 @@ use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemImageRepository;
 use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemVectorImageRepository;
 use ChronicleKeeper\Library\Infrastructure\VectorStorage\VectorImage;
 use ChronicleKeeper\Shared\Infrastructure\LLMChain\LLMChainFactory;
+use PhpLlm\LlmChain\Model\Response\VectorResponse;
 use Psr\Log\LoggerInterface;
 
+use function assert;
 use function count;
 use function reset;
 use function strlen;
@@ -87,16 +89,23 @@ class LibraryImageUpdater
         $content         = $image->description;
         $vectorDocuments = [];
 
-        $embeddingModel = $this->embeddings->createEmbeddings();
+        $platform = $this->embeddings->createPlatform();
         do {
             $vectorContent = u($content)->truncate($vectorContentLength, '', false)->toString();
             $content       = substr($content, strlen($vectorContent));
+
+            $vector = $platform->request(
+                model: $this->embeddings->createEmbeddingsModel(),
+                input: $vectorContent,
+            );
+            assert($vector instanceof VectorResponse);
+            $vector = $vector->getContent()[0];
 
             $vectorDocument = new VectorImage(
                 image: $image,
                 content: trim($vectorContent),
                 vectorContentHash: $image->getDescriptionHash(),
-                vector: $embeddingModel->create($vectorContent)->getData(),
+                vector: $vector->getData(),
             );
 
             $vectorDocuments[] = $vectorDocument;

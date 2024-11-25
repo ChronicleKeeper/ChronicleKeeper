@@ -7,13 +7,12 @@ namespace ChronicleKeeper\Library\Application\Service\Image;
 use ChronicleKeeper\Library\Domain\Entity\Image;
 use ChronicleKeeper\Settings\Application\SettingsHandler;
 use ChronicleKeeper\Shared\Infrastructure\LLMChain\LLMChainFactory;
-use PhpLlm\LlmChain\Message\Content\Image as LLMImage;
-use PhpLlm\LlmChain\Message\Message;
-use PhpLlm\LlmChain\Message\MessageBag;
-use PhpLlm\LlmChain\OpenAI\Model\Gpt\Version;
+use PhpLlm\LlmChain\Bridge\OpenAI\GPT;
+use PhpLlm\LlmChain\Model\Message\Content\Image as LLMImage;
+use PhpLlm\LlmChain\Model\Message\Message;
+use PhpLlm\LlmChain\Model\Message\MessageBag;
+use PhpLlm\LlmChain\Model\Response\TextResponse;
 use RuntimeException;
-
-use function is_string;
 
 use const PHP_EOL;
 
@@ -49,16 +48,16 @@ class LLMDescriber
         $response = $this->chain->create()->call(
             $messageBag,
             [
-                'model' => Version::gpt4o()->name,
+                'model' => GPT::GPT_4O,
                 'temperature' => $settings->getChatbotTuning()->getTemperature(),
             ],
         );
 
-        if (! is_string($response)) {
+        if (! $response instanceof TextResponse) {
             throw new RuntimeException('Image analyzing is expected to return string, given is an object.');
         }
 
-        return $response;
+        return $response->getContent();
     }
 
     private function getUserPromptText(Image $image): string

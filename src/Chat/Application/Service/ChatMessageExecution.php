@@ -10,10 +10,10 @@ use ChronicleKeeper\Library\Infrastructure\LLMChain\Tool\LibraryDocuments;
 use ChronicleKeeper\Library\Infrastructure\LLMChain\Tool\LibraryImages;
 use ChronicleKeeper\Shared\Infrastructure\LLMChain\LLMChainFactory;
 use ChronicleKeeper\Shared\Infrastructure\LLMChain\ToolUsageCollector;
-use PhpLlm\LlmChain\Message\Message;
+use PhpLlm\LlmChain\Model\Message\Message;
+use PhpLlm\LlmChain\Model\Response\TextResponse;
 
 use function assert;
-use function is_string;
 
 class ChatMessageExecution
 {
@@ -45,13 +45,13 @@ class ChatMessageExecution
                 'temperature' => $useTemperature,
             ],
         );
-        assert(is_string($response));
+        assert($response instanceof TextResponse);
 
         // Remove maximum distances in tools after the response ... just for saftey of the request
         $this->libraryDocuments->setOneTimeMaxDistance($conversation->settings->documentsMaxDistance);
         $this->libraryImages->setOneTimeMaxDistance($conversation->settings->imagesMaxDistance);
 
-        $response = new ExtendedMessage(message: Message::ofAssistant($response));
+        $response = new ExtendedMessage(message: Message::ofAssistant($response->getContent()));
 
         $this->appendReferencedDocumentsFromBackground($response);
         $this->appendReferencedImages($response);

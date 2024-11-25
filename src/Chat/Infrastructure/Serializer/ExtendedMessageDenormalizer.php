@@ -7,7 +7,7 @@ namespace ChronicleKeeper\Chat\Infrastructure\Serializer;
 use ChronicleKeeper\Chat\Domain\Entity\ExtendedMessage;
 use ChronicleKeeper\Library\Domain\Entity\Document;
 use ChronicleKeeper\Library\Domain\Entity\Image;
-use PhpLlm\LlmChain\Message\MessageInterface;
+use PhpLlm\LlmChain\Model\Message\MessageInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Webmozart\Assert\Assert;

@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace ChronicleKeeper\Shared\Infrastructure\LLMChain;
 
 use ChronicleKeeper\Settings\Application\SettingsHandler;
-use PhpLlm\LlmChain\ToolBox\ToolAnalyzer;
-use PhpLlm\LlmChain\ToolBox\ToolBox;
-use PhpLlm\LlmChain\ToolBox\ToolBoxInterface;
+use PhpLlm\LlmChain\Chain\ToolBox\ToolAnalyzer;
+use PhpLlm\LlmChain\Chain\ToolBox\ToolBox;
+use PhpLlm\LlmChain\Chain\ToolBox\ToolBoxInterface;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\DependencyInjection\Attribute\Lazy;
 use Traversable;

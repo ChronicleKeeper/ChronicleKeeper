@@ -9,11 +9,13 @@ use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemVectorImageRepos
 use ChronicleKeeper\Settings\Application\SettingsHandler;
 use ChronicleKeeper\Shared\Infrastructure\LLMChain\LLMChainFactory;
 use ChronicleKeeper\Shared\Infrastructure\LLMChain\ToolUsageCollector;
-use PhpLlm\LlmChain\ToolBox\Attribute\AsTool;
+use PhpLlm\LlmChain\Chain\ToolBox\Attribute\AsTool;
+use PhpLlm\LlmChain\Model\Response\VectorResponse;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 
 use function array_values;
+use function assert;
 use function count;
 
 use const PHP_EOL;
@@ -51,7 +53,13 @@ final class LibraryImages
     {
         $maxResults = $this->settingsHandler->get()->getChatbotGeneral()->getMaxImageResponses();
 
-        $vector  = $this->embeddings->createEmbeddings()->create($search);
+        $vector = $this->embeddings->createPlatform()->request(
+            model: $this->embeddings->createEmbeddingsModel(),
+            input: $search,
+        );
+        assert($vector instanceof VectorResponse);
+        $vector = $vector->getContent()[0];
+
         $results = $this->vectorImageRepository->findSimilar(
             $vector->getData(),
             maxDistance: $this->maxDistance,

@@ -7,11 +7,11 @@ namespace ChronicleKeeper\Chat\Presentation\Twig\Chat;
 use ChronicleKeeper\Chat\Domain\Entity\ExtendedMessage;
 use ChronicleKeeper\Chat\Domain\Entity\ExtendedMessageBag;
 use ChronicleKeeper\Settings\Application\SettingsHandler;
-use PhpLlm\LlmChain\Message\AssistantMessage;
-use PhpLlm\LlmChain\Message\Content\Content;
-use PhpLlm\LlmChain\Message\Content\Text;
-use PhpLlm\LlmChain\Message\Role;
-use PhpLlm\LlmChain\Message\UserMessage;
+use PhpLlm\LlmChain\Model\Message\AssistantMessage;
+use PhpLlm\LlmChain\Model\Message\Content\Content;
+use PhpLlm\LlmChain\Model\Message\Content\Text;
+use PhpLlm\LlmChain\Model\Message\Role;
+use PhpLlm\LlmChain\Model\Message\UserMessage;
 
 use function array_column;
 use function array_filter;
