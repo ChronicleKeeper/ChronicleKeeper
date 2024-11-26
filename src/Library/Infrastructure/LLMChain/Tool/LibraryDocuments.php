@@ -9,9 +9,13 @@ use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemVectorDocumentRe
 use ChronicleKeeper\Settings\Application\SettingsHandler;
 use ChronicleKeeper\Shared\Infrastructure\LLMChain\LLMChainFactory;
 use ChronicleKeeper\Shared\Infrastructure\LLMChain\ToolUsageCollector;
-use PhpLlm\LlmChain\ToolBox\Attribute\AsTool;
+use PhpLlm\LlmChain\Bridge\OpenAI\Embeddings;
+use PhpLlm\LlmChain\Chain\ToolBox\Attribute\AsTool;
+use PhpLlm\LlmChain\Model\Response\AsyncResponse;
+use PhpLlm\LlmChain\Model\Response\VectorResponse;
 
 use function array_values;
+use function assert;
 use function count;
 
 use const PHP_EOL;
@@ -49,7 +53,17 @@ final class LibraryDocuments
     {
         $maxResults = $this->settingsHandler->get()->getChatbotGeneral()->getMaxDocumentResponses();
 
-        $vector    = $this->embeddings->createEmbeddings()->create($search);
+        $vector = $this->embeddings->createPlatform()->request(
+            model: new Embeddings(),
+            input: $search,
+        );
+
+        assert($vector instanceof AsyncResponse);
+        $vector = $vector->unwrap();
+
+        assert($vector instanceof VectorResponse);
+        $vector = $vector->getContent()[0];
+
         $documents = $this->vectorDocumentRepository->findSimilar(
             $vector->getData(),
             maxDistance: $this->maxDistance,

@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Shared\Infrastructure\LLMChain\Serializer;
 
-use PhpLlm\LlmChain\Message\AssistantMessage;
-use PhpLlm\LlmChain\Message\Content\Content;
-use PhpLlm\LlmChain\Message\Content\Image;
-use PhpLlm\LlmChain\Message\Content\Text;
-use PhpLlm\LlmChain\Message\MessageInterface;
-use PhpLlm\LlmChain\Message\Role;
-use PhpLlm\LlmChain\Message\SystemMessage;
-use PhpLlm\LlmChain\Message\ToolCallMessage;
-use PhpLlm\LlmChain\Message\UserMessage;
+use PhpLlm\LlmChain\Model\Message\AssistantMessage;
+use PhpLlm\LlmChain\Model\Message\Content\Content;
+use PhpLlm\LlmChain\Model\Message\Content\Image;
+use PhpLlm\LlmChain\Model\Message\Content\Text;
+use PhpLlm\LlmChain\Model\Message\MessageInterface;
+use PhpLlm\LlmChain\Model\Message\Role;
+use PhpLlm\LlmChain\Model\Message\SystemMessage;
+use PhpLlm\LlmChain\Model\Message\ToolCallMessage;
+use PhpLlm\LlmChain\Model\Message\UserMessage;
 use Symfony\Component\Serializer\Normalizer\DenormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Webmozart\Assert\Assert;

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace ChronicleKeeper\Chat\Presentation\Form;
 
 use ChronicleKeeper\Chat\Domain\ValueObject\Settings;
-use PhpLlm\LlmChain\OpenAI\Model\Gpt\Version;
+use PhpLlm\LlmChain\Bridge\OpenAI\GPT;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\DataMapperInterface;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
@@ -43,8 +43,8 @@ final class ConversationSettingsType extends AbstractType implements DataMapperI
                 'translation_domain' => false,
                 'required' => false,
                 'choices' => [
-                    Version::gpt4oMini()->name => Version::gpt4oMini()->name,
-                    Version::gpt4o()->name => Version::gpt4o()->name,
+                    GPT::GPT_4O_MINI => GPT::GPT_4O_MINI,
+                    GPT::GPT_4O => GPT::GPT_4O,
                 ],
             ],
         );

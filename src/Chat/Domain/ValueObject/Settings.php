@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Chat\Domain\ValueObject;
 
-use PhpLlm\LlmChain\OpenAI\Model\Gpt\Version;
+use PhpLlm\LlmChain\Bridge\OpenAI\GPT;
 
 class Settings
 {
@@ -16,6 +16,6 @@ class Settings
         public readonly float $imagesMaxDistance = 0.7,
         public readonly float $documentsMaxDistance = 0.85,
     ) {
-        $this->version = $version ?? Version::gpt4oMini()->name;
+        $this->version = $version ?? GPT::GPT_4O_MINI;
     }
 }

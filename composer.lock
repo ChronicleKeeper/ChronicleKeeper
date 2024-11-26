@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "84f11e25d21469d80eeefa63d588687d",
+    "content-hash": "ecda6c333e1e438d58b7d6ea29a38db3",
     "packages": [
         {
             "name": "composer/semver",
@@ -1030,16 +1030,16 @@
         },
         {
             "name": "php-llm/llm-chain",
-            "version": "0.7.1",
+            "version": "0.8.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-llm/llm-chain.git",
-                "reference": "08150e74fe8c993da661c92614aa72d7131133f1"
+                "reference": "e95827068a32df8362f7da02792b09e2944902a1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-llm/llm-chain/zipball/08150e74fe8c993da661c92614aa72d7131133f1",
-                "reference": "08150e74fe8c993da661c92614aa72d7131133f1",
+                "url": "https://api.github.com/repos/php-llm/llm-chain/zipball/e95827068a32df8362f7da02792b09e2944902a1",
+                "reference": "e95827068a32df8362f7da02792b09e2944902a1",
                 "shasum": ""
             },
             "require": {
@@ -1057,13 +1057,15 @@
                 "webmozart/assert": "^1.11"
             },
             "conflict": {
-                "mongodb/mongodb": "<1.20"
+                "mongodb/mongodb": "<1.20",
+                "phpdocumentor/reflection-docblock": ">=5.6"
             },
             "require-dev": {
                 "codewithkyrian/chromadb-php": "^0.2.1",
                 "mongodb/mongodb": "^1.20",
                 "php-cs-fixer/shim": "^3.64",
                 "phpstan/phpstan": "^1.12",
+                "phpstan/phpstan-webmozart-assert": "^1.2",
                 "phpunit/phpunit": "^11.3",
                 "probots-io/pinecone-php": "^1.0",
                 "rector/rector": "^1.2",
@@ -1079,7 +1081,6 @@
                 "codewithkyrian/chromadb-php": "For using the ChromaDB as retrieval vector store.",
                 "mongodb/mongodb": "For using MongoDB Atlas as retrieval vector store.",
                 "probots-io/pinecone-php": "For using the Pinecone as retrieval vector store.",
-                "symfony/clock": "For using the clock tool.",
                 "symfony/css-selector": "For using the YouTube transcription tool.",
                 "symfony/dom-crawler": "For using the YouTube transcription tool."
             },
@@ -1102,9 +1103,9 @@
             "description": "A slim PHP component with tooling around LLMs.",
             "support": {
                 "issues": "https://github.com/php-llm/llm-chain/issues",
-                "source": "https://github.com/php-llm/llm-chain/tree/0.7.1"
+                "source": "https://github.com/php-llm/llm-chain/tree/0.8.1"
             },
-            "time": "2024-10-04T09:47:21+00:00"
+            "time": "2024-11-23T16:21:11+00:00"
         },
         {
             "name": "phpdocumentor/reflection-common",
@@ -1161,16 +1162,16 @@
         },
         {
             "name": "phpdocumentor/reflection-docblock",
-            "version": "5.6.0",
+            "version": "5.5.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpDocumentor/ReflectionDocBlock.git",
-                "reference": "f3558a4c23426d12bffeaab463f8a8d8b681193c"
+                "reference": "0c70d2c566e899666f367ab7b80986beb3581e6f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpDocumentor/ReflectionDocBlock/zipball/f3558a4c23426d12bffeaab463f8a8d8b681193c",
-                "reference": "f3558a4c23426d12bffeaab463f8a8d8b681193c",
+                "url": "https://api.github.com/repos/phpDocumentor/ReflectionDocBlock/zipball/0c70d2c566e899666f367ab7b80986beb3581e6f",
+                "reference": "0c70d2c566e899666f367ab7b80986beb3581e6f",
                 "shasum": ""
             },
             "require": {
@@ -1179,7 +1180,7 @@
                 "php": "^7.4 || ^8.0",
                 "phpdocumentor/reflection-common": "^2.2",
                 "phpdocumentor/type-resolver": "^1.7",
-                "phpstan/phpdoc-parser": "^1.7|^2.0",
+                "phpstan/phpdoc-parser": "^1.7",
                 "webmozart/assert": "^1.9.1"
             },
             "require-dev": {
@@ -1219,9 +1220,9 @@
             "description": "With this component, a library can provide support for annotations via DocBlocks or otherwise retrieve information that is embedded in a DocBlock.",
             "support": {
                 "issues": "https://github.com/phpDocumentor/ReflectionDocBlock/issues",
-                "source": "https://github.com/phpDocumentor/ReflectionDocBlock/tree/5.6.0"
+                "source": "https://github.com/phpDocumentor/ReflectionDocBlock/tree/5.5.1"
             },
-            "time": "2024-11-12T11:25:25+00:00"
+            "time": "2024-11-06T11:58:54+00:00"
         },
         {
             "name": "phpdocumentor/type-resolver",

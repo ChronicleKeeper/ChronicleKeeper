@@ -10,8 +10,8 @@ use ChronicleKeeper\Library\Domain\RootDirectory;
 use ChronicleKeeper\Settings\Domain\ValueObject\Settings as AppSettings;
 use ChronicleKeeper\Shared\Domain\Sluggable;
 use JsonSerializable;
-use PhpLlm\LlmChain\Message\Message;
-use PhpLlm\LlmChain\OpenAI\Model\Gpt\Version;
+use PhpLlm\LlmChain\Bridge\OpenAI\GPT;
+use PhpLlm\LlmChain\Model\Message\Message;
 use Symfony\Component\String\Slugger\AsciiSlugger;
 use Symfony\Component\Uid\Uuid;
 
@@ -44,7 +44,7 @@ class Conversation implements JsonSerializable, Sluggable
             'Ungespeichert',
             RootDirectory::get(),
             new Settings(
-                Version::gpt4oMini()->name,
+                GPT::GPT_4O_MINI,
                 $settings->getChatbotTuning()->getTemperature(),
                 $settings->getChatbotTuning()->getDocumentsMaxDistance(),
                 $settings->getChatbotTuning()->getDocumentsMaxDistance(),

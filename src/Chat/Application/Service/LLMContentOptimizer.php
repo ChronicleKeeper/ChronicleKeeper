@@ -5,14 +5,13 @@ declare(strict_types=1);
 namespace ChronicleKeeper\Chat\Application\Service;
 
 use ChronicleKeeper\Shared\Infrastructure\LLMChain\LLMChainFactory;
-use PhpLlm\LlmChain\Message\Message;
-use PhpLlm\LlmChain\Message\MessageBag;
-use PhpLlm\LlmChain\Message\SystemMessage;
-use PhpLlm\LlmChain\OpenAI\Model\Gpt\Version;
-use PhpLlm\LlmChain\Response\Response;
+use PhpLlm\LlmChain\Bridge\OpenAI\GPT;
+use PhpLlm\LlmChain\Model\Message\Message;
+use PhpLlm\LlmChain\Model\Message\MessageBag;
+use PhpLlm\LlmChain\Model\Message\SystemMessage;
+use PhpLlm\LlmChain\Model\Response\TextResponse;
 
 use function assert;
-use function is_object;
 
 class LLMContentOptimizer
 {
@@ -25,16 +24,12 @@ class LLMContentOptimizer
     {
         $response = $this->llmChainFactory->create()->call(
             new MessageBag($this->getSystemPrompt(), Message::ofUser($content)),
-            ['model' => Version::gpt4oMini()->name, 'temperature' => 0.75],
+            ['model' => GPT::GPT_4O, 'temperature' => 0.75],
         );
 
-        if (is_object($response)) {
-            assert($response instanceof Response);
+        assert($response instanceof TextResponse);
 
-            return (string) $response->getContent();
-        }
-
-        return $response;
+        return $response->getContent();
     }
 
     private function getSystemPrompt(): SystemMessage
