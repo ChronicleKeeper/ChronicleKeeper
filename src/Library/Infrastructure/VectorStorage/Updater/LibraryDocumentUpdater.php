@@ -9,6 +9,7 @@ use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemDocumentReposito
 use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemVectorDocumentRepository;
 use ChronicleKeeper\Library\Infrastructure\VectorStorage\VectorDocument;
 use ChronicleKeeper\Shared\Infrastructure\LLMChain\LLMChainFactory;
+use PhpLlm\LlmChain\Model\Response\AsyncResponse;
 use PhpLlm\LlmChain\Model\Response\VectorResponse;
 use Psr\Log\LoggerInterface;
 
@@ -98,6 +99,9 @@ class LibraryDocumentUpdater
                 model: $this->embeddings->createEmbeddingsModel(),
                 input: $vectorContent,
             );
+            assert($vector instanceof AsyncResponse);
+            $vector = $vector->unwrap();
+
             assert($vector instanceof VectorResponse);
             $vector = $vector->getContent()[0];
 

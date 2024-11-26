@@ -4,14 +4,20 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Shared\Infrastructure\LLMChain;
 
+use ChronicleKeeper\ImageGenerator\Infrastructure\LLMChain\Bridge\OpenAI\DallE\ModelClient as DalleModelClient;
 use ChronicleKeeper\Settings\Application\SettingsHandler;
 use PhpLlm\LlmChain\Bridge\OpenAI\Embeddings;
+use PhpLlm\LlmChain\Bridge\OpenAI\Embeddings\ModelClient as EmbeddingsModelClient;
+use PhpLlm\LlmChain\Bridge\OpenAI\Embeddings\ResponseConverter as EmbeddingsResponseConverter;
 use PhpLlm\LlmChain\Bridge\OpenAI\GPT;
-use PhpLlm\LlmChain\Bridge\OpenAI\PlatformFactory;
+use PhpLlm\LlmChain\Bridge\OpenAI\GPT\ModelClient as GPTModelClient;
+use PhpLlm\LlmChain\Bridge\OpenAI\GPT\ResponseConverter as GPTResponseConverter;
 use PhpLlm\LlmChain\Chain;
 use PhpLlm\LlmChain\Chain\ToolBox\ChainProcessor;
 use PhpLlm\LlmChain\Model\EmbeddingsModel;
+use PhpLlm\LlmChain\Platform;
 use PhpLlm\LlmChain\PlatformInterface;
+use Symfony\Component\HttpClient\EventSourceHttpClient;
 
 class LLMChainFactory
 {
@@ -37,7 +43,23 @@ class LLMChainFactory
 
     public function createPlatform(): PlatformInterface
     {
-        return PlatformFactory::create($this->settingsHandler->get()->getApplication()->openAIApiKey ?? '');
+        $apiKey     = $this->settingsHandler->get()->getApplication()->openAIApiKey ?? '';
+        $httpClient = new EventSourceHttpClient();
+
+        $dallEModelClient = new DalleModelClient($httpClient, $apiKey);
+
+        return new Platform(
+            [
+                new GPTModelClient($httpClient, $apiKey),
+                new EmbeddingsModelClient($httpClient, $apiKey),
+                $dallEModelClient,
+            ],
+            [
+                new GPTResponseConverter(),
+                new EmbeddingsResponseConverter(),
+                $dallEModelClient,
+            ],
+        );
     }
 
     public function createEmbeddingsModel(): EmbeddingsModel

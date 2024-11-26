@@ -10,6 +10,7 @@ use ChronicleKeeper\Settings\Application\SettingsHandler;
 use ChronicleKeeper\Shared\Infrastructure\LLMChain\LLMChainFactory;
 use ChronicleKeeper\Shared\Infrastructure\LLMChain\ToolUsageCollector;
 use PhpLlm\LlmChain\Chain\ToolBox\Attribute\AsTool;
+use PhpLlm\LlmChain\Model\Response\AsyncResponse;
 use PhpLlm\LlmChain\Model\Response\VectorResponse;
 
 use function array_values;
@@ -55,6 +56,10 @@ final class LibraryDocuments
             model: $this->embeddings->createEmbeddingsModel(),
             input: $search,
         );
+
+        assert($vector instanceof AsyncResponse);
+        $vector = $vector->unwrap();
+
         assert($vector instanceof VectorResponse);
         $vector = $vector->getContent()[0];
 
