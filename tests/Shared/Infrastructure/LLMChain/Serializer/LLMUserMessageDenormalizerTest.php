@@ -94,7 +94,7 @@ class LLMUserMessageDenormalizerTest extends TestCase
             'role' => 'user',
             'content' => [
                 ['type' => 'text', 'text' => 'foo bar baz'],
-                ['type' => 'image_url', 'image_url' => ['url' => 'baz foo bar']],
+                ['type' => 'image_url', 'image_url' => ['url' => 'data:baz foo bar']],
             ],
         ];
 
@@ -106,7 +106,7 @@ class LLMUserMessageDenormalizerTest extends TestCase
         self::assertSame('foo bar baz', $obj->content[0]->text);
 
         self::assertInstanceOf(Image::class, $obj->content[1]);
-        self::assertSame('baz foo bar', $obj->content[1]->url);
+        self::assertSame('data:baz foo bar', $obj->content[1]->url);
     }
 
     #[Test]

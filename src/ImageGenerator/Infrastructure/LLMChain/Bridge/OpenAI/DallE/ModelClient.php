@@ -33,6 +33,7 @@ final readonly class ModelClient implements PlatformResponseFactory, PlatformRes
         return $model instanceof DallE;
     }
 
+    /** @inheritdoc */
     public function request(Model $model, object|array|string $input, array $options = []): HttpResponse
     {
         return $this->httpClient->request('POST', 'https://api.openai.com/v1/images/generations', [
@@ -44,6 +45,7 @@ final readonly class ModelClient implements PlatformResponseFactory, PlatformRes
         ]);
     }
 
+    /** @inheritdoc */
     public function convert(HttpResponse $response, array $options = []): LlmResponse
     {
         $response = $response->toArray();
