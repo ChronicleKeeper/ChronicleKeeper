@@ -9,6 +9,7 @@ use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemVectorDocumentRe
 use ChronicleKeeper\Settings\Application\SettingsHandler;
 use ChronicleKeeper\Shared\Infrastructure\LLMChain\LLMChainFactory;
 use ChronicleKeeper\Shared\Infrastructure\LLMChain\ToolUsageCollector;
+use PhpLlm\LlmChain\Bridge\OpenAI\Embeddings;
 use PhpLlm\LlmChain\Chain\ToolBox\Attribute\AsTool;
 use PhpLlm\LlmChain\Model\Response\AsyncResponse;
 use PhpLlm\LlmChain\Model\Response\VectorResponse;
@@ -53,7 +54,7 @@ final class LibraryDocuments
         $maxResults = $this->settingsHandler->get()->getChatbotGeneral()->getMaxDocumentResponses();
 
         $vector = $this->embeddings->createPlatform()->request(
-            model: $this->embeddings->createEmbeddingsModel(),
+            model: new Embeddings(),
             input: $search,
         );
 

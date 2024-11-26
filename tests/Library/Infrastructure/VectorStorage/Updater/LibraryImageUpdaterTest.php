@@ -10,7 +10,8 @@ use ChronicleKeeper\Library\Infrastructure\VectorStorage\Updater\LibraryImageUpd
 use ChronicleKeeper\Shared\Infrastructure\LLMChain\LLMChainFactory;
 use ChronicleKeeper\Test\Library\Domain\Entity\ImageBuilder;
 use PhpLlm\LlmChain\Document\Vector;
-use PhpLlm\LlmChain\EmbeddingsModel;
+use PhpLlm\LlmChain\Model\Response\VectorResponse;
+use PhpLlm\LlmChain\PlatformInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\Attributes\Test;
@@ -23,17 +24,17 @@ use ReflectionClass;
 class LibraryImageUpdaterTest extends TestCase
 {
     #[Test]
-    public function splitDocumentIntoVectorChunks(): void
+    public function splitImagesIntoVectorChunks(): void
     {
         $image = (new ImageBuilder())->withDescription('This is a test document.')->build();
 
-        $embeddingModel = self::createStub(EmbeddingsModel::class);
-        $embeddingModel->method('create')->willReturn(new Vector([0.1, 0.2, 0.3]));
+        $platform = self::createStub(PlatformInterface::class);
+        $platform->method('request')->willReturn(new VectorResponse(new Vector([0.1, 0.2, 0.3])));
 
         $chainFactory = $this->createMock(LLMChainFactory::class);
         $chainFactory->expects($this->once())
-            ->method('createEmbeddings')
-            ->willReturn($embeddingModel);
+            ->method('createPlatform')
+            ->willReturn($platform);
 
         $updater = new LibraryImageUpdater(
             self::createStub(LoggerInterface::class),

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ChronicleKeeper\Test\Settings\Domain\ValueObject;
 
 use ChronicleKeeper\Settings\Domain\ValueObject\Settings;
+use ChronicleKeeper\Settings\Domain\ValueObject\Settings\Application;
 use ChronicleKeeper\Settings\Domain\ValueObject\Settings\Calendar;
 use ChronicleKeeper\Settings\Domain\ValueObject\Settings\ChatbotFunctions;
 use ChronicleKeeper\Settings\Domain\ValueObject\Settings\ChatbotGeneral;
@@ -15,6 +16,7 @@ use ChronicleKeeper\Settings\Domain\ValueObject\Settings\MoonCalendar;
 
 class SettingsBuilder
 {
+    private Application $application;
     private ChatbotGeneral $chatbotGeneral;
     private ChatbotSystemPrompt $chatbotSystemPrompt;
     private ChatbotTuning $chatbotTuning;
@@ -25,6 +27,7 @@ class SettingsBuilder
 
     public function __construct()
     {
+        $this->application         = new Application();
         $this->chatbotGeneral      = new ChatbotGeneral();
         $this->chatbotSystemPrompt = new ChatbotSystemPrompt();
         $this->chatbotTuning       = new ChatbotTuning();
@@ -32,6 +35,13 @@ class SettingsBuilder
         $this->calendar            = new Calendar();
         $this->moonCalendar        = new MoonCalendar();
         $this->holiday             = new Holiday();
+    }
+
+    public function withApplication(Application $application): self
+    {
+        $this->application = $application;
+
+        return $this;
     }
 
     public function withChatbotGeneral(ChatbotGeneral $chatbotGeneral): self
@@ -86,6 +96,7 @@ class SettingsBuilder
     public function build(): Settings
     {
         $settings = new Settings();
+        $settings->setApplication($this->application);
         $settings->setChatbotGeneral($this->chatbotGeneral);
         $settings->setChatbotSystemPrompt($this->chatbotSystemPrompt);
         $settings->setChatbotTuning($this->chatbotTuning);

@@ -9,6 +9,7 @@ use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemImageRepository;
 use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemVectorImageRepository;
 use ChronicleKeeper\Library\Infrastructure\VectorStorage\VectorImage;
 use ChronicleKeeper\Shared\Infrastructure\LLMChain\LLMChainFactory;
+use PhpLlm\LlmChain\Bridge\OpenAI\Embeddings;
 use PhpLlm\LlmChain\Model\Response\AsyncResponse;
 use PhpLlm\LlmChain\Model\Response\VectorResponse;
 use Psr\Log\LoggerInterface;
@@ -96,11 +97,13 @@ class LibraryImageUpdater
             $content       = substr($content, strlen($vectorContent));
 
             $vector = $platform->request(
-                model: $this->embeddings->createEmbeddingsModel(),
+                model: new Embeddings(),
                 input: $vectorContent,
             );
-            assert($vector instanceof AsyncResponse);
-            $vector = $vector->unwrap();
+
+            if ($vector instanceof AsyncResponse) {
+                $vector = $vector->unwrap();
+            }
 
             assert($vector instanceof VectorResponse);
             $vector = $vector->getContent()[0];

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace ChronicleKeeper\Test\Chat\Domain\ValueObject;
 
 use ChronicleKeeper\Chat\Domain\ValueObject\Settings;
-use PhpLlm\LlmChain\OpenAI\Model\Gpt\Version;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\Attributes\Test;
@@ -22,7 +21,7 @@ class SettingsTest extends TestCase
     {
         $settings = new Settings();
 
-        self::assertSame(Version::gpt4oMini()->name, $settings->version);
+        self::assertSame('gpt-4o-mini', $settings->version);
         self::assertEqualsWithDelta(0.7, $settings->temperature, PHP_FLOAT_EPSILON);
         self::assertEqualsWithDelta(0.7, $settings->imagesMaxDistance, PHP_FLOAT_EPSILON);
         self::assertEqualsWithDelta(0.85, $settings->documentsMaxDistance, PHP_FLOAT_EPSILON);

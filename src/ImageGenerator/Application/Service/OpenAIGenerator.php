@@ -30,9 +30,10 @@ class OpenAIGenerator
             input: $prompt,
         );
 
-        assert($response instanceof AsyncResponse);
+        if ($response instanceof AsyncResponse) {
+            $response = $response->unwrap();
+        }
 
-        $response = $response->unwrap();
         assert($response instanceof Base64ImageResponse);
 
         return new GeneratorResult($response->image, $response->revisedPrompt);

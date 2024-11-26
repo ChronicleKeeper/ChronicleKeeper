@@ -8,7 +8,7 @@ use ChronicleKeeper\Chat\Application\Service\ChatMessageExecution;
 use ChronicleKeeper\Chat\Domain\Entity\Conversation;
 use ChronicleKeeper\Chat\Domain\Entity\ExtendedMessage;
 use ChronicleKeeper\ImageGenerator\Application\Service\PromptOptimizer;
-use PhpLlm\LlmChain\Message\Message;
+use PhpLlm\LlmChain\Model\Message\Message;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\Attributes\Test;
