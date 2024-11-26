@@ -13,7 +13,8 @@ final readonly class Base64ImageResponse implements ResponseInterface
         public string $revisedPrompt,
         public string $image,
     ) {
-        Assert::stringNotEmpty($revisedPrompt);
+        Assert::stringNotEmpty($revisedPrompt, 'The revised prompt by endpoint must not be empty.');
+        Assert::stringNotEmpty($image, 'The image generated must be given.');
     }
 
     public function getContent(): string|iterable|object|null

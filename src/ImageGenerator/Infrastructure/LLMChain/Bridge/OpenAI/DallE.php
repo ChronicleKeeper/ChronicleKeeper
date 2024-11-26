@@ -8,7 +8,7 @@ use PhpLlm\LlmChain\Model\LanguageModel;
 
 final class DallE implements LanguageModel
 {
-    public const DALL_E_3 = 'dall-e-3';
+    public const string DALL_E_3 = 'dall-e-3';
 
     /** @param array<string, mixed> $options The default options for the model usage */
     public function __construct(
