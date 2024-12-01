@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ecda6c333e1e438d58b7d6ea29a38db3",
+    "content-hash": "f7a427eaeaab2fce9e46a14c798f9e88",
     "packages": [
         {
             "name": "composer/semver",
@@ -7329,16 +7329,16 @@
         },
         {
             "name": "phpstan/phpstan",
-            "version": "1.12.11",
+            "version": "1.12.12",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpstan.git",
-                "reference": "0d1fc20a962a91be578bcfe7cf939e6e1a2ff733"
+                "reference": "b5ae1b88f471d3fd4ba1aa0046234b5ca3776dd0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/0d1fc20a962a91be578bcfe7cf939e6e1a2ff733",
-                "reference": "0d1fc20a962a91be578bcfe7cf939e6e1a2ff733",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/b5ae1b88f471d3fd4ba1aa0046234b5ca3776dd0",
+                "reference": "b5ae1b88f471d3fd4ba1aa0046234b5ca3776dd0",
                 "shasum": ""
             },
             "require": {
@@ -7383,7 +7383,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2024-11-17T14:08:01+00:00"
+            "time": "2024-11-28T22:13:23+00:00"
         },
         {
             "name": "phpstan/phpstan-phpunit",
@@ -9081,29 +9081,29 @@
         },
         {
             "name": "spaze/phpstan-disallowed-calls",
-            "version": "v3.5.1",
+            "version": "v4.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spaze/phpstan-disallowed-calls.git",
-                "reference": "ed12b333bacdff9fdde19957e135ba93e7d252ec"
+                "reference": "0f030fd3fb770ee7c262445c8ad3c0b470a32ac5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spaze/phpstan-disallowed-calls/zipball/ed12b333bacdff9fdde19957e135ba93e7d252ec",
-                "reference": "ed12b333bacdff9fdde19957e135ba93e7d252ec",
+                "url": "https://api.github.com/repos/spaze/phpstan-disallowed-calls/zipball/0f030fd3fb770ee7c262445c8ad3c0b470a32ac5",
+                "reference": "0f030fd3fb770ee7c262445c8ad3c0b470a32ac5",
                 "shasum": ""
             },
             "require": {
-                "php": "^7.2 || ^8.0",
-                "phpstan/phpstan": "^1.12.6"
+                "php": "^7.4 || ^8.0",
+                "phpstan/phpstan": "^1.12.6 || ^2.0"
             },
             "require-dev": {
-                "nette/neon": "^3.2",
+                "nette/neon": "^3.3.1",
                 "nikic/php-parser": "^4.13 || ^5.0",
                 "php-parallel-lint/php-console-highlighter": "^1.0",
                 "php-parallel-lint/php-parallel-lint": "^1.2",
-                "phpstan/phpstan-deprecation-rules": "^1.2",
-                "phpunit/phpunit": "^8.5 || ^10.1 || ^11.0",
+                "phpstan/phpstan-deprecation-rules": "^1.2 || ^2.0",
+                "phpunit/phpunit": "^8.5.14 || ^10.1 || ^11.0",
                 "spaze/coding-standard": "^1.7"
             },
             "type": "phpstan-extension",
@@ -9136,7 +9136,7 @@
             ],
             "support": {
                 "issues": "https://github.com/spaze/phpstan-disallowed-calls/issues",
-                "source": "https://github.com/spaze/phpstan-disallowed-calls/tree/v3.5.1"
+                "source": "https://github.com/spaze/phpstan-disallowed-calls/tree/v4.0.1"
             },
             "funding": [
                 {
@@ -9144,7 +9144,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2024-10-26T01:00:28+00:00"
+            "time": "2024-11-13T17:17:13+00:00"
         },
         {
             "name": "squizlabs/php_codesniffer",
@@ -9634,7 +9634,7 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {},
+    "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
@@ -9642,6 +9642,6 @@
         "ext-gd": "*",
         "ext-zip": "*"
     },
-    "platform-dev": {},
+    "platform-dev": [],
     "plugin-api-version": "2.6.0"
 }
