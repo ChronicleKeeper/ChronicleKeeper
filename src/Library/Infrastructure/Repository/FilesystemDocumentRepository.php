@@ -6,7 +6,6 @@ namespace ChronicleKeeper\Library\Infrastructure\Repository;
 
 use ChronicleKeeper\Library\Domain\Entity\Directory;
 use ChronicleKeeper\Library\Domain\Entity\Document;
-use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\PathRegistry;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
@@ -26,7 +25,6 @@ class FilesystemDocumentRepository
 
     public function __construct(
         private readonly LoggerInterface $logger,
-        private readonly FileAccess $fileAccess,
         private readonly SerializerInterface $serializer,
         private readonly PathRegistry $pathRegistry,
     ) {
@@ -66,19 +64,5 @@ class FilesystemDocumentRepository
             $documents,
             static fn (Document $document) => $document->directory->id === $directory->id,
         ));
-    }
-
-    public function findById(string $id): Document
-    {
-        $filename = $this->generateFilename($id);
-        $json     = $this->fileAccess->read(self::STORAGE_NAME, $filename);
-
-        return $this->serializer->deserialize($json, Document::class, 'json');
-    }
-
-    /** @return non-empty-string */
-    private function generateFilename(string $id): string
-    {
-        return $id . '.json';
     }
 }

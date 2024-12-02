@@ -6,6 +6,7 @@ namespace ChronicleKeeper\Favorizer\Domain;
 
 use ChronicleKeeper\Chat\Application\Query\FindConversationByIdParameters;
 use ChronicleKeeper\Chat\Domain\Entity\Conversation;
+use ChronicleKeeper\Document\Application\Query\GetDocument;
 use ChronicleKeeper\Favorizer\Domain\Exception\UnknownMedium;
 use ChronicleKeeper\Favorizer\Domain\ValueObject\ChatConversationTarget;
 use ChronicleKeeper\Favorizer\Domain\ValueObject\LibraryDocumentTarget;
@@ -13,7 +14,6 @@ use ChronicleKeeper\Favorizer\Domain\ValueObject\LibraryImageTarget;
 use ChronicleKeeper\Favorizer\Domain\ValueObject\Target;
 use ChronicleKeeper\Library\Domain\Entity\Document;
 use ChronicleKeeper\Library\Domain\Entity\Image;
-use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemDocumentRepository;
 use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemImageRepository;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
 
@@ -22,7 +22,6 @@ use function Symfony\Component\String\u;
 class TargetFactory
 {
     public function __construct(
-        private readonly FilesystemDocumentRepository $filesystemDocumentRepository,
         private readonly FilesystemImageRepository $filesystemImageRepository,
         private readonly QueryService $queryService,
     ) {
@@ -31,7 +30,7 @@ class TargetFactory
     public function create(string $id, string $type): Target
     {
         if ($type === Document::class) {
-            return $this->createFromDocument($this->filesystemDocumentRepository->findById($id));
+            return $this->createFromDocument($this->queryService->query(new GetDocument($id)));
         }
 
         if ($type === Image::class) {

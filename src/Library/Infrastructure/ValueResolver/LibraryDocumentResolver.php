@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Library\Infrastructure\ValueResolver;
 
+use ChronicleKeeper\Document\Application\Query\GetDocument;
 use ChronicleKeeper\Library\Domain\Entity\Document;
-use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemDocumentRepository;
+use ChronicleKeeper\Shared\Application\Query\QueryService;
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Exception\UnableToReadFile;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,7 +22,7 @@ use function is_string;
 class LibraryDocumentResolver implements ValueResolverInterface
 {
     public function __construct(
-        private readonly FilesystemDocumentRepository $documentRepository,
+        private readonly QueryService $queryService,
     ) {
     }
 
@@ -39,7 +40,7 @@ class LibraryDocumentResolver implements ValueResolverInterface
         }
 
         try {
-            $document = $this->documentRepository->findById($documentIdentifier);
+            $document = $this->queryService->query(new GetDocument($documentIdentifier));
         } catch (UnableToReadFile) {
             throw new NotFoundHttpException('Document "' . $documentIdentifier . '" not found.');
         }

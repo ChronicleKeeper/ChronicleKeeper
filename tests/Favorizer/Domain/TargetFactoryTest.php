@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace ChronicleKeeper\Test\Favorizer\Domain;
 
 use ChronicleKeeper\Chat\Application\Query\FindConversationByIdParameters;
+use ChronicleKeeper\Document\Application\Query\GetDocument;
 use ChronicleKeeper\Favorizer\Domain\Exception\UnknownMedium;
 use ChronicleKeeper\Favorizer\Domain\TargetFactory;
-use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemDocumentRepository;
 use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemImageRepository;
+use ChronicleKeeper\Shared\Application\Query\QueryParameters;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
 use ChronicleKeeper\Test\Chat\Domain\Entity\ConversationBuilder;
 use ChronicleKeeper\Test\Library\Domain\Entity\DocumentBuilder;
@@ -17,6 +18,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
+use UnexpectedValueException;
 
 #[CoversClass(TargetFactory::class)]
 #[Small]
@@ -29,19 +31,25 @@ class TargetFactoryTest extends TestCase
             ->withTitle('Foo Bar Baz Quoz Quux Corge Grault Garply Waldo Fred Plugh Xyzzy Thud')
             ->build();
 
-        $filesystemDocumentRepository = $this->createMock(FilesystemDocumentRepository::class);
-        $filesystemDocumentRepository->expects($this->once())
-            ->method('findById')
-            ->with($document->id)
-            ->willReturn($document);
-
         $filesystemImageRepository = $this->createMock(FilesystemImageRepository::class);
         $filesystemImageRepository->expects($this->never())->method('findById');
 
         $queryService = $this->createMock(QueryService::class);
-        $queryService->expects($this->never())->method('query');
+        $queryService->expects($this->once())
+            ->method('query')
+            ->willReturnCallback(
+                static function (QueryParameters $query) use ($document): object {
+                    if ($query instanceof GetDocument) {
+                        self::assertSame($document->id, $query->id);
 
-        $targetFactory = new TargetFactory($filesystemDocumentRepository, $filesystemImageRepository, $queryService);
+                        return $document;
+                    }
+
+                    throw new UnexpectedValueException('Unexpected query.');
+                },
+            );
+
+        $targetFactory = new TargetFactory($filesystemImageRepository, $queryService);
         $target        = $targetFactory->create($document->id, $document::class);
 
         self::assertSame($document->id, $target->getId());
@@ -55,9 +63,6 @@ class TargetFactoryTest extends TestCase
             ->withTitle('Foo Bar Baz Quoz Quux Corge Grault Garply Waldo Fred Plugh Xyzzy Thud')
             ->build();
 
-        $filesystemDocumentRepository = $this->createMock(FilesystemDocumentRepository::class);
-        $filesystemDocumentRepository->expects($this->never())->method('findById');
-
         $filesystemImageRepository = $this->createMock(FilesystemImageRepository::class);
         $filesystemImageRepository->expects($this->once())
             ->method('findById')
@@ -67,7 +72,7 @@ class TargetFactoryTest extends TestCase
         $queryService = $this->createMock(QueryService::class);
         $queryService->expects($this->never())->method('query');
 
-        $targetFactory = new TargetFactory($filesystemDocumentRepository, $filesystemImageRepository, $queryService);
+        $targetFactory = new TargetFactory($filesystemImageRepository, $queryService);
         $target        = $targetFactory->create($image->id, $image::class);
 
         self::assertSame($image->id, $target->getId());
@@ -77,23 +82,26 @@ class TargetFactoryTest extends TestCase
     #[Test]
     public function createConversationTarget(): void
     {
-        $conversation = (new ConversationBuilder())
+        $conversation              = (new ConversationBuilder())
             ->withTitle('Foo Bar Baz Quoz Quux Corge Grault Garply Waldo Fred Plugh Xyzzy Thud')
             ->build();
-
-        $filesystemDocumentRepository = $this->createMock(FilesystemDocumentRepository::class);
-        $filesystemDocumentRepository->expects($this->never())->method('findById');
-
         $filesystemImageRepository = $this->createMock(FilesystemImageRepository::class);
         $filesystemImageRepository->expects($this->never())->method('findById');
 
         $queryService = $this->createMock(QueryService::class);
         $queryService->expects($this->once())
             ->method('query')
-            ->with(self::isInstanceOf(FindConversationByIdParameters::class))
-            ->willReturn($conversation);
+            ->willReturnCallback(
+                static function (QueryParameters $query) use ($conversation): object {
+                    if ($query instanceof FindConversationByIdParameters) {
+                        return $conversation;
+                    }
 
-        $targetFactory = new TargetFactory($filesystemDocumentRepository, $filesystemImageRepository, $queryService);
+                    throw new UnexpectedValueException('Unexpected query.');
+                },
+            );
+
+        $targetFactory = new TargetFactory($filesystemImageRepository, $queryService);
         $target        = $targetFactory->create($conversation->id, $conversation::class);
 
         self::assertSame($conversation->id, $target->getId());
@@ -105,16 +113,13 @@ class TargetFactoryTest extends TestCase
     {
         $this->expectException(UnknownMedium::class);
 
-        $filesystemDocumentRepository = $this->createMock(FilesystemDocumentRepository::class);
-        $filesystemDocumentRepository->expects($this->never())->method('findById');
-
         $filesystemImageRepository = $this->createMock(FilesystemImageRepository::class);
         $filesystemImageRepository->expects($this->never())->method('findById');
 
         $queryService = $this->createMock(QueryService::class);
         $queryService->expects($this->never())->method('query');
 
-        $targetFactory = new TargetFactory($filesystemDocumentRepository, $filesystemImageRepository, $queryService);
+        $targetFactory = new TargetFactory($filesystemImageRepository, $queryService);
         $targetFactory->create('123', 'UnknownType');
     }
 }

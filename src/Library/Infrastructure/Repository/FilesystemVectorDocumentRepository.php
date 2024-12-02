@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Library\Infrastructure\Repository;
 
+use ChronicleKeeper\Document\Application\Query\GetDocument;
 use ChronicleKeeper\Library\Infrastructure\VectorStorage\Distance\CosineDistance;
 use ChronicleKeeper\Library\Infrastructure\VectorStorage\VectorDocument;
 use ChronicleKeeper\Settings\Application\SettingsHandler;
+use ChronicleKeeper\Shared\Application\Query\QueryService;
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Exception\UnableToReadFile;
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\PathRegistry;
@@ -31,15 +33,15 @@ use const JSON_THROW_ON_ERROR;
 #[Autoconfigure(lazy: true)]
 class FilesystemVectorDocumentRepository
 {
-    private const STORAGE_NAME = 'vector.documents';
+    private const string STORAGE_NAME = 'vector.documents';
 
     public function __construct(
         private readonly LoggerInterface $logger,
-        private readonly FilesystemDocumentRepository $documentRepository,
         private readonly CosineDistance $distance,
         private readonly FileAccess $fileAccess,
         private readonly SettingsHandler $settingsHandler,
         private readonly PathRegistry $pathRegistry,
+        private readonly QueryService $queryService,
     ) {
     }
 
@@ -147,7 +149,7 @@ class FilesystemVectorDocumentRepository
             throw new RuntimeException('Document to load contains invalid content.');
         }
 
-        $document = $this->documentRepository->findById($vectorDocumentArr['documentId']);
+        $document = $this->queryService->query(new GetDocument($vectorDocumentArr['documentId']));
 
         $vectorDocument     = new VectorDocument(
             document: $document,
