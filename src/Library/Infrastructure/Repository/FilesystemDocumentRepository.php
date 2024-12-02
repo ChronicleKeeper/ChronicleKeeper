@@ -18,6 +18,7 @@ use Symfony\Component\Finder\Finder;
 use Symfony\Component\Serializer\SerializerInterface;
 
 use function array_filter;
+use function array_values;
 use function json_encode;
 use function strcasecmp;
 use function usort;
@@ -79,7 +80,10 @@ class FilesystemDocumentRepository
     {
         $documents = $this->findAll();
 
-        return array_filter($documents, static fn (Document $document) => $document->directory->id === $directory->id);
+        return array_values(array_filter(
+            $documents,
+            static fn (Document $document) => $document->directory->id === $directory->id,
+        ));
     }
 
     public function findById(string $id): Document

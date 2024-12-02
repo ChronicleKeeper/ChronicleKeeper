@@ -26,3 +26,9 @@ parameters:
         -
             function: 'dd()'
             message: 'please use a logger instead.'
+
+    ignoreErrors:
+        -
+            identifier: argument.named
+        -
+            identifier: missingType.generics

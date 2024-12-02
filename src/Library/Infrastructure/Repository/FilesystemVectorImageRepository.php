@@ -19,6 +19,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use function array_filter;
 use function array_keys;
 use function array_slice;
+use function array_values;
 use function asort;
 use function is_array;
 use function json_decode;
@@ -127,10 +128,10 @@ class FilesystemVectorImageRepository
     /** @return list<VectorImage> */
     public function findAllByImageId(string $id): array
     {
-        return array_filter(
+        return array_values(array_filter(
             $this->findAll(),
             static fn (VectorImage $vectorImage): bool => $vectorImage->image->id === $id,
-        );
+        ));
     }
 
     public function remove(VectorImage $vectorImage): void

@@ -48,7 +48,7 @@ class Directory implements JsonSerializable
         return [
             'id' => $this->id,
             'title' => $this->title,
-            'parent' => $this->parent?->id ?? RootDirectory::ID,
+            'parent' => $this->parent->id ?? RootDirectory::ID,
         ];
     }
 

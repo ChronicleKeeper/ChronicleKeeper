@@ -11,6 +11,14 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\Constraints\NotNull;
 
+/**
+ * @template-extends AbstractType<array{
+ *     archive: string,
+ *     overwrite_settings: bool,
+ *     prune_library: bool,
+ *     overwrite_library: bool
+ * }>
+ */
 class ImportType extends AbstractType
 {
     /** @inheritDoc */

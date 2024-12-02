@@ -14,6 +14,7 @@ use Webmozart\Assert\Assert;
 
 use function array_diff;
 use function array_keys;
+use function array_values;
 
 final class ExtendedMessageDenormalizer implements DenormalizerInterface, DenormalizerAwareInterface
 {
@@ -47,8 +48,8 @@ final class ExtendedMessageDenormalizer implements DenormalizerInterface, Denorm
 
         $extendedMessage     = new ExtendedMessage(
             $message,
-            $documents,
-            $images,
+            array_values($documents),
+            array_values($images),
             $data['calledTools'],
         );
         $extendedMessage->id = $data['id'];

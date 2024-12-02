@@ -19,6 +19,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 use function array_filter;
+use function array_values;
 use function json_encode;
 use function json_validate;
 use function strcasecmp;
@@ -81,7 +82,7 @@ class FilesystemImageRepository
     {
         $images = $this->findAll();
 
-        return array_filter($images, static fn (Image $image) => $image->directory->id === $directory->id);
+        return array_values(array_filter($images, static fn (Image $image) => $image->directory->id === $directory->id));
     }
 
     public function findById(string $id): Image|null

@@ -13,6 +13,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 use function array_map;
 use function array_merge;
+use function array_values;
 use function in_array;
 
 final class DirectoryChoiceType extends AbstractType
@@ -104,6 +105,6 @@ final class DirectoryChoiceType extends AbstractType
             unset($existingChoices[$index]);
         }
 
-        return $existingChoices;
+        return array_values($existingChoices);
     }
 }

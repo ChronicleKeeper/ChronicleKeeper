@@ -21,6 +21,7 @@ use Throwable;
 
 use function array_filter;
 use function array_merge;
+use function array_values;
 use function json_encode;
 use function strcasecmp;
 use function usort;
@@ -133,10 +134,10 @@ class FilesystemDirectoryRepository
     {
         $directories = $this->findAll();
 
-        return array_filter(
+        return array_values(array_filter(
             $directories,
             static fn (Directory $directory) => $directory->parent?->id === $parent->id,
-        );
+        ));
     }
 
     public function findById(string $id): Directory|null
