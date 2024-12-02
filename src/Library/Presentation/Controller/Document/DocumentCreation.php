@@ -7,11 +7,11 @@ namespace ChronicleKeeper\Library\Presentation\Controller\Document;
 use ChronicleKeeper\Chat\Application\Query\FindConversationByIdParameters;
 use ChronicleKeeper\Chat\Application\Query\GetTemporaryConversationParameters;
 use ChronicleKeeper\Chat\Domain\Entity\ExtendedMessage;
+use ChronicleKeeper\Document\Application\Command\StoreDocument;
 use ChronicleKeeper\Library\Domain\Entity\Directory;
 use ChronicleKeeper\Library\Domain\Entity\Document;
 use ChronicleKeeper\Library\Domain\RootDirectory;
 use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemDirectoryRepository;
-use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemDocumentRepository;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
 use ChronicleKeeper\Shared\Presentation\FlashMessages\Alert;
 use ChronicleKeeper\Shared\Presentation\FlashMessages\HandleFlashMessages;
@@ -20,6 +20,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Requirement\Requirement;
 use Symfony\Component\Routing\RouterInterface;
@@ -42,9 +43,9 @@ class DocumentCreation extends AbstractController
     public function __construct(
         private readonly Environment $environment,
         private readonly RouterInterface $router,
-        private readonly FilesystemDocumentRepository $documentRepository,
         private readonly FilesystemDirectoryRepository $directoryRepository,
         private readonly QueryService $queryService,
+        private readonly MessageBusInterface $bus,
     ) {
     }
 
@@ -66,7 +67,7 @@ class DocumentCreation extends AbstractController
                 $document            = new Document($title, $content);
                 $document->directory = $storeDirectory;
 
-                $this->documentRepository->store($document);
+                $this->bus->dispatch(new StoreDocument($document));
 
                 $this->addFlashMessage(
                     $request,

@@ -4,15 +4,16 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Library\Presentation\Controller\Document;
 
+use ChronicleKeeper\Document\Application\Command\StoreDocument;
 use ChronicleKeeper\Library\Domain\Entity\Document;
 use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemDirectoryRepository;
-use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemDocumentRepository;
 use ChronicleKeeper\Shared\Presentation\FlashMessages\Alert;
 use ChronicleKeeper\Shared\Presentation\FlashMessages\HandleFlashMessages;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Requirement\Requirement;
 use Symfony\Component\Routing\RouterInterface;
@@ -32,8 +33,8 @@ class DocumentEdit extends AbstractController
     public function __construct(
         private readonly Environment $environment,
         private readonly RouterInterface $router,
-        private readonly FilesystemDocumentRepository $documentRepository,
         private readonly FilesystemDirectoryRepository $directoryRepository,
+        private readonly MessageBusInterface $bus,
     ) {
     }
 
@@ -56,7 +57,7 @@ class DocumentEdit extends AbstractController
 
                 $document->directory = $storeDirectory;
 
-                $this->documentRepository->store($document);
+                $this->bus->dispatch(new StoreDocument($document));
 
                 $this->addFlashMessage(
                     $request,

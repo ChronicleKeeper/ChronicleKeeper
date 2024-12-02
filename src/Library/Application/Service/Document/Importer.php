@@ -5,13 +5,14 @@ declare(strict_types=1);
 namespace ChronicleKeeper\Library\Application\Service\Document;
 
 use ChronicleKeeper\Chat\Application\Service\LLMContentOptimizer;
+use ChronicleKeeper\Document\Application\Command\StoreDocument;
 use ChronicleKeeper\Library\Application\Service\Document\Importer\FileConverter;
 use ChronicleKeeper\Library\Domain\Entity\Directory;
 use ChronicleKeeper\Library\Domain\Entity\Document;
-use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemDocumentRepository;
 use RuntimeException;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\Messenger\MessageBusInterface;
 
 use function array_key_exists;
 use function array_keys;
@@ -25,8 +26,8 @@ class Importer
     public function __construct(
         #[AutowireIterator(tag: 'document_file_converter')]
         iterable $fileConverters,
-        private readonly FilesystemDocumentRepository $documentRepository,
         private readonly LLMContentOptimizer $contentOptimizer,
+        private readonly MessageBusInterface $bus,
     ) {
         foreach ($fileConverters as $converter) {
             $this->addFileConverter($converter);
@@ -65,7 +66,7 @@ class Importer
         $document            = new Document($file->getClientOriginalName(), $convertedDocumentContent);
         $document->directory = $directory;
 
-        $this->documentRepository->store($document);
+        $this->bus->dispatch(new StoreDocument($document));
 
         return $document;
     }

@@ -6,6 +6,7 @@ namespace ChronicleKeeper\Library\Presentation\Controller\Directory;
 
 use ChronicleKeeper\Chat\Application\Command\StoreConversation;
 use ChronicleKeeper\Chat\Application\Query\FindConversationsByDirectoryParameters;
+use ChronicleKeeper\Document\Application\Command\StoreDocument;
 use ChronicleKeeper\Library\Domain\Entity\Directory;
 use ChronicleKeeper\Library\Domain\RootDirectory;
 use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemDirectoryRepository;
@@ -96,7 +97,7 @@ class DirectoryDelete extends AbstractController
 
         foreach ($this->documentRepository->findByDirectory($sourceDirectory) as $document) {
             $document->directory = $targetDirectory;
-            $this->documentRepository->store($document);
+            $this->bus->dispatch(new StoreDocument($document, false));
         }
 
         foreach ($this->imageRepository->findByDirectory($sourceDirectory) as $image) {

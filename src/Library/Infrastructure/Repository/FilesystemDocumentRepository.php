@@ -41,15 +41,6 @@ class FilesystemDocumentRepository
     ) {
     }
 
-    public function store(Document $document): void
-    {
-        $document->updatedAt = new DateTimeImmutable();
-        $filename            = $this->generateFilename($document->id);
-        $content             = json_encode($document->toArray(), JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT);
-
-        $this->fileAccess->write(self::STORAGE_NAME, $filename, $content);
-    }
-
     /** @return list<Document> */
     public function findAll(): array
     {
