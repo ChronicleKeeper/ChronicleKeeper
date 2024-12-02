@@ -17,7 +17,7 @@ final readonly class Base64ImageResponse implements ResponseInterface
         Assert::stringNotEmpty($image, 'The image generated must be given.');
     }
 
-    public function getContent(): string|iterable|object|null
+    public function getContent(): string
     {
         return $this->image;
     }

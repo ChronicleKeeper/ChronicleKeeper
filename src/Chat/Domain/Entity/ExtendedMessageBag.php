@@ -31,6 +31,6 @@ final class ExtendedMessageBag extends ArrayObject implements JsonSerializable
     /** @return list<ExtendedMessage> */
     public function jsonSerialize(): array
     {
-        return $this->getArrayCopy();
+        return array_values($this->getArrayCopy());
     }
 }

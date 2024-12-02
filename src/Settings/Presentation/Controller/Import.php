@@ -19,7 +19,6 @@ use Symfony\Component\Routing\RouterInterface;
 use Twig\Environment;
 
 use function assert;
-use function is_array;
 
 #[Route('/application/import', name: 'application_import')]
 class Import extends AbstractController
@@ -44,7 +43,6 @@ class Import extends AbstractController
             assert($archive instanceof UploadedFile);
 
             $fullFormData = $form->getData();
-            assert(is_array($fullFormData));
 
             $this->importer->import($archive->getRealPath(), ImportSettings::fromArray($fullFormData));
             $request->getSession()->clear();

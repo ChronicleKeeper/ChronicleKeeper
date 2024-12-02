@@ -40,7 +40,6 @@ class GeneratorRequestValueResolverTest extends TestCase
         $valueResolver = new GeneratorRequestValueResolver($queryService);
         $resolvedValue = $valueResolver->resolve(Request::create('/'), $argument);
 
-        self::assertIsArray($resolvedValue);
         self::assertCount(0, $resolvedValue);
     }
 
@@ -61,7 +60,6 @@ class GeneratorRequestValueResolverTest extends TestCase
         $valueResolver = new GeneratorRequestValueResolver($queryService);
         $resolvedValue = $valueResolver->resolve(Request::create('/'), $argument);
 
-        self::assertIsArray($resolvedValue);
         self::assertCount(0, $resolvedValue);
     }
 
@@ -89,7 +87,6 @@ class GeneratorRequestValueResolverTest extends TestCase
         $valueResolver = new GeneratorRequestValueResolver($queryService);
         $resolvedValue = $valueResolver->resolve($request, $argument);
 
-        self::assertIsArray($resolvedValue);
         self::assertCount(0, $resolvedValue);
     }
 
@@ -117,7 +114,6 @@ class GeneratorRequestValueResolverTest extends TestCase
         $valueResolver = new GeneratorRequestValueResolver($queryService);
         $resolvedValue = $valueResolver->resolve($request, $argument);
 
-        self::assertIsArray($resolvedValue);
         self::assertCount(0, $resolvedValue);
     }
 
@@ -152,7 +148,6 @@ class GeneratorRequestValueResolverTest extends TestCase
         $valueResolver = new GeneratorRequestValueResolver($queryService);
         $resolvedValue = $valueResolver->resolve($request, $argument);
 
-        self::assertIsArray($resolvedValue);
         self::assertCount(0, $resolvedValue);
     }
 
@@ -188,7 +183,6 @@ class GeneratorRequestValueResolverTest extends TestCase
         $valueResolver = new GeneratorRequestValueResolver($queryService);
         $resolvedValue = $valueResolver->resolve($request, $argument);
 
-        self::assertIsArray($resolvedValue);
         self::assertCount(0, $resolvedValue);
     }
 
@@ -221,7 +215,6 @@ class GeneratorRequestValueResolverTest extends TestCase
         $valueResolver = new GeneratorRequestValueResolver($queryService);
         $resolvedValue = $valueResolver->resolve($request, $argument);
 
-        self::assertIsArray($resolvedValue);
         self::assertCount(1, $resolvedValue);
     }
 }

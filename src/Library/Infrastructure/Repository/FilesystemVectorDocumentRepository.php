@@ -18,6 +18,7 @@ use Symfony\Component\Finder\Finder;
 use function array_filter;
 use function array_keys;
 use function array_slice;
+use function array_values;
 use function asort;
 use function is_array;
 use function json_decode;
@@ -126,10 +127,10 @@ class FilesystemVectorDocumentRepository
     /** @return list<VectorDocument> */
     public function findAllByDocumentId(string $id): array
     {
-        return array_filter(
+        return array_values(array_filter(
             $this->findAll(),
             static fn (VectorDocument $vectorDocument): bool => $vectorDocument->document->id === $id,
-        );
+        ));
     }
 
     public function remove(VectorDocument $vectorDocument): void
