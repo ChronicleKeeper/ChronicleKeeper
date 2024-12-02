@@ -6,11 +6,8 @@ namespace ChronicleKeeper\Library\Infrastructure\Repository;
 
 use ChronicleKeeper\Library\Domain\Entity\Directory;
 use ChronicleKeeper\Library\Domain\Entity\Document;
-use ChronicleKeeper\Library\Domain\Event\DocumentDeleted;
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\PathRegistry;
-use DateTimeImmutable;
-use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
@@ -19,12 +16,8 @@ use Symfony\Component\Serializer\SerializerInterface;
 
 use function array_filter;
 use function array_values;
-use function json_encode;
 use function strcasecmp;
 use function usort;
-
-use const JSON_PRETTY_PRINT;
-use const JSON_THROW_ON_ERROR;
 
 #[Autoconfigure(lazy: true)]
 class FilesystemDocumentRepository
@@ -35,9 +28,7 @@ class FilesystemDocumentRepository
         private readonly LoggerInterface $logger,
         private readonly FileAccess $fileAccess,
         private readonly SerializerInterface $serializer,
-        private readonly FilesystemVectorDocumentRepository $vectorRepository,
         private readonly PathRegistry $pathRegistry,
-        private readonly EventDispatcherInterface $eventDispatcher,
     ) {
     }
 
@@ -83,19 +74,6 @@ class FilesystemDocumentRepository
         $json     = $this->fileAccess->read(self::STORAGE_NAME, $filename);
 
         return $this->serializer->deserialize($json, Document::class, 'json');
-    }
-
-    public function remove(Document $document): void
-    {
-        $filename = $this->generateFilename($document->id);
-
-        foreach ($this->vectorRepository->findAllByDocumentId($document->id) as $vectors) {
-            $this->vectorRepository->remove($vectors);
-        }
-
-        $this->fileAccess->delete(self::STORAGE_NAME, $filename);
-
-        $this->eventDispatcher->dispatch(new DocumentDeleted($document->id));
     }
 
     /** @return non-empty-string */

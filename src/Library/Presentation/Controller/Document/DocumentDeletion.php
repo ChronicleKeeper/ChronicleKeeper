@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Library\Presentation\Controller\Document;
 
+use ChronicleKeeper\Document\Application\Command\DeleteDocument;
 use ChronicleKeeper\Library\Domain\Entity\Document;
-use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemDocumentRepository;
-use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemVectorDocumentRepository;
 use ChronicleKeeper\Shared\Presentation\FlashMessages\Alert;
 use ChronicleKeeper\Shared\Presentation\FlashMessages\HandleFlashMessages;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Requirement\Requirement;
 use Symfony\Component\Routing\RouterInterface;
@@ -28,8 +28,7 @@ class DocumentDeletion extends AbstractController
 
     public function __construct(
         private readonly RouterInterface $router,
-        private readonly FilesystemDocumentRepository $documentRepository,
-        private readonly FilesystemVectorDocumentRepository $vectorDocumentRepository,
+        private readonly MessageBusInterface $bus,
     ) {
     }
 
@@ -45,13 +44,7 @@ class DocumentDeletion extends AbstractController
             return new RedirectResponse($this->router->generate('library', ['directory' => $document->directory->id]));
         }
 
-        $vectorDocuments = $this->vectorDocumentRepository->findAllByDocumentId($document->id);
-
-        foreach ($vectorDocuments as $vectorDocument) {
-            $this->vectorDocumentRepository->remove($vectorDocument);
-        }
-
-        $this->documentRepository->remove($document);
+        $this->bus->dispatch(new DeleteDocument($document->id));
 
         $this->addFlashMessage(
             $request,
