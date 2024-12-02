@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace ChronicleKeeper\Library\Presentation\Controller;
 
 use ChronicleKeeper\Chat\Application\Query\FindConversationsByDirectoryParameters;
+use ChronicleKeeper\Document\Application\Query\FindDocumentsByDirectory;
 use ChronicleKeeper\Library\Domain\Entity\Directory;
 use ChronicleKeeper\Library\Domain\RootDirectory;
 use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemDirectoryRepository;
-use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemDocumentRepository;
 use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemImageRepository;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
 use ChronicleKeeper\Shared\Domain\Sluggable;
@@ -33,7 +33,6 @@ class Library extends AbstractController
 {
     public function __construct(
         private readonly Environment $environment,
-        private readonly FilesystemDocumentRepository $documentRepository,
         private readonly FilesystemDirectoryRepository $directoryRepository,
         private readonly FilesystemImageRepository $imageRepository,
         private readonly QueryService $queryService,
@@ -43,7 +42,7 @@ class Library extends AbstractController
     public function __invoke(Request $request, Directory $directory): Response
     {
         $directoryContent = array_merge(
-            $this->documentRepository->findByDirectory($directory),
+            $this->queryService->query(new FindDocumentsByDirectory($directory->id)),
             $this->imageRepository->findByDirectory($directory),
             $this->queryService->query(new FindConversationsByDirectoryParameters($directory)),
         );

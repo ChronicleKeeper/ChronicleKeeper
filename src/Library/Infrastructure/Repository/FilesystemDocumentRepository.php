@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Library\Infrastructure\Repository;
 
-use ChronicleKeeper\Library\Domain\Entity\Directory;
 use ChronicleKeeper\Library\Domain\Entity\Document;
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\PathRegistry;
 use Psr\Log\LoggerInterface;
@@ -13,8 +12,6 @@ use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Serializer\SerializerInterface;
 
-use function array_filter;
-use function array_values;
 use function strcasecmp;
 use function usort;
 
@@ -53,16 +50,5 @@ class FilesystemDocumentRepository
         );
 
         return $documents;
-    }
-
-    /** @return list<Document> */
-    public function findByDirectory(Directory $directory): array
-    {
-        $documents = $this->findAll();
-
-        return array_values(array_filter(
-            $documents,
-            static fn (Document $document) => $document->directory->id === $directory->id,
-        ));
     }
 }

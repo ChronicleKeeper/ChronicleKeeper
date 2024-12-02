@@ -7,6 +7,7 @@ namespace ChronicleKeeper\Library\Infrastructure\Repository;
 use ChronicleKeeper\Chat\Application\Command\DeleteConversation;
 use ChronicleKeeper\Chat\Application\Query\FindConversationsByDirectoryParameters;
 use ChronicleKeeper\Document\Application\Command\DeleteDocument;
+use ChronicleKeeper\Document\Application\Query\FindDocumentsByDirectory;
 use ChronicleKeeper\Library\Domain\Entity\Directory;
 use ChronicleKeeper\Library\Domain\RootDirectory;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
@@ -39,7 +40,6 @@ class FilesystemDirectoryRepository
         private readonly SerializerInterface $serializer,
         private readonly FileAccess $fileAccess,
         private readonly FilesystemImageRepository $imageRepository,
-        private readonly FilesystemDocumentRepository $documentRepository,
         private readonly PathRegistry $pathRegistry,
         private readonly QueryService $queryService,
         private readonly MessageBusInterface $bus,
@@ -72,7 +72,7 @@ class FilesystemDirectoryRepository
             $this->remove($directory);
         }
 
-        foreach ($this->documentRepository->findByDirectory($sourceDirectory) as $document) {
+        foreach ($this->queryService->query(new FindDocumentsByDirectory($sourceDirectory->id)) as $document) {
             $this->bus->dispatch(new DeleteDocument($document->id));
         }
 
