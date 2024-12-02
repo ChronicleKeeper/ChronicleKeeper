@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Library\Infrastructure\VectorStorage\Updater;
 
+use ChronicleKeeper\Document\Application\Query\FindAllDocuments;
 use ChronicleKeeper\Library\Domain\Entity\Document;
-use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemDocumentRepository;
 use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemVectorDocumentRepository;
 use ChronicleKeeper\Library\Infrastructure\VectorStorage\VectorDocument;
+use ChronicleKeeper\Shared\Application\Query\QueryService;
 use ChronicleKeeper\Shared\Infrastructure\LLMChain\LLMChainFactory;
 use PhpLlm\LlmChain\Bridge\OpenAI\Embeddings;
 use PhpLlm\LlmChain\Model\Response\AsyncResponse;
@@ -29,14 +30,14 @@ class LibraryDocumentUpdater
     public function __construct(
         private readonly LoggerInterface $logger,
         private readonly LLMChainFactory $embeddings,
-        private readonly FilesystemDocumentRepository $documentRepository,
         private readonly FilesystemVectorDocumentRepository $vectorDocumentRepository,
+        private readonly QueryService $queryService,
     ) {
     }
 
     public function updateAll(): void
     {
-        foreach ($this->documentRepository->findAll() as $document) {
+        foreach ($this->queryService->query(new FindAllDocuments()) as $document) {
             $this->updateOrCreateVectorsForDocument($document);
         }
     }
