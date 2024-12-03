@@ -6,7 +6,7 @@ namespace ChronicleKeeper\Library\Infrastructure\LLMChain\Tool;
 
 use ChronicleKeeper\Document\Application\Query\SearchSimilarVectors;
 use ChronicleKeeper\Document\Domain\Entity\Document;
-use ChronicleKeeper\Library\Infrastructure\VectorStorage\VectorDocument;
+use ChronicleKeeper\Document\Domain\Entity\VectorDocument;
 use ChronicleKeeper\Settings\Application\SettingsHandler;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
 use ChronicleKeeper\Shared\Infrastructure\LLMChain\LLMChainFactory;

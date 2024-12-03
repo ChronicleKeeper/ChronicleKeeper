@@ -6,8 +6,8 @@ namespace ChronicleKeeper\Test\Document\Application\Query;
 
 use ChronicleKeeper\Document\Application\Query\SearchSimilarVectors;
 use ChronicleKeeper\Document\Application\Query\SearchSimilarVectorsQuery;
+use ChronicleKeeper\Document\Domain\Entity\VectorDocument;
 use ChronicleKeeper\Library\Infrastructure\VectorStorage\Distance\CosineDistance;
-use ChronicleKeeper\Library\Infrastructure\VectorStorage\VectorDocument;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
 use ChronicleKeeper\Test\Library\Domain\Entity\DocumentBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;

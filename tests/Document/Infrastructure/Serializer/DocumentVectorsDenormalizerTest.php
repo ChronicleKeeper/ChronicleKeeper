@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace ChronicleKeeper\Test\Document\Infrastructure\Serializer;
 
 use ChronicleKeeper\Document\Application\Query\GetDocument;
+use ChronicleKeeper\Document\Domain\Entity\VectorDocument;
 use ChronicleKeeper\Document\Infrastructure\Serializer\DocumentVectorsDenormalizer;
-use ChronicleKeeper\Library\Infrastructure\VectorStorage\VectorDocument;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
 use ChronicleKeeper\Test\Library\Domain\Entity\DocumentBuilder;
 use InvalidArgumentException;

@@ -2,9 +2,8 @@
 
 declare(strict_types=1);
 
-namespace ChronicleKeeper\Library\Infrastructure\VectorStorage;
+namespace ChronicleKeeper\Document\Domain\Entity;
 
-use ChronicleKeeper\Document\Domain\Entity\Document;
 use Symfony\Component\Uid\Uuid;
 
 use function array_key_exists;

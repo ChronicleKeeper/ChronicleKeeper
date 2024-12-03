@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace ChronicleKeeper\Document\Infrastructure\Serializer;
 
 use ChronicleKeeper\Document\Application\Query\GetDocument;
-use ChronicleKeeper\Library\Infrastructure\VectorStorage\VectorDocument;
+use ChronicleKeeper\Document\Domain\Entity\VectorDocument;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
