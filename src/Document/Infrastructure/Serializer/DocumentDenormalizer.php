@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ChronicleKeeper\Library\Infrastructure\Serializer;
+namespace ChronicleKeeper\Document\Infrastructure\Serializer;
 
 use ChronicleKeeper\Document\Application\Query\GetDocument;
 use ChronicleKeeper\Document\Domain\Entity\Document;

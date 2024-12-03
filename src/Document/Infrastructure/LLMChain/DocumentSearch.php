@@ -2,22 +2,18 @@
 
 declare(strict_types=1);
 
-namespace ChronicleKeeper\Library\Infrastructure\LLMChain\Tool;
+namespace ChronicleKeeper\Document\Infrastructure\LLMChain;
 
 use ChronicleKeeper\Document\Application\Query\SearchSimilarVectors;
 use ChronicleKeeper\Document\Domain\Entity\Document;
 use ChronicleKeeper\Document\Domain\Entity\VectorDocument;
 use ChronicleKeeper\Settings\Application\SettingsHandler;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
-use ChronicleKeeper\Shared\Infrastructure\LLMChain\LLMChainFactory;
+use ChronicleKeeper\Shared\Infrastructure\LLMChain\EmbeddingCalculator;
 use ChronicleKeeper\Shared\Infrastructure\LLMChain\ToolUsageCollector;
-use PhpLlm\LlmChain\Bridge\OpenAI\Embeddings;
 use PhpLlm\LlmChain\Chain\ToolBox\Attribute\AsTool;
-use PhpLlm\LlmChain\Model\Response\AsyncResponse;
-use PhpLlm\LlmChain\Model\Response\VectorResponse;
 
 use function array_values;
-use function assert;
 use function count;
 
 use const PHP_EOL;
@@ -38,7 +34,7 @@ final class DocumentSearch
     private float|null $maxDistance = null;
 
     public function __construct(
-        private readonly LLMChainFactory $embeddings,
+        private readonly EmbeddingCalculator $embeddingCalculator,
         private readonly SettingsHandler $settingsHandler,
         private readonly ToolUsageCollector $collector,
         private readonly QueryService $queryService,
@@ -57,20 +53,9 @@ final class DocumentSearch
         $maxResults  = $settings->getChatbotGeneral()->getMaxDocumentResponses();
         $maxDistance = $this->maxDistance ?? $settings->getChatbotTuning()->getDocumentsMaxDistance();
 
-        $vector = $this->embeddings->createPlatform()->request(
-            model: new Embeddings(),
-            input: $search,
-        );
-
-        assert($vector instanceof AsyncResponse);
-        $vector = $vector->unwrap();
-
-        assert($vector instanceof VectorResponse);
-        $vector = $vector->getContent()[0];
-
         /** @var list<array{vector: VectorDocument, distance: float}> $documents */
         $documents = $this->queryService->query(new SearchSimilarVectors(
-            $vector->getData(),
+            $this->embeddingCalculator->getSingleEmbedding($search),
             $maxDistance,
             $maxResults,
         ));

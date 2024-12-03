@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ChronicleKeeper\Library\Presentation\Controller\Document;
+namespace ChronicleKeeper\Document\Presentation\Controller;
 
 use ChronicleKeeper\Document\Application\Command\DeleteDocument;
 use ChronicleKeeper\Document\Domain\Entity\Document;

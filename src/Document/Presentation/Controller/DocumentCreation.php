@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ChronicleKeeper\Library\Presentation\Controller\Document;
+namespace ChronicleKeeper\Document\Presentation\Controller;
 
 use ChronicleKeeper\Chat\Application\Query\FindConversationByIdParameters;
 use ChronicleKeeper\Chat\Application\Query\GetTemporaryConversationParameters;
@@ -17,14 +17,11 @@ use ChronicleKeeper\Shared\Presentation\FlashMessages\Alert;
 use ChronicleKeeper\Shared\Presentation\FlashMessages\HandleFlashMessages;
 use PhpLlm\LlmChain\Model\Message\AssistantMessage;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Requirement\Requirement;
-use Symfony\Component\Routing\RouterInterface;
-use Twig\Environment;
 
 use function array_filter;
 use function is_string;
@@ -41,8 +38,6 @@ class DocumentCreation extends AbstractController
     use HandleFlashMessages;
 
     public function __construct(
-        private readonly Environment $environment,
-        private readonly RouterInterface $router,
         private readonly FilesystemDirectoryRepository $directoryRepository,
         private readonly QueryService $queryService,
         private readonly MessageBusInterface $bus,
@@ -75,14 +70,14 @@ class DocumentCreation extends AbstractController
                     'Das Dokument wurde erstellt, damit es in der Suche aktiv ist kannst du den Suchindex aktualisieren.',
                 );
 
-                return new RedirectResponse($this->router->generate('library', ['directory' => $directory->id]));
+                return $this->redirectToRoute('library', ['directory' => $directory->id]);
             }
         }
 
-        return new Response($this->environment->render(
+        return $this->render(
             'library/document_create.html.twig',
             ['directory' => $directory, 'template_content' => $this->getTemplateContentFromChatMessagesBag($request)],
-        ));
+        );
     }
 
     private function getTemplateContentFromChatMessagesBag(Request $request): string

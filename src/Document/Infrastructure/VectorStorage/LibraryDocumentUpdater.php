@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ChronicleKeeper\Library\Infrastructure\VectorStorage\Updater;
+namespace ChronicleKeeper\Document\Infrastructure\VectorStorage;
 
 use ChronicleKeeper\Document\Application\Command\DeleteDocumentVectors;
 use ChronicleKeeper\Document\Application\Command\StoreDocumentVectors;
@@ -11,14 +11,10 @@ use ChronicleKeeper\Document\Application\Query\FindVectorsOfDocument;
 use ChronicleKeeper\Document\Domain\Entity\Document;
 use ChronicleKeeper\Document\Domain\Entity\VectorDocument;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
-use ChronicleKeeper\Shared\Infrastructure\LLMChain\LLMChainFactory;
-use PhpLlm\LlmChain\Bridge\OpenAI\Embeddings;
-use PhpLlm\LlmChain\Model\Response\AsyncResponse;
-use PhpLlm\LlmChain\Model\Response\VectorResponse;
+use ChronicleKeeper\Shared\Infrastructure\LLMChain\EmbeddingCalculator;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
 
-use function assert;
 use function count;
 use function reset;
 use function strlen;
@@ -32,25 +28,25 @@ class LibraryDocumentUpdater
 
     public function __construct(
         private readonly LoggerInterface $logger,
-        private readonly LLMChainFactory $embeddings,
+        private readonly EmbeddingCalculator $embeddingCalculator,
         private readonly QueryService $queryService,
         private readonly MessageBusInterface $bus,
     ) {
     }
 
-    public function updateAll(): void
+    public function updateAll(int $contentLength = self::VECTOR_CONTENT_LENGTH): void
     {
         foreach ($this->queryService->query(new FindAllDocuments()) as $document) {
-            $this->updateOrCreateVectorsForDocument($document);
+            $this->updateOrCreateVectorsForDocument($document, $contentLength);
         }
     }
 
-    private function updateOrCreateVectorsForDocument(Document $document): void
+    private function updateOrCreateVectorsForDocument(Document $document, int $contentLength): void
     {
         $existingStorage = $this->queryService->query(new FindVectorsOfDocument($document->id));
 
         if ($existingStorage === []) {
-            $this->createVectorDocument($document);
+            $this->createVectorDocument($document, $contentLength);
 
             return;
         }
@@ -71,12 +67,12 @@ class LibraryDocumentUpdater
         $this->logger->debug('Vector storage for document was cleared.', ['document' => $document]);
 
         // Re-Create the Storage
-        $this->createVectorDocument($document);
+        $this->createVectorDocument($document, $contentLength);
     }
 
-    private function createVectorDocument(Document $document): void
+    private function createVectorDocument(Document $document, int $contentLength): void
     {
-        $vectorDocuments = $this->splitDocumentInVectorDocuments($document, self::VECTOR_CONTENT_LENGTH);
+        $vectorDocuments = $this->splitDocumentInVectorDocuments($document, $contentLength);
         foreach ($vectorDocuments as $vectorDocument) {
             $this->bus->dispatch(new StoreDocumentVectors($vectorDocument));
         }
@@ -90,33 +86,20 @@ class LibraryDocumentUpdater
     /** @return VectorDocument[] */
     private function splitDocumentInVectorDocuments(
         Document $document,
-        int $vectorContentLength,
+        int $contentLength,
     ): array {
-        $content         = $document->content;
+        $content         = trim($document->content);
         $vectorDocuments = [];
 
-        $platform = $this->embeddings->createPlatform();
         do {
-            $vectorContent = u($content)->truncate($vectorContentLength, '', false)->toString();
-            $content       = substr($content, strlen($vectorContent));
-
-            $vector = $platform->request(
-                model: new Embeddings(),
-                input: $vectorContent,
-            );
-
-            if ($vector instanceof AsyncResponse) {
-                $vector = $vector->unwrap();
-            }
-
-            assert($vector instanceof VectorResponse);
-            $vector = $vector->getContent()[0];
+            $vectorContent = u($content)->truncate($contentLength, '', false)->toString();
+            $content       = trim(substr($content, strlen($vectorContent)));
 
             $vectorDocument = new VectorDocument(
                 document: $document,
                 content: trim($vectorContent),
                 vectorContentHash: $document->getContentHash(),
-                vector: $vector->getData(),
+                vector: $this->embeddingCalculator->getSingleEmbedding($vectorContent),
             );
 
             $vectorDocuments[] = $vectorDocument;

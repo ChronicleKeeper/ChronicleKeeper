@@ -8,7 +8,7 @@ use ChronicleKeeper\Document\Application\Command\DeleteDocument;
 use ChronicleKeeper\Document\Application\Command\DeleteDocumentHandler;
 use ChronicleKeeper\Document\Application\Command\DeleteDocumentVectors;
 use ChronicleKeeper\Document\Application\Query\FindVectorsOfDocument;
-use ChronicleKeeper\Library\Domain\Event\DocumentDeleted;
+use ChronicleKeeper\Document\Domain\Event\DocumentDeleted;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
 use ChronicleKeeper\Test\Document\Domain\Entity\DocumentBuilder;

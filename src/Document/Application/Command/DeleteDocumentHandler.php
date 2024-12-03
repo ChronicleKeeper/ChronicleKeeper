@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace ChronicleKeeper\Document\Application\Command;
 
 use ChronicleKeeper\Document\Application\Query\FindVectorsOfDocument;
-use ChronicleKeeper\Library\Domain\Event\DocumentDeleted;
+use ChronicleKeeper\Document\Domain\Event\DocumentDeleted;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ChronicleKeeper\Library\Presentation\Controller\Document;
+namespace ChronicleKeeper\Document\Presentation\Controller;
 
 use ChronicleKeeper\Document\Application\Service\Exception\PDFHasEmptyContent;
 use ChronicleKeeper\Document\Application\Service\Importer;

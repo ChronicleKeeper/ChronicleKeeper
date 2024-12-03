@@ -6,7 +6,7 @@ namespace ChronicleKeeper\Chat\Application\Service;
 
 use ChronicleKeeper\Chat\Domain\Entity\Conversation;
 use ChronicleKeeper\Chat\Domain\Entity\ExtendedMessage;
-use ChronicleKeeper\Library\Infrastructure\LLMChain\Tool\DocumentSearch;
+use ChronicleKeeper\Document\Infrastructure\LLMChain\DocumentSearch;
 use ChronicleKeeper\Library\Infrastructure\LLMChain\Tool\LibraryImages;
 use ChronicleKeeper\Shared\Infrastructure\LLMChain\LLMChainFactory;
 use ChronicleKeeper\Shared\Infrastructure\LLMChain\ToolUsageCollector;

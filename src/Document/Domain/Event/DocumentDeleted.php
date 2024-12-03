@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ChronicleKeeper\Library\Domain\Event;
+namespace ChronicleKeeper\Document\Domain\Event;
 
 final readonly class DocumentDeleted
 {

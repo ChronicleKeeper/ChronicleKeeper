@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ChronicleKeeper\Library\Infrastructure\ValueResolver;
+namespace ChronicleKeeper\Document\Infrastructure\ValueResolver;
 
 use ChronicleKeeper\Document\Application\Query\GetDocument;
 use ChronicleKeeper\Document\Domain\Entity\Document;
@@ -34,7 +34,7 @@ class LibraryDocumentResolver implements ValueResolverInterface
             return [];
         }
 
-        $documentIdentifier = $request->attributes->get($argument->getName());
+        $documentIdentifier = $request->get($argument->getName());
         if (! is_string($documentIdentifier) || ! Uuid::isValid($documentIdentifier)) {
             return [];
         }

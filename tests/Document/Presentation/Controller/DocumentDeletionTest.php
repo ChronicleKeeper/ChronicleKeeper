@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace ChronicleKeeper\Test\Library\Presentation\Controller\Document;
+namespace ChronicleKeeper\Test\Document\Presentation\Controller;
 
-use ChronicleKeeper\Library\Presentation\Controller\Document\DocumentDeletion;
+use ChronicleKeeper\Document\Presentation\Controller\DocumentDeletion;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Large;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;

@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace ChronicleKeeper\Favorizer\Infrastructure\Subscriber;
 
 use ChronicleKeeper\Chat\Domain\Event\ConversationDeleted;
+use ChronicleKeeper\Document\Domain\Event\DocumentDeleted;
 use ChronicleKeeper\Favorizer\Application\Command\StoreTargetBag;
 use ChronicleKeeper\Favorizer\Application\Query\GetTargetBag;
 use ChronicleKeeper\Favorizer\Domain\ValueObject\ChatConversationTarget;
 use ChronicleKeeper\Favorizer\Domain\ValueObject\LibraryDocumentTarget;
 use ChronicleKeeper\Favorizer\Domain\ValueObject\LibraryImageTarget;
-use ChronicleKeeper\Library\Domain\Event\DocumentDeleted;
 use ChronicleKeeper\Library\Domain\Event\ImageDeleted;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
