@@ -8,7 +8,7 @@ use ChronicleKeeper\Document\Application\Query\GetDocument;
 use ChronicleKeeper\Document\Domain\Entity\VectorDocument;
 use ChronicleKeeper\Document\Infrastructure\Serializer\DocumentVectorsDenormalizer;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
-use ChronicleKeeper\Test\Library\Domain\Entity\DocumentBuilder;
+use ChronicleKeeper\Test\Document\Domain\Entity\DocumentBuilder;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;

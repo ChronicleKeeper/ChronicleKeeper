@@ -8,7 +8,7 @@ use ChronicleKeeper\Document\Application\Query\GetDocument;
 use ChronicleKeeper\Document\Application\Query\GetDocumentQuery;
 use ChronicleKeeper\Document\Domain\Entity\Document;
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
-use ChronicleKeeper\Test\Library\Domain\Entity\DocumentBuilder;
+use ChronicleKeeper\Test\Document\Domain\Entity\DocumentBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\Attributes\Test;

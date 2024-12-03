@@ -11,6 +11,8 @@ use ChronicleKeeper\Library\Domain\Entity\Directory;
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\Finder;
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\PathRegistry;
+use ChronicleKeeper\Test\Document\Domain\Entity\DocumentBuilder;
+use ChronicleKeeper\Test\Library\Domain\Entity\DirectoryBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\Attributes\Test;
@@ -104,31 +106,28 @@ class FindDocumentsByDirectoryTest extends TestCase
                 },
             );
 
+        $searchDirectory = (new DirectoryBuilder())->build();
+
         $serializer = $this->createMock(SerializerInterface::class);
         $serializer->expects($this->exactly(2))
             ->method('deserialize')
             ->willReturnCallback(
-                static function (string $content, string $class): object {
+                static function (string $content, string $class) use ($searchDirectory): object {
                     self::assertSame(Document::class, $class);
 
                     if ($content === 'foo.content') {
-                        $directory     = new Directory('foo.directory');
-                        $directory->id = 'foo';
-
-                        $document            = new Document('foo', 'foo');
-                        $document->directory = $directory;
-
-                        return $document;
+                        return (new DocumentBuilder())
+                            ->withTitle('foo')
+                            ->withDirectory($searchDirectory)
+                            ->withContent('foo')
+                            ->build();
                     }
 
                     if ($content === 'bar.content') {
-                        $directory     = new Directory('bar.directory');
-                        $directory->id = 'bar';
-
-                        $document            = new Document('bar', 'bar');
-                        $document->directory = $directory;
-
-                        return $document;
+                        return (new DocumentBuilder())
+                            ->withTitle('bar')
+                            ->withContent('bar')
+                            ->build();
                     }
 
                     throw new UnexpectedValueException('Unexpected content');
@@ -146,7 +145,7 @@ class FindDocumentsByDirectoryTest extends TestCase
             $logger,
         );
 
-        $documents = $query->query(new FindDocumentsByDirectory('foo'));
+        $documents = $query->query(new FindDocumentsByDirectory($searchDirectory->id));
 
         self::assertCount(1, $documents);
         self::assertSame('foo', $documents[0]->title);
@@ -195,17 +194,19 @@ class FindDocumentsByDirectoryTest extends TestCase
                     $directory->id = 'foo';
 
                     if ($content === 'foo.content') {
-                        $document            = new Document('foo', 'foo');
-                        $document->directory = $directory;
-
-                        return $document;
+                        return (new DocumentBuilder())
+                            ->withTitle('foo')
+                            ->withDirectory($directory)
+                            ->withContent('foo')
+                            ->build();
                     }
 
                     if ($content === 'bar.content') {
-                        $document            = new Document('bar', 'bar');
-                        $document->directory = $directory;
-
-                        return $document;
+                        return (new DocumentBuilder())
+                            ->withTitle('bar')
+                            ->withDirectory($directory)
+                            ->withContent('bar')
+                            ->build();
                     }
 
                     throw new UnexpectedValueException('Unexpected content');

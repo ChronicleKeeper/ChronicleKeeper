@@ -7,7 +7,7 @@ namespace ChronicleKeeper\Test\Library\Infrastructure\VectorStorage\Updater;
 use ChronicleKeeper\Library\Infrastructure\VectorStorage\Updater\LibraryDocumentUpdater;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
 use ChronicleKeeper\Shared\Infrastructure\LLMChain\LLMChainFactory;
-use ChronicleKeeper\Test\Library\Domain\Entity\DocumentBuilder;
+use ChronicleKeeper\Test\Document\Domain\Entity\DocumentBuilder;
 use PhpLlm\LlmChain\Document\Vector;
 use PhpLlm\LlmChain\Model\Response\VectorResponse;
 use PhpLlm\LlmChain\PlatformInterface;

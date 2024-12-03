@@ -7,10 +7,11 @@ namespace ChronicleKeeper\Test\Document\Application\Query;
 use ChronicleKeeper\Document\Application\Query\FindAllDocuments;
 use ChronicleKeeper\Document\Application\Query\FindAllDocumentsQuery;
 use ChronicleKeeper\Document\Domain\Entity\Document;
-use ChronicleKeeper\Library\Domain\Entity\Directory;
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\Finder;
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\PathRegistry;
+use ChronicleKeeper\Test\Document\Domain\Entity\DocumentBuilder;
+use ChronicleKeeper\Test\Library\Domain\Entity\DirectoryBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\Attributes\Test;
@@ -110,21 +111,22 @@ class FindAllDocumentsTest extends TestCase
                 static function (string $content, string $class): object {
                     self::assertSame(Document::class, $class);
 
-                    $directory     = new Directory('foo.directory');
-                    $directory->id = 'foo';
+                    $directory = (new DirectoryBuilder())->build();
 
                     if ($content === 'foo.content') {
-                        $document            = new Document('foo', 'foo');
-                        $document->directory = $directory;
-
-                        return $document;
+                        return (new DocumentBuilder())
+                            ->withTitle('foo')
+                            ->withDirectory($directory)
+                            ->withContent('foo')
+                            ->build();
                     }
 
                     if ($content === 'bar.content') {
-                        $document            = new Document('bar', 'bar');
-                        $document->directory = $directory;
-
-                        return $document;
+                        return (new DocumentBuilder())
+                            ->withTitle('bar')
+                            ->withDirectory($directory)
+                            ->withContent('bar')
+                            ->build();
                     }
 
                     throw new UnexpectedValueException('Unexpected content');

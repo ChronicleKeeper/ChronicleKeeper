@@ -8,7 +8,7 @@ use ChronicleKeeper\Document\Application\Command\StoreDocument;
 use ChronicleKeeper\Document\Application\Command\StoreDocumentHandler;
 use ChronicleKeeper\Document\Domain\Entity\Document;
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
-use ChronicleKeeper\Test\Library\Domain\Entity\DocumentBuilder;
+use ChronicleKeeper\Test\Document\Domain\Entity\DocumentBuilder;
 use DateTimeImmutable;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;

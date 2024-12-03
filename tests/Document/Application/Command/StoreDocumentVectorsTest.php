@@ -8,7 +8,7 @@ use ChronicleKeeper\Document\Application\Command\StoreDocumentVectors;
 use ChronicleKeeper\Document\Application\Command\StoreDocumentVectorsHandler;
 use ChronicleKeeper\Document\Domain\Entity\VectorDocument;
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
-use ChronicleKeeper\Test\Library\Domain\Entity\DocumentBuilder;
+use ChronicleKeeper\Test\Document\Domain\Entity\VectorDocumentBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\Attributes\Test;
@@ -32,8 +32,7 @@ class StoreDocumentVectorsTest extends TestCase
     #[Test]
     public function documentIsStored(): void
     {
-        $document       = (new DocumentBuilder())->build();
-        $vectorDocument = new VectorDocument($document, 'content', 'foo', []);
+        $vectorDocument = (new VectorDocumentBuilder())->build();
 
         $handler        = new StoreDocumentVectorsHandler(
             $fileAccess = $this->createMock(FileAccess::class),

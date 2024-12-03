@@ -6,9 +6,8 @@ namespace ChronicleKeeper\Test\Document\Application\Query;
 
 use ChronicleKeeper\Document\Application\Query\FindVectorsOfDocument;
 use ChronicleKeeper\Document\Application\Query\FindVectorsOfDocumentQuery;
-use ChronicleKeeper\Document\Domain\Entity\VectorDocument;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
-use ChronicleKeeper\Test\Library\Domain\Entity\DocumentBuilder;
+use ChronicleKeeper\Test\Document\Domain\Entity\VectorDocumentBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\Attributes\Test;
@@ -44,8 +43,8 @@ class FindVectorsOfDocumentTest extends TestCase
     #[Test]
     public function queryWithFilteredResults(): void
     {
-        $firstDocument  = new VectorDocument((new DocumentBuilder())->build(), 'foo', 'foo', []);
-        $secondDocument = new VectorDocument((new DocumentBuilder())->build(), 'bar', 'bar', []);
+        $firstDocument  = (new VectorDocumentBuilder())->build();
+        $secondDocument = (new VectorDocumentBuilder())->build();
 
         $queryService = $this->createMock(QueryService::class);
         $queryService->expects($this->once())

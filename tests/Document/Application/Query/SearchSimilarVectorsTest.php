@@ -6,10 +6,10 @@ namespace ChronicleKeeper\Test\Document\Application\Query;
 
 use ChronicleKeeper\Document\Application\Query\SearchSimilarVectors;
 use ChronicleKeeper\Document\Application\Query\SearchSimilarVectorsQuery;
-use ChronicleKeeper\Document\Domain\Entity\VectorDocument;
 use ChronicleKeeper\Library\Infrastructure\VectorStorage\Distance\CosineDistance;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
-use ChronicleKeeper\Test\Library\Domain\Entity\DocumentBuilder;
+use ChronicleKeeper\Test\Document\Domain\Entity\DocumentBuilder;
+use ChronicleKeeper\Test\Document\Domain\Entity\VectorDocumentBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\Attributes\Test;
@@ -51,8 +51,8 @@ class SearchSimilarVectorsTest extends TestCase
     #[Test]
     public function queryWithFilteredResults(): void
     {
-        $firstDocument  = new VectorDocument((new DocumentBuilder())->build(), 'foo', 'foo', [12.0, 13.0]);
-        $secondDocument = new VectorDocument((new DocumentBuilder())->build(), 'bar', 'bar', [14.0, 15.0]);
+        $firstDocument  = (new VectorDocumentBuilder())->build();
+        $secondDocument = (new VectorDocumentBuilder())->build();
 
         $queryService = $this->createMock(QueryService::class);
         $queryService->expects($this->once())
@@ -74,8 +74,8 @@ class SearchSimilarVectorsTest extends TestCase
     #[Test]
     public function queryRespectsMaximalResults(): void
     {
-        $firstDocument  = new VectorDocument((new DocumentBuilder())->build(), 'foo', 'foo', [12.0, 13.0]);
-        $secondDocument = new VectorDocument((new DocumentBuilder())->build(), 'bar', 'bar', [14.0, 15.0]);
+        $firstDocument  = (new VectorDocumentBuilder())->build();
+        $secondDocument = (new VectorDocumentBuilder())->build();
 
         $queryService = $this->createMock(QueryService::class);
         $queryService->expects($this->once())
@@ -96,13 +96,10 @@ class SearchSimilarVectorsTest extends TestCase
     #[Test]
     public function documentWithEmptyContentIsIgnored(): void
     {
-        $firstDocument  = new VectorDocument((new DocumentBuilder())->build(), 'foo', '', [12.0, 13.0]);
-        $secondDocument = new VectorDocument(
-            (new DocumentBuilder())->withContent('')->build(),
-            'bar',
-            'bar',
-            [14.0, 15.0],
-        );
+        $firstDocument  = (new VectorDocumentBuilder())->withVector([12.0, 13.0])->build();
+        $secondDocument = (new VectorDocumentBuilder())
+            ->withDocument((new DocumentBuilder())->withContent('')->build())
+            ->build();
 
         $queryService = $this->createMock(QueryService::class);
         $queryService->expects($this->once())
@@ -124,8 +121,8 @@ class SearchSimilarVectorsTest extends TestCase
     #[Test]
     public function documentsAreOrderedByVectorDistance(): void
     {
-        $firstDocument  = new VectorDocument((new DocumentBuilder())->build(), 'foo', 'foo', [12.0, 13.0]);
-        $secondDocument = new VectorDocument((new DocumentBuilder())->build(), 'bar', 'bar', [14.0, 15.0]);
+        $firstDocument  = (new VectorDocumentBuilder())->withVector([12.0, 13.0])->build();
+        $secondDocument = (new VectorDocumentBuilder())->withVector([14.0, 15.0])->build();
 
         $queryService = $this->createMock(QueryService::class);
         $queryService->expects($this->once())

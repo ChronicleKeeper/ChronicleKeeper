@@ -2,15 +2,17 @@
 
 declare(strict_types=1);
 
-namespace ChronicleKeeper\Test\Library\Domain\Entity;
+namespace ChronicleKeeper\Test\Document\Domain\Entity;
 
 use ChronicleKeeper\Document\Domain\Entity\Document;
 use ChronicleKeeper\Library\Domain\Entity\Directory;
 use ChronicleKeeper\Library\Domain\RootDirectory;
 use DateTimeImmutable;
+use Symfony\Component\Uid\Uuid;
 
 class DocumentBuilder
 {
+    private string $id;
     private string $title;
     private string $content;
     private Directory $directory;
@@ -18,15 +20,18 @@ class DocumentBuilder
 
     public function __construct()
     {
+        $this->id        = Uuid::v4()->toString();
         $this->title     = 'Default Title';
         $this->content   = 'Default Content';
         $this->directory = RootDirectory::get(); // Assuming a method to create a root directory
         $this->updatedAt = new DateTimeImmutable();
     }
 
-    public static function create(): self
+    public function withId(string $id): self
     {
-        return new self();
+        $this->id = $id;
+
+        return $this;
     }
 
     public function withTitle(string $title): self
@@ -60,6 +65,7 @@ class DocumentBuilder
     public function build(): Document
     {
         $document            = new Document($this->title, $this->content);
+        $document->id        = $this->id;
         $document->directory = $this->directory;
         $document->updatedAt = $this->updatedAt;
 

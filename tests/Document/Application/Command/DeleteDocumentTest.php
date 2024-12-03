@@ -8,11 +8,11 @@ use ChronicleKeeper\Document\Application\Command\DeleteDocument;
 use ChronicleKeeper\Document\Application\Command\DeleteDocumentHandler;
 use ChronicleKeeper\Document\Application\Command\DeleteDocumentVectors;
 use ChronicleKeeper\Document\Application\Query\FindVectorsOfDocument;
-use ChronicleKeeper\Document\Domain\Entity\VectorDocument;
 use ChronicleKeeper\Library\Domain\Event\DocumentDeleted;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
-use ChronicleKeeper\Test\Library\Domain\Entity\DocumentBuilder;
+use ChronicleKeeper\Test\Document\Domain\Entity\DocumentBuilder;
+use ChronicleKeeper\Test\Document\Domain\Entity\VectorDocumentBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\Attributes\Test;
@@ -38,7 +38,7 @@ class DeleteDocumentTest extends TestCase
     public function documentIsFullyDeleted(): void
     {
         $document       = (new DocumentBuilder())->build();
-        $vectorDocument = new VectorDocument($document, 'content', 'foo', []);
+        $vectorDocument = (new VectorDocumentBuilder())->withDocument($document)->build();
 
         $queryService = $this->createMock(QueryService::class);
         $queryService->expects($this->once())

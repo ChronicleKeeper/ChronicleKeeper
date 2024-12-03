@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Document\Domain\Entity;
 
+use JsonSerializable;
 use Symfony\Component\Uid\Uuid;
-
-use function array_key_exists;
-use function count;
 
 /**
  * @phpstan-type VectorDocumentArray = array{
@@ -18,7 +16,7 @@ use function count;
  *     vector: list<float>
  * }
  */
-class VectorDocument
+class VectorDocument implements JsonSerializable
 {
     public string $id;
 
@@ -33,7 +31,7 @@ class VectorDocument
     }
 
     /** @return VectorDocumentArray */
-    public function toArray(): array
+    public function jsonSerialize(): array
     {
         return [
             'id' => $this->id,
@@ -42,20 +40,5 @@ class VectorDocument
             'vectorContentHash' => $this->vectorContentHash,
             'vector' => $this->vector,
         ];
-    }
-
-    /**
-     * @param mixed[] $array
-     *
-     * @phpstan-return ($array is VectorDocumentArray ? true : false)
-     */
-    public static function isVectorDocumentArray(array $array): bool
-    {
-        return count($array) === 5
-            && array_key_exists('id', $array)
-            && array_key_exists('documentId', $array)
-            && array_key_exists('content', $array)
-            && array_key_exists('vectorContentHash', $array)
-            && array_key_exists('vector', $array);
     }
 }

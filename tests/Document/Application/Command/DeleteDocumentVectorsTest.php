@@ -6,9 +6,8 @@ namespace ChronicleKeeper\Test\Document\Application\Command;
 
 use ChronicleKeeper\Document\Application\Command\DeleteDocumentVectors;
 use ChronicleKeeper\Document\Application\Command\DeleteDocumentVectorsHandler;
-use ChronicleKeeper\Document\Domain\Entity\VectorDocument;
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
-use ChronicleKeeper\Test\Library\Domain\Entity\DocumentBuilder;
+use ChronicleKeeper\Test\Document\Domain\Entity\VectorDocumentBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\Attributes\Test;
@@ -30,8 +29,7 @@ class DeleteDocumentVectorsTest extends TestCase
     #[Test]
     public function documentIsFullyDeleted(): void
     {
-        $document       = (new DocumentBuilder())->build();
-        $vectorDocument = new VectorDocument($document, 'content', 'foo', []);
+        $vectorDocument = (new VectorDocumentBuilder())->build();
 
         $fileAccess = $this->createMock(FileAccess::class);
         $fileAccess->expects($this->once())
