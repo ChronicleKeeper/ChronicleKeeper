@@ -24,11 +24,7 @@ use function array_values;
 use function asort;
 use function is_array;
 use function json_decode;
-use function json_encode;
 use function json_validate;
-
-use const JSON_PRETTY_PRINT;
-use const JSON_THROW_ON_ERROR;
 
 #[Autoconfigure(lazy: true)]
 class FilesystemVectorDocumentRepository
@@ -43,14 +39,6 @@ class FilesystemVectorDocumentRepository
         private readonly PathRegistry $pathRegistry,
         private readonly QueryService $queryService,
     ) {
-    }
-
-    public function store(VectorDocument $vectorDocument): void
-    {
-        $filename = $this->generateFilename($vectorDocument->id);
-        $content  = json_encode($vectorDocument->toArray(), JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT);
-
-        $this->fileAccess->write(self::STORAGE_NAME, $filename, $content);
     }
 
     /** @return list<VectorDocument> */
@@ -133,12 +121,6 @@ class FilesystemVectorDocumentRepository
             $this->findAll(),
             static fn (VectorDocument $vectorDocument): bool => $vectorDocument->document->id === $id,
         ));
-    }
-
-    public function remove(VectorDocument $vectorDocument): void
-    {
-        $filename = $this->generateFilename($vectorDocument->id);
-        $this->fileAccess->delete(self::STORAGE_NAME, $filename);
     }
 
     private function convertJsonToVectorDocument(string $json): VectorDocument

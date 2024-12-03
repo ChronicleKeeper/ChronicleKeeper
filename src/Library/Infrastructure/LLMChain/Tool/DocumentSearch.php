@@ -28,7 +28,7 @@ use const PHP_EOL;
     consider using the "library_images" function.
     TEXT,
 )]
-final class LibraryDocuments
+final class DocumentSearch
 {
     /** @var array<string, Document> */
     private array $referencedDocuments = [];

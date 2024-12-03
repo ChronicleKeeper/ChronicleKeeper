@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Library\Infrastructure\VectorStorage\Updater;
 
+use ChronicleKeeper\Document\Application\Command\DeleteDocumentVectors;
+use ChronicleKeeper\Document\Application\Command\StoreDocumentVectors;
 use ChronicleKeeper\Document\Application\Query\FindAllDocuments;
 use ChronicleKeeper\Library\Domain\Entity\Document;
 use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemVectorDocumentRepository;
@@ -14,6 +16,7 @@ use PhpLlm\LlmChain\Bridge\OpenAI\Embeddings;
 use PhpLlm\LlmChain\Model\Response\AsyncResponse;
 use PhpLlm\LlmChain\Model\Response\VectorResponse;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Messenger\MessageBusInterface;
 
 use function assert;
 use function count;
@@ -32,6 +35,7 @@ class LibraryDocumentUpdater
         private readonly LLMChainFactory $embeddings,
         private readonly FilesystemVectorDocumentRepository $vectorDocumentRepository,
         private readonly QueryService $queryService,
+        private readonly MessageBusInterface $bus,
     ) {
     }
 
@@ -62,7 +66,7 @@ class LibraryDocumentUpdater
 
         // Clean Vector Storage
         foreach ($existingStorage as $vectorDocument) {
-            $this->vectorDocumentRepository->remove($vectorDocument);
+            $this->bus->dispatch(new DeleteDocumentVectors($vectorDocument->id));
         }
 
         $this->logger->debug('Vector storage for document was cleared.', ['document' => $document]);
@@ -75,7 +79,7 @@ class LibraryDocumentUpdater
     {
         $vectorDocuments = $this->splitDocumentInVectorDocuments($document, self::VECTOR_CONTENT_LENGTH);
         foreach ($vectorDocuments as $vectorDocument) {
-            $this->vectorDocumentRepository->store($vectorDocument);
+            $this->bus->dispatch(new StoreDocumentVectors($vectorDocument));
         }
 
         $this->logger->debug(

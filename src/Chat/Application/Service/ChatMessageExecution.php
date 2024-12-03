@@ -6,7 +6,7 @@ namespace ChronicleKeeper\Chat\Application\Service;
 
 use ChronicleKeeper\Chat\Domain\Entity\Conversation;
 use ChronicleKeeper\Chat\Domain\Entity\ExtendedMessage;
-use ChronicleKeeper\Library\Infrastructure\LLMChain\Tool\LibraryDocuments;
+use ChronicleKeeper\Library\Infrastructure\LLMChain\Tool\DocumentSearch;
 use ChronicleKeeper\Library\Infrastructure\LLMChain\Tool\LibraryImages;
 use ChronicleKeeper\Shared\Infrastructure\LLMChain\LLMChainFactory;
 use ChronicleKeeper\Shared\Infrastructure\LLMChain\ToolUsageCollector;
@@ -19,7 +19,7 @@ class ChatMessageExecution
 {
     public function __construct(
         private readonly LLMChainFactory $chain,
-        private readonly LibraryDocuments $libraryDocuments,
+        private readonly DocumentSearch $libraryDocuments,
         private readonly LibraryImages $libraryImages,
         private readonly ToolUsageCollector $collector,
     ) {

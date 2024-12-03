@@ -18,6 +18,7 @@ use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use ReflectionClass;
+use Symfony\Component\Messenger\MessageBusInterface;
 
 #[CoversClass(LibraryDocumentUpdater::class)]
 #[Small]
@@ -41,6 +42,7 @@ class LibraryDocumentUpdaterTest extends TestCase
             $chainFactory,
             self::createStub(FilesystemVectorDocumentRepository::class),
             self::createStub(QueryService::class),
+            self::createStub(MessageBusInterface::class),
         );
 
         $reflection = new ReflectionClass(LibraryDocumentUpdater::class);
