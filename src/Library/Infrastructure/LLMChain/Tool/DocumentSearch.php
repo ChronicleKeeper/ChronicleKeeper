@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Library\Infrastructure\LLMChain\Tool;
 
+use ChronicleKeeper\Document\Application\Query\SearchSimilarVectors;
 use ChronicleKeeper\Library\Domain\Entity\Document;
-use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemVectorDocumentRepository;
+use ChronicleKeeper\Library\Infrastructure\VectorStorage\VectorDocument;
 use ChronicleKeeper\Settings\Application\SettingsHandler;
+use ChronicleKeeper\Shared\Application\Query\QueryService;
 use ChronicleKeeper\Shared\Infrastructure\LLMChain\LLMChainFactory;
 use ChronicleKeeper\Shared\Infrastructure\LLMChain\ToolUsageCollector;
 use PhpLlm\LlmChain\Bridge\OpenAI\Embeddings;
@@ -36,10 +38,10 @@ final class DocumentSearch
     private float|null $maxDistance = null;
 
     public function __construct(
-        private readonly FilesystemVectorDocumentRepository $vectorDocumentRepository,
         private readonly LLMChainFactory $embeddings,
         private readonly SettingsHandler $settingsHandler,
         private readonly ToolUsageCollector $collector,
+        private readonly QueryService $queryService,
     ) {
     }
 
@@ -51,7 +53,9 @@ final class DocumentSearch
     /** @param string $search The search parameter containing the user's question or relevant keywords related to the information they seek */
     public function __invoke(string $search): string
     {
-        $maxResults = $this->settingsHandler->get()->getChatbotGeneral()->getMaxDocumentResponses();
+        $settings    = $this->settingsHandler->get();
+        $maxResults  = $settings->getChatbotGeneral()->getMaxDocumentResponses();
+        $maxDistance = $this->maxDistance ?? $settings->getChatbotTuning()->getDocumentsMaxDistance();
 
         $vector = $this->embeddings->createPlatform()->request(
             model: new Embeddings(),
@@ -64,18 +68,19 @@ final class DocumentSearch
         assert($vector instanceof VectorResponse);
         $vector = $vector->getContent()[0];
 
-        $documents = $this->vectorDocumentRepository->findSimilar(
+        /** @var list<array{vector: VectorDocument, distance: float}> $documents */
+        $documents = $this->queryService->query(new SearchSimilarVectors(
             $vector->getData(),
-            maxDistance: $this->maxDistance,
-            maxResults: $maxResults,
-        );
+            $maxDistance,
+            $maxResults,
+        ));
 
         $this->referencedDocuments = [];
         if (count($documents) === 0) {
             $this->collector->called(
                 'library_documents',
                 [
-                    'arguments' => ['search' => $search, 'maxDistance' => $this->maxDistance, 'maxResults' => $maxResults],
+                    'arguments' => ['search' => $search, 'maxDistance' => $maxDistance, 'maxResults' => $maxResults],
                     'responses' => [],
                 ],
             );
