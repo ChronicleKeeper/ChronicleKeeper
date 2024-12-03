@@ -9,7 +9,6 @@ use ChronicleKeeper\Library\Infrastructure\VectorStorage\Distance\CosineDistance
 use ChronicleKeeper\Library\Infrastructure\VectorStorage\VectorDocument;
 use ChronicleKeeper\Settings\Application\SettingsHandler;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
-use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Exception\UnableToReadFile;
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\PathRegistry;
 use Psr\Log\LoggerInterface;
@@ -17,14 +16,11 @@ use RuntimeException;
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 use Symfony\Component\Finder\Finder;
 
-use function array_filter;
 use function array_keys;
 use function array_slice;
-use function array_values;
 use function asort;
 use function is_array;
 use function json_decode;
-use function json_validate;
 
 #[Autoconfigure(lazy: true)]
 class FilesystemVectorDocumentRepository
@@ -34,7 +30,6 @@ class FilesystemVectorDocumentRepository
     public function __construct(
         private readonly LoggerInterface $logger,
         private readonly CosineDistance $distance,
-        private readonly FileAccess $fileAccess,
         private readonly SettingsHandler $settingsHandler,
         private readonly PathRegistry $pathRegistry,
         private readonly QueryService $queryService,
@@ -59,18 +54,6 @@ class FilesystemVectorDocumentRepository
         }
 
         return $documents;
-    }
-
-    public function findById(string $id): VectorDocument|null
-    {
-        $filename = $this->generateFilename($id);
-        $json     = $this->fileAccess->read(self::STORAGE_NAME, $filename);
-
-        if (! json_validate($json)) {
-            return null;
-        }
-
-        return $this->convertJsonToVectorDocument($json);
     }
 
     /**
@@ -114,15 +97,6 @@ class FilesystemVectorDocumentRepository
         return $results;
     }
 
-    /** @return list<VectorDocument> */
-    public function findAllByDocumentId(string $id): array
-    {
-        return array_values(array_filter(
-            $this->findAll(),
-            static fn (VectorDocument $vectorDocument): bool => $vectorDocument->document->id === $id,
-        ));
-    }
-
     private function convertJsonToVectorDocument(string $json): VectorDocument
     {
         $vectorDocumentArr = json_decode($json, true);
@@ -142,11 +116,5 @@ class FilesystemVectorDocumentRepository
         $vectorDocument->id = $vectorDocumentArr['id'];
 
         return $vectorDocument;
-    }
-
-    /** @return non-empty-string */
-    private function generateFilename(string $id): string
-    {
-        return $id . '.json';
     }
 }

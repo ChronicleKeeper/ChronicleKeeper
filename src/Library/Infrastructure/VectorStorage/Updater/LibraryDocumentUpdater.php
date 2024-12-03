@@ -7,8 +7,8 @@ namespace ChronicleKeeper\Library\Infrastructure\VectorStorage\Updater;
 use ChronicleKeeper\Document\Application\Command\DeleteDocumentVectors;
 use ChronicleKeeper\Document\Application\Command\StoreDocumentVectors;
 use ChronicleKeeper\Document\Application\Query\FindAllDocuments;
+use ChronicleKeeper\Document\Application\Query\FindVectorsOfDocument;
 use ChronicleKeeper\Library\Domain\Entity\Document;
-use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemVectorDocumentRepository;
 use ChronicleKeeper\Library\Infrastructure\VectorStorage\VectorDocument;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
 use ChronicleKeeper\Shared\Infrastructure\LLMChain\LLMChainFactory;
@@ -33,7 +33,6 @@ class LibraryDocumentUpdater
     public function __construct(
         private readonly LoggerInterface $logger,
         private readonly LLMChainFactory $embeddings,
-        private readonly FilesystemVectorDocumentRepository $vectorDocumentRepository,
         private readonly QueryService $queryService,
         private readonly MessageBusInterface $bus,
     ) {
@@ -48,7 +47,7 @@ class LibraryDocumentUpdater
 
     private function updateOrCreateVectorsForDocument(Document $document): void
     {
-        $existingStorage = $this->vectorDocumentRepository->findAllByDocumentId($document->id);
+        $existingStorage = $this->queryService->query(new FindVectorsOfDocument($document->id));
 
         if ($existingStorage === []) {
             $this->createVectorDocument($document);

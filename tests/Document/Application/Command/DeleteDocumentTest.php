@@ -7,9 +7,10 @@ namespace ChronicleKeeper\Test\Document\Application\Command;
 use ChronicleKeeper\Document\Application\Command\DeleteDocument;
 use ChronicleKeeper\Document\Application\Command\DeleteDocumentHandler;
 use ChronicleKeeper\Document\Application\Command\DeleteDocumentVectors;
+use ChronicleKeeper\Document\Application\Query\FindVectorsOfDocument;
 use ChronicleKeeper\Library\Domain\Event\DocumentDeleted;
-use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemVectorDocumentRepository;
 use ChronicleKeeper\Library\Infrastructure\VectorStorage\VectorDocument;
+use ChronicleKeeper\Shared\Application\Query\QueryService;
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
 use ChronicleKeeper\Test\Library\Domain\Entity\DocumentBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -39,10 +40,10 @@ class DeleteDocumentTest extends TestCase
         $document       = (new DocumentBuilder())->build();
         $vectorDocument = new VectorDocument($document, 'content', 'foo', []);
 
-        $vectorRepository = $this->createMock(FilesystemVectorDocumentRepository::class);
-        $vectorRepository->expects($this->once())
-            ->method('findAllByDocumentId')
-            ->with($document->id)
+        $queryService = $this->createMock(QueryService::class);
+        $queryService->expects($this->once())
+            ->method('query')
+            ->with(self::isInstanceOf(FindVectorsOfDocument::class))
             ->willReturn([$vectorDocument]);
 
         $fileAccess = $this->createMock(FileAccess::class);
@@ -61,7 +62,7 @@ class DeleteDocumentTest extends TestCase
             ->method('dispatch')
             ->with(self::isInstanceOf(DocumentDeleted::class));
 
-        $handler = new DeleteDocumentHandler($fileAccess, $eventDispatcher, $vectorRepository, $bus);
+        $handler = new DeleteDocumentHandler($fileAccess, $eventDispatcher, $bus, $queryService);
         $handler(new DeleteDocument($document->id));
     }
 }

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Test\Library\Infrastructure\VectorStorage\Updater;
 
-use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemVectorDocumentRepository;
 use ChronicleKeeper\Library\Infrastructure\VectorStorage\Updater\LibraryDocumentUpdater;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
 use ChronicleKeeper\Shared\Infrastructure\LLMChain\LLMChainFactory;
@@ -40,7 +39,6 @@ class LibraryDocumentUpdaterTest extends TestCase
         $updater = new LibraryDocumentUpdater(
             self::createStub(LoggerInterface::class),
             $chainFactory,
-            self::createStub(FilesystemVectorDocumentRepository::class),
             self::createStub(QueryService::class),
             self::createStub(MessageBusInterface::class),
         );
