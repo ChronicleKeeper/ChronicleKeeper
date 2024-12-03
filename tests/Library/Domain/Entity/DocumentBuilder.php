@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Test\Library\Domain\Entity;
 
+use ChronicleKeeper\Document\Domain\Entity\Document;
 use ChronicleKeeper\Library\Domain\Entity\Directory;
-use ChronicleKeeper\Library\Domain\Entity\Document;
 use ChronicleKeeper\Library\Domain\RootDirectory;
 use DateTimeImmutable;
 

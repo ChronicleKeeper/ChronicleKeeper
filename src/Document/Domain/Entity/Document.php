@@ -2,8 +2,9 @@
 
 declare(strict_types=1);
 
-namespace ChronicleKeeper\Library\Domain\Entity;
+namespace ChronicleKeeper\Document\Domain\Entity;
 
+use ChronicleKeeper\Library\Domain\Entity\Directory;
 use ChronicleKeeper\Library\Domain\RootDirectory;
 use ChronicleKeeper\Shared\Domain\Sluggable;
 use DateTimeImmutable;

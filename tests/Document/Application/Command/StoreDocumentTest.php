@@ -6,7 +6,7 @@ namespace ChronicleKeeper\Test\Document\Application\Command;
 
 use ChronicleKeeper\Document\Application\Command\StoreDocument;
 use ChronicleKeeper\Document\Application\Command\StoreDocumentHandler;
-use ChronicleKeeper\Library\Domain\Entity\Document;
+use ChronicleKeeper\Document\Domain\Entity\Document;
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
 use ChronicleKeeper\Test\Library\Domain\Entity\DocumentBuilder;
 use DateTimeImmutable;

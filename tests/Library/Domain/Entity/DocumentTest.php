@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Test\Library\Domain\Entity;
 
-use ChronicleKeeper\Library\Domain\Entity\Document;
+use ChronicleKeeper\Document\Domain\Entity\Document;
 use DateTimeInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;

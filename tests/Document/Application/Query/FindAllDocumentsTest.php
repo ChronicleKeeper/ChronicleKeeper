@@ -6,8 +6,8 @@ namespace ChronicleKeeper\Test\Document\Application\Query;
 
 use ChronicleKeeper\Document\Application\Query\FindAllDocuments;
 use ChronicleKeeper\Document\Application\Query\FindAllDocumentsQuery;
+use ChronicleKeeper\Document\Domain\Entity\Document;
 use ChronicleKeeper\Library\Domain\Entity\Directory;
-use ChronicleKeeper\Library\Domain\Entity\Document;
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\Finder;
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\PathRegistry;

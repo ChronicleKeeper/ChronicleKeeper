@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace ChronicleKeeper\Library\Infrastructure\Serializer;
 
 use ChronicleKeeper\Document\Application\Query\GetDocument;
+use ChronicleKeeper\Document\Domain\Entity\Document;
 use ChronicleKeeper\Library\Domain\Entity\Directory;
-use ChronicleKeeper\Library\Domain\Entity\Document;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
 use DateTimeImmutable;
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;

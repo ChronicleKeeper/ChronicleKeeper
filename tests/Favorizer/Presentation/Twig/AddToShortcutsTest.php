@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Test\Favorizer\Presentation\Twig;
 
+use ChronicleKeeper\Document\Domain\Entity\Document;
 use ChronicleKeeper\Favorizer\Presentation\Twig\AddToShortcuts;
-use ChronicleKeeper\Library\Domain\Entity\Document;
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
 use ChronicleKeeper\Test\Library\Domain\Entity\DocumentBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;

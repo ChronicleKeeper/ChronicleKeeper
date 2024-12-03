@@ -8,7 +8,7 @@ use ChronicleKeeper\Document\Application\Command\DeleteDocumentVectors;
 use ChronicleKeeper\Document\Application\Command\StoreDocumentVectors;
 use ChronicleKeeper\Document\Application\Query\FindAllDocuments;
 use ChronicleKeeper\Document\Application\Query\FindVectorsOfDocument;
-use ChronicleKeeper\Library\Domain\Entity\Document;
+use ChronicleKeeper\Document\Domain\Entity\Document;
 use ChronicleKeeper\Library\Infrastructure\VectorStorage\VectorDocument;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
 use ChronicleKeeper\Shared\Infrastructure\LLMChain\LLMChainFactory;

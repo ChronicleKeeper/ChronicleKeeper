@@ -6,9 +6,9 @@ namespace ChronicleKeeper\Library\Application\Service\Document;
 
 use ChronicleKeeper\Chat\Application\Service\LLMContentOptimizer;
 use ChronicleKeeper\Document\Application\Command\StoreDocument;
+use ChronicleKeeper\Document\Domain\Entity\Document;
 use ChronicleKeeper\Library\Application\Service\Document\Importer\FileConverter;
 use ChronicleKeeper\Library\Domain\Entity\Directory;
-use ChronicleKeeper\Library\Domain\Entity\Document;
 use RuntimeException;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\HttpFoundation\File\UploadedFile;

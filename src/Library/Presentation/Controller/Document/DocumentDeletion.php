@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace ChronicleKeeper\Library\Presentation\Controller\Document;
 
 use ChronicleKeeper\Document\Application\Command\DeleteDocument;
-use ChronicleKeeper\Library\Domain\Entity\Document;
+use ChronicleKeeper\Document\Domain\Entity\Document;
 use ChronicleKeeper\Shared\Presentation\FlashMessages\Alert;
 use ChronicleKeeper\Shared\Presentation\FlashMessages\HandleFlashMessages;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;

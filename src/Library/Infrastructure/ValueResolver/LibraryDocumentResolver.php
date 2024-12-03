@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace ChronicleKeeper\Library\Infrastructure\ValueResolver;
 
 use ChronicleKeeper\Document\Application\Query\GetDocument;
-use ChronicleKeeper\Library\Domain\Entity\Document;
+use ChronicleKeeper\Document\Domain\Entity\Document;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Exception\UnableToReadFile;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
