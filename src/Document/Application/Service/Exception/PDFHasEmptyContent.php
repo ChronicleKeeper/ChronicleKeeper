@@ -10,7 +10,7 @@
 
 declare(strict_types=1);
 
-namespace ChronicleKeeper\Library\Application\Service\Document\Exception;
+namespace ChronicleKeeper\Document\Application\Service\Exception;
 
 use RuntimeException;
 

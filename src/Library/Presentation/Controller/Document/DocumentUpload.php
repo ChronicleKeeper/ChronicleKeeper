@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Library\Presentation\Controller\Document;
 
-use ChronicleKeeper\Library\Application\Service\Document\Exception\PDFHasEmptyContent;
-use ChronicleKeeper\Library\Application\Service\Document\Importer;
+use ChronicleKeeper\Document\Application\Service\Exception\PDFHasEmptyContent;
+use ChronicleKeeper\Document\Application\Service\Importer;
 use ChronicleKeeper\Library\Domain\Entity\Directory;
 use ChronicleKeeper\Library\Presentation\Form\DocumentUploadType;
 use ChronicleKeeper\Shared\Presentation\FlashMessages\Alert;

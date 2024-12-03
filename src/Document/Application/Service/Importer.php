@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace ChronicleKeeper\Library\Application\Service\Document;
+namespace ChronicleKeeper\Document\Application\Service;
 
 use ChronicleKeeper\Chat\Application\Service\LLMContentOptimizer;
 use ChronicleKeeper\Document\Application\Command\StoreDocument;
+use ChronicleKeeper\Document\Application\Service\Importer\FileConverter;
 use ChronicleKeeper\Document\Domain\Entity\Document;
-use ChronicleKeeper\Library\Application\Service\Document\Importer\FileConverter;
 use ChronicleKeeper\Library\Domain\Entity\Directory;
 use RuntimeException;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;

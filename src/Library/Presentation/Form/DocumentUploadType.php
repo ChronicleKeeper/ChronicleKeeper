@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Library\Presentation\Form;
 
-use ChronicleKeeper\Library\Application\Service\Document\Importer;
+use ChronicleKeeper\Document\Application\Service\Importer;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace ChronicleKeeper\Library\Application\Service\Document\Importer;
+namespace ChronicleKeeper\Document\Application\Service\Importer;
 
-use ChronicleKeeper\Library\Application\Service\Document\Exception\PDFHasEmptyContent;
+use ChronicleKeeper\Document\Application\Service\Exception\PDFHasEmptyContent;
 use Smalot\PdfParser\Config as PdfParserConfig;
 use Smalot\PdfParser\Parser as PdfParser;
 use Symfony\Component\Mime\MimeTypes;

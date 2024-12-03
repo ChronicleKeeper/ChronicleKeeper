@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ChronicleKeeper\Library\Application\Service\Document\Importer;
+namespace ChronicleKeeper\Document\Application\Service\Importer;
 
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Mime\MimeTypes;
