@@ -1,0 +1,43 @@
+{% extends 'layout.html.twig' %}
+
+{% block page_title %}Dokument "{{ form.title.vars.value }}" bearbeiten{% endblock %}
+
+{% block page_content %}
+<div class="container-xl">
+    <div class="row row-deck row-cards">
+        <div class="row-sm-12">
+            <div class="card card-borderless">
+                <div class="card-body">
+                    <twig:directoryBreadcrumb directory="{{ form.directory.vars.data }}" extraLastNode="{{ form.title.vars.value }}" />
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-12">
+            <div class="card">
+                <form action="{{ path('library_document_edit', {'document': document.id}) }}" method="post">
+                    <div class="card-body">
+                        <div class="row g-5">
+                            {{ form_row(form.title) }}
+                            <div class="col-12">
+                                {{ form_label(form.directory) }}
+                                <twig:directorySelection name="document[directory]" preSelected="{{ form.directory.vars.value }}" />
+                            </div>
+                            <div class="col-12">
+                                {{ form_label(form.content) }}
+                                <twig:markdownEditor rows="10" name="document[content]" content="{{ form.content.vars.value }}" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer text-end">
+                        <div class="d-flex">
+                            <a href="{{ path('library', {'directory': form.directory.vars.value }) }}" class="btn btn-link">Abbruch</a>
+                            <button type="submit" class="btn btn-primary ms-auto">Speichern</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

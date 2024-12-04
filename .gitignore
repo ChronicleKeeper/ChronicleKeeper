@@ -9,3 +9,6 @@
 
 /.phpcs-cache
 /.phpunit.cache/
+
+/coverage.xml
+/coverage

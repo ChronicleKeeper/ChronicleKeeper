@@ -6,13 +6,11 @@ namespace ChronicleKeeper\Test\ImageGenerator\Application\Command;
 
 use ChronicleKeeper\ImageGenerator\Application\Command\DeleteGeneratorRequest;
 use ChronicleKeeper\ImageGenerator\Application\Command\DeleteGeneratorRequestHandler;
-use ChronicleKeeper\ImageGenerator\Application\Service\PromptOptimizer;
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Serializer\SerializerInterface;
 use Webmozart\Assert\InvalidArgumentException;
 
 #[CoversClass(DeleteGeneratorRequestHandler::class)]
@@ -32,11 +30,9 @@ class DeleteGeneratorRequestHandlerTest extends TestCase
     #[Test]
     public function deletionWorksAsExcpected(): void
     {
-        $fileAccess      = $this->createMock(FileAccess::class);
-        $serializer      = $this->createMock(SerializerInterface::class);
-        $promptOptimizer = $this->createMock(PromptOptimizer::class);
+        $fileAccess = $this->createMock(FileAccess::class);
 
-        $handler = new DeleteGeneratorRequestHandler($fileAccess, $serializer, $promptOptimizer);
+        $handler = new DeleteGeneratorRequestHandler($fileAccess);
         $request = new DeleteGeneratorRequest('30da9c8d-7c80-4404-b8d2-5fa196e9548c');
 
         $invoker = $this->exactly(2);

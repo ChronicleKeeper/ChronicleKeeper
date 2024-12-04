@@ -6,10 +6,11 @@ namespace ChronicleKeeper\Library\Presentation\Controller\Directory;
 
 use ChronicleKeeper\Chat\Application\Command\StoreConversation;
 use ChronicleKeeper\Chat\Application\Query\FindConversationsByDirectoryParameters;
+use ChronicleKeeper\Document\Application\Command\StoreDocument;
+use ChronicleKeeper\Document\Application\Query\FindDocumentsByDirectory;
 use ChronicleKeeper\Library\Domain\Entity\Directory;
 use ChronicleKeeper\Library\Domain\RootDirectory;
 use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemDirectoryRepository;
-use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemDocumentRepository;
 use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemImageRepository;
 use ChronicleKeeper\Library\Presentation\Form\DirectoryDeleteOptions;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
@@ -34,7 +35,6 @@ class DirectoryDelete extends AbstractController
 
     public function __construct(
         private readonly FilesystemDirectoryRepository $directoryRepository,
-        private readonly FilesystemDocumentRepository $documentRepository,
         private readonly FilesystemImageRepository $imageRepository,
         private readonly QueryService $queryService,
         private readonly MessageBusInterface $bus,
@@ -94,9 +94,9 @@ class DirectoryDelete extends AbstractController
             $this->directoryRepository->store($directory);
         }
 
-        foreach ($this->documentRepository->findByDirectory($sourceDirectory) as $document) {
+        foreach ($this->queryService->query(new FindDocumentsByDirectory($sourceDirectory->id)) as $document) {
             $document->directory = $targetDirectory;
-            $this->documentRepository->store($document);
+            $this->bus->dispatch(new StoreDocument($document, false));
         }
 
         foreach ($this->imageRepository->findByDirectory($sourceDirectory) as $image) {

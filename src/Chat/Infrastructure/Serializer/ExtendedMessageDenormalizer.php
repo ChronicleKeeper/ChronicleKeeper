@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace ChronicleKeeper\Chat\Infrastructure\Serializer;
 
 use ChronicleKeeper\Chat\Domain\Entity\ExtendedMessage;
-use ChronicleKeeper\Library\Domain\Entity\Document;
+use ChronicleKeeper\Document\Domain\Entity\Document;
 use ChronicleKeeper\Library\Domain\Entity\Image;
 use PhpLlm\LlmChain\Model\Message\MessageInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerAwareInterface;

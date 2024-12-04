@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Chat\Domain\Entity;
 
-use ChronicleKeeper\Library\Domain\Entity\Document;
+use ChronicleKeeper\Document\Domain\Entity\Document;
 use ChronicleKeeper\Library\Domain\Entity\Image;
 use JsonSerializable;
 use PhpLlm\LlmChain\Model\Message\MessageInterface;
