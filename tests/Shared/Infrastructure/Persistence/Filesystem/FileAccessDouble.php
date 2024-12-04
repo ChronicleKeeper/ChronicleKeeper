@@ -9,11 +9,28 @@ use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Exception\Unabl
 use Symfony\Contracts\Service\ResetInterface;
 
 use function array_key_exists;
+use function str_replace;
+use function str_starts_with;
 
 class FileAccessDouble implements FileAccess, ResetInterface
 {
     /** @var array<string, string> */
     private array $storage = [];
+
+    /** @return array<string, string> */
+    public function allOfType(string $type): array
+    {
+        $files = [];
+        foreach ($this->storage as $path => $content) {
+            if (! str_starts_with($path, $type)) {
+                continue;
+            }
+
+            $files[str_replace($type . '/', '', $path)] = $content;
+        }
+
+        return $files;
+    }
 
     public function read(string $type, string $filename): string
     {

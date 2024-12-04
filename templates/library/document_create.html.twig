@@ -8,33 +8,31 @@
         <div class="row-sm-12">
             <div class="card card-borderless">
                 <div class="card-body">
-                    <twig:directoryBreadcrumb directory="{{ directory }}" extraLastNode="Neues Dokument" />
+                    <twig:directoryBreadcrumb directory="{{ form.directory.vars.data }}" extraLastNode="Neues Dokument" />
                 </div>
             </div>
         </div>
 
         <div class="col-sm-12">
             <div class="card">
-                <form action="{{ path('library_document_create', {'directory': directory.id}) }}" method="post">
+                <form action="{{ path('library_document_create', {'directory': form.directory.vars.value}) }}" method="post">
                     <div class="card-body">
                         <div class="row g-5">
+                            {{ form_row(form.title) }}
                             <div class="col-12">
-                                <label for="title" class="form-label required">Titel</label>
-                                <input type="text" class="form-control" name="title" required />
+                                {{ form_label(form.directory) }}
+
+                                <twig:directorySelection name="document[directory]" preSelected="{{ form.directory.vars.value }}" />
                             </div>
                             <div class="col-12">
-                                <label for="directory" class="form-label">Erstellen in Verzeichnis ...</label>
-                                <twig:directorySelection name="directory" preSelected="{{ directory.id }}" />
-                            </div>
-                            <div class="col-12">
-                                <label for="content" class="form-label">Inhalt</label>
-                                <twig:markdownEditor rows="10" name="content" content="{{ template_content }}" />
+                                {{ form_label(form.content) }}
+                                <twig:markdownEditor rows="10" name="document[content]" content="{{ form.content.vars.value }}" />
                             </div>
                         </div>
                     </div>
                     <div class="card-footer text-end">
                         <div class="d-flex">
-                            <a href="{{ path('library', {'directory': directory.id }) }}" class="btn btn-link">Abbruch</a>
+                            <a href="{{ path('library', {'directory': form.directory.vars.value }) }}" class="btn btn-link">Abbruch</a>
                             <button type="submit" class="btn btn-primary ms-auto">Speichern</button>
                         </div>
                     </div>

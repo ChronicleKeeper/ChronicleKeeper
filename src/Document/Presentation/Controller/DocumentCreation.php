@@ -9,9 +9,9 @@ use ChronicleKeeper\Chat\Application\Query\GetTemporaryConversationParameters;
 use ChronicleKeeper\Chat\Domain\Entity\ExtendedMessage;
 use ChronicleKeeper\Document\Application\Command\StoreDocument;
 use ChronicleKeeper\Document\Domain\Entity\Document;
+use ChronicleKeeper\Document\Presentation\Form\DocumentType;
 use ChronicleKeeper\Library\Domain\Entity\Directory;
 use ChronicleKeeper\Library\Domain\RootDirectory;
-use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemDirectoryRepository;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
 use ChronicleKeeper\Shared\Presentation\FlashMessages\Alert;
 use ChronicleKeeper\Shared\Presentation\FlashMessages\HandleFlashMessages;
@@ -24,7 +24,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Requirement\Requirement;
 
 use function array_filter;
-use function is_string;
+use function assert;
 use function reset;
 
 #[Route(
@@ -38,7 +38,6 @@ class DocumentCreation extends AbstractController
     use HandleFlashMessages;
 
     public function __construct(
-        private readonly FilesystemDirectoryRepository $directoryRepository,
         private readonly QueryService $queryService,
         private readonly MessageBusInterface $bus,
     ) {
@@ -46,53 +45,44 @@ class DocumentCreation extends AbstractController
 
     public function __invoke(Request $request, Directory $directory): Response
     {
-        if ($request->isMethod(Request::METHOD_POST)) {
-            $title   = $request->get('title', '');
-            $content = $request->get('content', '');
+        $form = $this->createForm(DocumentType::class, $this->getDocumentFromChatMessagesBag($request));
+        $form->handleRequest($request);
 
-            $storeDirectory = $request->getPayload()->get('directory');
+        if ($form->isSubmitted() && $form->isValid()) {
+            $document = $form->getData();
+            assert($document instanceof Document);
 
-            if (is_string($storeDirectory)) {
-                $storeDirectory = $this->directoryRepository->findById($storeDirectory) ?? $directory;
-            } else {
-                $storeDirectory = $directory;
-            }
+            $this->bus->dispatch(new StoreDocument($document));
 
-            if (is_string($title) && is_string($content)) {
-                $document            = new Document($title, $content);
-                $document->directory = $storeDirectory;
+            $this->addFlashMessage(
+                $request,
+                Alert::SUCCESS,
+                'Das Dokument wurde erstellt, damit es in der Suche aktiv ist kannst du den Suchindex aktualisieren.',
+            );
 
-                $this->bus->dispatch(new StoreDocument($document));
-
-                $this->addFlashMessage(
-                    $request,
-                    Alert::SUCCESS,
-                    'Das Dokument wurde erstellt, damit es in der Suche aktiv ist kannst du den Suchindex aktualisieren.',
-                );
-
-                return $this->redirectToRoute('library', ['directory' => $directory->id]);
-            }
+            return $this->redirectToRoute('library', ['directory' => $document->directory->id]);
         }
 
         return $this->render(
             'library/document_create.html.twig',
-            ['directory' => $directory, 'template_content' => $this->getTemplateContentFromChatMessagesBag($request)],
+            ['form' => $form->createView()],
         );
     }
 
-    private function getTemplateContentFromChatMessagesBag(Request $request): string
+    private function getDocumentFromChatMessagesBag(Request $request): Document|null
     {
         if (
             ! $request->isMethod(Request::METHOD_GET)
             || ! $request->query->has('conversation')
             || ! $request->query->has('conversation_message')
         ) {
-            return '';
+            return null;
         }
 
         $conversation = $this->queryService->query(
             new FindConversationByIdParameters((string) $request->query->get('conversation')),
         );
+
         if ($conversation === null) {
             $conversation = $this->queryService->query(new GetTemporaryConversationParameters());
         }
@@ -108,13 +98,16 @@ class DocumentCreation extends AbstractController
         $foundMessageByIdentifier = reset($foundMessagesByIdentifier);
 
         if (! $foundMessageByIdentifier instanceof ExtendedMessage) {
-            return '';
+            return null;
         }
 
         if (! $foundMessageByIdentifier->message instanceof AssistantMessage) {
-            return '';
+            return null;
         }
 
-        return (string) $foundMessageByIdentifier->message->content;
+        return new Document(
+            $conversation->title,
+            (string) $foundMessageByIdentifier->message->content,
+        );
     }
 }
