@@ -83,4 +83,22 @@ class VectorDocumentTest extends TestCase
             json_encode($vectorDocument, JSON_THROW_ON_ERROR),
         );
     }
+
+    #[Test]
+    public function canBeConvertedToSearchVector(): void
+    {
+        $document       = (new DocumentBuilder())->build();
+        $vectorDocument = new VectorDocument(
+            $document,
+            'foo',
+            'bar',
+            [1.0, 2.0, 3.0],
+        );
+
+        $searchVector = $vectorDocument->toSearchVector();
+
+        self::assertSame($vectorDocument->id, $searchVector->id);
+        self::assertSame($document->id, $searchVector->documentId);
+        self::assertSame([1.0, 2.0, 3.0], $searchVector->vectors);
+    }
 }

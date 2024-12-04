@@ -30,6 +30,11 @@ class VectorDocument implements JsonSerializable
         $this->id = Uuid::v4()->toString();
     }
 
+    public function toSearchVector(): SearchVector
+    {
+        return SearchVector::fromVectorDocument($this);
+    }
+
     /** @return VectorDocumentArray */
     public function jsonSerialize(): array
     {
