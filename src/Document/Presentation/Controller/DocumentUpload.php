@@ -6,20 +6,17 @@ namespace ChronicleKeeper\Document\Presentation\Controller;
 
 use ChronicleKeeper\Document\Application\Service\Exception\PDFHasEmptyContent;
 use ChronicleKeeper\Document\Application\Service\Importer;
+use ChronicleKeeper\Document\Presentation\Form\DocumentUploadType;
 use ChronicleKeeper\Library\Domain\Entity\Directory;
-use ChronicleKeeper\Library\Presentation\Form\DocumentUploadType;
 use ChronicleKeeper\Shared\Presentation\FlashMessages\Alert;
 use ChronicleKeeper\Shared\Presentation\FlashMessages\HandleFlashMessages;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Requirement\Requirement;
-use Symfony\Component\Routing\RouterInterface;
-use Twig\Environment;
 
 use function assert;
 use function is_bool;
@@ -34,9 +31,7 @@ class DocumentUpload extends AbstractController
     use HandleFlashMessages;
 
     public function __construct(
-        private readonly Environment $environment,
         private readonly FormFactoryInterface $formFactory,
-        private readonly RouterInterface $router,
         private readonly Importer $importer,
     ) {
     }
@@ -62,10 +57,7 @@ class DocumentUpload extends AbstractController
                     'Das Dokument mit dem Titel "' . $document->title . '" wurde erfolgreich hochgeladen. Bitte überprüfe den Text nach einer Optimierung.',
                 );
 
-                return new RedirectResponse($this->router->generate(
-                    'library_document_view',
-                    ['document' => $document->id],
-                ));
+                return $this->redirectToRoute('library_document_view', ['document' => $document->id]);
             } catch (PDFHasEmptyContent) {
                 $this->addFlashMessage(
                     $request,
@@ -75,9 +67,9 @@ class DocumentUpload extends AbstractController
             }
         }
 
-        return new Response($this->environment->render(
+        return $this->render(
             'library/document_upload.html.twig',
             ['directory' => $directory, 'form' => $form->createView()],
-        ));
+        );
     }
 }

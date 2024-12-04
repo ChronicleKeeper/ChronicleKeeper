@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ChronicleKeeper\Library\Presentation\Form;
+namespace ChronicleKeeper\Document\Presentation\Form;
 
 use ChronicleKeeper\Document\Application\Service\Importer;
 use Symfony\Component\Form\AbstractType;
