@@ -9,14 +9,12 @@ use ChronicleKeeper\Library\Infrastructure\VectorStorage\Distance\CosineDistance
 use ChronicleKeeper\Shared\Application\Query\Query;
 use ChronicleKeeper\Shared\Application\Query\QueryParameters;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
-use Symfony\Component\DependencyInjection\Attribute\Lazy;
 
 use function array_keys;
 use function array_slice;
 use function asort;
 use function assert;
 
-#[Lazy]
 class SearchSimilarVectorsQuery implements Query
 {
     public function __construct(

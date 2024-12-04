@@ -1,0 +1,5 @@
+services:
+  ChronicleKeeper\Shared\Application\Query\QueryService:
+    autowire: true
+    autoconfigure: true
+    public: true
