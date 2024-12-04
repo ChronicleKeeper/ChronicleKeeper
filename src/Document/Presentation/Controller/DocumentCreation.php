@@ -64,7 +64,7 @@ class DocumentCreation extends AbstractController
         }
 
         return $this->render(
-            'library/document_create.html.twig',
+            'document/document_create.html.twig',
             ['form' => $form->createView()],
         );
     }

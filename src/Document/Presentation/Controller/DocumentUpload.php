@@ -68,7 +68,7 @@ class DocumentUpload extends AbstractController
         }
 
         return $this->render(
-            'library/document_upload.html.twig',
+            'document/document_upload.html.twig',
             ['directory' => $directory, 'form' => $form->createView()],
         );
     }

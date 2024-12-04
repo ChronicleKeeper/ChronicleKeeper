@@ -20,6 +20,6 @@ class DocumentView extends AbstractController
 {
     public function __invoke(Request $request, Document $document): Response
     {
-        return $this->render('library/document_view.html.twig', ['document' => $document]);
+        return $this->render('document/document_view.html.twig', ['document' => $document]);
     }
 }

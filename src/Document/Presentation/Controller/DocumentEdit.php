@@ -48,7 +48,7 @@ class DocumentEdit extends AbstractController
         }
 
         return $this->render(
-            'library/document_edit.html.twig',
+            'document/document_edit.html.twig',
             ['form' => $form->createView(), 'document' => $document],
         );
     }
