@@ -6,7 +6,9 @@ namespace ChronicleKeeper\Shared\Application\Query;
 
 use ChronicleKeeper\Shared\Application\Query\Exception\QueryNotExists;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
+use Symfony\Component\DependencyInjection\Attribute\Lazy;
 
+#[Lazy]
 class QueryService
 {
     /** @var array<class-string, Query> */

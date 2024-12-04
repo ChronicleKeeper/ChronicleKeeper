@@ -7,6 +7,8 @@ namespace ChronicleKeeper\Test\Document\Presentation\Controller;
 use ChronicleKeeper\Document\Presentation\Controller\DocumentCreation;
 use ChronicleKeeper\Document\Presentation\Form\DocumentType;
 use ChronicleKeeper\Library\Domain\RootDirectory;
+use ChronicleKeeper\Library\Presentation\Twig\DirectoryBreadcrumb;
+use ChronicleKeeper\Library\Presentation\Twig\DirectorySelection;
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
 use ChronicleKeeper\Test\Chat\Domain\Entity\ConversationBuilder;
 use ChronicleKeeper\Test\Chat\Domain\Entity\ExtendedMessageBagBuilder;
@@ -25,6 +27,8 @@ use function reset;
 
 #[CoversClass(DocumentCreation::class)]
 #[CoversClass(DocumentType::class)]
+#[CoversClass(DirectorySelection::class)]
+#[CoversClass(DirectoryBreadcrumb::class)]
 #[Large]
 class DocumentCreationTest extends WebTestCase
 {
@@ -39,6 +43,7 @@ class DocumentCreationTest extends WebTestCase
 
         self::assertResponseIsSuccessful();
         self::assertSelectorTextSame('h2', 'Neues Dokument');
+        self::assertSelectorTextSame('ol.breadcrumb', 'Hauptverzeichnis Neues Dokument');
 
         self::assertFormValue('form', 'document[title]', '');
         self::assertFormValue('form', 'document[directory]', RootDirectory::ID);

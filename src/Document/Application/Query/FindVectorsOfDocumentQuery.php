@@ -8,13 +8,11 @@ use ChronicleKeeper\Document\Domain\Entity\VectorDocument;
 use ChronicleKeeper\Shared\Application\Query\Query;
 use ChronicleKeeper\Shared\Application\Query\QueryParameters;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
-use Symfony\Component\DependencyInjection\Attribute\Lazy;
 
 use function array_filter;
 use function array_values;
 use function assert;
 
-#[Lazy]
 class FindVectorsOfDocumentQuery implements Query
 {
     public function __construct(
