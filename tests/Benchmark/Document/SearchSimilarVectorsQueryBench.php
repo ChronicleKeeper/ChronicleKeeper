@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace ChronicleKeeper\Test\Benchmark\Document\Application\Query;
+namespace ChronicleKeeper\Test\Benchmark\Document;
 
 use ChronicleKeeper\Document\Application\Query\SearchSimilarVectors;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
-use ChronicleKeeper\Shared\Kernel;
+use ChronicleKeeper\Test\Benchmark\UseSymfonyKernel;
 use PhpBench\Benchmark\Metadata\Annotations\BeforeMethods;
 
 use function array_fill;
@@ -14,6 +14,8 @@ use function assert;
 
 class SearchSimilarVectorsQueryBench
 {
+    use UseSymfonyKernel;
+
     private QueryService $queryService;
 
     /** @var list<float> */
@@ -21,8 +23,7 @@ class SearchSimilarVectorsQueryBench
 
     public function setUp(): void
     {
-        $kernel = new Kernel('bench', false);
-        $kernel->boot();
+        $kernel = $this->getKernel();
 
         $queryService = $kernel->getContainer()->get(QueryService::class);
         assert($queryService instanceof QueryService);

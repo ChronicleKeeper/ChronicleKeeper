@@ -3,3 +3,8 @@ services:
     autowire: true
     autoconfigure: true
     public: true
+
+  ChronicleKeeper\Library\Infrastructure\Repository\FilesystemVectorImageRepository:
+    autowire: true
+    autoconfigure: true
+    public: true
