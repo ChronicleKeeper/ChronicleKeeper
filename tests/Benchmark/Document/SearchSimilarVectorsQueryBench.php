@@ -35,7 +35,7 @@ class SearchSimilarVectorsQueryBench
     /** @BeforeMethods("setUp") */
     public function benchSearchSimlarDocuments(): void
     {
-        $result = $this->queryService->query(
+        $this->queryService->query(
             new SearchSimilarVectors(
                 $this->searchForVectors,
                 1.0,

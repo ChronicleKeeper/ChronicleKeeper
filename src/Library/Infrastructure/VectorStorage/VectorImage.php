@@ -4,11 +4,9 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Library\Infrastructure\VectorStorage;
 
+use ChronicleKeeper\Image\Domain\Entity\SearchVector;
 use ChronicleKeeper\Library\Domain\Entity\Image;
 use Symfony\Component\Uid\Uuid;
-
-use function array_key_exists;
-use function count;
 
 /**
  * @phpstan-type VectorImageArray = array{
@@ -33,6 +31,15 @@ class VectorImage
         $this->id = Uuid::v4()->toString();
     }
 
+    public function toSearchVector(): SearchVector
+    {
+        return new SearchVector(
+            $this->id,
+            $this->image->id,
+            $this->vector,
+        );
+    }
+
     /** @return VectorImageArray */
     public function toArray(): array
     {
@@ -43,20 +50,5 @@ class VectorImage
             'vectorContentHash' => $this->vectorContentHash,
             'vector' => $this->vector,
         ];
-    }
-
-    /**
-     * @param mixed[] $array
-     *
-     * @phpstan-return ($array is VectorImageArray ? true : false)
-     */
-    public static function isVectorImageArray(array $array): bool
-    {
-        return count($array) === 5
-            && array_key_exists('id', $array)
-            && array_key_exists('imageId', $array)
-            && array_key_exists('content', $array)
-            && array_key_exists('vectorContentHash', $array)
-            && array_key_exists('vector', $array);
     }
 }

@@ -4,9 +4,13 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Library\Infrastructure\Repository;
 
+use ChronicleKeeper\Image\Application\Query\GetAllVectorSearchImages;
+use ChronicleKeeper\Image\Application\Query\GetVectorImage;
+use ChronicleKeeper\Image\Domain\Entity\SearchVector;
 use ChronicleKeeper\Library\Infrastructure\VectorStorage\Distance\CosineDistance;
 use ChronicleKeeper\Library\Infrastructure\VectorStorage\VectorImage;
 use ChronicleKeeper\Settings\Application\SettingsHandler;
+use ChronicleKeeper\Shared\Application\Query\QueryService;
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Exception\UnableToReadFile;
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\PathRegistry;
@@ -14,17 +18,14 @@ use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 use Symfony\Component\Finder\Finder;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Serializer\SerializerInterface;
 
 use function array_filter;
 use function array_keys;
 use function array_slice;
 use function array_values;
 use function asort;
-use function is_array;
-use function json_decode;
 use function json_encode;
-use function json_validate;
 
 use const JSON_PRETTY_PRINT;
 use const JSON_THROW_ON_ERROR;
@@ -36,11 +37,12 @@ class FilesystemVectorImageRepository
 
     public function __construct(
         private readonly LoggerInterface $logger,
-        private readonly FilesystemImageRepository $imageRepository,
         private readonly CosineDistance $distance,
         private readonly FileAccess $fileAccess,
         private readonly SettingsHandler $settingsHandler,
         private readonly PathRegistry $pathRegistry,
+        private readonly QueryService $queryService,
+        private readonly SerializerInterface $serializer,
     ) {
     }
 
@@ -63,25 +65,15 @@ class FilesystemVectorImageRepository
         $images = [];
         foreach ($finder as $file) {
             try {
-                $images[] = $this->convertJsonToVectorImage($file->getContents());
+                $content = $file->getContents();
+
+                $images[] = $this->serializer->deserialize($content, VectorImage::class, 'json');
             } catch (RuntimeException | UnableToReadFile $e) {
                 $this->logger->debug($e);
             }
         }
 
         return $images;
-    }
-
-    public function findById(string $id): VectorImage|null
-    {
-        $filename = $this->generateFilename($id);
-        $json     = $this->fileAccess->read(self::STORAGE_NAME, $filename);
-
-        if (! json_validate($json)) {
-            return null;
-        }
-
-        return $this->convertJsonToVectorImage($json);
     }
 
     /**
@@ -91,19 +83,17 @@ class FilesystemVectorImageRepository
      */
     public function findSimilar(array $searchedVectors, float|null $maxDistance = null, int $maxResults = 4): array
     {
-        $distances    = [];
-        $vectorImages = $this->findAll();
+        $distances = [];
+
+        /** @var list<SearchVector> $searchVectors */
+        $searchVectors = $this->queryService->query(new GetAllVectorSearchImages());
 
         $maxDistance ??= $this->settingsHandler->get()->getChatbotTuning()->getImagesMaxDistance();
 
-        foreach ($vectorImages as $index => $image) {
-            if ($image->image->description === '') {
-                continue;
-            }
-
-            $dist = $this->distance->measure($searchedVectors, $image->vector);
+        foreach ($searchVectors as $index => $search) {
+            $dist = $this->distance->measure($searchedVectors, $search->vectors);
             if ($dist > $maxDistance) {
-                unset($vectorImages[$index]);
+                unset($searchVectors[$index]);
                 continue;
             }
 
@@ -116,8 +106,10 @@ class FilesystemVectorImageRepository
 
         $results = [];
         foreach ($topKIndices as $index) {
+            $vectorImage = $this->queryService->query(new GetVectorImage($searchVectors[$index]->id));
+
             $results[] = [
-                'vector' => $vectorImages[$index],
+                'vector' => $vectorImage,
                 'distance' => $distances[$index],
             ];
         }
@@ -138,27 +130,6 @@ class FilesystemVectorImageRepository
     {
         $filename = $this->generateFilename($vectorImage->id);
         $this->fileAccess->delete(self::STORAGE_NAME, $filename);
-    }
-
-    private function convertJsonToVectorImage(string $json): VectorImage
-    {
-        $vectorImageArr = json_decode($json, true);
-
-        if (! is_array($vectorImageArr) || ! VectorImage::isVectorImageArray($vectorImageArr)) {
-            throw new RuntimeException('Image to load contains invalid content.');
-        }
-
-        $image = $this->imageRepository->findById($vectorImageArr['imageId']) ?? throw new NotFoundHttpException();
-
-        $vectorImage     = new VectorImage(
-            image: $image,
-            content: $vectorImageArr['content'],
-            vectorContentHash: $vectorImageArr['vectorContentHash'],
-            vector: $vectorImageArr['vector'],
-        );
-        $vectorImage->id = $vectorImageArr['id'];
-
-        return $vectorImage;
     }
 
     /** @return non-empty-string */
