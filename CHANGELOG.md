@@ -3,9 +3,10 @@
 ## [alpha-0.6] - Performance and Stability
 
 **Changed**
-- Refactored the document related code within the library to be a module on it's own.
-- Upgraded a lot of dependencies to the current stable versions.
-- Improved PHP configuration to be more efficient in the local PHPDesktop environment.
+- Refactored the document-related code within the library to be a module on its own.
+- Upgraded many dependencies to the current stable versions.
+- Improved PHP configuration to be more efficient in the local PHP Desktop environment.
+- Optimized performance within document and image vectors by reducing the data loaded from the database for search.
 
 ## [alpha-0.5.1]
 
