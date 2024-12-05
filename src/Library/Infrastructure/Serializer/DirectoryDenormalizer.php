@@ -19,6 +19,9 @@ use function is_string;
 #[Autoconfigure(lazy: true)]
 class DirectoryDenormalizer implements DenormalizerInterface, DenormalizerAwareInterface
 {
+    /** @var array<string, Directory> */
+    private array $cachedEntries = [];
+
     private DenormalizerInterface $denormalizer;
 
     public function __construct(private readonly FilesystemDirectoryRepository $documentRepository)
@@ -39,10 +42,17 @@ class DirectoryDenormalizer implements DenormalizerInterface, DenormalizerAwareI
 
         Assert::isArray($data);
         Assert::true(array_diff(['id', 'title', 'parent'], array_keys($data)) === []);
+        Assert::uuid($data['id']);
+
+        if (isset($this->cachedEntries[$data['id']])) {
+            return $this->cachedEntries[$data['id']];
+        }
 
         $directory         = new Directory($data['title']);
         $directory->id     = $data['id'];
         $directory->parent = $this->denormalizer->denormalize($data['parent'], Directory::class, $format, $context);
+
+        $this->cachedEntries[$directory->id] = $directory;
 
         return $directory;
     }

@@ -15,11 +15,15 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Webmozart\Assert\Assert;
 
 use function array_keys;
+use function assert;
 use function is_string;
 
 #[Autoconfigure(lazy: true)]
 class DocumentDenormalizer implements DenormalizerInterface, DenormalizerAwareInterface
 {
+    /** @var array<string, Document> */
+    private array $cachedEntries = [];
+
     private DenormalizerInterface $denormalizer;
 
     public function __construct(
@@ -36,11 +40,20 @@ class DocumentDenormalizer implements DenormalizerInterface, DenormalizerAwareIn
     public function denormalize(mixed $data, string $type, string|null $format = null, array $context = []): Document
     {
         if (is_string($data)) {
-            return $this->queryService->query(new GetDocument($data));
+            $document = $this->cachedEntries[$data] ?? $this->queryService->query(new GetDocument($data));
+            assert($document instanceof Document);
+            $this->cachedEntries[$document->id] = $document;
+
+            return $document;
         }
 
         Assert::isArray($data);
         Assert::same(['id', 'title', 'content', 'directory', 'last_updated'], array_keys($data));
+        Assert::uuid($data['id']);
+
+        if (isset($this->cachedEntries[$data['id']])) {
+            return $this->cachedEntries[$data['id']];
+        }
 
         $document            = new Document($data['title'], $data['content']);
         $document->id        = $data['id'];
@@ -51,6 +64,8 @@ class DocumentDenormalizer implements DenormalizerInterface, DenormalizerAwareIn
             $context,
         );
         $document->updatedAt = new DateTimeImmutable($data['last_updated']);
+
+        $this->cachedEntries[$document->id] = $document;
 
         return $document;
     }

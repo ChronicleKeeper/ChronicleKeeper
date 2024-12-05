@@ -16,6 +16,9 @@ use function array_keys;
 #[Autoconfigure(lazy: true)]
 class DocumentVectorsDenormalizer implements DenormalizerInterface
 {
+    /** @var array<string, VectorDocument> */
+    private array $cachedEntries = [];
+
     public function __construct(
         private readonly QueryService $queryService,
     ) {
@@ -30,6 +33,11 @@ class DocumentVectorsDenormalizer implements DenormalizerInterface
     ): VectorDocument {
         Assert::isArray($data);
         Assert::same(['id', 'documentId', 'content', 'vectorContentHash', 'vector'], array_keys($data));
+        Assert::uuid($data['id']);
+
+        if (isset($this->cachedEntries[$data['id']])) {
+            return $this->cachedEntries[$data['id']];
+        }
 
         $document = $this->queryService->query(new GetDocument($data['documentId']));
 
@@ -40,6 +48,8 @@ class DocumentVectorsDenormalizer implements DenormalizerInterface
             $data['vector'],
         );
         $vectorDocument->id = $data['id'];
+
+        $this->cachedEntries[$vectorDocument->id] = $vectorDocument;
 
         return $vectorDocument;
     }

@@ -16,6 +16,9 @@ use function array_keys;
 #[Autoconfigure(lazy: true)]
 class VectorImageDenormalizer implements DenormalizerInterface
 {
+    /** @var array<string, VectorImage> */
+    private array $cachedEntries = [];
+
     public function __construct(
         private readonly QueryService $queryService,
     ) {
@@ -30,6 +33,11 @@ class VectorImageDenormalizer implements DenormalizerInterface
     ): VectorImage {
         Assert::isArray($data);
         Assert::same(['id', 'imageId', 'content', 'vectorContentHash', 'vector'], array_keys($data));
+        Assert::uuid($data['id']);
+
+        if (isset($this->cachedEntries[$data['id']])) {
+            return $this->cachedEntries[$data['id']];
+        }
 
         $image = $this->queryService->query(new GetImage($data['imageId']));
 
@@ -40,6 +48,8 @@ class VectorImageDenormalizer implements DenormalizerInterface
             $data['vector'],
         );
         $vectorImage->id = $data['id'];
+
+        $this->cachedEntries[$vectorImage->id] = $vectorImage;
 
         return $vectorImage;
     }

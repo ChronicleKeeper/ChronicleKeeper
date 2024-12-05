@@ -64,7 +64,7 @@ class VectorImageDenormalizerTest extends TestCase
     public function isDeliveringConvertedJson(): void
     {
         $array = [
-            'id' => '123',
+            'id' => 'b3907fc7-00ec-4223-9d36-13a17080ae5a',
             'imageId' => '456',
             'content' => 'foo',
             'vectorContentHash' => 'bar',
@@ -79,10 +79,34 @@ class VectorImageDenormalizerTest extends TestCase
 
         $vectorImage = (new VectorImageDenormalizer($queryService))->denormalize($array, VectorImage::class);
 
-        self::assertSame('123', $vectorImage->id);
+        self::assertSame('b3907fc7-00ec-4223-9d36-13a17080ae5a', $vectorImage->id);
         self::assertSame($image, $vectorImage->image);
         self::assertSame('foo', $vectorImage->content);
         self::assertSame('bar', $vectorImage->vectorContentHash);
         self::assertSame([10.2], $vectorImage->vector);
+    }
+
+    #[Test]
+    public function isDeliveringConvertedJsonFromCache(): void
+    {
+        $array = [
+            'id' => 'b3907fc7-00ec-4223-9d36-13a17080ae5a',
+            'imageId' => '456',
+            'content' => 'foo',
+            'vectorContentHash' => 'bar',
+            'vector' => [10.2],
+        ];
+
+        $queryService = $this->createMock(QueryService::class);
+        $queryService->expects($this->once())
+            ->method('query')
+            ->with(self::equalTo(new GetImage('456')))
+            ->willReturn($image = (new ImageBuilder())->build());
+
+        $denormalizer      = new VectorImageDenormalizer($queryService);
+        $vectorImage       = $denormalizer->denormalize($array, VectorImage::class);
+        $cachedVectorImage = $denormalizer->denormalize($array, VectorImage::class);
+
+        self::assertSame($vectorImage, $cachedVectorImage);
     }
 }

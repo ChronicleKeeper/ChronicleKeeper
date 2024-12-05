@@ -8,3 +8,13 @@ services:
     autowire: true
     autoconfigure: true
     public: true
+
+  ChronicleKeeper\Library\Infrastructure\Repository\FilesystemImageRepository:
+    autowire: true
+    autoconfigure: true
+    public: true
+
+  ChronicleKeeper\Library\Infrastructure\Repository\FilesystemDirectoryRepository:
+    autowire: true
+    autoconfigure: true
+    public: true
