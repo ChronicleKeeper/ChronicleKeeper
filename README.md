@@ -22,11 +22,12 @@ Gefährte zur Seite.
 **Eine kleine Auswahl der Magie des Chronicle Keepers:**
 
 - ChatGPT Integration: Mach deine Dokumente interaktiv und abfragbar durch System-Prompts.
-- Document Management: Verwalte und organisiere Dokumente und Bilder effizient für Kontextwissen.
+- Document Management: Verwalte und organisiere Dokumente und Bilder effizient für Kontextwissen in Gesprächen mit ChatGPT.
 - PHPDesktop Support: Führe die Anwendung als Desktop-Applikation für Windows aus.
 - Export / Import: Exportiere deine Daten, um sie wieder zu importieren, weiterzugeben oder zu sichern.
 - Umfangreiche Konfiguration zum Verhalten des Chronicle Keeper im Gespräch.
 - Konfigurierbare Kalender mit Feiertagen und Mondzyklen, unabhängig vom realen Kalender und dem realen Zeitablauf.
+- Bildgenerierung mit DALL-E 3 und dem bestehenden Kontextwissen aus der Bibliothek in einem Zwei-Schritt-Verfahren.
 
 ## Windows-Installation
 
