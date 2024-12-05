@@ -56,6 +56,24 @@ class DocumentDenormalizerTest extends TestCase
     }
 
     #[Test]
+    public function isQueryingForDocumentOnStringDataFromCache(): void
+    {
+        $queryService = $this->createMock(QueryService::class);
+        $queryService->expects($this->once())
+            ->method('query')
+            ->with(self::isInstanceOf(GetDocument::class))
+            ->willReturn($document = (new DocumentBuilder())->build());
+
+        $denormalizer = new DocumentDenormalizer($queryService);
+        $denormalizer->setDenormalizer($denormalizer);
+
+        $document       = $denormalizer->denormalize($document->id, Document::class);
+        $cachedDocument = $denormalizer->denormalize($document->id, Document::class);
+
+        self::assertSame($document, $cachedDocument);
+    }
+
+    #[Test]
     public function isFailingWithNonArrayData(): void
     {
         $this->expectException(InvalidArgumentException::class);
@@ -83,7 +101,7 @@ class DocumentDenormalizerTest extends TestCase
     public function isDeliveringConvertedJson(): void
     {
         $array = [
-            'id'           => '456',
+            'id'           => 'b0b4a534-9c7b-47a0-9ef0-1f86377a6b69',
             'title'        => 'foo',
             'content'      => 'bar',
             'directory'    => 'baz',
@@ -109,10 +127,44 @@ class DocumentDenormalizerTest extends TestCase
 
         $document = $documentDenormalizer->denormalize($array, Document::class);
 
-        self::assertSame('456', $document->id);
+        self::assertSame('b0b4a534-9c7b-47a0-9ef0-1f86377a6b69', $document->id);
         self::assertSame('foo', $document->title);
         self::assertSame('bar', $document->content);
         self::assertSame($directory, $document->directory);
         self::assertEquals(new DateTimeImmutable('2021-01-01 00:00:00'), $document->updatedAt);
+    }
+
+    #[Test]
+    public function isDeliveringCachedDocument(): void
+    {
+        $array = [
+            'id'           => 'b0b4a534-9c7b-47a0-9ef0-1f86377a6b69',
+            'title'        => 'foo',
+            'content'      => 'bar',
+            'directory'    => 'baz',
+            'last_updated' => '2021-01-01 00:00:00',
+        ];
+
+        $queryService = $this->createMock(QueryService::class);
+        $queryService->expects($this->never())->method('query');
+
+        $denormalizer = $this->createMock(DenormalizerInterface::class);
+        $denormalizer->expects($this->once())
+            ->method('denormalize')
+            ->with(
+                self::equalTo('baz'),
+                self::equalTo(Directory::class),
+                self::equalTo(null),
+                self::equalTo([]),
+            )
+            ->willReturn($directory = (new DirectoryBuilder())->build());
+
+        $documentDenormalizer = (new DocumentDenormalizer($queryService));
+        $documentDenormalizer->setDenormalizer($denormalizer);
+
+        $document       = $documentDenormalizer->denormalize($array, Document::class);
+        $cachedDocument = $documentDenormalizer->denormalize($array, Document::class);
+
+        self::assertSame($document, $cachedDocument);
     }
 }

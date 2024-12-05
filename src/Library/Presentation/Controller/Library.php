@@ -26,8 +26,8 @@ use function usort;
 #[Route(
     '/library/{directory}',
     name: 'library',
-    defaults: ['directory' => RootDirectory::ID],
     requirements: ['directory' => Requirement::UUID],
+    defaults: ['directory' => RootDirectory::ID],
 )]
 class Library extends AbstractController
 {

@@ -21,6 +21,9 @@ use function is_string;
 #[Autoconfigure(lazy: true)]
 class ImageDenormalizer implements DenormalizerInterface, DenormalizerAwareInterface
 {
+    /** @var array<string, Image> */
+    private array $cachedEntries = [];
+
     private DenormalizerInterface $denormalizer;
 
     public function __construct(private readonly FilesystemImageRepository $imageRepository)
@@ -49,6 +52,11 @@ class ImageDenormalizer implements DenormalizerInterface, DenormalizerAwareInter
             'directory',
             'last_updated',
         ], array_keys($data)) === []);
+        Assert::uuid($data['id']);
+
+        if (isset($this->cachedEntries[$data['id']])) {
+            return $this->cachedEntries[$data['id']];
+        }
 
         $image = new Image(
             $data['title'],
@@ -65,6 +73,8 @@ class ImageDenormalizer implements DenormalizerInterface, DenormalizerAwareInter
             $context,
         );
         $image->updatedAt = new DateTimeImmutable($data['last_updated']);
+
+        $this->cachedEntries[$image->id] = $image;
 
         return $image;
     }

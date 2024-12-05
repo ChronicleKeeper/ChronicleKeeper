@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace ChronicleKeeper\Document\Infrastructure\Serializer;
+namespace ChronicleKeeper\Image\Infrastructure\Serializer;
 
-use ChronicleKeeper\Document\Application\Query\GetDocument;
-use ChronicleKeeper\Document\Domain\Entity\VectorDocument;
+use ChronicleKeeper\Image\Application\Query\GetImage;
+use ChronicleKeeper\Library\Infrastructure\VectorStorage\VectorImage;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
@@ -14,9 +14,9 @@ use Webmozart\Assert\Assert;
 use function array_keys;
 
 #[Autoconfigure(lazy: true)]
-class DocumentVectorsDenormalizer implements DenormalizerInterface
+class VectorImageDenormalizer implements DenormalizerInterface
 {
-    /** @var array<string, VectorDocument> */
+    /** @var array<string, VectorImage> */
     private array $cachedEntries = [];
 
     public function __construct(
@@ -30,28 +30,28 @@ class DocumentVectorsDenormalizer implements DenormalizerInterface
         string $type,
         string|null $format = null,
         array $context = [],
-    ): VectorDocument {
+    ): VectorImage {
         Assert::isArray($data);
-        Assert::same(['id', 'documentId', 'content', 'vectorContentHash', 'vector'], array_keys($data));
+        Assert::same(['id', 'imageId', 'content', 'vectorContentHash', 'vector'], array_keys($data));
         Assert::uuid($data['id']);
 
         if (isset($this->cachedEntries[$data['id']])) {
             return $this->cachedEntries[$data['id']];
         }
 
-        $document = $this->queryService->query(new GetDocument($data['documentId']));
+        $image = $this->queryService->query(new GetImage($data['imageId']));
 
-        $vectorDocument     = new VectorDocument(
-            $document,
+        $vectorImage     = new VectorImage(
+            $image,
             $data['content'],
             $data['vectorContentHash'],
             $data['vector'],
         );
-        $vectorDocument->id = $data['id'];
+        $vectorImage->id = $data['id'];
 
-        $this->cachedEntries[$vectorDocument->id] = $vectorDocument;
+        $this->cachedEntries[$vectorImage->id] = $vectorImage;
 
-        return $vectorDocument;
+        return $vectorImage;
     }
 
     /** @inheritDoc */
@@ -61,12 +61,12 @@ class DocumentVectorsDenormalizer implements DenormalizerInterface
         string|null $format = null,
         array $context = [],
     ): bool {
-        return $type === VectorDocument::class;
+        return $type === VectorImage::class;
     }
 
     /** @inheritDoc */
     public function getSupportedTypes(string|null $format): array
     {
-        return [VectorDocument::class => true];
+        return [VectorImage::class => true];
     }
 }

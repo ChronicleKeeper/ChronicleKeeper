@@ -1,0 +1,20 @@
+services:
+  ChronicleKeeper\Shared\Application\Query\QueryService:
+    autowire: true
+    autoconfigure: true
+    public: true
+
+  ChronicleKeeper\Library\Infrastructure\Repository\FilesystemVectorImageRepository:
+    autowire: true
+    autoconfigure: true
+    public: true
+
+  ChronicleKeeper\Library\Infrastructure\Repository\FilesystemImageRepository:
+    autowire: true
+    autoconfigure: true
+    public: true
+
+  ChronicleKeeper\Library\Infrastructure\Repository\FilesystemDirectoryRepository:
+    autowire: true
+    autoconfigure: true
+    public: true

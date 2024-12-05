@@ -4,19 +4,18 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Document\Application\Query;
 
+use ChronicleKeeper\Document\Domain\Entity\SearchVector;
 use ChronicleKeeper\Document\Domain\Entity\VectorDocument;
 use ChronicleKeeper\Library\Infrastructure\VectorStorage\Distance\CosineDistance;
 use ChronicleKeeper\Shared\Application\Query\Query;
 use ChronicleKeeper\Shared\Application\Query\QueryParameters;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
-use Symfony\Component\DependencyInjection\Attribute\Lazy;
 
 use function array_keys;
 use function array_slice;
 use function asort;
 use function assert;
 
-#[Lazy]
 class SearchSimilarVectorsQuery implements Query
 {
     public function __construct(
@@ -30,18 +29,14 @@ class SearchSimilarVectorsQuery implements Query
     {
         assert($parameters instanceof SearchSimilarVectors);
 
-        /** @var VectorDocument[] $vectorDocuments */
-        $vectorDocuments = $this->queryService->query(new FindAllDocumentVectors());
+        /** @var list<SearchVector> $searchVectors */
+        $searchVectors = $this->queryService->query(new GetAllVectorSearchDocuments());
 
         $distances = [];
-        foreach ($vectorDocuments as $index => $document) {
-            if ($document->document->content === '') {
-                continue;
-            }
-
-            $dist = $this->distance->measure($parameters->searchedVectors, $document->vector);
+        foreach ($searchVectors as $index => $vector) {
+            $dist = $this->distance->measure($parameters->searchedVectors, $vector->vectors);
             if ($dist > $parameters->maxDistance) {
-                unset($vectorDocuments[$index]);
+                unset($searchVectors[$index]);
                 continue;
             }
 
@@ -54,8 +49,10 @@ class SearchSimilarVectorsQuery implements Query
 
         $results = [];
         foreach ($topKIndices as $index) {
+            $vectorDocument = $this->queryService->query(new GetVectorDocument($searchVectors[$index]->id));
+
             $results[] = [
-                'vector' => $vectorDocuments[$index],
+                'vector' => $vectorDocument,
                 'distance' => $distances[$index],
             ];
         }

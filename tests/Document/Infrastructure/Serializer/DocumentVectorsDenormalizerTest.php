@@ -64,7 +64,7 @@ class DocumentVectorsDenormalizerTest extends TestCase
     public function isDeliveringConvertedJson(): void
     {
         $array = [
-            'id' => '123',
+            'id' => 'b0eacee0-3fbe-4083-ac57-a045aee44647',
             'documentId' => '456',
             'content' => 'foo',
             'vectorContentHash' => 'bar',
@@ -80,10 +80,35 @@ class DocumentVectorsDenormalizerTest extends TestCase
         $vectorDocument = (new DocumentVectorsDenormalizer($queryService))
             ->denormalize($array, VectorDocument::class);
 
-        self::assertSame('123', $vectorDocument->id);
+        self::assertSame('b0eacee0-3fbe-4083-ac57-a045aee44647', $vectorDocument->id);
         self::assertSame($document, $vectorDocument->document);
         self::assertSame('foo', $vectorDocument->content);
         self::assertSame('bar', $vectorDocument->vectorContentHash);
         self::assertSame([10.2], $vectorDocument->vector);
+    }
+
+    #[Test]
+    public function isDeliveringConvertedJsonFromCache(): void
+    {
+        $array = [
+            'id' => 'b0eacee0-3fbe-4083-ac57-a045aee44647',
+            'documentId' => '456',
+            'content' => 'foo',
+            'vectorContentHash' => 'bar',
+            'vector' => [10.2],
+        ];
+
+        $queryService = $this->createMock(QueryService::class);
+        $queryService->expects($this->once())
+            ->method('query')
+            ->with(self::equalTo(new GetDocument('456')))
+            ->willReturn($document = (new DocumentBuilder())->build());
+
+        $denormalizer = new DocumentVectorsDenormalizer($queryService);
+
+        $vectorDocument       = $denormalizer->denormalize($array, VectorDocument::class);
+        $cachedVectorDocument = $denormalizer->denormalize($array, VectorDocument::class);
+
+        self::assertSame($vectorDocument, $cachedVectorDocument);
     }
 }
