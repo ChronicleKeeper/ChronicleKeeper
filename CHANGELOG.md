@@ -2,7 +2,7 @@
 
 ## [alpha-0.5.1]
 
-## Fixed
+### Fixed
 - Fixed a bug where a document upload with enabled LLM optimization had an error in data handling.
 
 ## [alpha-0.5] - Fun with images
