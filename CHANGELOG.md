@@ -1,13 +1,20 @@
 # Changelog
 
+## [alpha-0.6] - Performance and Stability
+
+**Changed**
+- Refactored the document related code within the library to be a module on it's own.
+- Upgraded a lot of dependencies to the current stable versions.
+- Improved PHP configuration to be more efficient in the local PHPDesktop environment.
+
 ## [alpha-0.5.1]
 
-### Fixed
+**Fixed**
 - Fixed a bug where a document upload with enabled LLM optimization had an error in data handling.
 
 ## [alpha-0.5] - Fun with images
 
-### Added
+**Added**
 - Mechtild, the new image artist, is now available for image generation based on DALL-E 3.
 - Added shortcuts to the navigation for quick access to images, documents, and conversations.
 - Added a "notifications" event in UX available for live-action notifications.
@@ -17,18 +24,18 @@
 - Added a button for markdown editor to toggle fullscreen mode.
 - Implemented that descriptions for chatbot functions are editable within the settings.
 
-### Changed
+**Changed**
 - Raised default library responses to ChatGPT to 20 documents and 15 images within the default settings.
 - The OpenAI API key is now set up in application settings instead of the environment.
 
-### Fixed
+**Fixed**
 - Resolved importing from alpha-0.2 does not assign all files and images to a directory.
 - Fixed import library archives being limited to 10 MB.
 - Fixed various spelling errors.
 
 ## [alpha-0.4] - Conversations will save the world
 
-### Added
+**Added**
 - Docker development environment with [FrankenPHP](https://frankenphp.dev/) support as an alternative to the Symfony local server.
 - Confirmation dialog for resetting settings.
 - Image button in the markdown editor for embedding image links.
@@ -40,7 +47,7 @@
 - Directories can be moved between parent directories. The content within a directory will move with the directory.
 - Directories can now be deleted and one can choose to move or purge the content.
 
-### Changed
+**Changed**
 - Began project file structure cleanup, moving from prototyping to clean code.
 - Navigation now displays the project logo and is sticky at the top.
 - Reverted default GPT model to GPT4o-mini from GPT4o due to lack of improvement.
@@ -52,14 +59,14 @@
 - Improvements for the GPT function descriptions, enhanced with examples to give a better understanding when to use them.
 - Improved the System Prompt to have better knowledge about the calendar and improve the understanding of what to do with the user.
 
-### Fixed
+**Fixed**
 - Resolved build process failure caused by a missing content block in the loader component.
 - Disabled unnecessary Turbo streams activation.
 - Utilize 64bit PHP insteaf of 32bit for Windows Desktop build to fix twig cache problems utilizing large integers.
 
 ## [alpha-0.3] - Images will rule the world
 
-### Added
+**Added**
 - Show referenced documents from vector storage during chat, disable with general chatbot setting.
 - Library extended with image management: upload, view, edit, delete, and vector storage for search.
 - Images in the library get LLM-guessed descriptions on upload for search and chatbot context.
@@ -72,20 +79,20 @@
 - Library can be pruned before import is starting.
 - Collect debugging information about called tools for analysis. Displayed within the response if the setting is enabled.
 
-### Changed
+**Changed**
 - Chatbot messages now store context in a custom design instead of directly in the chat response.
 - Vector storage search for context documents and images now uses a max distance to reduce false positives.
 - Upgraded tabler.io design from beta-20 to beta-21.
 - The chat with "Rostbart" now uses GPT-4o instead of GPT-4o-mini to improve context interpretation.
 
-### Fixed
+**Fixed**
 - Media deletion in the library could be executed when the loader shows and the mouse hovers over the delete action.
 - Loader spinner no longer displayed on history back.
 - Library sorting now respects German umlauts.
 
 ## [alpha-0.2] - Improve Document Workflows
 
-### Added
+**Added**
 - Implement Symfony UX with a Loader Component to indicate page loading.
 - Implement TOAST UI Editor for creating and editing documents to have improved markdown access.
 - Implement virtual directories to the library functionality to bring some order to it.
@@ -95,8 +102,8 @@
 - Implement view for documents with parsed output, including full directory breadcrumb navigation.
 - Add GPT Functions for extended information to the calendar system, holidays, and moon calendar, configurable within the settings.
 - Added an export functionality to the settings area as preparation for alpha-0.3 import and migration.
-
-### Changed
+- 
+**Changed**
 - Replace Font Awesome full icon set reference with Symfony UX Icons and utilize tabler.io icons.
 - Rename the document section to library for better wording.
 - Design change of the settings page in preparation for upcoming extended settings.
@@ -105,7 +112,7 @@
 
 ## [alpha-0.1] - Dungeon Master Showcase Prototype
 
-### Added
+**Added**
 - Implement a base system for document management using vector embeddings.
 - Implement settings for system prompt, number of documents searched in chat, and the current play date.
 - Implement a basic chat feature with a single conversation store utilizing the OpenAI API.
