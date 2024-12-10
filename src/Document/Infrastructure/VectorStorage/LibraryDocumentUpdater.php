@@ -17,9 +17,6 @@ use Symfony\Component\Messenger\MessageBusInterface;
 
 use function count;
 use function reset;
-use function strlen;
-use function substr;
-use function Symfony\Component\String\u;
 use function trim;
 
 class LibraryDocumentUpdater
@@ -88,28 +85,19 @@ class LibraryDocumentUpdater
         Document $document,
         int $contentLength,
     ): array {
-        $content = trim($document->content);
-
-        $contentChunks = [];
-        do {
-            $vectorContent   = u($content)->truncate($contentLength, '', false)->trim()->toString();
-            $contentChunks[] = $vectorContent;
-            $content         = trim(substr($content, strlen($vectorContent)));
-        } while ($content !== '');
-
+        // Calculate Content Chunks
+        $contentChunks = $this->embeddingCalculator->createTextChunks($document->content, $contentLength);
         // Calculate vectors from the chunks
         $vectors = $this->embeddingCalculator->getMultipleEmbeddings($contentChunks);
 
         $vectorDocuments = [];
         foreach ($contentChunks as $index => $chunk) {
-            $vectorDocument = new VectorDocument(
+            $vectorDocuments[] = new VectorDocument(
                 document: $document,
                 content: trim($chunk),
                 vectorContentHash: $document->getContentHash(),
                 vector: $vectors[$index],
             );
-
-            $vectorDocuments[] = $vectorDocument;
         }
 
         return $vectorDocuments;

@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace ChronicleKeeper\Test\Library\Infrastructure\VectorStorage\Updater;
+namespace ChronicleKeeper\Test\Image\Infrastructure\VectorStorage;
 
+use ChronicleKeeper\Image\Infrastructure\VectorStorage\LibraryImageUpdater;
 use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemImageRepository;
 use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemVectorImageRepository;
-use ChronicleKeeper\Library\Infrastructure\VectorStorage\Updater\LibraryImageUpdater;
-use ChronicleKeeper\Shared\Infrastructure\LLMChain\LLMChainFactory;
+use ChronicleKeeper\Shared\Infrastructure\LLMChain\EmbeddingCalculator;
 use ChronicleKeeper\Test\Library\Domain\Entity\ImageBuilder;
 use PhpLlm\LlmChain\Document\Vector;
 use PhpLlm\LlmChain\Model\Response\VectorResponse;
@@ -31,14 +31,19 @@ class LibraryImageUpdaterTest extends TestCase
         $platform = self::createStub(PlatformInterface::class);
         $platform->method('request')->willReturn(new VectorResponse(new Vector([0.1, 0.2, 0.3])));
 
-        $chainFactory = $this->createMock(LLMChainFactory::class);
-        $chainFactory->expects($this->once())
-            ->method('createPlatform')
-            ->willReturn($platform);
+        $embeddingCalculator = $this->createMock(EmbeddingCalculator::class);
+        $embeddingCalculator->expects($this->once())
+            ->method('createTextChunks')
+            ->with('This is a test document.')
+            ->willReturn(['This', 'is', 'a', 'test', 'document.']);
+        $embeddingCalculator->expects($this->once())
+            ->method('getMultipleEmbeddings')
+            ->with(['This', 'is', 'a', 'test', 'document.'])
+            ->willReturn([[10.1], [10.2], [10.3], [10.4], [10.5]]);
 
         $updater = new LibraryImageUpdater(
             self::createStub(LoggerInterface::class),
-            $chainFactory,
+            $embeddingCalculator,
             self::createStub(FilesystemImageRepository::class),
             self::createStub(FilesystemVectorImageRepository::class),
         );

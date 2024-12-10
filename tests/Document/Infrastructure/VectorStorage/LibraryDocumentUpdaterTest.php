@@ -37,7 +37,8 @@ class LibraryDocumentUpdaterTest extends TestCase
             ->willReturn([]);
 
         $embeddingCalculator = $this->createMock(EmbeddingCalculator::class);
-        $embeddingCalculator->expects($this->never())->method('getSingleEmbedding');
+        $embeddingCalculator->expects($this->never())->method('createTextChunks');
+        $embeddingCalculator->expects($this->never())->method('getMultipleEmbeddings');
         $embeddingCalculator->expects($this->never())->method('getMultipleEmbeddings');
 
         $bus = $this->createMock(MessageBusInterface::class);
@@ -72,6 +73,9 @@ class LibraryDocumentUpdaterTest extends TestCase
         $embeddingCalculator->expects($this->once())
             ->method('getMultipleEmbeddings')
             ->willReturn([[10.12]]);
+        $embeddingCalculator->expects($this->once())
+            ->method('createTextChunks')
+            ->willReturn(['foo']);
 
         $bus = $this->createMock(MessageBusInterface::class);
         $bus->expects($this->once())
@@ -155,6 +159,9 @@ class LibraryDocumentUpdaterTest extends TestCase
         $embeddingCalculator->expects($this->once())
             ->method('getMultipleEmbeddings')
             ->willReturn([[10.12]]);
+        $embeddingCalculator->expects($this->once())
+            ->method('createTextChunks')
+            ->willReturn([$document->content]);
 
         $bus = $this->createMock(MessageBusInterface::class);
         $bus->expects($this->exactly(2))
@@ -198,6 +205,9 @@ class LibraryDocumentUpdaterTest extends TestCase
             );
 
         $embeddingCalculator = $this->createMock(EmbeddingCalculator::class);
+        $embeddingCalculator->expects($this->once())
+            ->method('createTextChunks')
+            ->willReturn(['Foo', 'Bar', 'Baz']);
         $embeddingCalculator->expects($this->once())
             ->method('getMultipleEmbeddings')
             ->willReturn([[10.12], [11.13], [12.14]]);

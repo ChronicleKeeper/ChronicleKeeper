@@ -65,4 +65,31 @@ class EmbeddingCalculatorTest extends TestCase
             $embeddings,
         );
     }
+
+    #[Test]
+    public function itCreatesTextChunksOfSpezificSize(): void
+    {
+        $calculator = new EmbeddingCalculator(self::createStub(LLMChainFactory::class));
+
+        $chunks = $calculator->createTextChunks('This is a test string to generate an embedding for.', 10, 1);
+
+        self::assertCount(4, $chunks);
+
+        self::assertSame('This is a', $chunks[0]);
+        self::assertSame('test string', $chunks[1]);
+        self::assertSame('to generate', $chunks[2]);
+        self::assertSame('an embedding for.', $chunks[3]);
+    }
+
+    #[Test]
+    public function itCreatesTextChunksOfSpezificSizeWithMinChunkLength(): void
+    {
+        $calculator = new EmbeddingCalculator(self::createStub(LLMChainFactory::class));
+
+        $chunks = $calculator->createTextChunks('This is a test string to generate an embedding for.', 10, 100);
+
+        // Just a single chunk because the minChunkLength is higher than the content length
+        self::assertCount(1, $chunks);
+        self::assertSame('This is a test string to generate an embedding for.', $chunks[0]);
+    }
 }

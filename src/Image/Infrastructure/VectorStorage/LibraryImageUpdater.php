@@ -2,33 +2,24 @@
 
 declare(strict_types=1);
 
-namespace ChronicleKeeper\Library\Infrastructure\VectorStorage\Updater;
+namespace ChronicleKeeper\Image\Infrastructure\VectorStorage;
 
 use ChronicleKeeper\Library\Domain\Entity\Image;
 use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemImageRepository;
 use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemVectorImageRepository;
 use ChronicleKeeper\Library\Infrastructure\VectorStorage\VectorImage;
-use ChronicleKeeper\Shared\Infrastructure\LLMChain\LLMChainFactory;
-use PhpLlm\LlmChain\Bridge\OpenAI\Embeddings;
-use PhpLlm\LlmChain\Model\Response\AsyncResponse;
-use PhpLlm\LlmChain\Model\Response\VectorResponse;
+use ChronicleKeeper\Shared\Infrastructure\LLMChain\EmbeddingCalculator;
 use Psr\Log\LoggerInterface;
 
-use function assert;
 use function count;
 use function reset;
-use function strlen;
-use function substr;
-use function Symfony\Component\String\u;
 use function trim;
 
 class LibraryImageUpdater
 {
-    private const int VECTOR_CONTENT_LENGTH = 800;
-
     public function __construct(
         private readonly LoggerInterface $logger,
-        private readonly LLMChainFactory $embeddings,
+        private readonly EmbeddingCalculator $embeddingCalculator,
         private readonly FilesystemImageRepository $imageRepository,
         private readonly FilesystemVectorImageRepository $vectorImageRepository,
     ) {
@@ -72,7 +63,7 @@ class LibraryImageUpdater
 
     private function createVectorDocument(Image $image): void
     {
-        $vectorDocuments = $this->splitImageDescriptionInVectorDocuments($image, self::VECTOR_CONTENT_LENGTH);
+        $vectorDocuments = $this->splitImageDescriptionInVectorDocuments($image);
         foreach ($vectorDocuments as $vectorDocument) {
             $this->vectorImageRepository->store($vectorDocument);
         }
@@ -84,40 +75,23 @@ class LibraryImageUpdater
     }
 
     /** @return VectorImage[] */
-    private function splitImageDescriptionInVectorDocuments(
-        Image $image,
-        int $vectorContentLength,
-    ): array {
-        $content         = $image->description;
-        $vectorDocuments = [];
+    private function splitImageDescriptionInVectorDocuments(Image $image): array
+    {
+        // Calculate Content Chunks
+        $contentChunks = $this->embeddingCalculator->createTextChunks($image->description);
+        // Calculate vectors from the chunks
+        $vectors = $this->embeddingCalculator->getMultipleEmbeddings($contentChunks);
 
-        $platform = $this->embeddings->createPlatform();
-        do {
-            $vectorContent = u($content)->truncate($vectorContentLength, '', false)->toString();
-            $content       = substr($content, strlen($vectorContent));
-
-            $vector = $platform->request(
-                model: new Embeddings(),
-                input: $vectorContent,
-            );
-
-            if ($vector instanceof AsyncResponse) {
-                $vector = $vector->unwrap();
-            }
-
-            assert($vector instanceof VectorResponse);
-            $vector = $vector->getContent()[0];
-
-            $vectorDocument = new VectorImage(
+        $vectorImages = [];
+        foreach ($contentChunks as $index => $chunk) {
+            $vectorImages[] = new VectorImage(
                 image: $image,
-                content: trim($vectorContent),
+                content: trim($chunk),
                 vectorContentHash: $image->getDescriptionHash(),
-                vector: $vector->getData(),
+                vector: $vectors[$index],
             );
+        }
 
-            $vectorDocuments[] = $vectorDocument;
-        } while ($content !== '');
-
-        return $vectorDocuments;
+        return $vectorImages;
     }
 }
