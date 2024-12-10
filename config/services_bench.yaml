@@ -18,3 +18,8 @@ services:
     autowire: true
     autoconfigure: true
     public: true
+
+  ChronicleKeeper\Shared\Infrastructure\LLMChain\EmbeddingCalculator:
+    autowire: true
+    autoconfigure: true
+    public: true

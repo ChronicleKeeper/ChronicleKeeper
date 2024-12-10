@@ -7,6 +7,7 @@
 - Upgraded many dependencies to the current stable versions.
 - Improved PHP configuration to be more efficient in the local PHP Desktop environment.
 - Optimized performance within document and image vectors by reducing the data loaded from the database for search.
+- Improved the performance of embedding generation by generating all document text chunks at once.
 
 ## [alpha-0.5.1]
 

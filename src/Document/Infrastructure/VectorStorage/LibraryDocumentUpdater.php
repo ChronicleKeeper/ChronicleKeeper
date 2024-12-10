@@ -88,22 +88,29 @@ class LibraryDocumentUpdater
         Document $document,
         int $contentLength,
     ): array {
-        $content         = trim($document->content);
-        $vectorDocuments = [];
+        $content = trim($document->content);
 
+        $contentChunks = [];
         do {
-            $vectorContent = u($content)->truncate($contentLength, '', false)->toString();
-            $content       = trim(substr($content, strlen($vectorContent)));
+            $vectorContent   = u($content)->truncate($contentLength, '', false)->trim()->toString();
+            $contentChunks[] = $vectorContent;
+            $content         = trim(substr($content, strlen($vectorContent)));
+        } while ($content !== '');
 
+        // Calculate vectors from the chunks
+        $vectors = $this->embeddingCalculator->getMultipleEmbeddings($contentChunks);
+
+        $vectorDocuments = [];
+        foreach ($contentChunks as $index => $chunk) {
             $vectorDocument = new VectorDocument(
                 document: $document,
-                content: trim($vectorContent),
+                content: trim($chunk),
                 vectorContentHash: $document->getContentHash(),
-                vector: $this->embeddingCalculator->getSingleEmbedding($vectorContent),
+                vector: $vectors[$index],
             );
 
             $vectorDocuments[] = $vectorDocument;
-        } while ($content !== '');
+        }
 
         return $vectorDocuments;
     }
