@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace ChronicleKeeper\Library\Infrastructure\VectorStorage;
 
 use ChronicleKeeper\Document\Infrastructure\VectorStorage\LibraryDocumentUpdater;
-use ChronicleKeeper\Library\Infrastructure\VectorStorage\Updater\LibraryImageUpdater;
+use ChronicleKeeper\Image\Infrastructure\VectorStorage\LibraryImageUpdater;
 
 class Updater
 {
