@@ -1,6 +1,8 @@
+SHELL := /bin/bash
 .PHONY: *
 
 OPTS=
+ROOT_DIR:=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 
 help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
@@ -30,7 +32,7 @@ serve-symfony: ## start dev webserver with symfony cli
 	symfony local:server:start --no-tls
 
 serve-frankenphp: ## start dev webserver with frankenphp cli
-	frankenphp php-server -l 127.0.0.1:8000 -r public
+	PHP_INI_SCAN_DIR=$(ROOT_DIR)/config/phpdesktop/php.ini frankenphp php-server -l 127.0.0.1:8000 -r public
 
 check-cs: ## check coding standards
 	vendor/bin/phpcs -n
