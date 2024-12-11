@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace ChronicleKeeper\Test\Calendar\Domain\Entity;
 
 use ChronicleKeeper\Calendar\Domain\Entity\CalendarDate;
+use ChronicleKeeper\Calendar\Domain\Exception\DayNotExistsInMonth;
+use ChronicleKeeper\Calendar\Domain\Exception\MonthNotExists;
 use ChronicleKeeper\Test\Calendar\Domain\Entity\Fixture\FullExampleCalendar;
 use Generator;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -46,5 +48,23 @@ class CalendarDateTest extends TestCase
             40,
             '6. FirstMonth 2',
         ];
+    }
+
+    #[Test]
+    public function itFailsCreatingDateWithInvalidDay(): void
+    {
+        $this->expectException(DayNotExistsInMonth::class);
+
+        $calendar = FullExampleCalendar::get();
+        new CalendarDate($calendar, 1, 1, 32);
+    }
+
+    #[Test]
+    public function itFailsWithCreatingANonExistentMonth(): void
+    {
+        $this->expectException(MonthNotExists::class);
+
+        $calendar = FullExampleCalendar::get();
+        new CalendarDate($calendar, 1, 4, 1);
     }
 }

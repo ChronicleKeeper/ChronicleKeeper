@@ -13,11 +13,11 @@ class FullExampleCalendar
     {
         $calendar = new Calendar();
 
-        $calendar->setMonths([
+        $calendar->setMonths(
             new Month($calendar, 1, 'FirstMonth', 10),
             new Month($calendar, 3, 'ThirdMonth', 10),
             new Month($calendar, 2, 'SecondMonth', 15),
-        ]);
+        );
 
         return $calendar;
     }
