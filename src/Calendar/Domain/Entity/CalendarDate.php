@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Calendar\Domain\Entity;
 
+use ChronicleKeeper\Calendar\Domain\Exception\DayNotExistsInMonth;
 use ChronicleKeeper\Calendar\Domain\Exception\MonthNotExists;
 
 use function sprintf;
@@ -16,6 +17,14 @@ class CalendarDate
         private readonly int $month,
         private readonly int $day,
     ) {
+        // Check if month exists in calendar, method throws exception if not exists
+        $month = $this->calendar->getMonthOfTheYear($this->month);
+
+        // Check if day is valid for the given month
+        $maxDaysInMonth = $month->numberOfDays;
+        if ($this->day < 1 || $this->day > $maxDaysInMonth) {
+            throw new DayNotExistsInMonth($this->day, $this->month);
+        }
     }
 
     public function format(): string
