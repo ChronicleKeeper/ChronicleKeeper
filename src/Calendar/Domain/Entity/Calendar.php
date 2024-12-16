@@ -61,7 +61,7 @@ class Calendar
     {
         return array_reduce(
             $this->months,
-            static fn (int $carry, Month $month) => $carry + $month->numberOfDays,
+            static fn (int $carry, Month $month) => $carry + $month->getDayCount(),
             0,
         );
     }

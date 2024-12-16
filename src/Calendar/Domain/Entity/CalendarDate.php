@@ -21,7 +21,7 @@ class CalendarDate
         $month = $this->calendar->getMonthOfTheYear($this->month);
 
         // Check if day is valid for the given month
-        $maxDaysInMonth = $month->numberOfDays;
+        $maxDaysInMonth = $month->getDayCount();
         if ($this->day < 1 || $this->day > $maxDaysInMonth) {
             throw new DayNotExistsInMonth($this->day, $this->month);
         }
@@ -29,6 +29,15 @@ class CalendarDate
 
     public function format(): string
     {
+        $currentMonth = $this->calendar->getMonthOfTheYear($this->month);
+        if ($currentMonth->isLeapDay($this->day)) {
+            return sprintf(
+                '%s %d',
+                $currentMonth->getLeapDay($this->day)->name,
+                $this->year,
+            );
+        }
+
         return sprintf(
             '%d. %s %d',
             $this->day,
@@ -37,9 +46,14 @@ class CalendarDate
         );
     }
 
+    public function isLeapDay(): bool
+    {
+        return $this->calendar->getMonthOfTheYear($this->month)->isLeapDay($this->day);
+    }
+
     public function addDays(int $days): CalendarDate
     {
-        $maxDaysInMonth = $this->calendar->getMonthOfTheYear($this->month)->numberOfDays;
+        $maxDaysInMonth = $this->calendar->getMonthOfTheYear($this->month)->getDayCount();
 
         // We stay in same month, so all fine
         if ($this->day + $days <= $maxDaysInMonth) {
