@@ -16,6 +16,8 @@ use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(CalendarDate::class)]
+#[CoversClass(DayNotExistsInMonth::class)]
+#[CoversClass(MonthNotExists::class)]
 #[Small]
 class CalendarDateTest extends TestCase
 {
@@ -46,7 +48,7 @@ class CalendarDateTest extends TestCase
         yield 'Add 40 days to the beginning of the year, year changes' => [
             new CalendarDate($calendar, 1, 1, 1),
             40,
-            '6. FirstMonth 2',
+            '4. FirstMonth 2',
         ];
     }
 
@@ -66,5 +68,51 @@ class CalendarDateTest extends TestCase
 
         $calendar = FullExampleCalendar::get();
         new CalendarDate($calendar, 1, 4, 1);
+    }
+
+    #[Test]
+    public function itCanAddDaysToDateWithLeapDay(): void
+    {
+        $calendar = FullExampleCalendar::get();
+        $date     = new CalendarDate($calendar, 1, 3, 10);
+
+        $result = $date->addDays(2);
+        self::assertSame('EndOfYearSecondLeapDay 1', $result->format());
+    }
+
+    #[Test]
+    public function isChecksToNotBeingALeapDay(): void
+    {
+        $calendar = FullExampleCalendar::get();
+        $date     = new CalendarDate($calendar, 1, 3, 10);
+
+        self::assertFalse($date->isLeapDay());
+    }
+
+    #[Test]
+    public function isChecksToBeingALeapDay(): void
+    {
+        $calendar = FullExampleCalendar::get();
+        $date     = new CalendarDate($calendar, 1, 3, 11);
+
+        self::assertTrue($date->isLeapDay());
+    }
+
+    #[Test]
+    public function ifFormatsARegularDate(): void
+    {
+        $calendar = FullExampleCalendar::get();
+        $date     = new CalendarDate($calendar, 1, 3, 10);
+
+        self::assertSame('10. ThirdMonth 1', $date->format());
+    }
+
+    #[Test]
+    public function ifFormatsALeapDay(): void
+    {
+        $calendar = FullExampleCalendar::get();
+        $date     = new CalendarDate($calendar, 1, 3, 11);
+
+        self::assertSame('EndOfYearFirstLeapDay 1', $date->format());
     }
 }

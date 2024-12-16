@@ -6,6 +6,7 @@ namespace ChronicleKeeper\Test\Calendar\Domain\Entity;
 
 use ChronicleKeeper\Calendar\Domain\Entity\Calendar;
 use ChronicleKeeper\Calendar\Domain\Entity\Calendar\Month;
+use ChronicleKeeper\Calendar\Domain\Exception\MonthNotExists;
 use ChronicleKeeper\Calendar\Domain\Exception\YearHasNotASequentialListOfMonths;
 use ChronicleKeeper\Calendar\Domain\Exception\YearIsNotStartingWithFirstMonth;
 use ChronicleKeeper\Test\Calendar\Domain\Entity\Fixture\FullExampleCalendar;
@@ -15,6 +16,9 @@ use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(Calendar::class)]
+#[CoversClass(YearIsNotStartingWithFirstMonth::class)]
+#[CoversClass(YearHasNotASequentialListOfMonths::class)]
+#[CoversClass(MonthNotExists::class)]
 #[Small]
 class CalendarTest extends TestCase
 {
@@ -32,7 +36,7 @@ class CalendarTest extends TestCase
     public function itCanCountTheDaysInAYear(): void
     {
         $calendar = $this->getCalendar();
-        self::assertSame(35, $calendar->countDaysInYear());
+        self::assertSame(37, $calendar->countDaysInYear());
     }
 
     #[Test]
@@ -62,6 +66,24 @@ class CalendarTest extends TestCase
             new Month($calendar, 3, 'ThirdMonth', 10),
             new Month($calendar, 4, 'SecondMonth', 15),
         );
+    }
+
+    #[Test]
+    public function itFailsGettingNonExistentMonth(): void
+    {
+        $this->expectException(MonthNotExists::class);
+
+        $calendar = $this->getCalendar();
+        $calendar->getMonthOfTheYear(4);
+    }
+
+    #[Test]
+    public function itFailsOverwritingTheAlreadySetMonths(): void
+    {
+        $calendar = $this->getCalendar();
+        $calendar->setMonths();
+
+        self::assertNotSame(0, $calendar->countDaysInYear());
     }
 
     private function getCalendar(): Calendar
