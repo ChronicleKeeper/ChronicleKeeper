@@ -53,9 +53,9 @@ class ChatMessageExecution
 
         $response = new ExtendedMessage(message: Message::ofAssistant($response->getContent()));
 
-        $this->appendReferencedDocumentsFromBackground($response);
+        /*$this->appendReferencedDocumentsFromBackground($response);
         $this->appendReferencedImages($response);
-        $this->appendCalledTools($response);
+        $this->appendCalledTools($response); */
 
         $messages[] = $response;
 

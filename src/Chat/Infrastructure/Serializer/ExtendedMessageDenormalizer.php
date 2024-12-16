@@ -5,16 +5,10 @@ declare(strict_types=1);
 namespace ChronicleKeeper\Chat\Infrastructure\Serializer;
 
 use ChronicleKeeper\Chat\Domain\Entity\ExtendedMessage;
-use ChronicleKeeper\Document\Domain\Entity\Document;
-use ChronicleKeeper\Library\Domain\Entity\Image;
 use PhpLlm\LlmChain\Model\Message\MessageInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Webmozart\Assert\Assert;
-
-use function array_diff;
-use function array_keys;
-use function array_values;
 
 final class ExtendedMessageDenormalizer implements DenormalizerInterface, DenormalizerAwareInterface
 {
@@ -26,15 +20,9 @@ final class ExtendedMessageDenormalizer implements DenormalizerInterface, Denorm
     }
 
     /** @inheritDoc */
-    public function denormalize(mixed $data, string $type, string|null $format = null, array $context = []): mixed
+    public function denormalize(mixed $data, string $type, string|null $format = null, array $context = []): ExtendedMessage
     {
         Assert::isArray($data);
-        Assert::true(array_diff([
-            'message',
-            'documents',
-            'images',
-            'calledTools',
-        ], array_keys($data)) === []);
 
         $message = $this->denormalizer->denormalize(
             $data['message'],
@@ -43,15 +31,7 @@ final class ExtendedMessageDenormalizer implements DenormalizerInterface, Denorm
             $context,
         );
 
-        $documents = $this->denormalizer->denormalize($data['documents'], Document::class . '[]', $format, $context);
-        $images    = $this->denormalizer->denormalize($data['images'], Image::class . '[]', $format, $context);
-
-        $extendedMessage     = new ExtendedMessage(
-            $message,
-            array_values($documents),
-            array_values($images),
-            $data['calledTools'],
-        );
+        $extendedMessage     = new ExtendedMessage($message);
         $extendedMessage->id = $data['id'];
 
         return $extendedMessage;

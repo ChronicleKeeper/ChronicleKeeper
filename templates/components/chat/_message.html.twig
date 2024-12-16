@@ -17,10 +17,11 @@
             </div>
             <div class="card-body chatbot-message">
                 {{ content.message|markdown_to_html }}
-                {% if settings_handler.get.chatbotFunctions.allowDebugOutput and content.extended.calledTools is not empty %}
+                {% if settings_handler.get.chatbotFunctions.allowDebugOutput and content.extended.calledTools is defined and content.extended.calledTools is not empty %}
                     {{ _self.bot_debug_output(content) }}
                 {% endif %}
-                {{ _self.bot_used_context(content) }}
+
+                {# {{ _self.bot_used_context(content) }} #}
             </div>
         </div>
     </div>
