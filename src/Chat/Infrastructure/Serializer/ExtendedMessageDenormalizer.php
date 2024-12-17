@@ -5,13 +5,21 @@ declare(strict_types=1);
 namespace ChronicleKeeper\Chat\Infrastructure\Serializer;
 
 use ChronicleKeeper\Chat\Domain\Entity\ExtendedMessage;
+use ChronicleKeeper\Chat\Domain\ValueObject\MessageContext;
+use ChronicleKeeper\Chat\Domain\ValueObject\Reference;
 use PhpLlm\LlmChain\Model\Message\MessageInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Webmozart\Assert\Assert;
 
+use function array_map;
+use function array_values;
+
 final class ExtendedMessageDenormalizer implements DenormalizerInterface, DenormalizerAwareInterface
 {
+    public const string WITH_CONTEXT_DOCUMENTS = 'with_context_documents';
+    public const string WITH_CONTEXT_IMAGES    = 'with_context_images';
+
     private DenormalizerInterface $denormalizer;
 
     public function setDenormalizer(DenormalizerInterface $denormalizer): void
@@ -20,8 +28,12 @@ final class ExtendedMessageDenormalizer implements DenormalizerInterface, Denorm
     }
 
     /** @inheritDoc */
-    public function denormalize(mixed $data, string $type, string|null $format = null, array $context = []): ExtendedMessage
-    {
+    public function denormalize(
+        mixed $data,
+        string $type,
+        string|null $format = null,
+        array $context = [],
+    ): ExtendedMessage {
         Assert::isArray($data);
 
         $message = $this->denormalizer->denormalize(
@@ -33,6 +45,26 @@ final class ExtendedMessageDenormalizer implements DenormalizerInterface, Denorm
 
         $extendedMessage     = new ExtendedMessage($message);
         $extendedMessage->id = $data['id'];
+
+        $documents = [];
+        if (isset($context[self::WITH_CONTEXT_DOCUMENTS]) && $context[self::WITH_CONTEXT_DOCUMENTS] === true) {
+            // Denormalize documents to be added
+            $documents = array_map(
+                static fn (array $document) => new Reference($document['id'], $document['type'], $document['title']),
+                $data['context']['documents'] ?? [],
+            );
+        }
+
+        $images = [];
+        if (isset($context[self::WITH_CONTEXT_IMAGES]) && $context[self::WITH_CONTEXT_IMAGES] === true) {
+            // Denormalize documents to be added
+            $images = array_map(
+                static fn (array $image) => new Reference($image['id'], $image['type'], $image['title']),
+                $data['context']['images'] ?? [],
+            );
+        }
+
+        $extendedMessage->context = new MessageContext(array_values($documents), array_values($images));
 
         return $extendedMessage;
     }

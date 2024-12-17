@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Library\Infrastructure\LLMChain\Tool;
 
-use ChronicleKeeper\Library\Domain\Entity\Image;
+use ChronicleKeeper\Chat\Domain\ValueObject\Reference;
+use ChronicleKeeper\Chat\Infrastructure\LLMChain\RuntimeCollector;
 use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemVectorImageRepository;
 use ChronicleKeeper\Settings\Application\SettingsHandler;
 use ChronicleKeeper\Shared\Infrastructure\LLMChain\LLMChainFactory;
@@ -16,7 +17,6 @@ use PhpLlm\LlmChain\Model\Response\VectorResponse;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 
-use function array_values;
 use function assert;
 use function count;
 
@@ -30,10 +30,8 @@ use const PHP_EOL;
     situations, and characters from the game universe.
     TEXT,
 )]
-final class LibraryImages
+class LibraryImages
 {
-    /** @var array<string, Image> */
-    private array $referencedImages = [];
     private float|null $maxDistance = null;
 
     public function __construct(
@@ -42,6 +40,7 @@ final class LibraryImages
         private readonly SettingsHandler $settingsHandler,
         private readonly ToolUsageCollector $collector,
         private readonly RouterInterface $router,
+        private readonly RuntimeCollector $runtimeCollector,
     ) {
     }
 
@@ -71,7 +70,6 @@ final class LibraryImages
             maxResults: $maxResults,
         );
 
-        $this->referencedImages = [];
         if (count($results) === 0) {
             $this->collector->called(
                 'library_images',
@@ -102,7 +100,7 @@ final class LibraryImages
             $result .= 'The image is described as the following: ' . PHP_EOL;
             $result .= $image['vector']->content . PHP_EOL . PHP_EOL;
 
-            $this->referencedImages[$libraryImage->id] = $libraryImage;
+            $this->runtimeCollector->addReference(Reference::forImage($libraryImage));
 
             $debugResponse[] = [
                 'image' => $libraryImage->directory->flattenHierarchyTitle()
@@ -121,14 +119,5 @@ final class LibraryImages
         );
 
         return $result;
-    }
-
-    /** @return list<Image> */
-    public function getReferencedImages(): array
-    {
-        $images                 = array_values($this->referencedImages);
-        $this->referencedImages = [];
-
-        return $images;
     }
 }

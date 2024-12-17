@@ -6,6 +6,7 @@ namespace ChronicleKeeper\Chat\Application\Query;
 
 use ChronicleKeeper\Chat\Application\Command\StoreTemporaryConversation;
 use ChronicleKeeper\Chat\Domain\Entity\Conversation;
+use ChronicleKeeper\Chat\Infrastructure\Serializer\ExtendedMessageDenormalizer;
 use ChronicleKeeper\Settings\Application\SettingsHandler;
 use ChronicleKeeper\Shared\Application\Query\Query;
 use ChronicleKeeper\Shared\Application\Query\QueryParameters;
@@ -31,16 +32,24 @@ class GetTemporaryConversationQuery implements Query
     {
         assert($parameters instanceof GetTemporaryConversationParameters);
 
+        $settings                = $this->settingsHandler->get();
+        $showReferencedDocuments = $settings->getChatbotGeneral()->showReferencedDocuments();
+        $showReferencedImages    = $settings->getChatbotGeneral()->showReferencedImages();
+
         try {
             return $this->serializer->deserialize(
                 $this->fileAccess->read('temp', 'conversation_temporary.json'),
                 Conversation::class,
                 JsonEncoder::FORMAT,
+                [
+                    ExtendedMessageDenormalizer::WITH_CONTEXT_DOCUMENTS => $showReferencedDocuments,
+                    ExtendedMessageDenormalizer::WITH_CONTEXT_IMAGES => $showReferencedImages,
+                ],
             );
         } catch (UnableToReadFile) {
             // All is fine, file not exists ... we create it.
 
-            $conversation = Conversation::createFromSettings($this->settingsHandler->get());
+            $conversation = Conversation::createFromSettings($settings);
             $this->bus->dispatch(new StoreTemporaryConversation($conversation));
 
             return $conversation;

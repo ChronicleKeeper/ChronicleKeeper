@@ -23,6 +23,15 @@ use Symfony\Component\Serializer\SerializerInterface;
 class FindConversationByIdQueryTest extends TestCase
 {
     #[Test]
+    public function itEnsuresTheParametersHasTheCorrectQueryClass(): void
+    {
+        self::assertSame(
+            FindConversationByIdQuery::class,
+            (new FindConversationByIdParameters('123e4567-e89b-12d3-a456-426614174000'))->getQueryClass(),
+        );
+    }
+
+    #[Test]
     public function queryReturnsConversation(): void
     {
         $parameters   = new FindConversationByIdParameters('123e4567-e89b-12d3-a456-426614174000');

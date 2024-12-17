@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Test\Document\Infrastructure\LLMChain;
 
+use ChronicleKeeper\Chat\Infrastructure\LLMChain\RuntimeCollector;
 use ChronicleKeeper\Document\Application\Query\SearchSimilarVectors;
 use ChronicleKeeper\Document\Infrastructure\LLMChain\DocumentSearch;
 use ChronicleKeeper\Settings\Application\SettingsHandler;
@@ -63,11 +64,15 @@ class DocumentSearchTest extends TestCase
                 return $foundDocuments;
             });
 
+        $runtimeCollector = $this->createMock(RuntimeCollector::class);
+        $runtimeCollector->expects($this->exactly(2))->method('addReference');
+
         $documentSearch = new DocumentSearch(
             $embeddingCalculatoir,
             $settingsHanlder,
             $toolUsageCollector,
             $queryService,
+            $runtimeCollector,
         );
         $result         = $documentSearch('I am searching for documents');
 
@@ -113,11 +118,15 @@ class DocumentSearchTest extends TestCase
             ->with(self::isInstanceOf(SearchSimilarVectors::class))
             ->willReturn([]);
 
+        $runtimeCollector = $this->createMock(RuntimeCollector::class);
+        $runtimeCollector->expects($this->never())->method('addReference');
+
         $documentSearch = new DocumentSearch(
             $embeddingCalculatoir,
             $settingsHanlder,
             $toolUsageCollector,
             $queryService,
+            $runtimeCollector,
         );
 
         $response = $documentSearch('I am searching for documents');
@@ -162,11 +171,15 @@ class DocumentSearchTest extends TestCase
                 return $foundDocuments;
             });
 
+        $runtimeCollector = $this->createMock(RuntimeCollector::class);
+        $runtimeCollector->expects($this->once())->method('addReference');
+
         $documentSearch = new DocumentSearch(
             $embeddingCalculatoir,
             $settingsHanlder,
             $toolUsageCollector,
             $queryService,
+            $runtimeCollector,
         );
         $documentSearch->setOneTimeMaxDistance(0.15);
 
@@ -183,51 +196,5 @@ class DocumentSearchTest extends TestCase
             TEXT,
             $result,
         );
-    }
-
-    #[Test]
-    public function itIsPossibleToFetchReferencedDocumentsAfterSearch(): void
-    {
-        $settings = (new SettingsBuilder())->build();
-
-        $settingsHanlder = $this->createMock(SettingsHandler::class);
-        $settingsHanlder->expects($this->once())->method('get')->willReturn($settings);
-
-        $embeddingCalculatoir = $this->createMock(EmbeddingCalculator::class);
-        $embeddingCalculatoir->expects($this->once())
-            ->method('getSingleEmbedding')
-            ->with('I am searching for documents')
-            ->willReturn([0.1, 0.2, 0.3]);
-
-        $toolUsageCollector = $this->createMock(ToolUsageCollector::class);
-        $toolUsageCollector->expects($this->once())
-            ->method('called')
-            ->with('library_documents');
-
-        $foundVectorDocument = (new VectorDocumentBuilder())->build();
-        $foundDocuments      = [['vector' => $foundVectorDocument, 'distance' => 0.1]];
-
-        $queryService = $this->createMock(QueryService::class);
-        $queryService->expects($this->once())
-            ->method('query')
-            ->with(self::isInstanceOf(SearchSimilarVectors::class))
-            ->willReturn($foundDocuments);
-
-        $documentSearch = new DocumentSearch(
-            $embeddingCalculatoir,
-            $settingsHanlder,
-            $toolUsageCollector,
-            $queryService,
-        );
-
-        $documentSearch('I am searching for documents');
-
-        $referencedDocuments = $documentSearch->getReferencedDocuments();
-
-        self::assertCount(1, $referencedDocuments);
-        self::assertSame($foundVectorDocument->document, $referencedDocuments[0]);
-
-        // And check that a second fecth will be empty
-        self::assertEmpty($documentSearch->getReferencedDocuments());
     }
 }

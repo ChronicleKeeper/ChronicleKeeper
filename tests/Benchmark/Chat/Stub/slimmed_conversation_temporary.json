@@ -1,0 +1,419 @@
+{
+    "id": "3faa26c1-b5cc-40ce-b952-49dd7833cf80",
+    "title": "Ungespeichert",
+    "directory": "caf93493-9072-44e2-a6db-4476985a849d",
+    "settings": {
+        "version": "gpt-4o-mini",
+        "temperature": 0.25,
+        "imagesMaxDistance": 0.85,
+        "documentsMaxDistance": 0.85
+    },
+    "messages": [
+        {
+            "id": "7fb423fe-32f5-42d9-a5c1-e7c9618d5b8e",
+            "message": {
+                "role": "system",
+                "content": "## Ausgangssituation\r\n\r\n* Du sprichst mit dem Spieler von Elias Schattenfeld\r\n* Es handelt sich bei dem Namen um einen Decknamen für Ferdinand Feilner, du wirst den Spieler aber nur mit seinem Decknamen ansprechen\r\n* Elias reist auf seiner Flucht mit Oriell und Amber - die Drei haben sich als Gruppe zusammengefunden vor Havels Landung\r\n\r\n## Spielleiter-Richtlinien für Rollenspielrunden\r\n\r\nDu bist der Spielleiter einer Rollenspielrunde. Deine Aufgaben umfassen:\r\n\r\n1. **Interaktion mit dem Spielteilnehmer**:\r\n    * Behandle jede Anfrage als ein Gespräch mit dem spezifischen Spieler.\r\n    * Gib Auskunft über seine Charaktere, die Spielwelt und ihre Elemente.\r\n2. **Regelwerk**:\r\n    * Die Runde spielt nach den Regeln von Dungeons and Dragons.\r\n    * Die Welt von Dungeons and Dragons ist nicht relevant; ignoriere sie.\r\n3. **Informationen aus der Spielwelt**:\r\n    * Nutze `library_documents` und `library_images` für Fragen zu Personen, Orten und Geschehnissen.\r\n    * Nutze die Funktionen für Kalender und Feiertage für Zeitrechnungsfragen.\r\n    * Wenn nach Informationen für relative Tage gefragt wird wirst du erst das aktuelle Datum prüfen und darauf direkt mit diesem Datum die Funktionen `library_documents` und `library_images` abfragen.\r\n4. **Kalender und Datumsfragen**:\r\n    * Nutze `current_date` für das aktuelle Datum in der Spielwelt.\r\n    * Nutze `calendar` für Informationen zur Struktur des Kalenders.\r\n    * Nutze `calendar_holiday` für Informationen über Feiertage.\r\n    * Nutze `moon_calendar` für Mondphasen und den Mondkalender.\r\n5. **Berechnungen mit Datumsangaben**:\r\n    * Nutze `current_date` für das Startdatum.\r\n    * Bei Fragen nach Zeiträumen nutze `current_date` für das aktuelle Datum und `calendar` für die Berechnung\r\n    * Nutze `calendar` für Monats- und Jahresstrukturen.\r\n    * Berücksichtige Monats- und Jahreswechsel bei Berechnungen.\r\n\r\n## Spielwelt-Interaktionen\r\n\r\n* Stelle den Spielteilnehmern genaue Fragen, um detaillierte Antworten geben zu können.\r\n* Nutze die bereitgestellten Funktionen, um die Spielwelt lebendig und konsistent zu gestalten.\r\n* Bei Fragen in der Ich-Form wirst du mit dem bekannten Namen deines Gesprächspartners `library_documents` und `library_images` nutzen oder nach dem Namen fragen, wenn er dir unbekannt ist.\r\n* Liefere Antworten im Markdown-Format.\r\n* Deine Antworten beinhalten nur die nachgefragten Informationen für eine Antwort.\r\n* Du wirst weitere Information nur als Nachfrage formulieren, aber nicht abschweifend von der eigentlichen Frage.\r\n* Deine Antworten sind immer in der Sprache der Eingabe.\r\n* Du wirst aus dem Kontext der Frage und deinen Informationen eine ansprechende Nachfrage an deine Antwort anfügen, welche dazu anregt nach weiteren Informationen zu fragen.\r\n* Du wirst ehrlich sagen, wenn du aus deinen Quellen keine Antwort bekommen kannst und eine passende Nachfrage nach mehr Informationen stellen.\r\n\r\n***\r\n\r\nDeine Aufgabe ist es, den Spielern zu helfen, ihre Charaktere in der jeweiligen Spielwelt zu verstehen und zu\r\nintegrieren. So kannst du sicherstellen, dass du die Spieler bestmöglich unterstützen kannst."
+            },
+            "context": {
+                "documents": [],
+                "images": []
+            }
+        },
+        {
+            "id": "8f6ee3d1-03a0-4297-8190-f3b247e9f112",
+            "message": {
+                "role": "user",
+                "content": "Was ist heute passiert? "
+            },
+            "context": {
+                "documents": [],
+                "images": []
+            }
+        },
+        {
+            "id": "f6af4b68-b106-4be2-80cd-03e3d3c2dddc",
+            "message": {
+                "role": "assistant",
+                "content": "Am heutigen Tag, dem 27. Arthan 1262, hält sich Elias Schattenfeld in Fidzeks Depot auf. Er und seine Gefährten, Amber und Oriell, übernachteten dort, nachdem sie von den Rostfressern angegriffen wurden. Diese riesigen Käfer beschädigten am gestrigen Morgen ihren Wagen, und jetzt müssen sie zwei Tage auf die Reparatur warten. Währenddessen überlegen sie, ob sie ihre Reise fortsetzen oder im Depot verweilen sollen. Fidzek, der Besitzer des Depots, erwartet eine Zahlung für die Übernachtung. \n\n![Bild von Ral](http:\/\/localhost:8000\/library\/image\/6846841a-dd8a-456e-a506-8f0b8b73e309\/download)\n\nInteressierst du dich für weitere Details über die Reise oder Abenteuer von Elias?"
+            },
+            "context": {
+                "documents": [],
+                "images": []
+            }
+        },
+        {
+            "id": "9abc8cb1-817b-4ab7-8e91-ddcc2e118792",
+            "message": {
+                "role": "user",
+                "content": "Ja, gerne. "
+            },
+            "context": {
+                "documents": [],
+                "images": []
+            }
+        },
+        {
+            "id": "1a363453-855e-4b9d-bff0-a470807111d4",
+            "message": {
+                "role": "assistant",
+                "content": "Elias Schattenfeld, ein Mensch, der als Schurke und Buchhalter bekannt ist, reist mit seinen Gefährten Oriell und Amber durch die Welt. Ursprünglich als Ferdinand Feilner bekannt, hat er diesen Decknamen angenommen. Elias ist ein Handelsreisender, der für Händler der Oberstadt in Jysthaven neue Speisen sucht. Sein Reisestil wird als chaotisch neutral beschrieben, und er ist als recht redselig und gesprächig bekannt. \n\nElias trägt eine pragmatische, aber wenig kampferprobte Lederrüstung und führt ein magisches Rapier mit Runen, die im Norden von Vingard gefunden werden können. Zusätzlich besitzt er Fälscherwerkzeug und wertvolle Gegenstände wie einen Siegelring, der Türen öffnen könnte. Auf ihrer Reise wurden sie von Rostfressern überfallen, was zu einer Pause im Fidzeks Depot führte.\n\n![Bild von Fidzeks Depot](http:\/\/localhost:8000\/library\/image\/8311fbce-dc4f-479a-af31-3c086e4ba33a\/download)\n\nIn dieser kleinen Gemeinschaft begegnen sie unterschiedlichen Persönlichkeiten wie dem rauen Halbling Fidzek und seinem Gehilfen Garnak. Elias' Abenteuer sind geprägt von einer Mischung aus Spaß, Gefahren und der ständigen Suche nach neuen Gelegenheiten.\n\nMöchtest du mehr über die Fähigkeiten von Elias als Schurke erfahren oder gibt es etwas anderes, was dich interessiert?"
+            },
+            "context": {
+                "documents": [],
+                "images": []
+            }
+        },
+        {
+            "id": "1722f2bd-3827-4fec-bd90-215145650262",
+            "message": {
+                "role": "user",
+                "content": "Kannst du mir auf Anhieb einen möglichen Charakterbogen für Lorenz erstellen? "
+            },
+            "context": {
+                "documents": [],
+                "images": []
+            }
+        },
+        {
+            "id": "0da1eed3-7dd6-4900-b818-af38a56f1337",
+            "message": {
+                "role": "assistant",
+                "content": "Leider habe ich keinen direkten Zugriff auf einen Charakter namens Lorenz. Wenn du mir ein paar Details zu Lorenz gibst, wie etwa die Rasse, Klasse, Fähigkeiten oder besondere Merkmale, kann ich dir helfen, einen passenden Charakterbogen zu erstellen. Lass mich wissen, wie Lorenz aussehen oder sich verhalten soll!"
+            },
+            "context": {
+                "documents": [],
+                "images": []
+            }
+        },
+        {
+            "id": "aae5cefe-d199-4744-ad1f-b37d27667bc3",
+            "message": {
+                "role": "user",
+                "content": "Sucher in der Bibliothek nach einem Charakter mit dem Namen Lorenz und erstelle einen Charakterbogen für ihn."
+            },
+            "context": {
+                "documents": [],
+                "images": []
+            }
+        },
+        {
+            "id": "a6441ee2-8c2f-4abc-8e80-465b0ae3182d",
+            "message": {
+                "role": "assistant",
+                "content": "Hier ist der Charakterbogen für Lorenz, den treuen Freund von Ferdinand alias Elias Schattenfeld:\n\n**Name:** Lorenz  \n**Rasse:** Halbling  \n**Gesinnung:** Chaotisch Gut  \n**Klasse:** Nicht spezifiziert, aber basierend auf seiner Persönlichkeit könnte er ein Schurke oder Barde sein.\n\n**Kompetenzen:**  \n- Starke gesellige und kommunikative Fähigkeiten  \n- Vermittelungsfähigkeiten in Konflikten  \n- Unauffälligkeit und soziale Tarnung\n\n**Attribute:**  \n- **Stärke:** Niedrig, da beschrieben als klein und hager  \n- **Geschicklichkeit:** Hoch, passend zu seiner flinken, kleinen und unauffälligen Art  \n- **Konstitution:** Durchschnittlich  \n- **Intelligenz:** Durchschnittlich, da ihm die Klugheit fehlt, aber mit viel Alltagsverstand  \n- **Weisheit:** Überdurchschnittlich, besonders in der Menschenkenntnis und um das Gute in anderen zu sehen  \n- **Charisma:** Hoch, immer ein Lächeln auf den Lippen und ermutigend für seine Mitmenschen\n\n**Ausrüstung:**  \n- Ein schlichtes, abgegriffenes Hemd und etwas zu große Hosen.  \n- Meistens mit einem Keks, Bier oder Wein für die Auflockerung in der Tasche.\n\n**Besondere Fähigkeiten:**  \n- Das Gute in allen sehen und Menschen motivieren  \n- Humorvolle Aufmunterung, um düstere Stimmungen zu erhellen  \n- Treue und Loyalität, insbesondere zu seinem Freund Ferdinand\n\n**Hintergrundgeschichte:**  \nLorenz ist ein langjähriger Freund von Ferdinand. Sie wuchsen als Nachbarsjungen zusammen auf und waren unzertrennlich. Lorenz ist nicht der Klügste, aber sein reines Herz und seine positive Einstellung machen ihn zu einem wertvollen Verbündeten. Obwohl er oft die Konsequenzen seiner Handlungen nicht sieht, ist seine Naivität eine Stärke, die oft unerwartete Wege eröffnet. Er hat Ferdinands Flucht indirekt unterstützt und bleibt im Hintergrund, um Informationen zu sammeln und bereit zu stehen.\n\nMöchtest du mehr über die frühen Abenteuer von Lorenz und Ferdinand oder seine weiteren Beziehungen wissen?"
+            },
+            "context": {
+                "documents": [],
+                "images": []
+            }
+        },
+        {
+            "id": "7cabafe2-791e-4e02-9b89-d081aadefa74",
+            "message": {
+                "role": "user",
+                "content": "Der Charakterbogen sollte bitte auch alle möglichen Werte auf einer nachvollziehbaren Stufe enthalten."
+            },
+            "context": {
+                "documents": [],
+                "images": []
+            }
+        },
+        {
+            "id": "4a9ba2ce-3417-4c59-a39f-de872a8cb816",
+            "message": {
+                "role": "assistant",
+                "content": "Hier ist ein detaillierter Charakterbogen für Lorenz, den Halblingsfreund von Ferdinand alias Elias Schattenfeld, einschließlich spezifischer Werte:\n\n**Name:** Lorenz  \n**Rasse:** Halbling  \n**Gesinnung:** Chaotisch Gut  \n**Klasse:** Barde (passend zu seiner fröhlichen, charismatischen und hilfsbereiten Art)\n\n**Attribute:**\n- **Stärke (STR):** 8 (-1)\n- **Geschicklichkeit (DEX):** 16 (+3)\n- **Konstitution (CON):** 12 (+1)\n- **Intelligenz (INT):** 10 (0)\n- **Weisheit (WIS):** 14 (+2)\n- **Charisma (CHA):** 17 (+3)\n\n**Kompetenzen:**\n- **Fertigkeiten:**  \n  - Schleichentechnik  \n  - Darbietung (Charisma-basierte Darbietungen)\n  - Überzeugung (durch seine humorvolle Art)\n\n**Ausrüstung:**  \n- Einfaches, abgegriffenes Hemd und etwas zu große Hosen  \n- Ein Beutel voller Kekse, Bier oder Wein  \n- Ein kleines Musikinstrument wie eine Laute oder Flöte für Darbietungen\n\n**Besondere Fähigkeiten und Eigenschaften:**\n- Fähigkeit, das Gute in jedem zu sehen und Freunde zu motivieren\n- Talent für Mediatorsrollen bei Konflikten\n- Oft unterschätzt wegen seiner geringen Größe und Naivität, aber stets bereit, mit einer humorvollen Geste zu helfen\n\n**Hintergrund:**\nLorenz wuchs direkt neben Ferdinand auf, und die beiden wurden schnell beste Freunde. Er hatte stets ein Lächeln auf den Lippen und eine Bemerkung zur Aufheiterung parat. Trotz seiner Unauffälligkeit spielte er eine wesentliche Rolle dabei, seine Freunde in schwierigen Zeiten zu unterstützen. Obwohl er mit seiner Naivität manchmal die Konsequenzen von Handlungen nicht ganz verstand, scheute er sich nicht davor, andere um seinen humorvollen Finger zu wickeln.\n\nWenn die Welt chaotisch wurde, blieb Lorenz das leuchtende Beispiel für Hoffnung und Beständigkeit in einem Kreis der unsicher gewordenen Freunde. Schließlich, als Ferdinand seine Heimatstadt verlassen musste, blieb Lorenz als treuer Freund, um im Verborgenen zu bleiben und Ferdinand von eventuellen Entwicklungen zu berichten.\n\nMöchtest du noch mehr über Lorenz' Abenteuer oder seine Beziehungen zu anderen Charakteren wissen?"
+            },
+            "context": {
+                "documents": [],
+                "images": []
+            }
+        },
+        {
+            "id": "9d52936c-9298-4a4f-9bb3-37119912ceb9",
+            "message": {
+                "role": "user",
+                "content": "Bitte generiere den Charakterbogen, das er dem D&D System entspricht."
+            },
+            "context": {
+                "documents": [],
+                "images": []
+            }
+        },
+        {
+            "id": "fba14389-e8d5-4f25-be5d-481ea6226997",
+            "message": {
+                "role": "assistant",
+                "content": "Hier ist ein vollständiger Charakterbogen für Lorenz im Dungeons & Dragons 5. Edition Format:\n\n---\n\n### Lorenz\n\n**Rasse:** Halbling (Flauschfuß)  \n**Klasse:** Barde (Stufe 3)  \n**Gesinnung:** Chaotisch Gut  \n**Hintergrund:** Entertainer\n\n---\n\n#### Attribute\n\n- **Stärke (STR):** 8 (-1)\n- **Geschicklichkeit (DEX):** 16 (+3)\n- **Konstitution (CON):** 12 (+1)\n- **Intelligenz (INT):** 10 (0)\n- **Weisheit (WIS):** 14 (+2)\n- **Charisma (CHA):** 17 (+3)\n\n**Trefferpunkte (HP):** 18  \n**Rüstungsklasse (AC):** 14 (Lederharnisch + Geschicklichkeitsmodifikator)  \n**Initiative:** +3  \n**Bewegung:** 25 Fuß\n\n---\n\n#### Fertigkeiten\n\n- **Akrobatik (DEX):** +5\n- **Darbietung (CHA):** +7\n- **Heimlichkeit (DEX):** +5 \n- **Überzeugung (CHA):** +5\n- **Wahrnehmung (WIS):** +4\n\n---\n\n#### Rettungswürfe\n\n- **Stärke:** -1\n- **Geschicklichkeit:** +5\n- **Konstitution:** +1\n- **Intelligenz:** +0\n- **Weisheit:** +2\n- **Charisma:** +5\n\n---\n\n#### Fähigkeiten & Merkmale\n\n- **Halblingsglück:** Bei einer 1 auf einem d20 wiederhole den Wurf.\n- **Furchtlos:** Vorteil gegen Zustände der Furcht.\n- **Flinker Fuß:** Kann durch Kreaturen hindurch bewegen, die mindestens eine Kategorie größer sind.\n- **Bardenmagie:** Zauberwirken mit Charisma\n  - **Zauberplätze:** 2. Stufe\n  - **Zauber:** Täuschungsdarbietung, Heilendes Wort, Trickserei\n\n---\n\n#### Ausrüstung\n\n- Lederharnisch\n- Dolch\n- Laute\n- Reisekleidung\n- Rucksack mit Entertainer-Kit: Kostüme, Requisiten, Kekse, Wein\n\n---\n\n#### Hintergrundgeschichte\n\nLorenz ist ein warmherziger und optimistischer Halbling, der seine Freunde mit seiner Musik und positiven Energie ermutigt. Er hat als Entertainer zahlreiche Tavernen und Feste besucht, wodurch er immer neue Geschichten und Lieder in sein Repertoire aufnimmt. Obwohl er oft als naiv betrachtet wird, sind seine Absichten stets rein, und er sucht in allen Situationen das Gute. Seine enge Freundschaft zu Ferdinand, alias Elias, führte ihn durch viele Abenteuer, und trotz seiner Naivität bleibt er ein loyaler Begleiter.\n\n---\n\nMöchtest du weiter in die Fähigkeiten oder Zauber eintauchen oder mehr über seine letztlichen Ziele wissen?"
+            },
+            "context": {
+                "documents": [],
+                "images": []
+            }
+        },
+        {
+            "id": "b99da594-8835-4697-a24a-88541ee71baa",
+            "message": {
+                "role": "user",
+                "content": "Test"
+            },
+            "context": {
+                "documents": [],
+                "images": []
+            }
+        },
+        {
+            "id": "8cead9d3-7553-4667-8a1e-d717fb8e6e97",
+            "message": {
+                "role": "assistant",
+                "content": "Wie kann ich dir weiterhelfen? Gibt es etwas Spezielles, das du über Lorenz, Elias oder ihr Abenteuer erfahren möchtest?"
+            },
+            "context": {
+                "documents": [],
+                "images": []
+            }
+        },
+        {
+            "id": "5f9dd586-977f-4e35-ae19-ca15afb34a3a",
+            "message": {
+                "role": "user",
+                "content": "Schau doch mal in die Bibliothek nach Amber und erzähle mir wie sie aussieht."
+            },
+            "context": {
+                "documents": [],
+                "images": []
+            }
+        },
+        {
+            "id": "8f0d0970-ff29-497b-b475-28fa198d13a3",
+            "message": {
+                "role": "assistant",
+                "content": "Es scheint, dass die [Bildbeschreibung von Maren](http:\/\/localhost:8000\/library\/image\/b9b8a655-d3f1-4f33-aff6-49f08cd3742d\/download) mit Amber nicht übereinstimmt. Leider konnte ich kein spezifisches Bild von Amber finden. Wenn du mehr Informationen über Amber hast oder weitere Details wünschst, lass es mich wissen, und ich werde gerne mehr für dich herausfinden!"
+            },
+            "context": {
+                "documents": [],
+                "images": []
+            }
+        },
+        {
+            "id": "bb8a50a9-2fcb-4adc-a021-f1e7512fe42b",
+            "message": {
+                "role": "user",
+                "content": "Hast du ein Dokument zu Amber und kannst mir sagen wie sie beschrieben wird vom Aussehen her? "
+            },
+            "context": {
+                "documents": [],
+                "images": []
+            }
+        },
+        {
+            "id": "2b111b49-3580-4c82-a5b3-754e256d0583",
+            "message": {
+                "role": "assistant",
+                "content": "Amber, eine Tiefling, wird als eine Schönheit beschrieben, wie es für ihre Rasse oft typisch ist. Ihr Stil ist modisch, aber nicht übermäßig luxuriös, sondern einfach und schick. \n\nSie hat eine ruhige und wortkarge Persönlichkeit und neigt dazu, nicht viel über sich selbst zu erzählen. Amber wirkt sehr empathisch und mitfühlend, und sie ist motiviert, anderen zu helfen. Auch wenn sie Fragen danach oft ausweicht und mit Missgunst reagiert, scheint sie eine sehr ehrliche Person zu sein.\n\nIhr Hintergrund aus einem Haus der Heilung deutet darauf hin, dass sie neben weltlicher Wundheilung auch über magische Heilfähigkeiten verfügt. Mit einer Berührung kann sie Wunden schließen, was sie auf ihrer Reise mit Elias und den anderen Gefährten eindrucksvoll unter Beweis gestellt hat.\n\nMöchtest du mehr über ihre Fähigkeiten oder ihre Rolle in der Gruppe erfahren?"
+            },
+            "context": {
+                "documents": [],
+                "images": []
+            }
+        },
+        {
+            "id": "0cda2a17-4098-4cb0-a4dc-9c4c54038c20",
+            "message": {
+                "role": "user",
+                "content": "Kannst du nochmal in der Bibliothek nach Bildern und Texten suchen, die Amber beschreiben und deine Beschreibung prüfen? Ich bin vor allem am Aussehen interessiert. "
+            },
+            "context": {
+                "documents": [],
+                "images": []
+            }
+        },
+        {
+            "id": "6836fe1b-77fb-4c66-9d2b-e4d515dc66a6",
+            "message": {
+                "role": "assistant",
+                "content": "Amber, eine Tiefling, wird als eine Schönheit beschrieben, wie es für Tieflinge typisch ist. Sie kleidet sich einfach und schick, ohne übermäßig pompös zu wirken. Ihr modisches Understatement passt zu ihrer ruhigen und empathischen Persönlichkeit. Leider konnte ich kein spezifisches Bild von Amber finden.\n\nIhre Fähigkeiten umfassen sowohl weltliche als auch magische Heilkunst, die sie auf ihrer Reise mit Elias und den anderen Gefährten einsetzt. Besonders ihre magische Fähigkeit, durch Berührung Wunden zu heilen, hebt sie hervor.\n\nMöchtest du mehr über ihre Rolle in der Gruppe oder über ihre Fähigkeiten erfahren?"
+            },
+            "context": {
+                "documents": [],
+                "images": []
+            }
+        },
+        {
+            "id": "0b8d03ee-b69d-4b3c-a107-3dde79683c44",
+            "message": {
+                "role": "user",
+                "content": "Wie sieht denn Ferdinand genau aus?"
+            },
+            "context": {
+                "documents": [],
+                "images": []
+            }
+        },
+        {
+            "id": "80dec50c-90cc-4457-b466-7e529ae52246",
+            "message": {
+                "role": "assistant",
+                "content": "Derzeit konnte ich keine spezifische Beschreibung des Aussehens von Ferdinand Feilner alias Elias Schattenfeld finden. Allerdings gibt es ein [Bild von Ferdinand](http:\/\/localhost:8000\/library\/image\/ac989307-475d-4a69-9aae-860661e0ec2e\/download), das ihn in der Umgebung des Hafens zeigt, wo er aufgewachsen ist. Wenn du weitere Details oder eine andere Frage zu Ferdinand hast, lass es mich bitte wissen!"
+            },
+            "context": {
+                "documents": [],
+                "images": []
+            }
+        },
+        {
+            "id": "8037c581-f1ef-4b4f-bfe4-08cb9b5b79cd",
+            "message": {
+                "role": "user",
+                "content": "Kannst du noch einmal nach Information zu Ferdinands Aussehen suchen? "
+            },
+            "context": {
+                "documents": [],
+                "images": []
+            }
+        },
+        {
+            "id": "b35b6050-9eb5-4a27-9c5a-8188d101cbb4",
+            "message": {
+                "role": "assistant",
+                "content": "Ferdinand Feilner, der auch unter seinem Decknamen Elias Schattenfeld bekannt ist, wird wie folgt beschrieben:\n\n- **Rasse:** Mensch\n- **Größe:** Durchschnittlich für einen Menschen mit 174 cm\n- **Gewicht:** 70 kg\n- **Augenfarbe:** Grün\n- **Hautfarbe:** Weiß\n- **Haarfarbe:** Schwarz\n\nFerdinand hat einen schlanken Körperbau, der sehr agil wirkt. Seine Muskeln sind wenig ausgeprägt, was ihn eher wie einen einfachen Händler als einen Kämpfer erscheinen lässt. Sein schmaler, ernster Gesichtsausdruck trägt die Spuren seiner Vergangenheit. Die Haut ist durch die Nähe zur salzigen See eher fest. Sein Gesicht und seine Hände sind von kleinen Narben geprägt.\n\nSeine Haare sind schwarz, leicht lockig und gepflegt geschnitten, sodass sie eine ordentliche Frisur darstellen. Er trägt einen gepflegten, unauffälligen 3-Tage-Bart. Ferdinands Körperhaltung ist stets aufrecht und selbstbewusst. In seinem Handeln ist er flexibel und jederzeit bereit, Gefahren auszuweichen.\n\nSeine grünen Augen strahlen meist einen freundlichen Glanz aus, und sein Blick ist analytisch, stets darauf bedacht, mehr über seine Umgebung und Gesprächspartner zu erfahren.\n\nHast du Fragen zu seiner Rolle in der Gruppe oder möchtest du mehr über seine Fähigkeiten erfahren?"
+            },
+            "context": {
+                "documents": [],
+                "images": []
+            }
+        },
+        {
+            "id": "bd8f2634-82a1-412c-b82d-58511f2c7d89",
+            "message": {
+                "role": "user",
+                "content": "ZEig mir auch Bilder von Elias"
+            },
+            "context": {
+                "documents": [],
+                "images": []
+            }
+        },
+        {
+            "id": "74bb6aed-491e-4653-b4cc-90e429ebfb22",
+            "message": {
+                "role": "assistant",
+                "content": "Hier ist ein Bild von Elias Schattenfeld:\n\n![Elias Portrait](http:\/\/localhost:8000\/library\/image\/bbadee82-238b-4eca-ab8f-a351b484a27f\/download)\n\nDas Porträt zeigt Elias mit einem ernsten, nachdenklichen Gesichtsausdruck. Mit vollem, welligem, nach hinten gekämmtem dunklem Haar und einem dichten, gepflegten Bart erscheint er markant. Seine ausdrucksstarken Augen und die markanten Gesichtszüge zeichnen ihn als einen analytischen und aufmerksamen Beobachter aus.\n\nWenn du mehr Fragen zu Elias oder seinen Abenteuern hast, lass es mich gerne wissen!"
+            },
+            "context": {
+                "documents": [],
+                "images": []
+            }
+        },
+        {
+            "id": "8c04b3d5-fd93-4a58-80f2-26fed73b6880",
+            "message": {
+                "role": "user",
+                "content": "Schau bitte noch einmal in die Bibliothek nach Bildern und Dokumenten um mir mein Aussehe im Detail zu zeigen"
+            },
+            "context": {
+                "documents": [],
+                "images": []
+            }
+        },
+        {
+            "id": "4f9236dd-9a4c-4850-b799-b7a712c42820",
+            "message": {
+                "role": "assistant",
+                "content": "Hier ist das detaillierte Aussehen von Ferdinand Feilner, auch bekannt als Elias Schattenfeld:\n\n- **Rasse:** Mensch\n- **Größe:** 174 cm (durchschnittliche menschliche Größe)\n- **Gewicht:** 70 kg (schlank und agil)\n- **Augenfarbe:** Grün\n- **Hautfarbe:** Weiß\n- **Haarfarbe:** Schwarz\n\nElias' Körperbau ist schlank, er ist agil, aber seine Muskeln sind wenig ausgeprägt, sodass er eher wie ein Händler denn wie ein Kämpfer wirkt. Sein Gesicht ist schmal und ernst, von der Vergangenheit geprägt. Die Haut ist von der Nähe zum Meer fest, und er hat kleine Narben im Gesicht und auf den Händen. Seine schwarzen Haare sind gepflegt und leicht lockig, seine Frisur wirkt ordentlich. Sein Gesicht ziert ein unauffälliger 3-Tage-Bart.\n\nSeine Haltung ist stets aufrecht und selbstbewusst, was ihn bereit erscheinen lässt, jederzeit Gefahren auszuweichen. In seinen freundlichen, analytischen Augen steckt ein aufmerksamer Blick, der im Gespräch immer die Umgebung und seine Gesprächspartner genau erfasst.\n\n![Elias Portrait](http:\/\/localhost:8000\/library\/image\/bbadee82-238b-4eca-ab8f-a351b484a27f\/download)\n\nWenn du noch mehr über Elias und seine Abenteuer erfahren möchtest, lass es mich gerne wissen!"
+            },
+            "context": {
+                "documents": [
+                    {
+                        "id": "5138aaf9-a6a2-47c3-9518-651740367564",
+                        "type": "document",
+                        "title": "Aussehen von Ferdinand Feilner alias Elias Schattenfeld"
+                    },
+                    {
+                        "id": "fc9aa6e7-2118-45a2-81b3-2f889ed2e8a4",
+                        "type": "document",
+                        "title": "2024-09-21 Charakterbogen"
+                    },
+                    {
+                        "id": "fc9aa6e7-2118-45a2-81b3-2f889ed2e8a4",
+                        "type": "document",
+                        "title": "2024-09-21 Charakterbogen"
+                    },
+                    {
+                        "id": "d162fc04-e5cb-42ad-93f9-f8678f5fd865",
+                        "type": "document",
+                        "title": "Einführung Elias in die Gruppe.docx"
+                    },
+                    {
+                        "id": "d162fc04-e5cb-42ad-93f9-f8678f5fd865",
+                        "type": "document",
+                        "title": "Einführung Elias in die Gruppe.docx"
+                    },
+                    {
+                        "id": "e7e46f7e-7b66-4b8b-9376-5ef4354b98e9",
+                        "type": "document",
+                        "title": "Tag 02 - 20. Arthan 1262"
+                    },
+                    {
+                        "id": "e7e46f7e-7b66-4b8b-9376-5ef4354b98e9",
+                        "type": "document",
+                        "title": "Tag 02 - 20. Arthan 1262"
+                    },
+                    {
+                        "id": "6a0716c0-4d37-43d0-8a91-d56ed7355b01",
+                        "type": "document",
+                        "title": "Allgemeines Wissen"
+                    },
+                    {
+                        "id": "c3ab0831-839c-44cd-a202-bc9b756568f5",
+                        "type": "document",
+                        "title": "2024-09-24 Liste der Ausrüstung"
+                    },
+                    {
+                        "id": "0f79fabc-f920-4d9c-a075-833e7eaee4b7",
+                        "type": "document",
+                        "title": "Allgemeines Wissen"
+                    },
+                    {
+                        "id": "5138aaf9-a6a2-47c3-9518-651740367564",
+                        "type": "document",
+                        "title": "Aussehen von Ferdinand Feilner alias Elias Schattenfeld"
+                    },
+                    {
+                        "id": "dfe245d6-5892-4069-b8e8-942f5aa0d352",
+                        "type": "document",
+                        "title": "2024-09-21 Aktuelles Wissen - Was geht grad vor.docx"
+                    },
+                    {
+                        "id": "dd069a2c-8a3b-4cc6-b259-a67496e2d802",
+                        "type": "document",
+                        "title": "Institutionen"
+                    },
+                    {
+                        "id": "59eed8d1-8e65-456d-9efb-d5bc4d7fc187",
+                        "type": "document",
+                        "title": "Lorenz (Halbling) - Der treueste aller Freunde - Geschichte"
+                    },
+                    {
+                        "id": "a5b09c70-c288-4561-ad29-6e065024aa43",
+                        "type": "document",
+                        "title": "Ral (Mensch) – Der Geschichtenerzähler - Verstorben - Geschichte"
+                    }
+                ],
+                "images": [
+                    {
+                        "id": "bbadee82-238b-4eca-ab8f-a351b484a27f",
+                        "type": "image",
+                        "title": "Elias Portrait.png"
+                    },
+                    {
+                        "id": "6e51d379-b50d-45c9-840f-0233ae848d96",
+                        "type": "image",
+                        "title": "Joest.png"
+                    }
+                ]
+            }
+        }
+    ]
+}

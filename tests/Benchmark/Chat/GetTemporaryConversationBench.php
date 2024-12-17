@@ -47,4 +47,14 @@ class GetTemporaryConversationBench
             JsonEncoder::FORMAT,
         );
     }
+
+    /** @BeforeMethods("setUp") */
+    public function benchLoadSlimmed(): void
+    {
+        $this->serializer->deserialize(
+            file_get_contents(__DIR__ . '/Stub/slimmed_conversation_temporary.json'),
+            Conversation::class,
+            JsonEncoder::FORMAT,
+        );
+    }
 }
