@@ -37,19 +37,18 @@ class FindConversationsByDirectoryQuery implements Query
     {
         assert($parameters instanceof FindConversationsByDirectoryParameters);
 
+        $index = $this->fileAccess->readIndex('library.conversations');
         $conversations = [];
-        foreach ($this->finder->findFilesInDirectory($this->pathRegistry->get('library.conversations')) as $file) {
-            try {
-                $conversations[] = $this->deserialize($file->getFilename());
-            } catch (RuntimeException $e) {
-                $this->logger->error($e, ['file' => $file]);
+
+        foreach ($index as $file => $metadata) {
+            if ($metadata['directory_id'] === $parameters->directory->id) {
+                try {
+                    $conversations[] = $this->deserialize($file);
+                } catch (RuntimeException $e) {
+                    $this->logger->error($e, ['file' => $file]);
+                }
             }
         }
-
-        $conversations = array_filter(
-            $conversations,
-            static fn (Conversation $conversation) => $conversation->directory->id === $parameters->directory->id,
-        );
 
         usort(
             $conversations,

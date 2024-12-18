@@ -36,27 +36,18 @@ class FindDocumentsByDirectoryQuery implements Query
     {
         assert($parameters instanceof FindDocumentsByDirectory);
 
-        $files = $this->finder->findFilesInDirectory($this->pathRegistry->get('library.documents'));
-
+        $index = $this->fileAccess->readIndex('library.documents');
         $documents = [];
-        foreach ($files as $file) {
-            try {
-                $filename = $file->getFilename();
-                assert($filename !== '');
 
-                $content = $this->fileAccess->read('library.documents', $filename);
-                assert($content !== '');
-
-                $documents[] = $this->serializer->deserialize($content, Document::class, 'json');
-            } catch (RuntimeException $e) {
-                $this->logger->error($e, ['file' => $file]);
+        foreach ($index as $file => $metadata) {
+            if ($metadata['directory_id'] === $parameters->id) {
+                try {
+                    $documents[] = $this->deserialize($file);
+                } catch (RuntimeException $e) {
+                    $this->logger->error($e, ['file' => $file]);
+                }
             }
         }
-
-        $documents = array_values(array_filter(
-            $documents,
-            static fn (Document $document) => $document->directory->id === $parameters->id,
-        ));
 
         usort(
             $documents,
@@ -64,5 +55,16 @@ class FindDocumentsByDirectoryQuery implements Query
         );
 
         return $documents;
+    }
+
+    private function deserialize(string $file): Document
+    {
+        assert(!empty($file), 'The given file must not be empty.');
+
+        return $this->serializer->deserialize(
+            $this->fileAccess->read('library.documents', $file),
+            Document::class,
+            'json',
+        );
     }
 }

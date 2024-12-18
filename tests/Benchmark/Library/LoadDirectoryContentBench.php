@@ -52,4 +52,17 @@ class LoadDirectoryContentBench
         $this->queryService->query(new FindConversationsByDirectoryParameters($directory));
         $this->directoryRepository->findByParent($directory);
     }
+
+    /** @BeforeMethods("setUp") */
+    public function benchLoadDirectoryContentWithIndexing(): void
+    {
+        // We will check the root directory as for every directory the content is fully loaded
+        $directory = RootDirectory::get();
+
+        // See src/Library/Presentation/Controller/Library.php for all queries that are executed
+        $this->queryService->query(new FindDocumentsByDirectory($directory->id));
+        $this->imageRepository->findByDirectory($directory);
+        $this->queryService->query(new FindConversationsByDirectoryParameters($directory));
+        $this->directoryRepository->findByParent($directory);
+    }
 }

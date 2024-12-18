@@ -15,6 +15,8 @@ use const DIRECTORY_SEPARATOR;
 
 class FileAccess implements FileAccessContract
 {
+    private array $cache = [];
+
     public function __construct(
         private readonly PathRegistry $pathRegistry,
         private readonly Filesystem $filesystem,
@@ -25,12 +27,18 @@ class FileAccess implements FileAccessContract
     {
         $path = $this->buildPath($type, $filename);
 
+        if (isset($this->cache[$path])) {
+            return $this->cache[$path];
+        }
+
         if (! $this->filesystem->exists($path)) {
             throw new UnableToReadFile($path);
         }
 
         try {
-            return $this->filesystem->readFile($path);
+            $content = $this->filesystem->readFile($path);
+            $this->cache[$path] = $content;
+            return $content;
         } catch (IOException) {
             throw new UnableToReadFile($path);
         }
@@ -49,6 +57,7 @@ class FileAccess implements FileAccessContract
 
         try {
             $this->filesystem->dumpFile($path, $content);
+            $this->cache[$path] = $content;
         } catch (IOException) {
             throw new UnableToWriteFile($path);
         }
@@ -65,8 +74,37 @@ class FileAccess implements FileAccessContract
 
         try {
             $this->filesystem->remove($path);
+            unset($this->cache[$path]);
         } catch (IOException) {
             throw new UnableToDeleteFile($path);
+        }
+    }
+
+    public function readIndex(string $type): array
+    {
+        $indexPath = $this->buildPath($type, 'index.json');
+
+        if (! $this->filesystem->exists($indexPath)) {
+            return [];
+        }
+
+        try {
+            $content = $this->filesystem->readFile($indexPath);
+            return json_decode($content, true);
+        } catch (IOException) {
+            throw new UnableToReadFile($indexPath);
+        }
+    }
+
+    public function writeIndex(string $type, array $index): void
+    {
+        $indexPath = $this->buildPath($type, 'index.json');
+
+        try {
+            $content = json_encode($index);
+            $this->filesystem->dumpFile($indexPath, $content);
+        } catch (IOException) {
+            throw new UnableToWriteFile($indexPath);
         }
     }
 
