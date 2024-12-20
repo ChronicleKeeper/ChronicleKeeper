@@ -27,7 +27,7 @@ class StoreGeneratorRequestHandler
 
     public function __invoke(StoreGeneratorRequest $request): void
     {
-        if ($request->request->prompt === null) {
+        if (! $request->request->prompt instanceof OptimizedPrompt) {
             $optimizedPrompt          = $this->promptOptimizer->optimize($request->request->userInput->prompt);
             $request->request->prompt = new OptimizedPrompt($optimizedPrompt);
         }

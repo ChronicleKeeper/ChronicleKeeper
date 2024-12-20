@@ -24,7 +24,7 @@ class Uploader
 
     public function upload(UploadedFile $file, Directory|null $targetDirectory = null): Image
     {
-        if ($targetDirectory === null) {
+        if (! $targetDirectory instanceof Directory) {
             $targetDirectory = RootDirectory::get();
         }
 
