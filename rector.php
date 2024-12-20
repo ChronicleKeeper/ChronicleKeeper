@@ -23,6 +23,7 @@ return RectorConfig::configure()
         PHPUnitSetList::PHPUNIT_CODE_QUALITY,
         SymfonySetList::SYMFONY_CODE_QUALITY,
         ValueObjectSetList::EARLY_RETURN,
+        ValueObjectSetList::INSTANCEOF,
     ])
     ->withRules([
         PreferPHPUnitSelfCallRector::class,

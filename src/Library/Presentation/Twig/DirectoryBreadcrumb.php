@@ -33,7 +33,7 @@ class DirectoryBreadcrumb
                 ['directory' => $workOnBreadCrumb->id],
             );
 
-            if ($workOnBreadCrumb->parent === null) {
+            if (! $workOnBreadCrumb->parent instanceof Directory) {
                 // Break the loop as soon as the root directory is reached
                 break;
             }
