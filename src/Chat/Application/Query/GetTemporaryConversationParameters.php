@@ -8,10 +8,6 @@ use ChronicleKeeper\Shared\Application\Query\QueryParameters;
 
 class GetTemporaryConversationParameters implements QueryParameters
 {
-    public function __construct()
-    {
-    }
-
     public function getQueryClass(): string
     {
         return GetTemporaryConversationQuery::class;

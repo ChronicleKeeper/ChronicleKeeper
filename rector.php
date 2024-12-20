@@ -24,6 +24,7 @@ return RectorConfig::configure()
         SymfonySetList::SYMFONY_CODE_QUALITY,
         ValueObjectSetList::EARLY_RETURN,
         ValueObjectSetList::INSTANCEOF,
+        ValueObjectSetList::DEAD_CODE,
     ])
     ->withRules([
         PreferPHPUnitSelfCallRector::class,

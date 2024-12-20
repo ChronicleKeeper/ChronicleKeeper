@@ -6,7 +6,4 @@ namespace ChronicleKeeper\Chat\Application\Command;
 
 class ResetTemporaryConversation
 {
-    public function __construct()
-    {
-    }
 }
