@@ -7,6 +7,7 @@ use Rector\Php82\Rector\Class_\ReadOnlyClassRector;
 use Rector\PHPUnit\CodeQuality\Rector\Class_\PreferPHPUnitSelfCallRector;
 use Rector\PHPUnit\CodeQuality\Rector\Class_\PreferPHPUnitThisCallRector;
 use Rector\PHPUnit\Set\PHPUnitSetList;
+use Rector\Symfony\Set\SymfonySetList;
 
 return RectorConfig::configure()
     ->withPaths([
@@ -19,6 +20,7 @@ return RectorConfig::configure()
         PHPUnitSetList::PHPUNIT_110,
         PHPUnitSetList::ANNOTATIONS_TO_ATTRIBUTES,
         PHPUnitSetList::PHPUNIT_CODE_QUALITY,
+        SymfonySetList::SYMFONY_CODE_QUALITY,
     ])
     ->withRules([
         PreferPHPUnitSelfCallRector::class,

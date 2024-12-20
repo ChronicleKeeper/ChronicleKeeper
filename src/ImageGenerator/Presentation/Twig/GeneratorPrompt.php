@@ -10,7 +10,6 @@ use ChronicleKeeper\ImageGenerator\Presentation\Form\GeneratorRequestType;
 use ChronicleKeeper\Shared\Presentation\FlashMessages\HandleFlashMessages;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
@@ -42,13 +41,12 @@ class GeneratorPrompt extends AbstractController
     }
 
     #[LiveAction]
-    public function store(Request $request): Response
+    public function store(): Response
     {
         $this->submitForm();
         $generatorRequest = $this->getForm()->getData();
         $this->resetForm();
         assert($generatorRequest instanceof GeneratorRequest);
-
         $this->bus->dispatch(new StoreGeneratorRequest($generatorRequest));
 
         return $this->redirectToRoute('image_generator_generator', ['generatorRequest' => $generatorRequest->id]);

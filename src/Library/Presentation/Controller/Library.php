@@ -13,7 +13,6 @@ use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemImageRepository;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
 use ChronicleKeeper\Shared\Domain\Sluggable;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Requirement\Requirement;
@@ -39,7 +38,7 @@ class Library extends AbstractController
     ) {
     }
 
-    public function __invoke(Request $request, Directory $directory): Response
+    public function __invoke(Directory $directory): Response
     {
         $directoryContent = array_merge(
             $this->queryService->query(new FindDocumentsByDirectory($directory->id)),

@@ -11,6 +11,7 @@ use PHPUnit\Framework\Attributes\Large;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\Service\ResetInterface;
 
 use function assert;
@@ -46,7 +47,7 @@ class DeleteTest extends WebTestCase
     public function thatRequestingPageWithoutConfirmFails(): void
     {
         $this->client->request(
-            'GET',
+            Request::METHOD_GET,
             '/image_generator/778e656f-2012-4e98-80fe-558539e57e98/delete',
         );
 
@@ -57,7 +58,7 @@ class DeleteTest extends WebTestCase
     public function thatRequestingPageWithNonExistentDataIsSuccess(): void
     {
         $this->client->request(
-            'GET',
+            Request::METHOD_GET,
             '/image_generator/778e656f-2012-4e98-80fe-558539e57e98/delete?confirm=1',
         );
 
@@ -74,7 +75,7 @@ class DeleteTest extends WebTestCase
         );
 
         $this->client->request(
-            'GET',
+            Request::METHOD_GET,
             '/image_generator/c6f5d897-175c-4938-abe1-613fb51fdd68/delete?confirm=1',
         );
 
