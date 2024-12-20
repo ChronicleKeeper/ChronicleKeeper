@@ -27,7 +27,11 @@ class SettingsToolBox implements ToolBoxInterface
         // Check Settings for custom tool names and descriptions and overhault the metadata here :)
 
         foreach ($toolMap as $index => $tool) {
-            if (! array_key_exists($tool->name, $descriptions) || $descriptions[$tool->name] === '') {
+            if (! array_key_exists($tool->name, $descriptions)) {
+                continue;
+            }
+
+            if ($descriptions[$tool->name] === '') {
                 continue;
             }
 
