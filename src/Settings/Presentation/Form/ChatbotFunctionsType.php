@@ -117,7 +117,11 @@ final class ChatbotFunctionsType extends AbstractType implements DataMapperInter
 
                 $formDataWithoutWhitespaces        = preg_replace("/\r|\n/", '', (string) $formData);
                 $toolDescriptionWithoutWhitespaces = preg_replace("/\r|\n/", '', $tool->description);
-                if ($formData === '' || $formDataWithoutWhitespaces === $toolDescriptionWithoutWhitespaces) {
+                if ($formData === '') {
+                    continue;
+                }
+
+                if ($formDataWithoutWhitespaces === $toolDescriptionWithoutWhitespaces) {
                     continue;
                 }
 

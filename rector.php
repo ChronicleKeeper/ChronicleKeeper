@@ -7,6 +7,7 @@ use Rector\Php82\Rector\Class_\ReadOnlyClassRector;
 use Rector\PHPUnit\CodeQuality\Rector\Class_\PreferPHPUnitSelfCallRector;
 use Rector\PHPUnit\CodeQuality\Rector\Class_\PreferPHPUnitThisCallRector;
 use Rector\PHPUnit\Set\PHPUnitSetList;
+use Rector\Set\ValueObject\SetList as ValueObjectSetList;
 use Rector\Symfony\Set\SymfonySetList;
 
 return RectorConfig::configure()
@@ -21,6 +22,7 @@ return RectorConfig::configure()
         PHPUnitSetList::ANNOTATIONS_TO_ATTRIBUTES,
         PHPUnitSetList::PHPUNIT_CODE_QUALITY,
         SymfonySetList::SYMFONY_CODE_QUALITY,
+        ValueObjectSetList::EARLY_RETURN,
     ])
     ->withRules([
         PreferPHPUnitSelfCallRector::class,
