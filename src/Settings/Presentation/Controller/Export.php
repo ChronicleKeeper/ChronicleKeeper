@@ -8,7 +8,6 @@ use ChronicleKeeper\Settings\Application\Service\Exporter;
 use ChronicleKeeper\Shared\Presentation\FlashMessages\HandleFlashMessages;
 use RuntimeException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -26,11 +25,10 @@ class Export extends AbstractController
     ) {
     }
 
-    public function __invoke(Request $request): Response
+    public function __invoke(): Response
     {
         $zipFilePath = $this->exporter->export();
-
-        $zipFile = file_get_contents($zipFilePath);
+        $zipFile     = file_get_contents($zipFilePath);
         if ($zipFile === false) {
             throw new RuntimeException('Error during ZIP Archive creation.');
         }
@@ -39,7 +37,6 @@ class Export extends AbstractController
         $response->headers->set('Content-Type', 'application/zip');
         $response->headers->set('Content-Disposition', 'attachment;filename="' . $zipFilePath . '"');
         $response->headers->set('Content-length', (string) filesize($zipFilePath));
-
         @unlink($zipFilePath);
 
         return $response;

@@ -7,7 +7,6 @@ namespace ChronicleKeeper\ImageGenerator\Presentation\Controller;
 use ChronicleKeeper\ImageGenerator\Application\Query\FindAllGeneratorRequests;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -19,7 +18,7 @@ final class Overview extends AbstractController
     ) {
     }
 
-    public function __invoke(Request $request): Response
+    public function __invoke(): Response
     {
         return $this->render(
             'image_generator/overview.html.twig',
