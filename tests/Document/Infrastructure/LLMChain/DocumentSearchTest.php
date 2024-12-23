@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Test\Document\Infrastructure\LLMChain;
 
+use ChronicleKeeper\Chat\Domain\ValueObject\FunctionDebug;
 use ChronicleKeeper\Chat\Infrastructure\LLMChain\RuntimeCollector;
 use ChronicleKeeper\Document\Application\Query\SearchSimilarVectors;
 use ChronicleKeeper\Document\Infrastructure\LLMChain\DocumentSearch;
@@ -12,7 +13,6 @@ use ChronicleKeeper\Settings\Domain\ValueObject\Settings\ChatbotGeneral;
 use ChronicleKeeper\Settings\Domain\ValueObject\Settings\ChatbotTuning;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
 use ChronicleKeeper\Shared\Infrastructure\LLMChain\EmbeddingCalculator;
-use ChronicleKeeper\Shared\Infrastructure\LLMChain\ToolUsageCollector;
 use ChronicleKeeper\Test\Document\Domain\Entity\VectorDocumentBuilder;
 use ChronicleKeeper\Test\Settings\Domain\ValueObject\SettingsBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -41,11 +41,6 @@ class DocumentSearchTest extends TestCase
             ->with('I am searching for documents')
             ->willReturn([0.1, 0.2, 0.3]);
 
-        $toolUsageCollector = $this->createMock(ToolUsageCollector::class);
-        $toolUsageCollector->expects($this->once())
-            ->method('called')
-            ->with('library_documents');
-
         $foundDocuments = [
             ['vector' => (new VectorDocumentBuilder())->build(), 'distance' => 0.1],
             ['vector' => (new VectorDocumentBuilder())->build(), 'distance' => 0.2],
@@ -66,11 +61,13 @@ class DocumentSearchTest extends TestCase
 
         $runtimeCollector = $this->createMock(RuntimeCollector::class);
         $runtimeCollector->expects($this->exactly(2))->method('addReference');
+        $runtimeCollector->expects($this->once())
+            ->method('addFunctionDebug')
+            ->with(self::isInstanceOf(FunctionDebug::class));
 
         $documentSearch = new DocumentSearch(
             $embeddingCalculatoir,
             $settingsHanlder,
-            $toolUsageCollector,
             $queryService,
             $runtimeCollector,
         );
@@ -107,11 +104,6 @@ class DocumentSearchTest extends TestCase
             ->with('I am searching for documents')
             ->willReturn([0.1, 0.2, 0.3]);
 
-        $toolUsageCollector = $this->createMock(ToolUsageCollector::class);
-        $toolUsageCollector->expects($this->once())
-            ->method('called')
-            ->with('library_documents');
-
         $queryService = $this->createMock(QueryService::class);
         $queryService->expects($this->once())
             ->method('query')
@@ -124,7 +116,6 @@ class DocumentSearchTest extends TestCase
         $documentSearch = new DocumentSearch(
             $embeddingCalculatoir,
             $settingsHanlder,
-            $toolUsageCollector,
             $queryService,
             $runtimeCollector,
         );
@@ -151,11 +142,6 @@ class DocumentSearchTest extends TestCase
             ->with('I am searching for documents')
             ->willReturn([0.1, 0.2, 0.3]);
 
-        $toolUsageCollector = $this->createMock(ToolUsageCollector::class);
-        $toolUsageCollector->expects($this->once())
-            ->method('called')
-            ->with('library_documents');
-
         $foundDocuments = [['vector' => (new VectorDocumentBuilder())->build(), 'distance' => 0.1]];
 
         $queryService = $this->createMock(QueryService::class);
@@ -173,11 +159,13 @@ class DocumentSearchTest extends TestCase
 
         $runtimeCollector = $this->createMock(RuntimeCollector::class);
         $runtimeCollector->expects($this->once())->method('addReference');
+        $runtimeCollector->expects($this->once())
+            ->method('addFunctionDebug')
+            ->with(self::isInstanceOf(FunctionDebug::class));
 
         $documentSearch = new DocumentSearch(
             $embeddingCalculatoir,
             $settingsHanlder,
-            $toolUsageCollector,
             $queryService,
             $runtimeCollector,
         );

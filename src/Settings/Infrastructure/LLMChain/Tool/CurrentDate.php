@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Settings\Infrastructure\LLMChain\Tool;
 
+use ChronicleKeeper\Chat\Domain\ValueObject\FunctionDebug;
+use ChronicleKeeper\Chat\Infrastructure\LLMChain\RuntimeCollector;
 use ChronicleKeeper\Settings\Application\SettingsHandler;
-use ChronicleKeeper\Shared\Infrastructure\LLMChain\ToolUsageCollector;
 use PhpLlm\LlmChain\Chain\ToolBox\Attribute\AsTool;
 
 #[AsTool(
@@ -31,14 +32,15 @@ final readonly class CurrentDate
 {
     public function __construct(
         private SettingsHandler $settingsHandler,
-        private ToolUsageCollector $collector,
+        private RuntimeCollector $collector,
     ) {
     }
 
     public function __invoke(): string
     {
-        $this->collector->called('current_date');
+        $result = 'Heute ist der ' . $this->settingsHandler->get()->getCalendar()->getCurrentDate();
+        $this->collector->addFunctionDebug(new FunctionDebug(tool: 'current_date', result: $result));
 
-        return 'Heute ist der ' . $this->settingsHandler->get()->getCalendar()->getCurrentDate();
+        return $result;
     }
 }

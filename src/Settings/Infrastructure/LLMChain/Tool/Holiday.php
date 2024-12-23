@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Settings\Infrastructure\LLMChain\Tool;
 
+use ChronicleKeeper\Chat\Domain\ValueObject\FunctionDebug;
+use ChronicleKeeper\Chat\Infrastructure\LLMChain\RuntimeCollector;
 use ChronicleKeeper\Settings\Application\SettingsHandler;
-use ChronicleKeeper\Shared\Infrastructure\LLMChain\ToolUsageCollector;
 use PhpLlm\LlmChain\Chain\ToolBox\Attribute\AsTool;
 
 #[AsTool(
@@ -24,19 +25,21 @@ final readonly class Holiday
 {
     public function __construct(
         private SettingsHandler $settingsHandler,
-        private ToolUsageCollector $collector,
+        private RuntimeCollector $collector,
     ) {
     }
 
     public function __invoke(): string
     {
-        $this->collector->called('calendar_holiday');
-
         $explanation = $this->settingsHandler->get()->getHoliday()->getDescription();
 
         if ($explanation === '') {
-            return 'Es gibt keine Informationen zum Kalender.';
+            $this->collector->addFunctionDebug(new FunctionDebug(tool: 'calendar_holiday'));
+
+            return 'Es gibt keine Informationen zu Feiertagen.';
         }
+
+        $this->collector->addFunctionDebug(new FunctionDebug(tool: 'calendar_holiday', result: $explanation));
 
         return $explanation;
     }

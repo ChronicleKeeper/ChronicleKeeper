@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Test\Chat\Infrastructure\LLMChain;
 
+use ChronicleKeeper\Chat\Domain\ValueObject\FunctionDebug;
 use ChronicleKeeper\Chat\Domain\ValueObject\Reference;
 use ChronicleKeeper\Chat\Infrastructure\LLMChain\RuntimeCollector;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -44,9 +45,34 @@ class RuntimeCollectorTest extends TestCase
     {
         $collector = new RuntimeCollector();
         $collector->addReference(new Reference('id1', 'foo', 'title'));
+        $collector->addFunctionDebug(new FunctionDebug('tool1', [], 'result1'));
 
         $collector->reset();
 
         self::assertEmpty((new ReflectionProperty($collector, 'references'))->getValue($collector));
+        self::assertEmpty((new ReflectionProperty($collector, 'functionDebug'))->getValue($collector));
+    }
+
+    #[Test]
+    public function aFunctionDebugCanBeAdded(): void
+    {
+        $collector = new RuntimeCollector();
+        $collector->addFunctionDebug(new FunctionDebug('tool', [], 'result'));
+
+        self::assertCount(1, (new ReflectionProperty($collector, 'functionDebug'))->getValue($collector));
+    }
+
+    #[Test]
+    public function itCanFetchFunctionDebugByTool(): void
+    {
+        $collector = new RuntimeCollector();
+        $collector->addFunctionDebug(new FunctionDebug('tool1', [], 'result1'));
+        $collector->addFunctionDebug(new FunctionDebug('tool2', [], 'result2'));
+        $collector->addFunctionDebug(new FunctionDebug('tool1', [], 'result3'));
+
+        $functionDebugs = $collector->flushFunctionDebugByTool('tool1');
+
+        self::assertCount(1, (new ReflectionProperty($collector, 'functionDebug'))->getValue($collector));
+        self::assertCount(2, $functionDebugs);
     }
 }

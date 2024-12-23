@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Document\Infrastructure\LLMChain;
 
+use ChronicleKeeper\Chat\Domain\ValueObject\FunctionDebug;
 use ChronicleKeeper\Chat\Domain\ValueObject\Reference;
 use ChronicleKeeper\Chat\Infrastructure\LLMChain\RuntimeCollector;
 use ChronicleKeeper\Document\Application\Query\SearchSimilarVectors;
@@ -11,7 +12,6 @@ use ChronicleKeeper\Document\Domain\Entity\VectorDocument;
 use ChronicleKeeper\Settings\Application\SettingsHandler;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
 use ChronicleKeeper\Shared\Infrastructure\LLMChain\EmbeddingCalculator;
-use ChronicleKeeper\Shared\Infrastructure\LLMChain\ToolUsageCollector;
 use PhpLlm\LlmChain\Chain\ToolBox\Attribute\AsTool;
 
 use function count;
@@ -33,7 +33,6 @@ class DocumentSearch
     public function __construct(
         private readonly EmbeddingCalculator $embeddingCalculator,
         private readonly SettingsHandler $settingsHandler,
-        private readonly ToolUsageCollector $collector,
         private readonly QueryService $queryService,
         private readonly RuntimeCollector $runtimeCollector,
     ) {
@@ -59,12 +58,12 @@ class DocumentSearch
         ));
 
         if (count($documents) === 0) {
-            $this->collector->called(
-                'library_documents',
-                [
-                    'arguments' => ['search' => $search, 'maxDistance' => $maxDistance, 'maxResults' => $maxResults],
-                    'responses' => [],
-                ],
+            $this->runtimeCollector->addFunctionDebug(
+                new FunctionDebug(
+                    'library_documents',
+                    ['search' => $search, 'maxDistance' => $maxDistance, 'maxResults' => $maxResults],
+                    [],
+                ),
             );
 
             return 'There are no matching documents.';
@@ -90,12 +89,12 @@ class DocumentSearch
             ];
         }
 
-        $this->collector->called(
-            'library_documents',
-            [
-                'arguments' => ['search' => $search, 'maxDistance' => $this->maxDistance, 'maxResults' => $maxResults],
-                'responses' => $debugResponse,
-            ],
+        $this->runtimeCollector->addFunctionDebug(
+            new FunctionDebug(
+                'library_documents',
+                ['search' => $search, 'maxDistance' => $maxDistance, 'maxResults' => $maxResults],
+                $debugResponse,
+            ),
         );
 
         return $result;

@@ -10,7 +10,7 @@ use ChronicleKeeper\Chat\Domain\ValueObject\MessageContext;
 use ChronicleKeeper\Chat\Domain\ValueObject\Reference;
 use ChronicleKeeper\Chat\Infrastructure\LLMChain\RuntimeCollector;
 use ChronicleKeeper\Document\Infrastructure\LLMChain\DocumentSearch;
-use ChronicleKeeper\Library\Infrastructure\LLMChain\Tool\LibraryImages;
+use ChronicleKeeper\Library\Infrastructure\LLMChain\Tool\ImageSearch;
 use ChronicleKeeper\Shared\Infrastructure\LLMChain\LLMChainFactory;
 use PhpLlm\LlmChain\Model\Message\Message;
 use PhpLlm\LlmChain\Model\Response\TextResponse;
@@ -22,7 +22,7 @@ class ChatMessageExecution
     public function __construct(
         private readonly LLMChainFactory $chain,
         private readonly DocumentSearch $libraryDocuments,
-        private readonly LibraryImages $libraryImages,
+        private readonly ImageSearch $libraryImages,
         private readonly RuntimeCollector $runtimeCollector,
     ) {
     }

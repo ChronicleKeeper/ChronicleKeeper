@@ -7,7 +7,7 @@ namespace ChronicleKeeper\Test\Chat\Application\Service;
 use ChronicleKeeper\Chat\Application\Service\ChatMessageExecution;
 use ChronicleKeeper\Chat\Infrastructure\LLMChain\RuntimeCollector;
 use ChronicleKeeper\Document\Infrastructure\LLMChain\DocumentSearch;
-use ChronicleKeeper\Library\Infrastructure\LLMChain\Tool\LibraryImages;
+use ChronicleKeeper\Library\Infrastructure\LLMChain\Tool\ImageSearch;
 use ChronicleKeeper\Shared\Infrastructure\LLMChain\LLMChainFactory;
 use ChronicleKeeper\Test\Chat\Domain\Entity\ConversationBuilder;
 use PhpLlm\LlmChain\ChainInterface;
@@ -44,7 +44,7 @@ class ChatMessageExecutionTest extends TestCase
         $chainFactory->method('create')->willReturn($llmChain);
 
         $serarchDocuments = self::createStub(DocumentSearch::class);
-        $searchImages     = self::createStub(LibraryImages::class);
+        $searchImages     = self::createStub(ImageSearch::class);
 
         $runtimeCollector = self::createStub(RuntimeCollector::class);
 
