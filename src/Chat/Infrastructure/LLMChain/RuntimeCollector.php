@@ -6,12 +6,18 @@ namespace ChronicleKeeper\Chat\Infrastructure\LLMChain;
 
 use ChronicleKeeper\Chat\Domain\ValueObject\FunctionDebug;
 use ChronicleKeeper\Chat\Domain\ValueObject\Reference;
+use ChronicleKeeper\Settings\Application\SettingsHandler;
 
 use function array_filter;
 use function array_values;
 
 class RuntimeCollector
 {
+    public function __construct(
+        private readonly SettingsHandler $settingsHandler,
+    ) {
+    }
+
     /** @var list<Reference> */
     private array $references = [];
     /** @var list<FunctionDebug> */
@@ -24,6 +30,11 @@ class RuntimeCollector
 
     public function addFunctionDebug(FunctionDebug $functionDebug): void
     {
+        if (! $this->settingsHandler->get()->getChatbotFunctions()->isAllowDebugOutput()) {
+            // Only store the debug information when the debug is enabled for storage optimization
+            return;
+        }
+
         $this->functionDebug[] = $functionDebug;
     }
 

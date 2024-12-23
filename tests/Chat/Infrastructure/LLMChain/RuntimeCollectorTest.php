@@ -7,6 +7,9 @@ namespace ChronicleKeeper\Test\Chat\Infrastructure\LLMChain;
 use ChronicleKeeper\Chat\Domain\ValueObject\FunctionDebug;
 use ChronicleKeeper\Chat\Domain\ValueObject\Reference;
 use ChronicleKeeper\Chat\Infrastructure\LLMChain\RuntimeCollector;
+use ChronicleKeeper\Settings\Application\SettingsHandler;
+use ChronicleKeeper\Settings\Domain\ValueObject\Settings\ChatbotFunctions;
+use ChronicleKeeper\Test\Settings\Domain\ValueObject\SettingsBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\Attributes\Test;
@@ -20,7 +23,7 @@ class RuntimeCollectorTest extends TestCase
     #[Test]
     public function aReferenceCanBeAdded(): void
     {
-        $collector = new RuntimeCollector();
+        $collector = new RuntimeCollector(self::createStub(SettingsHandler::class));
         $collector->addReference(new Reference('id', 'type', 'title'));
 
         self::assertCount(1, (new ReflectionProperty($collector, 'references'))->getValue($collector));
@@ -29,7 +32,7 @@ class RuntimeCollectorTest extends TestCase
     #[Test]
     public function isCanFetchReferencesByType(): void
     {
-        $collector = new RuntimeCollector();
+        $collector = new RuntimeCollector(self::createStub(SettingsHandler::class));
         $collector->addReference(new Reference('id1', 'foo', 'title'));
         $collector->addReference(new Reference('id2', 'bar', 'title'));
         $collector->addReference(new Reference('id3', 'type', 'title'));
@@ -43,7 +46,7 @@ class RuntimeCollectorTest extends TestCase
     #[Test]
     public function isCanReset(): void
     {
-        $collector = new RuntimeCollector();
+        $collector = $this->createRuntimeCollectorWithEnabledDebug();
         $collector->addReference(new Reference('id1', 'foo', 'title'));
         $collector->addFunctionDebug(new FunctionDebug('tool1', [], 'result1'));
 
@@ -56,7 +59,7 @@ class RuntimeCollectorTest extends TestCase
     #[Test]
     public function aFunctionDebugCanBeAdded(): void
     {
-        $collector = new RuntimeCollector();
+        $collector = $this->createRuntimeCollectorWithEnabledDebug();
         $collector->addFunctionDebug(new FunctionDebug('tool', [], 'result'));
 
         self::assertCount(1, (new ReflectionProperty($collector, 'functionDebug'))->getValue($collector));
@@ -65,7 +68,7 @@ class RuntimeCollectorTest extends TestCase
     #[Test]
     public function itCanFetchFunctionDebugByTool(): void
     {
-        $collector = new RuntimeCollector();
+        $collector = $this->createRuntimeCollectorWithEnabledDebug();
         $collector->addFunctionDebug(new FunctionDebug('tool1', [], 'result1'));
         $collector->addFunctionDebug(new FunctionDebug('tool2', [], 'result2'));
         $collector->addFunctionDebug(new FunctionDebug('tool1', [], 'result3'));
@@ -74,5 +77,27 @@ class RuntimeCollectorTest extends TestCase
 
         self::assertCount(1, (new ReflectionProperty($collector, 'functionDebug'))->getValue($collector));
         self::assertCount(2, $functionDebugs);
+    }
+
+    #[Test]
+    public function itDoesIgnoreDebugFunctionWhenDebugIsDisabled(): void
+    {
+        $collector = new RuntimeCollector(self::createStub(SettingsHandler::class));
+        $collector->addFunctionDebug(new FunctionDebug('tool', [], 'result'));
+
+        self::assertEmpty((new ReflectionProperty($collector, 'functionDebug'))->getValue($collector));
+    }
+
+    private function createRuntimeCollectorWithEnabledDebug(): RuntimeCollector
+    {
+        $settings = (new SettingsBuilder())
+            ->withChatbotFunctions(new ChatbotFunctions(allowDebugOutput: true))
+            ->build();
+
+        $settingsHandler = self::createStub(SettingsHandler::class);
+        $settingsHandler->method('get')
+            ->willReturn($settings);
+
+        return new RuntimeCollector($settingsHandler);
     }
 }
