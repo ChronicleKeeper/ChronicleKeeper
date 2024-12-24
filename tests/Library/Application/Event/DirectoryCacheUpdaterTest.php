@@ -5,10 +5,14 @@ declare(strict_types=1);
 namespace ChronicleKeeper\Test\Library\Application\Event;
 
 use ChronicleKeeper\Chat\Domain\Event\ConversationDeleted;
+use ChronicleKeeper\Document\Domain\Event\DocumentCreated;
 use ChronicleKeeper\Document\Domain\Event\DocumentDeleted;
+use ChronicleKeeper\Document\Domain\Event\DocumentMovedToDirectory;
 use ChronicleKeeper\Library\Application\Event\DirectoryCacheUpdater;
 use ChronicleKeeper\Library\Application\Service\CacheReader;
+use ChronicleKeeper\Library\Domain\Entity\Directory;
 use ChronicleKeeper\Library\Domain\Event\ImageDeleted;
+use ChronicleKeeper\Library\Domain\ValueObject\DirectoryCache\Directory as DirectoryCache;
 use ChronicleKeeper\Test\Chat\Domain\Entity\ConversationBuilder;
 use ChronicleKeeper\Test\Document\Domain\Entity\DocumentBuilder;
 use ChronicleKeeper\Test\Library\Domain\Entity\DirectoryBuilder;
@@ -50,6 +54,50 @@ class DirectoryCacheUpdaterTest extends TestCase
             ->with($directory);
 
         $this->directoryCacheUpdater->updateOnImageDeleted($event);
+    }
+
+    #[Test]
+    public function updateOnDocumentCreated(): void
+    {
+        $directory = (new DirectoryBuilder())->build();
+        $document  = (new DocumentBuilder())->withDirectory($directory)->build();
+
+        $event = new DocumentCreated($document);
+
+        $this->cacheReader->expects($this->once())
+            ->method('refresh')
+            ->with($directory);
+
+        $this->directoryCacheUpdater->updateOnDocumentCreated($event);
+    }
+
+    #[Test]
+    public function updateOnDocumentMovedToDirectory(): void
+    {
+        $directory    = (new DirectoryBuilder())->build();
+        $oldDirectory = (new DirectoryBuilder())->build();
+        $document     = (new DocumentBuilder())->withDirectory($directory)->build();
+
+        $event = new DocumentMovedToDirectory($document, $oldDirectory);
+
+        $invoker = $this->exactly(2);
+        $this->cacheReader->expects($invoker)
+            ->method('refresh')
+            ->willReturnCallback(
+                static function (Directory $argDirectory) use ($invoker, $directory, $oldDirectory): DirectoryCache {
+                    if ($invoker->numberOfInvocations() === 1) {
+                        self::assertSame($directory, $argDirectory);
+
+                        return DirectoryCache::fromEntity($directory);
+                    }
+
+                    self::assertSame($oldDirectory, $argDirectory);
+
+                    return DirectoryCache::fromEntity($directory);
+                },
+            );
+
+        $this->directoryCacheUpdater->updateOnDocumentMovedToDirectory($event);
     }
 
     #[Test]
