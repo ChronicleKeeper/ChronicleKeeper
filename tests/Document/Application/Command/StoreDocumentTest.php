@@ -7,6 +7,7 @@ namespace ChronicleKeeper\Test\Document\Application\Command;
 use ChronicleKeeper\Document\Application\Command\StoreDocument;
 use ChronicleKeeper\Document\Application\Command\StoreDocumentHandler;
 use ChronicleKeeper\Document\Domain\Entity\Document;
+use ChronicleKeeper\Document\Domain\Event\DocumentRenamed;
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
 use ChronicleKeeper\Test\Document\Domain\Entity\DocumentBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -47,5 +48,22 @@ class StoreDocumentTest extends TestCase
             );
 
         $handler(new StoreDocument($document));
+    }
+
+    #[Test]
+    public function eventsAreReturned(): void
+    {
+        $document = (new DocumentBuilder())->build();
+        $document->rename('new-name');
+
+        $handler = new StoreDocumentHandler(
+            self::createStub(FileAccess::class),
+            self::createStub(SerializerInterface::class),
+        );
+
+        $dispatchedEvents = $handler(new StoreDocument($document))->getEvents();
+
+        self::assertNotEmpty($dispatchedEvents);
+        self::assertInstanceOf(DocumentRenamed::class, $dispatchedEvents[0]);
     }
 }

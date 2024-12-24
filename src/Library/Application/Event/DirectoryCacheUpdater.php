@@ -8,6 +8,7 @@ use ChronicleKeeper\Chat\Domain\Event\ConversationDeleted;
 use ChronicleKeeper\Document\Domain\Event\DocumentCreated;
 use ChronicleKeeper\Document\Domain\Event\DocumentDeleted;
 use ChronicleKeeper\Document\Domain\Event\DocumentMovedToDirectory;
+use ChronicleKeeper\Document\Domain\Event\DocumentRenamed;
 use ChronicleKeeper\Library\Application\Service\CacheReader;
 use ChronicleKeeper\Library\Domain\Event\ImageDeleted;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
@@ -36,6 +37,12 @@ class DirectoryCacheUpdater
     {
         $this->cacheReader->refresh($event->document->getDirectory());
         $this->cacheReader->refresh($event->oldDirectory);
+    }
+
+    #[AsEventListener]
+    public function updateOnDocumentRenamed(DocumentRenamed $event): void
+    {
+        $this->cacheReader->refresh($event->document->getDirectory());
     }
 
     #[AsEventListener]

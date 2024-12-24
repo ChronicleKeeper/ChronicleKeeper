@@ -8,6 +8,7 @@ use ChronicleKeeper\Chat\Domain\Event\ConversationDeleted;
 use ChronicleKeeper\Document\Domain\Event\DocumentCreated;
 use ChronicleKeeper\Document\Domain\Event\DocumentDeleted;
 use ChronicleKeeper\Document\Domain\Event\DocumentMovedToDirectory;
+use ChronicleKeeper\Document\Domain\Event\DocumentRenamed;
 use ChronicleKeeper\Library\Application\Event\DirectoryCacheUpdater;
 use ChronicleKeeper\Library\Application\Service\CacheReader;
 use ChronicleKeeper\Library\Domain\Entity\Directory;
@@ -98,6 +99,21 @@ class DirectoryCacheUpdaterTest extends TestCase
             );
 
         $this->directoryCacheUpdater->updateOnDocumentMovedToDirectory($event);
+    }
+
+    #[Test]
+    public function updateOnDocumentRenamed(): void
+    {
+        $directory = (new DirectoryBuilder())->build();
+        $document  = (new DocumentBuilder())->withDirectory($directory)->build();
+
+        $event = new DocumentRenamed($document, 'new-name');
+
+        $this->cacheReader->expects($this->once())
+            ->method('refresh')
+            ->with($directory);
+
+        $this->directoryCacheUpdater->updateOnDocumentRenamed($event);
     }
 
     #[Test]
