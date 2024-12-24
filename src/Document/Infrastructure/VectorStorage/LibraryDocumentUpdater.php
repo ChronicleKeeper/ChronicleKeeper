@@ -40,7 +40,7 @@ class LibraryDocumentUpdater
 
     private function updateOrCreateVectorsForDocument(Document $document, int $contentLength): void
     {
-        $existingStorage = $this->queryService->query(new FindVectorsOfDocument($document->id));
+        $existingStorage = $this->queryService->query(new FindVectorsOfDocument($document->getId()));
 
         if ($existingStorage === []) {
             $this->createVectorDocument($document, $contentLength);
@@ -86,7 +86,7 @@ class LibraryDocumentUpdater
         int $contentLength,
     ): array {
         // Calculate Content Chunks
-        $contentChunks = $this->embeddingCalculator->createTextChunks($document->content, $contentLength);
+        $contentChunks = $this->embeddingCalculator->createTextChunks($document->getContent(), $contentLength);
         // Calculate vectors from the chunks
         $vectors = $this->embeddingCalculator->getMultipleEmbeddings($contentChunks);
 

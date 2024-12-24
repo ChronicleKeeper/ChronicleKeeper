@@ -161,7 +161,7 @@ class LibraryDocumentUpdaterTest extends TestCase
             ->willReturn([[10.12]]);
         $embeddingCalculator->expects($this->once())
             ->method('createTextChunks')
-            ->willReturn([$document->content]);
+            ->willReturn([$document->getContent()]);
 
         $bus = $this->createMock(MessageBusInterface::class);
         $bus->expects($this->exactly(2))

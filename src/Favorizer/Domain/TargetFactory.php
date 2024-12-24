@@ -48,7 +48,7 @@ class TargetFactory
 
     private function createFromDocument(Document $document): Target
     {
-        return new LibraryDocumentTarget($document->id, u($document->title)->truncate(20, '…')->toString());
+        return new LibraryDocumentTarget($document->getId(), u($document->getTitle())->truncate(20, '…')->toString());
     }
 
     private function createFromImage(Image $image): Target

@@ -45,7 +45,7 @@ class DocumentViewTest extends WebTestCase
         $this->fileAccess = $fileAccess;
         $this->fileAccess->write(
             'library.documents',
-            $this->fixtureDocument->id . '.json',
+            $this->fixtureDocument->getId() . '.json',
             json_encode($this->fixtureDocument, JSON_THROW_ON_ERROR),
         );
     }
@@ -74,7 +74,7 @@ class DocumentViewTest extends WebTestCase
     {
         $this->client->request(
             Request::METHOD_GET,
-            '/library/document/' . $this->fixtureDocument->id,
+            '/library/document/' . $this->fixtureDocument->getId(),
         );
 
         self::assertResponseIsSuccessful();

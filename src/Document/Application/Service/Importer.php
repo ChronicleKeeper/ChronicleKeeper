@@ -63,9 +63,7 @@ class Importer
             $convertedDocumentContent = $this->contentOptimizer->optimize($convertedDocumentContent);
         }
 
-        $document            = new Document($file->getClientOriginalName(), $convertedDocumentContent);
-        $document->directory = $directory;
-
+        $document = Document::create($file->getClientOriginalName(), $convertedDocumentContent, $directory);
         $this->bus->dispatch(new StoreDocument($document));
 
         return $document;

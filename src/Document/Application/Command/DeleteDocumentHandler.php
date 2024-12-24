@@ -25,11 +25,11 @@ class DeleteDocumentHandler
 
     public function __invoke(DeleteDocument $command): void
     {
-        foreach ($this->queryService->query(new FindVectorsOfDocument($command->document->id)) as $vectors) {
+        foreach ($this->queryService->query(new FindVectorsOfDocument($command->document->getId())) as $vectors) {
             $this->bus->dispatch(new DeleteDocumentVectors($vectors->id));
         }
 
-        $this->fileAccess->delete('library.documents', $command->document->id . '.json');
+        $this->fileAccess->delete('library.documents', $command->document->getId() . '.json');
 
         $this->eventDispatcher->dispatch(new DocumentDeleted($command->document));
     }

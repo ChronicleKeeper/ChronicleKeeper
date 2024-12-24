@@ -64,11 +64,12 @@ class DocumentBuilder
 
     public function build(): Document
     {
-        $document            = new Document($this->title, $this->content);
-        $document->id        = $this->id;
-        $document->directory = $this->directory;
-        $document->updatedAt = $this->updatedAt;
-
-        return $document;
+        return new Document(
+            $this->id,
+            $this->title,
+            $this->content,
+            $this->directory,
+            $this->updatedAt,
+        );
     }
 }

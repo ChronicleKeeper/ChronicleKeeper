@@ -60,7 +60,7 @@ class DocumentCreation extends AbstractController
                 'Das Dokument wurde erstellt, damit es in der Suche aktiv ist kannst du den Suchindex aktualisieren.',
             );
 
-            return $this->redirectToRoute('library', ['directory' => $document->directory->id]);
+            return $this->redirectToRoute('library', ['directory' => $document->getDirectory()->id]);
         }
 
         return $this->render(
@@ -105,7 +105,7 @@ class DocumentCreation extends AbstractController
             return null;
         }
 
-        return new Document(
+        return Document::create(
             $conversation->title,
             (string) $foundMessageByIdentifier->message->content,
         );

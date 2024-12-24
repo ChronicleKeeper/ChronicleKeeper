@@ -33,8 +33,8 @@ class ReferenceTest extends TestCase
         $reference = Reference::forDocument($document);
 
         self::assertSame('document', $reference->type);
-        self::assertSame($document->id, $reference->id);
-        self::assertSame($document->title, $reference->title);
+        self::assertSame($document->getId(), $reference->id);
+        self::assertSame($document->getTitle(), $reference->title);
     }
 
     #[Test]

@@ -26,7 +26,7 @@ class DirectoryCacheUpdater
     #[AsEventListener]
     public function updateOnDocumentDeleted(DocumentDeleted $event): void
     {
-        $this->cacheReader->refresh($event->document->directory);
+        $this->cacheReader->refresh($event->document->getDirectory());
     }
 
     #[AsEventListener]

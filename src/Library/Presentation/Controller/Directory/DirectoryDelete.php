@@ -96,7 +96,7 @@ class DirectoryDelete extends AbstractController
 
         foreach ($this->queryService->query(new FindDocumentsByDirectory($sourceDirectory->id)) as $document) {
             $document->directory = $targetDirectory;
-            $this->bus->dispatch(new StoreDocument($document, false));
+            $this->bus->dispatch(new StoreDocument($document));
         }
 
         foreach ($this->imageRepository->findByDirectory($sourceDirectory) as $image) {

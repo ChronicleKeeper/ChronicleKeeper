@@ -42,7 +42,7 @@ class ClearOnLinkedDataRemoval
     public function removeOnDocumentDeleted(DocumentDeleted $event): void
     {
         $targetBag = $this->queryService->query(new GetTargetBag());
-        $target    = new LibraryDocumentTarget($event->document->id, 'Irrelevant');
+        $target    = new LibraryDocumentTarget($event->document->getId(), 'Irrelevant');
 
         if (! $targetBag->exists($target)) {
             return;

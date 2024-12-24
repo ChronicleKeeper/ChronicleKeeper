@@ -55,12 +55,12 @@ class FindDocumentsByDirectoryQuery implements Query
 
         $documents = array_values(array_filter(
             $documents,
-            static fn (Document $document) => $document->directory->id === $parameters->id,
+            static fn (Document $document) => $document->getDirectory()->id === $parameters->id,
         ));
 
         usort(
             $documents,
-            static fn (Document $left, Document $right) => strcasecmp($left->title, $right->title),
+            static fn (Document $left, Document $right) => strcasecmp($left->getTitle(), $right->getTitle()),
         );
 
         return $documents;

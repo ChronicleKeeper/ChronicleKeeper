@@ -42,7 +42,7 @@ class DocumentDenormalizer implements DenormalizerInterface, DenormalizerAwareIn
         if (is_string($data)) {
             $document = $this->cachedEntries[$data] ?? $this->queryService->query(new GetDocument($data));
             assert($document instanceof Document);
-            $this->cachedEntries[$document->id] = $document;
+            $this->cachedEntries[$document->getId()] = $document;
 
             return $document;
         }
@@ -55,17 +55,22 @@ class DocumentDenormalizer implements DenormalizerInterface, DenormalizerAwareIn
             return $this->cachedEntries[$data['id']];
         }
 
-        $document            = new Document($data['title'], $data['content']);
-        $document->id        = $data['id'];
-        $document->directory = $this->denormalizer->denormalize(
+        $directory = $this->denormalizer->denormalize(
             $data['directory'],
             Directory::class,
             $format,
             $context,
         );
-        $document->updatedAt = new DateTimeImmutable($data['last_updated']);
 
-        $this->cachedEntries[$document->id] = $document;
+        $document = new Document(
+            $data['id'],
+            $data['title'],
+            $data['content'],
+            $directory,
+            new DateTimeImmutable($data['last_updated']),
+        );
+
+        $this->cachedEntries[$document->getId()] = $document;
 
         return $document;
     }

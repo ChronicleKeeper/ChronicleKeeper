@@ -50,7 +50,7 @@ class DeleteDocumentTest extends TestCase
         $fileAccess = $this->createMock(FileAccess::class);
         $fileAccess->expects($this->once())
             ->method('delete')
-            ->with('library.documents', $document->id . '.json');
+            ->with('library.documents', $document->getId() . '.json');
 
         $bus = $this->createMock(MessageBusInterface::class);
         $bus->expects($this->once())

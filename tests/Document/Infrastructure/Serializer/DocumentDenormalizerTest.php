@@ -67,8 +67,8 @@ class DocumentDenormalizerTest extends TestCase
         $denormalizer = new DocumentDenormalizer($queryService);
         $denormalizer->setDenormalizer($denormalizer);
 
-        $document       = $denormalizer->denormalize($document->id, Document::class);
-        $cachedDocument = $denormalizer->denormalize($document->id, Document::class);
+        $document       = $denormalizer->denormalize($document->getId(), Document::class);
+        $cachedDocument = $denormalizer->denormalize($document->getId(), Document::class);
 
         self::assertSame($document, $cachedDocument);
     }
@@ -127,11 +127,11 @@ class DocumentDenormalizerTest extends TestCase
 
         $document = $documentDenormalizer->denormalize($array, Document::class);
 
-        self::assertSame('b0b4a534-9c7b-47a0-9ef0-1f86377a6b69', $document->id);
-        self::assertSame('foo', $document->title);
-        self::assertSame('bar', $document->content);
-        self::assertSame($directory, $document->directory);
-        self::assertEquals(new DateTimeImmutable('2021-01-01 00:00:00'), $document->updatedAt);
+        self::assertSame('b0b4a534-9c7b-47a0-9ef0-1f86377a6b69', $document->getId());
+        self::assertSame('foo', $document->getTitle());
+        self::assertSame('bar', $document->getContent());
+        self::assertSame($directory, $document->getDirectory());
+        self::assertEquals(new DateTimeImmutable('2021-01-01 00:00:00'), $document->getUpdatedAt());
     }
 
     #[Test]

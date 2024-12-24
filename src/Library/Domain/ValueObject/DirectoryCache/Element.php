@@ -25,12 +25,12 @@ class Element
     public static function fromDocumentEntity(Document $document): Element
     {
         return new Element(
-            $document->id,
+            $document->getId(),
             'document',
-            $document->title,
+            $document->getTitle(),
             $document->getSlug(),
             $document->getSize(),
-            $document->updatedAt,
+            $document->getUpdatedAt(),
         );
     }
 

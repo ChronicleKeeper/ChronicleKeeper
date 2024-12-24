@@ -9,12 +9,10 @@ use ChronicleKeeper\Document\Application\Command\StoreDocumentHandler;
 use ChronicleKeeper\Document\Domain\Entity\Document;
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
 use ChronicleKeeper\Test\Document\Domain\Entity\DocumentBuilder;
-use DateTimeImmutable;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Clock\ClockInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
 #[CoversClass(StoreDocument::class)]
@@ -38,49 +36,16 @@ class StoreDocumentTest extends TestCase
         $handler        = new StoreDocumentHandler(
             $fileAccess = $this->createMock(FileAccess::class),
             $serializer = self::createStub(SerializerInterface::class),
-            $clock      = $this->createMock(ClockInterface::class),
         );
 
         $fileAccess->expects($this->once())
             ->method('write')
             ->with(
                 'library.documents',
-                $document->id . '.json',
+                $document->getId() . '.json',
                 $serializer->serialize($document, 'json'),
             );
-
-        $clock->expects($this->once())
-            ->method('now')
-            ->willReturn($targetDateTime = new DateTimeImmutable());
 
         $handler(new StoreDocument($document));
-
-        self::assertSame($targetDateTime, $document->updatedAt);
-    }
-
-    #[Test]
-    public function documentIsStoredWithoutUpdatedTimestamp(): void
-    {
-        $document       = (new DocumentBuilder())->build();
-        $handler        = new StoreDocumentHandler(
-            $fileAccess = $this->createMock(FileAccess::class),
-            $serializer = self::createStub(SerializerInterface::class),
-            $clock      = $this->createMock(ClockInterface::class),
-        );
-
-        $fileAccess->expects($this->once())
-            ->method('write')
-            ->with(
-                'library.documents',
-                $document->id . '.json',
-                $serializer->serialize($document, 'json'),
-            );
-
-        $clock->expects($this->never())->method('now');
-
-        $targetDateTime = $document->updatedAt;
-        $handler(new StoreDocument($document, false));
-
-        self::assertSame($targetDateTime, $document->updatedAt);
     }
 }

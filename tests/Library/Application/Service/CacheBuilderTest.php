@@ -65,7 +65,7 @@ class CacheBuilderTest extends TestCase
             ->willReturnCallback(
                 static function (FindDocumentsByDirectory|FindConversationsByDirectoryParameters $query) use ($document, $conversation) {
                     if ($query instanceof FindDocumentsByDirectory) {
-                        self::assertSame($document->directory->id, $query->id);
+                        self::assertSame($document->getDirectory()->id, $query->id);
 
                         return [$document];
                     }

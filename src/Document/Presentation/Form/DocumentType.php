@@ -63,7 +63,8 @@ class DocumentType extends AbstractType implements DataMapperInterface
     public function mapDataToForms(mixed $viewData, Traversable $forms): void
     {
         if ($viewData === null) {
-            $viewData = new Document('', '');
+            // Create a default document, when there are no view data given to set default values
+            $viewData = Document::create('', '');
         }
 
         if (! $viewData instanceof Document) {
@@ -73,27 +74,46 @@ class DocumentType extends AbstractType implements DataMapperInterface
         /** @var FormInterface[] $forms */
         $forms = iterator_to_array($forms);
 
-        $forms['title']->setData($viewData->title);
-        $forms['content']->setData($viewData->content);
-        $forms['directory']->setData($viewData->directory);
+        $forms['title']->setData($viewData->getTitle());
+        $forms['content']->setData($viewData->getContent());
+        $forms['directory']->setData($viewData->getDirectory());
     }
 
     /** @param Traversable<FormInterface> $forms */
     public function mapFormsToData(Traversable $forms, mixed &$viewData): void
     {
+        /** @var FormInterface[] $forms */
+        $forms = iterator_to_array($forms);
+
         if (! $viewData instanceof Document) {
-            $viewData = new Document('', '');
+            // Create a new document
+
+            $viewData = Document::create(
+                (string) $forms['title']->getData(),
+                (string) $forms['content']->getData(),
+                $forms['directory']->getData(),
+            );
+
+            return;
         }
 
-        try {
-            /** @var FormInterface[] $forms */
-            $forms = iterator_to_array($forms);
+        // Update an existing document
 
-            $viewData->title     = (string) $forms['title']->getData();
-            $viewData->content   = (string) $forms['content']->getData();
-            $viewData->directory = $forms['directory']->getData();
-        } catch (UnexpectedTypeException) {
-            $viewData = new Document('', '');
+        $directory = $forms['directory']->getData();
+        if ($directory !== $viewData->getDirectory()) {
+            $viewData->moveToDirectory($forms['directory']->getData());
         }
+
+        $title = $forms['title']->getData();
+        if ($title !== $viewData->getTitle()) {
+            $viewData->rename($title);
+        }
+
+        $content = $forms['content']->getData();
+        if ($content === $viewData->getContent()) {
+            return;
+        }
+
+        $viewData->changeContent($content);
     }
 }

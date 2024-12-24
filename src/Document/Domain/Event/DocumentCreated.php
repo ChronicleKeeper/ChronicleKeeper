@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace ChronicleKeeper\Document\Application\Command;
+namespace ChronicleKeeper\Document\Domain\Event;
 
 use ChronicleKeeper\Document\Domain\Entity\Document;
 
-class StoreDocument
+final readonly class DocumentCreated
 {
     public function __construct(
-        public readonly Document $document,
+        public Document $document,
     ) {
     }
 }

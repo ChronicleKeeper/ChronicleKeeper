@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ChronicleKeeper\Tests\Document\Domain\Event;
+namespace ChronicleKeeper\Test\Document\Domain\Event;
 
 use ChronicleKeeper\Document\Domain\Event\DocumentDeleted;
 use ChronicleKeeper\Test\Document\Domain\Entity\DocumentBuilder;

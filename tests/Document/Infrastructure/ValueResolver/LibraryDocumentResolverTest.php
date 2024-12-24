@@ -86,7 +86,7 @@ class LibraryDocumentResolverTest extends TestCase
             ->method('query')
             ->willReturnCallback(
                 static function (GetDocument $query) use ($document): Document {
-                    self::assertSame($document->id, $query->id);
+                    self::assertSame($document->getId(), $query->id);
 
                     return $document;
                 },
@@ -94,7 +94,7 @@ class LibraryDocumentResolverTest extends TestCase
 
         $resolver = new LibraryDocumentResolver($queryService);
         $result   = $resolver->resolve(
-            Request::create('/', Request::METHOD_GET, ['document' => $document->id]),
+            Request::create('/', Request::METHOD_GET, ['document' => $document->getId()]),
             $this->buildArgumentMetadata(Document::class),
         );
 
@@ -107,7 +107,7 @@ class LibraryDocumentResolverTest extends TestCase
         $document = (new DocumentBuilder())->withId('58995dfd-0d69-4471-ac65-1d202e81069d')->build();
 
         $this->expectException(NotFoundHttpException::class);
-        $this->expectExceptionMessage('Document "' . $document->id . '" not found.');
+        $this->expectExceptionMessage('Document "' . $document->getId() . '" not found.');
 
         $queryService = $this->createMock(QueryService::class);
         $queryService->expects($this->once())
@@ -117,7 +117,7 @@ class LibraryDocumentResolverTest extends TestCase
         $resolver = new LibraryDocumentResolver($queryService);
 
         $resolver->resolve(
-            Request::create('/', Request::METHOD_GET, ['document' => $document->id]),
+            Request::create('/', Request::METHOD_GET, ['document' => $document->getId()]),
             $this->buildArgumentMetadata(Document::class),
         );
     }

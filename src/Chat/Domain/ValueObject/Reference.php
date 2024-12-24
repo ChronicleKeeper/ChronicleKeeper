@@ -21,7 +21,7 @@ class Reference
 
     public static function forDocument(Document $document): Reference
     {
-        return new self($document->id, self::TYPE_DOCUMENT, $document->title);
+        return new self($document->getId(), self::TYPE_DOCUMENT, $document->getTitle());
     }
 
     public static function forImage(Image $image): Reference
