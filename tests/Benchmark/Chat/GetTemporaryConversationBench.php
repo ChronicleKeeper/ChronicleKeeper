@@ -29,30 +29,10 @@ class GetTemporaryConversationBench
     }
 
     /** @BeforeMethods("setUp") */
-    public function benchLoadTemporaryLargeFile(): void
+    public function benchLoadTemporaryConversation(): void
     {
         $this->serializer->deserialize(
-            file_get_contents(__DIR__ . '/Stub/false_conversation_temporary.json'),
-            Conversation::class,
-            JsonEncoder::FORMAT,
-        );
-    }
-
-    /** @BeforeMethods("setUp") */
-    public function benchLoadOptimized(): void
-    {
-        $this->serializer->deserialize(
-            file_get_contents(__DIR__ . '/Stub/clean_conversation_temporary.json'),
-            Conversation::class,
-            JsonEncoder::FORMAT,
-        );
-    }
-
-    /** @BeforeMethods("setUp") */
-    public function benchLoadSlimmed(): void
-    {
-        $this->serializer->deserialize(
-            file_get_contents(__DIR__ . '/Stub/slimmed_conversation_temporary.json'),
+            file_get_contents(__DIR__ . '/../../../var/tmp/conversation_temporary.json'),
             Conversation::class,
             JsonEncoder::FORMAT,
         );
