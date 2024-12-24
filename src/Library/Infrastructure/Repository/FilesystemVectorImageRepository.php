@@ -33,7 +33,7 @@ use const JSON_THROW_ON_ERROR;
 #[Autoconfigure(lazy: true)]
 class FilesystemVectorImageRepository
 {
-    private const STORAGE_NAME = 'vector.images';
+    private const string STORAGE_NAME = 'vector.images';
 
     public function __construct(
         private readonly LoggerInterface $logger,

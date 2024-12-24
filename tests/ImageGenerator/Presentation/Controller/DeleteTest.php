@@ -6,6 +6,7 @@ namespace ChronicleKeeper\Test\ImageGenerator\Presentation\Controller;
 
 use ChronicleKeeper\ImageGenerator\Presentation\Controller\Delete;
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
+use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Large;
 use PHPUnit\Framework\Attributes\Test;
@@ -34,6 +35,7 @@ class DeleteTest extends WebTestCase
         $this->fileAccess = $fileAccess;
     }
 
+    #[Override]
     protected function tearDown(): void
     {
         parent::tearDown();

@@ -6,6 +6,7 @@ namespace ChronicleKeeper\Library\Presentation\Form;
 
 use ChronicleKeeper\Library\Domain\Entity\Directory;
 use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemDirectoryRepository;
+use Override;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\Options;
@@ -23,6 +24,7 @@ final class DirectoryChoiceType extends AbstractType
     ) {
     }
 
+    #[Override]
     public function getParent(): string
     {
         return ChoiceType::class;
