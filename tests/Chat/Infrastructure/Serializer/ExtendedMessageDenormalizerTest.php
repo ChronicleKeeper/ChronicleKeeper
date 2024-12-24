@@ -6,8 +6,6 @@ namespace ChronicleKeeper\Test\Chat\Infrastructure\Serializer;
 
 use ChronicleKeeper\Chat\Domain\Entity\ExtendedMessage;
 use ChronicleKeeper\Chat\Infrastructure\Serializer\ExtendedMessageDenormalizer;
-use ChronicleKeeper\Document\Domain\Entity\Document;
-use ChronicleKeeper\Library\Domain\Entity\Image;
 use PhpLlm\LlmChain\Model\Message\MessageInterface;
 use PhpLlm\LlmChain\Model\Message\SystemMessage;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -67,15 +65,7 @@ class ExtendedMessageDenormalizerTest extends TestCase
     }
 
     #[Test]
-    public function itFailsOnIncompleteArray(): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-
-        $this->normalizer->denormalize(['foo'], ExtendedMessage::class);
-    }
-
-    #[Test]
-    public function theNormalizationWorksAsExcepted(): void
+    public function theNormalizationWorksAsExpected(): void
     {
         $invoker = $this->any();
 
@@ -89,29 +79,11 @@ class ExtendedMessageDenormalizerTest extends TestCase
                         self::assertSame(['content' => 'foo'], $data);
                     }
 
-                    if ($invoker->numberOfInvocations() === 2) {
-                        self::assertIsArray($data);
-                        self::assertSame(['document' => 'bar'], $data);
-                    }
-
-                    if ($invoker->numberOfInvocations() === 3) {
-                        self::assertIsArray($data);
-                        self::assertSame(['image' => 'baz'], $data);
-                    }
-
                     return true;
                 }),
                 self::callback(static function (string $type) use ($invoker): true {
                     if ($invoker->numberOfInvocations() === 1) {
                         self::assertSame(MessageInterface::class, $type);
-                    }
-
-                    if ($invoker->numberOfInvocations() === 2) {
-                        self::assertSame(Document::class . '[]', $type);
-                    }
-
-                    if ($invoker->numberOfInvocations() === 3) {
-                        self::assertSame(Image::class . '[]', $type);
                     }
 
                     return true;
@@ -123,12 +95,51 @@ class ExtendedMessageDenormalizerTest extends TestCase
                         return new SystemMessage('foo');
                     }
 
-                    if ($invoker->numberOfInvocations() === 2) {
-                        return ['document' => 'bar'];
+                    return false;
+                },
+            );
+
+        $obj = $this->normalizer->denormalize(
+            [
+                'id' => '12345',
+                'message' => ['content' => 'foo'],
+                'context' => ['documents' => [], 'images' => []],
+            ],
+            ExtendedMessage::class,
+        );
+
+        self::assertSame('12345', $obj->id);
+    }
+
+    #[Test]
+    public function theNormalizationWorksAsExpectedWithContextDocuments(): void
+    {
+        $invoker = $this->any();
+
+        $this->serializer
+            ->expects($invoker)
+            ->method('denormalize')
+            ->with(
+                self::callback(static function (mixed $data) use ($invoker): true {
+                    if ($invoker->numberOfInvocations() === 1) {
+                        self::assertIsArray($data);
+                        self::assertSame(['content' => 'foo'], $data);
                     }
 
-                    if ($invoker->numberOfInvocations() === 3) {
-                        return ['image' => 'baz'];
+                    return true;
+                }),
+                self::callback(static function (string $type) use ($invoker): true {
+                    if ($invoker->numberOfInvocations() === 1) {
+                        self::assertSame(MessageInterface::class, $type);
+                    }
+
+                    return true;
+                }),
+            )
+            ->willReturnCallback(
+                static function () use ($invoker): mixed {
+                    if ($invoker->numberOfInvocations() === 1) {
+                        return new SystemMessage('foo');
                     }
 
                     return false;
@@ -139,16 +150,75 @@ class ExtendedMessageDenormalizerTest extends TestCase
             [
                 'id' => '12345',
                 'message' => ['content' => 'foo'],
-                'documents' => ['document' => 'bar'],
-                'images' => ['image' => 'baz'],
-                'calledTools' => ['calledTools' => 'qis'],
+                'context' => ['documents' => [['id' => 'foo', 'title' => 'bar', 'type' => 'document']], 'images' => []],
             ],
             ExtendedMessage::class,
+            null,
+            [ExtendedMessageDenormalizer::WITH_CONTEXT_DOCUMENTS => true],
         );
 
         self::assertSame('12345', $obj->id);
-        self::assertSame(['bar'], $obj->documents); // @phpstan-ignore staticMethod.impossibleType
-        self::assertSame(['baz'], $obj->images); // @phpstan-ignore staticMethod.impossibleType
-        self::assertSame(['calledTools' => 'qis'], $obj->calledTools); // @phpstan-ignore staticMethod.impossibleType
+
+        self::assertCount(1, $obj->context->documents);
+        self::assertSame('foo', $obj->context->documents[0]->id);
+        self::assertSame('document', $obj->context->documents[0]->type);
+        self::assertSame('bar', $obj->context->documents[0]->title);
+
+        self::assertEmpty($obj->context->images);
+    }
+
+    #[Test]
+    public function theNormalizationWorksAsExpectedWithContextImages(): void
+    {
+        $invoker = $this->any();
+
+        $this->serializer
+            ->expects($invoker)
+            ->method('denormalize')
+            ->with(
+                self::callback(static function (mixed $data) use ($invoker): true {
+                    if ($invoker->numberOfInvocations() === 1) {
+                        self::assertIsArray($data);
+                        self::assertSame(['content' => 'foo'], $data);
+                    }
+
+                    return true;
+                }),
+                self::callback(static function (string $type) use ($invoker): true {
+                    if ($invoker->numberOfInvocations() === 1) {
+                        self::assertSame(MessageInterface::class, $type);
+                    }
+
+                    return true;
+                }),
+            )
+            ->willReturnCallback(
+                static function () use ($invoker): mixed {
+                    if ($invoker->numberOfInvocations() === 1) {
+                        return new SystemMessage('foo');
+                    }
+
+                    return false;
+                },
+            );
+
+        $obj = $this->normalizer->denormalize(
+            [
+                'id' => '12345',
+                'message' => ['content' => 'foo'],
+                'context' => ['documents' => [], 'images' => [['id' => 'foo', 'title' => 'bar', 'type' => 'image']]],
+            ],
+            ExtendedMessage::class,
+            null,
+            [ExtendedMessageDenormalizer::WITH_CONTEXT_IMAGES => true],
+        );
+
+        self::assertSame('12345', $obj->id);
+        self::assertEmpty($obj->context->documents);
+
+        self::assertCount(1, $obj->context->images);
+        self::assertSame('foo', $obj->context->images[0]->id);
+        self::assertSame('image', $obj->context->images[0]->type);
+        self::assertSame('bar', $obj->context->images[0]->title);
     }
 }

@@ -7,6 +7,7 @@ namespace ChronicleKeeper\Test\Chat\Application\Query;
 use ArrayIterator;
 use ChronicleKeeper\Chat\Application\Query\FindConversationsByDirectoryParameters;
 use ChronicleKeeper\Chat\Application\Query\FindConversationsByDirectoryQuery;
+use ChronicleKeeper\Library\Domain\RootDirectory;
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\Finder;
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\PathRegistry;
@@ -25,6 +26,15 @@ use Symfony\Component\Serializer\SerializerInterface;
 #[Small]
 class FindConversationsByDirectoryQueryTest extends TestCase
 {
+    #[Test]
+    public function itEnsuresTheParametersHasTheCorrectQueryClass(): void
+    {
+        self::assertSame(
+            FindConversationsByDirectoryQuery::class,
+            (new FindConversationsByDirectoryParameters(RootDirectory::get()))->getQueryClass(),
+        );
+    }
+
     #[Test]
     public function queryReturnsConversations(): void
     {

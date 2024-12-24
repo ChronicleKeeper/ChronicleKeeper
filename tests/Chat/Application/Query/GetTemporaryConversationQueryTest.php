@@ -27,6 +27,15 @@ use Symfony\Component\Serializer\SerializerInterface;
 class GetTemporaryConversationQueryTest extends TestCase
 {
     #[Test]
+    public function itEnsuresTheParametersHasTheCorrectQueryClass(): void
+    {
+        self::assertSame(
+            GetTemporaryConversationQuery::class,
+            (new GetTemporaryConversationParameters())->getQueryClass(),
+        );
+    }
+
+    #[Test]
     public function queryReturnsConversation(): void
     {
         $fileAccessMock      = $this->createMock(FileAccess::class);

@@ -6,10 +6,13 @@ namespace ChronicleKeeper\Chat\Application\Service;
 
 use ChronicleKeeper\Chat\Domain\Entity\Conversation;
 use ChronicleKeeper\Chat\Domain\Entity\ExtendedMessage;
+use ChronicleKeeper\Chat\Domain\ValueObject\MessageContext;
+use ChronicleKeeper\Chat\Domain\ValueObject\MessageDebug;
+use ChronicleKeeper\Chat\Domain\ValueObject\Reference;
+use ChronicleKeeper\Chat\Infrastructure\LLMChain\RuntimeCollector;
 use ChronicleKeeper\Document\Infrastructure\LLMChain\DocumentSearch;
-use ChronicleKeeper\Library\Infrastructure\LLMChain\Tool\LibraryImages;
+use ChronicleKeeper\Library\Infrastructure\LLMChain\Tool\ImageSearch;
 use ChronicleKeeper\Shared\Infrastructure\LLMChain\LLMChainFactory;
-use ChronicleKeeper\Shared\Infrastructure\LLMChain\ToolUsageCollector;
 use PhpLlm\LlmChain\Model\Message\Message;
 use PhpLlm\LlmChain\Model\Response\TextResponse;
 
@@ -20,8 +23,8 @@ class ChatMessageExecution
     public function __construct(
         private readonly LLMChainFactory $chain,
         private readonly DocumentSearch $libraryDocuments,
-        private readonly LibraryImages $libraryImages,
-        private readonly ToolUsageCollector $collector,
+        private readonly ImageSearch $libraryImages,
+        private readonly RuntimeCollector $runtimeCollector,
     ) {
     }
 
@@ -48,47 +51,28 @@ class ChatMessageExecution
         assert($response instanceof TextResponse);
 
         // Remove maximum distances in tools after the response ... just for saftey of the request
-        $this->libraryDocuments->setOneTimeMaxDistance($conversation->settings->documentsMaxDistance);
-        $this->libraryImages->setOneTimeMaxDistance($conversation->settings->imagesMaxDistance);
+        $this->libraryDocuments->setOneTimeMaxDistance(null);
+        $this->libraryImages->setOneTimeMaxDistance(null);
 
-        $response = new ExtendedMessage(message: Message::ofAssistant($response->getContent()));
-
-        $this->appendReferencedDocumentsFromBackground($response);
-        $this->appendReferencedImages($response);
-        $this->appendCalledTools($response);
+        $response          = new ExtendedMessage(message: Message::ofAssistant($response->getContent()));
+        $response->context = $this->buildMessageContext();
+        $response->debug   = $this->buildMessageDebug();
 
         $messages[] = $response;
 
         $conversation->messages = $messages;
     }
 
-    private function appendCalledTools(ExtendedMessage $response): void
+    private function buildMessageDebug(): MessageDebug
     {
-        $toolCalls = $this->collector->getCalls();
-        if ($toolCalls === []) {
-            return;
-        }
-
-        $response->calledTools = $toolCalls;
+        return new MessageDebug(functions: $this->runtimeCollector->flushFunctionDebug());
     }
 
-    private function appendReferencedImages(ExtendedMessage $response): void
+    private function buildMessageContext(): MessageContext
     {
-        $referencedImages = $this->libraryImages->getReferencedImages();
-        if ($referencedImages === []) {
-            return;
-        }
-
-        $response->images = $referencedImages;
-    }
-
-    private function appendReferencedDocumentsFromBackground(ExtendedMessage $response): void
-    {
-        $referencedDocuments = $this->libraryDocuments->getReferencedDocuments();
-        if ($referencedDocuments === []) {
-            return;
-        }
-
-        $response->documents = $referencedDocuments;
+        return new MessageContext(
+            documents: $this->runtimeCollector->flushReferenceByType(Reference::TYPE_DOCUMENT),
+            images: $this->runtimeCollector->flushReferenceByType(Reference::TYPE_IMAGE),
+        );
     }
 }

@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Document\Infrastructure\LLMChain;
 
+use ChronicleKeeper\Chat\Domain\ValueObject\FunctionDebug;
+use ChronicleKeeper\Chat\Domain\ValueObject\Reference;
+use ChronicleKeeper\Chat\Infrastructure\LLMChain\RuntimeCollector;
 use ChronicleKeeper\Document\Application\Query\SearchSimilarVectors;
-use ChronicleKeeper\Document\Domain\Entity\Document;
 use ChronicleKeeper\Document\Domain\Entity\VectorDocument;
 use ChronicleKeeper\Settings\Application\SettingsHandler;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
 use ChronicleKeeper\Shared\Infrastructure\LLMChain\EmbeddingCalculator;
-use ChronicleKeeper\Shared\Infrastructure\LLMChain\ToolUsageCollector;
 use PhpLlm\LlmChain\Chain\ToolBox\Attribute\AsTool;
 
-use function array_values;
 use function count;
 
 use const PHP_EOL;
@@ -26,18 +26,15 @@ use const PHP_EOL;
     consider using the "library_images" function.
     TEXT,
 )]
-final class DocumentSearch
+class DocumentSearch
 {
-    /** @var array<string, Document> */
-    private array $referencedDocuments = [];
-
     private float|null $maxDistance = null;
 
     public function __construct(
         private readonly EmbeddingCalculator $embeddingCalculator,
         private readonly SettingsHandler $settingsHandler,
-        private readonly ToolUsageCollector $collector,
         private readonly QueryService $queryService,
+        private readonly RuntimeCollector $runtimeCollector,
     ) {
     }
 
@@ -60,14 +57,13 @@ final class DocumentSearch
             $maxResults,
         ));
 
-        $this->referencedDocuments = [];
         if (count($documents) === 0) {
-            $this->collector->called(
-                'library_documents',
-                [
-                    'arguments' => ['search' => $search, 'maxDistance' => $maxDistance, 'maxResults' => $maxResults],
-                    'responses' => [],
-                ],
+            $this->runtimeCollector->addFunctionDebug(
+                new FunctionDebug(
+                    'library_documents',
+                    ['search' => $search, 'maxDistance' => $maxDistance, 'maxResults' => $maxResults],
+                    [],
+                ),
             );
 
             return 'There are no matching documents.';
@@ -83,7 +79,7 @@ final class DocumentSearch
             $result .= 'Storage Directory: ' . $libraryDocument->directory->flattenHierarchyTitle() . PHP_EOL;
             $result .= $document['vector']->content . PHP_EOL . PHP_EOL;
 
-            $this->referencedDocuments[$libraryDocument->id] = $libraryDocument;
+            $this->runtimeCollector->addReference(Reference::forDocument($libraryDocument));
 
             $debugResponse[] = [
                 'document' => $libraryDocument->directory->flattenHierarchyTitle()
@@ -93,23 +89,14 @@ final class DocumentSearch
             ];
         }
 
-        $this->collector->called(
-            'library_documents',
-            [
-                'arguments' => ['search' => $search, 'maxDistance' => $this->maxDistance, 'maxResults' => $maxResults],
-                'responses' => $debugResponse,
-            ],
+        $this->runtimeCollector->addFunctionDebug(
+            new FunctionDebug(
+                'library_documents',
+                ['search' => $search, 'maxDistance' => $maxDistance, 'maxResults' => $maxResults],
+                $debugResponse,
+            ),
         );
 
         return $result;
-    }
-
-    /** @return list<Document> */
-    public function getReferencedDocuments(): array
-    {
-        $documents                 = array_values($this->referencedDocuments);
-        $this->referencedDocuments = [];
-
-        return $documents;
     }
 }

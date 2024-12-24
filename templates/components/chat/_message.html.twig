@@ -17,9 +17,10 @@
             </div>
             <div class="card-body chatbot-message">
                 {{ content.message|markdown_to_html }}
-                {% if settings_handler.get.chatbotFunctions.allowDebugOutput and content.extended.calledTools is not empty %}
-                    {{ _self.bot_debug_output(content) }}
+                {% if settings_handler.get.chatbotFunctions.allowDebugOutput and content.extended.debug.functions is defined and content.extended.debug.functions is not empty %}
+                    {{ _self.bot_debug_output(content.extended.debug.functions) }}
                 {% endif %}
+
                 {{ _self.bot_used_context(content) }}
             </div>
         </div>
@@ -61,10 +62,10 @@
     </div>
 {% endmacro %}
 
-{% macro bot_debug_output(content) %}
+{% macro bot_debug_output(debug) %}
     <div class="hr-text text-warning">GPT Functions Debugging Ausgaben</div>
     <div class="accordion" id="debug-tool-calls">
-        {% for index, call in content.extended.calledTools %}
+        {% for index, call in debug %}
             <div class="accordion-item">
                 <h2 class="accordion-header" id="heading-{{ index }}">
                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-{{ index }}" aria-expanded="true">
@@ -74,6 +75,7 @@
                 <div id="collapse-{{ index }}" class="accordion-collapse collapse" data-bs-parent="#debug-tool-calls" style="">
                     <div class="accordion-body pt-0">
                         <pre>{{ call.arguments|json_encode(constant('JSON_PRETTY_PRINT')) }}</pre>
+                        <pre>{{ call.result|json_encode(constant('JSON_PRETTY_PRINT')) }}</pre>
                     </div>
                 </div>
             </div>
@@ -85,8 +87,8 @@
     {% set showDocuments = settings_handler.get.chatbotGeneral.showReferencedDocuments %}
     {% set showImages = settings_handler.get.chatbotGeneral.showReferencedImages %}
 
-    {% set documents = content.extended.documents %}
-    {% set images = content.extended.images %}
+    {% set documents = showDocuments is same as(false) ? {} : content.extended.context.documents %}
+    {% set images = showImages is same as (false) ? {} : content.extended.context.images %}
 
     {% if (showDocuments and documents is not empty) or (showImages and images is not empty) %}
         <div class="hr-text text-warning">GPT Functions Used Information</div>
@@ -100,12 +102,11 @@
                 <div id="collapse-debug-additional-information-{{ content.extended.id }}" class="accordion-collapse collapse" data-bs-parent="#heading-debug-additional-information-{{ content.extended.id }}" style="">
                     <div class="accordion-body pt-0">
                         <div class="row row-cards">
-                            {% if showDocuments and documents is not empty %}
-                                {{ _self.bot_used_context_documents(documents, (showImages is same as(false) or images is empty ? '12' : '6')) }}
+                            {% if documents is not empty %}
+                                {{ _self.bot_used_references(documents, (images is empty ? '12' : '6')) }}
                             {% endif %}
-                            {% if showImages and images is not empty %}
-                                {% set documentsShown = showDocuments is same as(false) or documents is not empty %}
-                                {{ _self.bot_used_context_images(images, (documentsShown ? '6' : '12'), (documentsShown ? '4' : '2')) }}
+                            {% if images is not empty %}
+                                {{ _self.bot_used_references(images,  (documents is empty ? '12' : '6')) }}
                             {% endif %}
                         </div>
                     </div>
@@ -115,33 +116,19 @@
     {% endif %}
 {% endmacro %}
 
-{% macro bot_used_context_documents(documents, cols = 6) %}
-    {% if documents is not empty %}
+{% macro bot_used_references(references, cols = 6) %}
+    {% if references is not empty %}
         <div class="col-{{ cols }}">
             <div class="card">
                 <div class="list-group list-group-flush">
-                    {% for document in documents %}
-                        <a href="{{ path('library_document_view', {'document': document.id}) }}"
-                           class="list-group-item list-group-item-action"
-                        >{{ document.directory.flattenHierarchyTitle }} > {{ document.title }}</a>
+                    {% for reference in references %}
+                        {% if reference.type is same as ('document') %}
+                            <a href="{{ path('library_document_view', {'document': reference.id}) }}" class="list-group-item list-group-item-action">{{ reference.title }}</a>
+                        {% else %}
+                            <a href="{{ path('library_image_view', {'image': reference.id}) }}" class="list-group-item list-group-item-action">{{ reference.title }}</a>
+                        {% endif %}
                     {% endfor %}
                 </div>
-            </div>
-        </div>
-    {% endif %}
-{% endmacro %}
-
-{% macro bot_used_context_images(images, cols = 6, imageColWidth = 2) %}
-    {% if images is not empty %}
-        <div class="col-{{ cols }}">
-            <div class="row row-cols-{{ imageColWidth }} g-3">
-                {% for image in images %}
-                    <div class="col">
-                        <a data-fslightbox="gallery" href="{{ path('library_image_view', {'image': image.id} )}}">
-                            <div class="img-responsive img-responsive-1x1 rounded border" style="background-image: url({{ image.imageUrl }})"></div>
-                        </a>
-                    </div>
-                {% endfor %}
             </div>
         </div>
     {% endif %}

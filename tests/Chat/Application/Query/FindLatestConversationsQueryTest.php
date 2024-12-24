@@ -24,6 +24,15 @@ use Symfony\Component\Serializer\SerializerInterface;
 class FindLatestConversationsQueryTest extends TestCase
 {
     #[Test]
+    public function itEnsuresTheParametersHasTheCorrectQueryClass(): void
+    {
+        self::assertSame(
+            FindLatestConversationsQuery::class,
+            (new FindLatestConversationsParameters(12))->getQueryClass(),
+        );
+    }
+
+    #[Test]
     public function queryReturnsConversations(): void
     {
         $fileAccessMock   = $this->createMock(FileAccess::class);

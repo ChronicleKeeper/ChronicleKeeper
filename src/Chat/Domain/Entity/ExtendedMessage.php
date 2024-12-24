@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Chat\Domain\Entity;
 
-use ChronicleKeeper\Document\Domain\Entity\Document;
-use ChronicleKeeper\Library\Domain\Entity\Image;
+use ChronicleKeeper\Chat\Domain\ValueObject\MessageContext;
+use ChronicleKeeper\Chat\Domain\ValueObject\MessageDebug;
 use JsonSerializable;
 use PhpLlm\LlmChain\Model\Message\MessageInterface;
 use Symfony\Component\Uid\Uuid;
@@ -14,27 +14,24 @@ use Symfony\Component\Uid\Uuid;
  * @phpstan-type ExtendedMessageArray = array{
  *      id: string,
  *      message: MessageInterface,
- *      documents: list<Document>,
- *      images: list<Image>,
- *      calledTools: list<array{tool: string, arguments: array<string,mixed>}>
+ *      context: MessageContext,
+ *      debug: MessageDebug,
  *  }
  */
 class ExtendedMessage implements JsonSerializable
 {
     public string $id;
+    public MessageContext $context;
+    public MessageDebug $debug;
 
-    /**
-     * @param list<Document>                                            $documents
-     * @param list<Image>                                               $images
-     * @param list<array{tool: string, arguments: array<string,mixed>}> $calledTools
-     */
     public function __construct(
         public readonly MessageInterface $message,
-        public array $documents = [],
-        public array $images = [],
-        public array $calledTools = [],
+        MessageContext|null $context = null,
+        MessageDebug|null $debug = null,
     ) {
-        $this->id = Uuid::v4()->toString();
+        $this->id      = Uuid::v4()->toString();
+        $this->context = $context ?? new MessageContext();
+        $this->debug   = $debug ?? new MessageDebug();
     }
 
     /** @return ExtendedMessageArray */
@@ -43,9 +40,8 @@ class ExtendedMessage implements JsonSerializable
         return [
             'id' => $this->id,
             'message' => $this->message,
-            'documents' => $this->documents,
-            'images' => $this->images,
-            'calledTools' => $this->calledTools,
+            'context' => $this->context,
+            'debug' => $this->debug,
         ];
     }
 }

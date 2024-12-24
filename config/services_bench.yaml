@@ -23,3 +23,7 @@ services:
     autowire: true
     autoconfigure: true
     public: true
+
+  Symfony\Component\Serializer\Serializer:
+    parent: serializer
+    public: true

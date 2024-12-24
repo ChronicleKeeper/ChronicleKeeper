@@ -10,6 +10,7 @@ use ChronicleKeeper\Chat\Application\Query\GetTemporaryConversationParameters;
 use ChronicleKeeper\Chat\Application\Service\ChatMessageExecution;
 use ChronicleKeeper\Chat\Domain\Entity\Conversation;
 use ChronicleKeeper\Chat\Domain\Entity\ExtendedMessage;
+use ChronicleKeeper\Chat\Infrastructure\Serializer\ExtendedMessageDenormalizer;
 use ChronicleKeeper\Chat\Presentation\Twig\Chat\ExtendedMessageBagToViewConverter;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -28,7 +29,15 @@ class Chat extends AbstractController
     use DefaultActionTrait;
     use ComponentToolsTrait;
 
-    #[LiveProp(writable: true, useSerializerForHydration: true)]
+    #[LiveProp(
+        writable: true,
+        useSerializerForHydration: true,
+        serializationContext: [
+            ExtendedMessageDenormalizer::WITH_CONTEXT_DOCUMENTS => true,
+            ExtendedMessageDenormalizer::WITH_CONTEXT_IMAGES => true,
+            ExtendedMessageDenormalizer::WITH_DEBUG_FUNCTIONS => true,
+        ],
+    )]
     public Conversation $conversation;
 
     #[LiveProp]
