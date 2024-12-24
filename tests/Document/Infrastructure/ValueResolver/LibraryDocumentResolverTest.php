@@ -54,7 +54,7 @@ class LibraryDocumentResolverTest extends TestCase
 
         $resolver = new LibraryDocumentResolver($queryService);
         $result   = $resolver->resolve(
-            Request::create('/', 'GET', ['document' => 'invalid']),
+            Request::create('/', Request::METHOD_GET, ['document' => 'invalid']),
             $this->buildArgumentMetadata(Document::class),
         );
 
@@ -69,7 +69,7 @@ class LibraryDocumentResolverTest extends TestCase
 
         $resolver = new LibraryDocumentResolver($queryService);
         $result   = $resolver->resolve(
-            Request::create('/', 'GET', ['document' => 123]),
+            Request::create('/', Request::METHOD_GET, ['document' => 123]),
             $this->buildArgumentMetadata(Document::class),
         );
 
@@ -94,7 +94,7 @@ class LibraryDocumentResolverTest extends TestCase
 
         $resolver = new LibraryDocumentResolver($queryService);
         $result   = $resolver->resolve(
-            Request::create('/', 'GET', ['document' => $document->id]),
+            Request::create('/', Request::METHOD_GET, ['document' => $document->id]),
             $this->buildArgumentMetadata(Document::class),
         );
 
@@ -117,7 +117,7 @@ class LibraryDocumentResolverTest extends TestCase
         $resolver = new LibraryDocumentResolver($queryService);
 
         $resolver->resolve(
-            Request::create('/', 'GET', ['document' => $document->id]),
+            Request::create('/', Request::METHOD_GET, ['document' => $document->id]),
             $this->buildArgumentMetadata(Document::class),
         );
     }

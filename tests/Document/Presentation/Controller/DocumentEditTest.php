@@ -13,6 +13,7 @@ use ChronicleKeeper\Library\Presentation\Twig\DirectorySelection;
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
 use ChronicleKeeper\Test\Document\Domain\Entity\DocumentBuilder;
 use ChronicleKeeper\Test\Shared\Infrastructure\Persistence\Filesystem\FileAccessDouble;
+use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Large;
 use PHPUnit\Framework\Attributes\Test;
@@ -55,6 +56,7 @@ class DocumentEditTest extends WebTestCase
         );
     }
 
+    #[Override]
     protected function tearDown(): void
     {
         parent::tearDown();

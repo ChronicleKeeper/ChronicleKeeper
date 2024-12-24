@@ -7,6 +7,7 @@ namespace ChronicleKeeper\Test\ImageGenerator\Presentation\Form;
 use ChronicleKeeper\ImageGenerator\Domain\Entity\GeneratorRequest;
 use ChronicleKeeper\ImageGenerator\Presentation\Form\GeneratorRequestType;
 use ChronicleKeeper\Test\ImageGenerator\Domain\Entity\GeneratorRequestBuilder;
+use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\Attributes\Test;
@@ -90,6 +91,7 @@ class GeneratorRequestTypeTest extends TypeTestCase
     }
 
     /** @return list<FormExtensionInterface> */
+    #[Override]
     protected function getExtensions(): array
     {
         return [

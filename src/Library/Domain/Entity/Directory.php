@@ -37,7 +37,7 @@ class Directory implements JsonSerializable
         do {
             $components[] = $directory->title;
             $directory    = $directory->parent;
-        } while ($directory !== null);
+        } while ($directory instanceof Directory);
 
         return implode(' > ', array_reverse($components));
     }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Shared;
 
+use Override;
 use PhpLlm\LlmChain\Chain\ToolBox\Attribute\AsTool;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Component\DependencyInjection\ChildDefinition;
@@ -16,6 +17,7 @@ class Kernel extends BaseKernel
 {
     use MicroKernelTrait;
 
+    #[Override]
     public function getProjectDir(): string
     {
         return dirname(
@@ -24,6 +26,7 @@ class Kernel extends BaseKernel
         );
     }
 
+    #[Override]
     protected function prepareContainer(ContainerBuilder $container): void
     {
         parent::prepareContainer($container);

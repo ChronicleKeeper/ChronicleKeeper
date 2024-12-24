@@ -7,11 +7,13 @@ namespace ChronicleKeeper\Test\ImageGenerator\Presentation\Controller;
 use ChronicleKeeper\ImageGenerator\Presentation\Controller\Generator;
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
 use ChronicleKeeper\Test\ImageGenerator\Domain\Entity\GeneratorRequestBuilder;
+use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Large;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\Service\ResetInterface;
 
 use function assert;
@@ -37,6 +39,7 @@ class GeneratorTest extends WebTestCase
         $this->fileAccess = $fileAccess;
     }
 
+    #[Override]
     protected function tearDown(): void
     {
         parent::tearDown();
@@ -49,7 +52,7 @@ class GeneratorTest extends WebTestCase
     public function thatRequestingPageWithNonExistentDataIsFailing(): void
     {
         $this->client->request(
-            'GET',
+            Request::METHOD_GET,
             '/image_generator/778e656f-2012-4e98-80fe-558539e57e98/generator',
         );
 
@@ -69,7 +72,7 @@ class GeneratorTest extends WebTestCase
         );
 
         $this->client->request(
-            'GET',
+            Request::METHOD_GET,
             '/image_generator/6695cae4-ba8f-4d22-90e6-623675502817/generator',
         );
 
