@@ -75,10 +75,10 @@ class StoreConversation extends AbstractController
         string $conversationId,
     ): Response {
         $conversation = $this->queryService->query(new FindConversationByIdParameters($conversationId));
-        $temporary = false;
+        $temporary    = false;
         if ($conversation === null) {
             $conversation = $this->queryService->query(new GetTemporaryConversationParameters());
-            $temporary = true;
+            $temporary    = true;
         }
 
         $this->conversation = $conversation;

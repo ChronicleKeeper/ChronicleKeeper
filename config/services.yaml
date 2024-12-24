@@ -37,6 +37,8 @@ services:
       - method: add
         arguments: [ 'library.directories', '%app.storage.base_dir%/directories' ]
       - method: add
+        arguments: [ 'library.directories.cache', '%kernel.cache_dir%/library/directories' ]
+      - method: add
         arguments: [ 'library.conversations', '%app.library.base_dir%/conversations' ]
       - method: add
         arguments: [ 'vector.documents', '%app.data.base_dir%/document' ]
