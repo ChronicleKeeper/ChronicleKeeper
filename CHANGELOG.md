@@ -9,6 +9,8 @@
 - Optimized performance within document and image vectors by reducing the data loaded from the database for search.
 - Improved the performance of embedding generation by generating all document and image text chunks at once.
 - Utilized a minimum vector content chunk length to reduce the failure rate for "only-dot" content cases.
+- Optimized the conversation storage to not keep copies of the library within the own storage.
+- BC: Imported conversations older than version 0.6 will be deleted from the database.
 
 ## [alpha-0.5.1]
 
