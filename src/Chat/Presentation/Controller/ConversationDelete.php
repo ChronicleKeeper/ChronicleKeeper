@@ -41,7 +41,7 @@ class ConversationDelete extends AbstractController
             return $this->redirectToRoute('library', ['directory' => $conversation->directory->id]);
         }
 
-        $this->bus->dispatch(new DeleteConversation($conversation->id));
+        $this->bus->dispatch(new DeleteConversation($conversation));
 
         $this->addFlashMessage(
             $request,

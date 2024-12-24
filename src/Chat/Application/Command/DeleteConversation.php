@@ -4,13 +4,12 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Chat\Application\Command;
 
-use Webmozart\Assert\Assert;
+use ChronicleKeeper\Chat\Domain\Entity\Conversation;
 
 class DeleteConversation
 {
     public function __construct(
-        public readonly string $conversationId,
+        public readonly Conversation $conversation,
     ) {
-        Assert::uuid($this->conversationId, 'To delete a conversation an identifier is needed.');
     }
 }

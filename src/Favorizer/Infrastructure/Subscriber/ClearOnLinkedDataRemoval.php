@@ -28,7 +28,7 @@ class ClearOnLinkedDataRemoval
     public function removeOnImageDeleted(ImageDeleted $event): void
     {
         $targetBag = $this->queryService->query(new GetTargetBag());
-        $target    = new LibraryImageTarget($event->id, 'Irrelevant');
+        $target    = new LibraryImageTarget($event->image->id, 'Irrelevant');
 
         if (! $targetBag->exists($target)) {
             return;
@@ -42,7 +42,7 @@ class ClearOnLinkedDataRemoval
     public function removeOnDocumentDeleted(DocumentDeleted $event): void
     {
         $targetBag = $this->queryService->query(new GetTargetBag());
-        $target    = new LibraryDocumentTarget($event->id, 'Irrelevant');
+        $target    = new LibraryDocumentTarget($event->document->id, 'Irrelevant');
 
         if (! $targetBag->exists($target)) {
             return;
@@ -56,7 +56,7 @@ class ClearOnLinkedDataRemoval
     public function removeOnConversationDeleted(ConversationDeleted $event): void
     {
         $targetBag = $this->queryService->query(new GetTargetBag());
-        $target    = new ChatConversationTarget($event->id, 'Irrelevant');
+        $target    = new ChatConversationTarget($event->conversation->id, 'Irrelevant');
 
         if (! $targetBag->exists($target)) {
             return;

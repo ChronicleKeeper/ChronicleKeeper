@@ -112,7 +112,7 @@ class FilesystemImageRepository
 
         $this->fileAccess->delete(self::STORAGE_NAME, $filename);
 
-        $this->eventDispatcher->dispatch(new ImageDeleted($image->id));
+        $this->eventDispatcher->dispatch(new ImageDeleted($image));
     }
 
     /** @return non-empty-string */

@@ -8,12 +8,12 @@ use ChronicleKeeper\Chat\Application\Command\DeleteConversation;
 use ChronicleKeeper\Chat\Application\Command\DeleteConversationHandler;
 use ChronicleKeeper\Chat\Domain\Event\ConversationDeleted;
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
+use ChronicleKeeper\Test\Chat\Domain\Entity\ConversationBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
-use Webmozart\Assert\InvalidArgumentException as WebmozartInvalidArgumentException;
 
 #[CoversClass(DeleteConversationHandler::class)]
 #[CoversClass(DeleteConversation::class)]
@@ -23,13 +23,13 @@ class DeleteConversationHandlerTest extends TestCase
     #[Test]
     public function executeDeletion(): void
     {
-        $conversationId = '123e4567-e89b-12d3-a456-426614174000';
-        $message        = new DeleteConversation($conversationId);
+        $conversation = (new ConversationBuilder())->build();
+        $message      = new DeleteConversation($conversation);
 
         $fileAccess = $this->createMock(FileAccess::class);
         $fileAccess->expects($this->once())
             ->method('delete')
-            ->with('library.conversations', $conversationId . '.json');
+            ->with('library.conversations', $conversation->id . '.json');
 
         $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
         $eventDispatcher->expects($this->once())
@@ -38,20 +38,5 @@ class DeleteConversationHandlerTest extends TestCase
 
         $handler = new DeleteConversationHandler($fileAccess, $eventDispatcher);
         $handler($message);
-    }
-
-    #[Test]
-    public function validUuid(): void
-    {
-        $conversationId = '123e4567-e89b-12d3-a456-426614174000';
-        $command        = new DeleteConversation($conversationId);
-        self::assertSame($conversationId, $command->conversationId);
-    }
-
-    #[Test]
-    public function invalidUuid(): void
-    {
-        $this->expectException(WebmozartInvalidArgumentException::class);
-        new DeleteConversation('invalid-uuid');
     }
 }

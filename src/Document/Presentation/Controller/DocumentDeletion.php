@@ -44,7 +44,7 @@ class DocumentDeletion extends AbstractController
             return new RedirectResponse($this->router->generate('library', ['directory' => $document->directory->id]));
         }
 
-        $this->bus->dispatch(new DeleteDocument($document->id));
+        $this->bus->dispatch(new DeleteDocument($document));
 
         $this->addFlashMessage(
             $request,

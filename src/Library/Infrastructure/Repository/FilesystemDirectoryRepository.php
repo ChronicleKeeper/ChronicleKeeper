@@ -73,7 +73,7 @@ class FilesystemDirectoryRepository
         }
 
         foreach ($this->queryService->query(new FindDocumentsByDirectory($sourceDirectory->id)) as $document) {
-            $this->bus->dispatch(new DeleteDocument($document->id));
+            $this->bus->dispatch(new DeleteDocument($document));
         }
 
         foreach ($this->imageRepository->findByDirectory($sourceDirectory) as $image) {
@@ -81,7 +81,7 @@ class FilesystemDirectoryRepository
         }
 
         foreach ($this->queryService->query(new FindConversationsByDirectoryParameters($sourceDirectory)) as $conversation) {
-            $this->bus->dispatch(new DeleteConversation($conversation->id));
+            $this->bus->dispatch(new DeleteConversation($conversation));
         }
     }
 

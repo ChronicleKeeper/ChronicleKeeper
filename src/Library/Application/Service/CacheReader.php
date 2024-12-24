@@ -18,6 +18,20 @@ class CacheReader
     ) {
     }
 
+    public function refresh(DirectoryEntity $directory): DirectoryCache
+    {
+        $filename = $directory->id . '.json';
+
+        $cache = $this->cacheBuilder->build($directory);
+        $this->fileAccess->write(
+            'library.directories.cache',
+            $filename,
+            $this->serializer->serialize($cache, 'json'),
+        );
+
+        return $cache;
+    }
+
     public function read(DirectoryEntity $directory): DirectoryCache
     {
         $filename    = $directory->id . '.json';
@@ -30,13 +44,6 @@ class CacheReader
             );
         }
 
-        $cache = $this->cacheBuilder->build($directory);
-        $this->fileAccess->write(
-            'library.directories.cache',
-            $filename,
-            $this->serializer->serialize($cache, 'json'),
-        );
-
-        return $cache;
+        return $this->refresh($directory);
     }
 }
