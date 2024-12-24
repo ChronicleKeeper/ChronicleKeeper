@@ -44,6 +44,19 @@ class RuntimeCollectorTest extends TestCase
     }
 
     #[Test]
+    public function itCanFlushAllToolCalls(): void
+    {
+        $collector = $this->createRuntimeCollectorWithEnabledDebug();
+        $collector->addFunctionDebug(new FunctionDebug('tool1', [], 'result1'));
+        $collector->addFunctionDebug(new FunctionDebug('tool2', [], 'result2'));
+
+        $functionDebugs = $collector->flushFunctionDebug();
+
+        self::assertEmpty((new ReflectionProperty($collector, 'functionDebug'))->getValue($collector));
+        self::assertCount(2, $functionDebugs);
+    }
+
+    #[Test]
     public function isCanReset(): void
     {
         $collector = $this->createRuntimeCollectorWithEnabledDebug();

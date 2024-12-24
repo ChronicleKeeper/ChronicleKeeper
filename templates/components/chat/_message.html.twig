@@ -17,8 +17,8 @@
             </div>
             <div class="card-body chatbot-message">
                 {{ content.message|markdown_to_html }}
-                {% if settings_handler.get.chatbotFunctions.allowDebugOutput and content.extended.calledTools is defined and content.extended.calledTools is not empty %}
-                    {{ _self.bot_debug_output(content) }}
+                {% if settings_handler.get.chatbotFunctions.allowDebugOutput and content.extended.debug.functions is defined and content.extended.debug.functions is not empty %}
+                    {{ _self.bot_debug_output(content.extended.debug.functions) }}
                 {% endif %}
 
                 {{ _self.bot_used_context(content) }}
@@ -62,10 +62,10 @@
     </div>
 {% endmacro %}
 
-{% macro bot_debug_output(content) %}
+{% macro bot_debug_output(debug) %}
     <div class="hr-text text-warning">GPT Functions Debugging Ausgaben</div>
     <div class="accordion" id="debug-tool-calls">
-        {% for index, call in content.extended.calledTools %}
+        {% for index, call in debug %}
             <div class="accordion-item">
                 <h2 class="accordion-header" id="heading-{{ index }}">
                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-{{ index }}" aria-expanded="true">
@@ -75,6 +75,7 @@
                 <div id="collapse-{{ index }}" class="accordion-collapse collapse" data-bs-parent="#debug-tool-calls" style="">
                     <div class="accordion-body pt-0">
                         <pre>{{ call.arguments|json_encode(constant('JSON_PRETTY_PRINT')) }}</pre>
+                        <pre>{{ call.result|json_encode(constant('JSON_PRETTY_PRINT')) }}</pre>
                     </div>
                 </div>
             </div>
@@ -83,10 +84,13 @@
 {% endmacro %}
 
 {% macro bot_used_context(content) %}
-    {% set documents = content.extended.context.documents %}
-    {% set images = content.extended.context.images %}
+    {% set showDocuments = settings_handler.get.chatbotGeneral.showReferencedDocuments %}
+    {% set showImages = settings_handler.get.chatbotGeneral.showReferencedImages %}
 
-    {% if images is not empty or documents is not empty %}
+    {% set documents = showDocuments is same as(false) ? {} : content.extended.context.documents %}
+    {% set images = showImages is same as (false) ? {} : content.extended.context.images %}
+
+    {% if (showDocuments and documents is not empty) or (showImages and images is not empty) %}
         <div class="hr-text text-warning">GPT Functions Used Information</div>
         <div class="accordion" id="debug-additional-information-{{ content.extended.id }}">
             <div class="accordion-item">

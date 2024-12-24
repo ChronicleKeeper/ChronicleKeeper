@@ -7,6 +7,7 @@ namespace ChronicleKeeper\Chat\Application\Service;
 use ChronicleKeeper\Chat\Domain\Entity\Conversation;
 use ChronicleKeeper\Chat\Domain\Entity\ExtendedMessage;
 use ChronicleKeeper\Chat\Domain\ValueObject\MessageContext;
+use ChronicleKeeper\Chat\Domain\ValueObject\MessageDebug;
 use ChronicleKeeper\Chat\Domain\ValueObject\Reference;
 use ChronicleKeeper\Chat\Infrastructure\LLMChain\RuntimeCollector;
 use ChronicleKeeper\Document\Infrastructure\LLMChain\DocumentSearch;
@@ -55,10 +56,16 @@ class ChatMessageExecution
 
         $response          = new ExtendedMessage(message: Message::ofAssistant($response->getContent()));
         $response->context = $this->buildMessageContext();
+        $response->debug   = $this->buildMessageDebug();
 
         $messages[] = $response;
 
         $conversation->messages = $messages;
+    }
+
+    private function buildMessageDebug(): MessageDebug
+    {
+        return new MessageDebug(functions: $this->runtimeCollector->flushFunctionDebug());
     }
 
     private function buildMessageContext(): MessageContext

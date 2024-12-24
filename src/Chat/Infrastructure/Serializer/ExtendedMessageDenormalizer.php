@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace ChronicleKeeper\Chat\Infrastructure\Serializer;
 
 use ChronicleKeeper\Chat\Domain\Entity\ExtendedMessage;
+use ChronicleKeeper\Chat\Domain\ValueObject\FunctionDebug;
 use ChronicleKeeper\Chat\Domain\ValueObject\MessageContext;
+use ChronicleKeeper\Chat\Domain\ValueObject\MessageDebug;
 use ChronicleKeeper\Chat\Domain\ValueObject\Reference;
 use PhpLlm\LlmChain\Model\Message\MessageInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerAwareInterface;
@@ -19,6 +21,7 @@ final class ExtendedMessageDenormalizer implements DenormalizerInterface, Denorm
 {
     public const string WITH_CONTEXT_DOCUMENTS = 'with_context_documents';
     public const string WITH_CONTEXT_IMAGES    = 'with_context_images';
+    public const string WITH_DEBUG_FUNCTIONS   = 'with_debug_functions';
 
     private DenormalizerInterface $denormalizer;
 
@@ -65,6 +68,21 @@ final class ExtendedMessageDenormalizer implements DenormalizerInterface, Denorm
         }
 
         $extendedMessage->context = new MessageContext(array_values($documents), array_values($images));
+
+        $debug = [];
+        if (isset($context[self::WITH_DEBUG_FUNCTIONS]) && $context[self::WITH_DEBUG_FUNCTIONS] === true) {
+            // Denormalize debug functions to be added
+            $debug = array_map(
+                static fn (array $function) => new FunctionDebug(
+                    $function['tool'],
+                    $function['arguments'],
+                    $function['result'],
+                ),
+                $data['debug']['functions'] ?? [],
+            );
+        }
+
+        $extendedMessage->debug = new MessageDebug(array_values($debug));
 
         return $extendedMessage;
     }

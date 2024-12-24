@@ -35,6 +35,7 @@ class GetTemporaryConversationQuery implements Query
         $settings                = $this->settingsHandler->get();
         $showReferencedDocuments = $settings->getChatbotGeneral()->showReferencedDocuments();
         $showReferencedImages    = $settings->getChatbotGeneral()->showReferencedImages();
+        $showDebugOutput         = $settings->getChatbotFunctions()->isAllowDebugOutput();
 
         try {
             return $this->serializer->deserialize(
@@ -44,6 +45,7 @@ class GetTemporaryConversationQuery implements Query
                 [
                     ExtendedMessageDenormalizer::WITH_CONTEXT_DOCUMENTS => $showReferencedDocuments,
                     ExtendedMessageDenormalizer::WITH_CONTEXT_IMAGES => $showReferencedImages,
+                    ExtendedMessageDenormalizer::WITH_DEBUG_FUNCTIONS => $showDebugOutput,
                 ],
             );
         } catch (UnableToReadFile) {

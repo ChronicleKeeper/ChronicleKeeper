@@ -59,6 +59,15 @@ class RuntimeCollector
     }
 
     /** @return list<FunctionDebug> */
+    public function flushFunctionDebug(): array
+    {
+        $functions           = $this->functionDebug;
+        $this->functionDebug = [];
+
+        return $functions;
+    }
+
+    /** @return list<FunctionDebug> */
     public function flushFunctionDebugByTool(string $tool): array
     {
         $debug = array_filter(

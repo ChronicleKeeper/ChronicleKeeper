@@ -9,6 +9,7 @@ use ChronicleKeeper\Chat\Application\Command\StoreConversation as StoreConversat
 use ChronicleKeeper\Chat\Application\Query\FindConversationByIdParameters;
 use ChronicleKeeper\Chat\Application\Query\GetTemporaryConversationParameters;
 use ChronicleKeeper\Chat\Domain\Entity\Conversation;
+use ChronicleKeeper\Chat\Infrastructure\Serializer\ExtendedMessageDenormalizer;
 use ChronicleKeeper\Chat\Presentation\Form\StoreConversationType;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
 use ChronicleKeeper\Shared\Presentation\FlashMessages\Alert;
@@ -42,7 +43,15 @@ class StoreConversation extends AbstractController
     ) {
     }
 
-    #[LiveProp(writable: true, useSerializerForHydration: true)]
+    #[LiveProp(
+        writable: true,
+        useSerializerForHydration: true,
+        serializationContext: [
+            ExtendedMessageDenormalizer::WITH_CONTEXT_DOCUMENTS => true,
+            ExtendedMessageDenormalizer::WITH_CONTEXT_IMAGES => true,
+            ExtendedMessageDenormalizer::WITH_DEBUG_FUNCTIONS => true,
+        ],
+    )]
     public Conversation $conversation;
 
     #[PostMount]
@@ -64,7 +73,7 @@ class StoreConversation extends AbstractController
     public function updateConversation(
         #[LiveArg]
         string $conversationId,
-    ): void {
+    ): Response {
         $conversation = $this->queryService->query(new FindConversationByIdParameters($conversationId));
         if ($conversation === null) {
             $conversation = $this->queryService->query(new GetTemporaryConversationParameters());
@@ -72,6 +81,8 @@ class StoreConversation extends AbstractController
 
         $this->conversation = $conversation;
         $this->getForm()->setData($this->conversation);
+
+        return $this->redirectToRoute('chat', ['conversation' => $conversation->id]);
     }
 
     #[LiveAction]
