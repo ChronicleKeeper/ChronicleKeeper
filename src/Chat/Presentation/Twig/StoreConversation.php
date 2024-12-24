@@ -75,14 +75,16 @@ class StoreConversation extends AbstractController
         string $conversationId,
     ): Response {
         $conversation = $this->queryService->query(new FindConversationByIdParameters($conversationId));
+        $temporary = false;
         if ($conversation === null) {
             $conversation = $this->queryService->query(new GetTemporaryConversationParameters());
+            $temporary = true;
         }
 
         $this->conversation = $conversation;
         $this->getForm()->setData($this->conversation);
 
-        return $this->redirectToRoute('chat', ['conversation' => $conversation->id]);
+        return $this->redirectToRoute('chat', ['conversation' => $temporary ? null : $conversation->id]);
     }
 
     #[LiveAction]
