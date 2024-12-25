@@ -33,7 +33,7 @@
 
     {% component "Tabler:Modal" with {id: 'store-conversation-modal'} %}
         {% block modal_full_content %}
-            {{ component('Chat:StoreConversation', chatOptions) }}
+            {{ component('Chat:StoreConversation', { 'conversationId': not isTemporary ? conversation.id : null }) }}
         {% endblock %}
     {% endcomponent %}
 

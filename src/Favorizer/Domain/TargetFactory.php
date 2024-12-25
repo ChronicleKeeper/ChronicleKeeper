@@ -58,6 +58,6 @@ class TargetFactory
 
     private function createFromConversation(Conversation $conversation): Target
     {
-        return new ChatConversationTarget($conversation->id, u($conversation->title)->truncate(20, '…')->toString());
+        return new ChatConversationTarget($conversation->getId(), u($conversation->getTitle())->truncate(20, '…')->toString());
     }
 }

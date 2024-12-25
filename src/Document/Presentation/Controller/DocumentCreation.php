@@ -6,6 +6,7 @@ namespace ChronicleKeeper\Document\Presentation\Controller;
 
 use ChronicleKeeper\Chat\Application\Query\FindConversationByIdParameters;
 use ChronicleKeeper\Chat\Application\Query\GetTemporaryConversationParameters;
+use ChronicleKeeper\Chat\Domain\Entity\Conversation;
 use ChronicleKeeper\Chat\Domain\Entity\ExtendedMessage;
 use ChronicleKeeper\Document\Application\Command\StoreDocument;
 use ChronicleKeeper\Document\Domain\Entity\Document;
@@ -83,13 +84,13 @@ class DocumentCreation extends AbstractController
             new FindConversationByIdParameters((string) $request->query->get('conversation')),
         );
 
-        if ($conversation === null) {
+        if (! $conversation instanceof Conversation) {
             $conversation = $this->queryService->query(new GetTemporaryConversationParameters());
         }
 
         $chatMessageToTemplateFrom = (string) $request->query->get('conversation_message');
 
-        $latestMessages            = $conversation->messages->getArrayCopy();
+        $latestMessages            = $conversation->getMessages()->getArrayCopy();
         $foundMessagesByIdentifier = array_filter(
             $latestMessages,
             static fn (ExtendedMessage $message) => $message->id === $chatMessageToTemplateFrom,
@@ -106,7 +107,7 @@ class DocumentCreation extends AbstractController
         }
 
         return Document::create(
-            $conversation->title,
+            $conversation->getTitle(),
             (string) $foundMessageByIdentifier->message->content,
         );
     }

@@ -35,10 +35,10 @@ class ConversationDelete extends AbstractController
             $this->addFlashMessage(
                 $request,
                 Alert::WARNING,
-                'Das Löschen des Gespräches "' . $conversation->title . '" muss erst bestätigt werden!',
+                'Das Löschen des Gespräches "' . $conversation->getTitle() . '" muss erst bestätigt werden!',
             );
 
-            return $this->redirectToRoute('library', ['directory' => $conversation->directory->id]);
+            return $this->redirectToRoute('library', ['directory' => $conversation->getDirectory()->id]);
         }
 
         $this->bus->dispatch(new DeleteConversation($conversation));
@@ -46,9 +46,9 @@ class ConversationDelete extends AbstractController
         $this->addFlashMessage(
             $request,
             Alert::SUCCESS,
-            'Das Gespräch "' . $conversation->title . '" wurde erfolgreich gelöscht.',
+            'Das Gespräch "' . $conversation->getTitle() . '" wurde erfolgreich gelöscht.',
         );
 
-        return $this->redirectToRoute('library', ['directory' => $conversation->directory->id]);
+        return $this->redirectToRoute('library', ['directory' => $conversation->getDirectory()->id]);
     }
 }

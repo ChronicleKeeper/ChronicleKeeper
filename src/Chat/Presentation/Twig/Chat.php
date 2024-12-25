@@ -68,7 +68,7 @@ class Chat extends AbstractController
     /** @return list<array{role: string, message: string, extended: ExtendedMessage}> */
     public function getMessages(): array
     {
-        return $this->messageBagToViewConverter->convert($this->conversation->messages);
+        return $this->messageBagToViewConverter->convert($this->conversation->getMessages());
     }
 
     #[LiveAction]
@@ -81,13 +81,13 @@ class Chat extends AbstractController
         if ($this->isTemporary === true) {
             $this->bus->dispatch(new StoreTemporaryConversation($this->conversation));
 
-            $this->emit('conversation_updated', ['conversationId' => $this->conversation->id]);
+            $this->emit('conversation_updated', ['conversationId' => $this->conversation->getId()]);
 
             return;
         }
 
         $this->bus->dispatch(new StoreConversationCommand($this->conversation));
 
-        $this->emit('conversation_updated', ['conversationId' => $this->conversation->id]);
+        $this->emit('conversation_updated', ['conversationId' => $this->conversation->getId()]);
     }
 }

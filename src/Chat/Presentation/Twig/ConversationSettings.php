@@ -75,7 +75,7 @@ class ConversationSettings extends AbstractController
 
         return $this->createForm(
             ConversationSettingsType::class,
-            $this->conversation->settings,
+            $this->conversation->getSettings(),
         );
     }
 
@@ -102,7 +102,7 @@ class ConversationSettings extends AbstractController
 
         assert($settings instanceof Settings);
 
-        $this->conversation->settings = $settings;
+        $this->conversation->changeSettings($settings);
 
         if ($this->isTemporary === true) {
             $this->bus->dispatch(new StoreTemporaryConversation($this->conversation));
@@ -112,6 +112,6 @@ class ConversationSettings extends AbstractController
 
         $this->bus->dispatch(new StoreConversationCommand($this->conversation));
 
-        return $this->redirectToRoute('chat', ['conversation' => $this->conversation->id]);
+        return $this->redirectToRoute('chat', ['conversation' => $this->conversation->getId()]);
     }
 }

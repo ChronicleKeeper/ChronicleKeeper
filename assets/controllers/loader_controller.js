@@ -17,7 +17,9 @@ export default class extends Controller {
 
         const attachFormSubmitListener = () => {
             const form = document.querySelector('form');
-            if (form) {
+            const isLiveActionForm = form && form.getAttribute('data-action') !== null;
+
+            if (form && !isLiveActionForm) {
                 form.addEventListener('submit', (event) => {
                     event.preventDefault();
                     showLoader();
@@ -69,6 +71,14 @@ export default class extends Controller {
             hideLoader();
             attachFormSubmitListener();
         };
+
+        window.addEventListener('loader:show', () => {
+            showLoader();
+        });
+
+        window.addEventListener('loader:hide', () => {
+            hideLoader();
+        });
     }
 
 

@@ -49,11 +49,11 @@ class Element
     public static function fromConversationEntity(Conversation $conversation): Element
     {
         return new Element(
-            $conversation->id,
+            $conversation->getId(),
             'conversation',
-            $conversation->title,
+            $conversation->getTitle(),
             $conversation->getSlug(),
-            $conversation->messages->count(),
+            $conversation->getMessages()->count(),
             null,
         );
     }

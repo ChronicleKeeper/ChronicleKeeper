@@ -56,7 +56,7 @@ class ClearOnLinkedDataRemoval
     public function removeOnConversationDeleted(ConversationDeleted $event): void
     {
         $targetBag = $this->queryService->query(new GetTargetBag());
-        $target    = new ChatConversationTarget($event->conversation->id, 'Irrelevant');
+        $target    = new ChatConversationTarget($event->conversation->getId(), 'Irrelevant');
 
         if (! $targetBag->exists($target)) {
             return;

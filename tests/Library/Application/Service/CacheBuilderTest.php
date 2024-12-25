@@ -70,7 +70,7 @@ class CacheBuilderTest extends TestCase
                         return [$document];
                     }
 
-                    self::assertSame($conversation->directory->id, $query->directory->id);
+                    self::assertSame($conversation->getDirectory()->id, $query->directory->id);
 
                     return [$conversation];
                 },

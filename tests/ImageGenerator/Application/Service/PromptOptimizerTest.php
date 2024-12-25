@@ -32,8 +32,10 @@ class PromptOptimizerTest extends TestCase
                     return true;
                 }),
                 self::callback(static function (Conversation $conversation): bool {
-                    self::assertCount(1, $conversation->messages);
-                    $conversation->messages[] = new ExtendedMessage(Message::ofAssistant('Success!'));
+                    $messages = $conversation->getMessages();
+
+                    self::assertCount(1, $messages);
+                    $messages[] = new ExtendedMessage(Message::ofAssistant('Success!'));
 
                     return true;
                 }),

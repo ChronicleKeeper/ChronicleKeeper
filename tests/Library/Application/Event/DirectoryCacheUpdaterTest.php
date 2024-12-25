@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Test\Library\Application\Event;
 
+use ChronicleKeeper\Chat\Domain\Event\ConversationCreated;
 use ChronicleKeeper\Chat\Domain\Event\ConversationDeleted;
+use ChronicleKeeper\Chat\Domain\Event\ConversationMovedToDirectory;
+use ChronicleKeeper\Chat\Domain\Event\ConversationRenamed;
 use ChronicleKeeper\Document\Domain\Event\DocumentCreated;
 use ChronicleKeeper\Document\Domain\Event\DocumentDeleted;
 use ChronicleKeeper\Document\Domain\Event\DocumentMovedToDirectory;
@@ -144,5 +147,64 @@ class DirectoryCacheUpdaterTest extends TestCase
             ->with($directory);
 
         $this->directoryCacheUpdater->updateOnConversationDeleted($event);
+    }
+
+    #[Test]
+    public function updateOnConversationMovedToDirectory(): void
+    {
+        $directory    = (new DirectoryBuilder())->build();
+        $oldDirectory = (new DirectoryBuilder())->build();
+        $conversation = (new ConversationBuilder())->withDirectory($directory)->build();
+
+        $event = new ConversationMovedToDirectory($conversation, $oldDirectory);
+
+        $invoker = $this->exactly(2);
+        $this->cacheReader->expects($invoker)
+            ->method('refresh')
+            ->willReturnCallback(
+                static function (Directory $argDirectory) use ($invoker, $directory, $oldDirectory): DirectoryCache {
+                    if ($invoker->numberOfInvocations() === 1) {
+                        self::assertSame($directory, $argDirectory);
+
+                        return DirectoryCache::fromEntity($directory);
+                    }
+
+                    self::assertSame($oldDirectory, $argDirectory);
+
+                    return DirectoryCache::fromEntity($directory);
+                },
+            );
+
+        $this->directoryCacheUpdater->updateOnConversationMovedToDirectory($event);
+    }
+
+    #[Test]
+    public function updateOnConversationRenamed(): void
+    {
+        $directory    = (new DirectoryBuilder())->build();
+        $conversation = (new ConversationBuilder())->withDirectory($directory)->build();
+
+        $event = new ConversationRenamed($conversation, 'new-name');
+
+        $this->cacheReader->expects($this->once())
+            ->method('refresh')
+            ->with($directory);
+
+        $this->directoryCacheUpdater->updateOnConversationRenamed($event);
+    }
+
+    #[Test]
+    public function updateOnConversationCreated(): void
+    {
+        $directory    = (new DirectoryBuilder())->build();
+        $conversation = (new ConversationBuilder())->withDirectory($directory)->build();
+
+        $event = new ConversationCreated($conversation);
+
+        $this->cacheReader->expects($this->once())
+            ->method('refresh')
+            ->with($directory);
+
+        $this->directoryCacheUpdater->updateOnConversationCreated($event);
     }
 }

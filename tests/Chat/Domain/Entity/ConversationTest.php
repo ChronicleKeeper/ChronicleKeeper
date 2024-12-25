@@ -6,8 +6,11 @@ namespace ChronicleKeeper\Test\Chat\Domain\Entity;
 
 use ChronicleKeeper\Chat\Domain\Entity\Conversation;
 use ChronicleKeeper\Chat\Domain\Entity\ExtendedMessageBag;
+use ChronicleKeeper\Chat\Domain\Event\ConversationMovedToDirectory;
+use ChronicleKeeper\Chat\Domain\Event\ConversationRenamed;
 use ChronicleKeeper\Chat\Domain\ValueObject\Settings;
 use ChronicleKeeper\Library\Domain\RootDirectory;
+use ChronicleKeeper\Test\Library\Domain\Entity\DirectoryBuilder;
 use ChronicleKeeper\Test\Settings\Domain\ValueObject\SettingsBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
@@ -24,8 +27,8 @@ class ConversationTest extends TestCase
     {
         $conversation = Conversation::createEmpty();
 
-        self::assertNotEmpty($conversation->id);
-        self::assertSame('Ungespeichert', $conversation->title);
+        self::assertNotEmpty($conversation->getId());
+        self::assertSame('Ungespeichert', $conversation->getTitle());
     }
 
     #[Test]
@@ -34,8 +37,8 @@ class ConversationTest extends TestCase
         $appSettings  = (new SettingsBuilder())->build();
         $conversation = Conversation::createFromSettings($appSettings);
 
-        self::assertNotEmpty($conversation->id);
-        self::assertSame('Ungespeichert', $conversation->title);
+        self::assertNotEmpty($conversation->getId());
+        self::assertSame('Ungespeichert', $conversation->getTitle());
     }
 
     #[Test]
@@ -75,5 +78,98 @@ class ConversationTest extends TestCase
             ],
             $json,
         );
+    }
+
+    #[Test]
+    public function itCanBeDuplicated(): void
+    {
+        $conversation = (new ConversationBuilder())
+            ->withMessages((new ExtendedMessageBagBuilder())
+                ->withMessages((new ExtendedMessageBuilder())->build(), (new ExtendedMessageBuilder())->build())
+                ->build())
+            ->build();
+
+        $duplicatedConversation = Conversation::createFromConversation($conversation);
+
+        // Check base data
+        self::assertNotSame($conversation->getId(), $duplicatedConversation->getId());
+        self::assertSame($conversation->getTitle(), $duplicatedConversation->getTitle());
+        self::assertSame($conversation->getDirectory(), $duplicatedConversation->getDirectory());
+
+        // Check settings
+        self::assertSame(
+            $conversation->getSettings()->version,
+            $duplicatedConversation->getSettings()->version,
+        );
+        self::assertSame(
+            $conversation->getSettings()->temperature,
+            $duplicatedConversation->getSettings()->temperature,
+        );
+        self::assertSame(
+            $conversation->getSettings()->imagesMaxDistance,
+            $duplicatedConversation->getSettings()->imagesMaxDistance,
+        );
+        self::assertSame(
+            $conversation->getSettings()->documentsMaxDistance,
+            $duplicatedConversation->getSettings()->documentsMaxDistance,
+        );
+
+        // Check messages
+        self::assertCount(2, $duplicatedConversation->getMessages());
+        self::assertSame(
+            $conversation->getMessages()->getArrayCopy(),
+            $duplicatedConversation->getMessages()->getArrayCopy(),
+        );
+    }
+
+    #[Test]
+    public function itRecordsEventWhenRenamed(): void
+    {
+        $conversation = (new ConversationBuilder())->withTitle('Old Title')->build();
+        $conversation->rename('New Title');
+
+        $events = $conversation->flushEvents();
+        self::assertCount(1, $events);
+        self::assertInstanceOf(ConversationRenamed::class, $events[0]);
+        self::assertSame('Old Title', $events[0]->oldTitle);
+        self::assertSame('New Title', $conversation->getTitle());
+    }
+
+    #[Test]
+    public function itDoesNotRecordEventWhenRenamedToSameTitle(): void
+    {
+        $conversation = (new ConversationBuilder())->withTitle('Same Title')->build();
+        $conversation->rename('Same Title');
+
+        $events = $conversation->flushEvents();
+        self::assertCount(0, $events);
+    }
+
+    #[Test]
+    public function itRecordsEventWhenMovedToDirectory(): void
+    {
+        $oldDirectory = (new DirectoryBuilder())->build();
+        $newDirectory = (new DirectoryBuilder())->build();
+        $conversation = (new ConversationBuilder())->withDirectory($oldDirectory)->build();
+
+        $conversation->moveToDirectory($newDirectory);
+
+        $events = $conversation->flushEvents();
+        self::assertCount(1, $events);
+        self::assertInstanceOf(ConversationMovedToDirectory::class, $events[0]);
+        self::assertSame($oldDirectory, $events[0]->oldDirectory);
+        self::assertSame($newDirectory, $conversation->getDirectory());
+    }
+
+    #[Test]
+    public function itDoesNotRecordEventWhenMovedToSameDirectory(): void
+    {
+        $directory    = (new DirectoryBuilder())->build();
+        $conversation = (new ConversationBuilder())->withDirectory($directory)->build();
+
+        $conversation->moveToDirectory($directory);
+
+        $events = $conversation->flushEvents();
+        self::assertCount(0, $events);
     }
 }

@@ -4,12 +4,10 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Chat\Presentation\Twig;
 
-use ChronicleKeeper\Chat\Application\Command\ResetTemporaryConversation;
 use ChronicleKeeper\Chat\Application\Command\StoreConversation as StoreConversationCommand;
 use ChronicleKeeper\Chat\Application\Query\FindConversationByIdParameters;
 use ChronicleKeeper\Chat\Application\Query\GetTemporaryConversationParameters;
 use ChronicleKeeper\Chat\Domain\Entity\Conversation;
-use ChronicleKeeper\Chat\Infrastructure\Serializer\ExtendedMessageDenormalizer;
 use ChronicleKeeper\Chat\Presentation\Form\StoreConversationType;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
 use ChronicleKeeper\Shared\Presentation\FlashMessages\Alert;
@@ -43,68 +41,80 @@ class StoreConversation extends AbstractController
     ) {
     }
 
-    #[LiveProp(
-        writable: true,
-        useSerializerForHydration: true,
-        serializationContext: [
-            ExtendedMessageDenormalizer::WITH_CONTEXT_DOCUMENTS => true,
-            ExtendedMessageDenormalizer::WITH_CONTEXT_IMAGES => true,
-            ExtendedMessageDenormalizer::WITH_DEBUG_FUNCTIONS => true,
-        ],
-    )]
-    public Conversation $conversation;
+    #[LiveProp(writable: true)]
+    public string|null $conversationId = null;
+    #[LiveProp]
+    public bool $isTemporary           = true;
+
+    private Conversation $conversation;
 
     #[PostMount]
-    public function loadTemporaryConversation(): void
+    public function loadConversation(): void
     {
         if (isset($this->conversation)) {
             return;
         }
 
+        if ($this->conversationId !== null) {
+            $this->isTemporary  = false;
+            $this->conversation = $this->queryService->query(new FindConversationByIdParameters($this->conversationId));
+
+            return;
+        }
+
+        // Load temporary when there is no identifier for an existing conversation
+        $this->isTemporary  = true;
         $this->conversation = $this->queryService->query(new GetTemporaryConversationParameters());
     }
 
     protected function instantiateForm(): FormInterface
     {
-        return $this->createForm(StoreConversationType::class, $this->conversation ?? Conversation::createEmpty());
+        if (! isset($this->conversation)) {
+            $this->loadConversation();
+        }
+
+        return $this->createForm(StoreConversationType::class, $this->conversation);
     }
 
     #[LiveListener('conversation_updated')]
     public function updateConversation(
         #[LiveArg]
         string $conversationId,
-    ): Response {
+    ): void {
         $conversation = $this->queryService->query(new FindConversationByIdParameters($conversationId));
-        $temporary    = false;
         if ($conversation === null) {
             $conversation = $this->queryService->query(new GetTemporaryConversationParameters());
-            $temporary    = true;
         }
 
         $this->conversation = $conversation;
         $this->getForm()->setData($this->conversation);
-
-        return $this->redirectToRoute('chat', ['conversation' => $temporary ? null : $conversation->id]);
     }
 
     #[LiveAction]
     public function store(Request $request): Response
     {
+        $this->isTemporary = $this->conversationId === null;
+
         $this->submitForm();
         $conversationData = $this->getForm()->getData();
         $this->resetForm();
 
         assert($conversationData instanceof Conversation);
 
+        if ($this->isTemporary === true) {
+            $conversationData = Conversation::createFromConversation($conversationData);
+        }
+
         $this->bus->dispatch(new StoreConversationCommand($conversationData));
-        $this->bus->dispatch(new ResetTemporaryConversation());
 
         $this->addFlashMessage(
             $request,
             Alert::SUCCESS,
-            'Die Unterhaltung wurde erfolgreich in der Bibliothek gespeichert.',
+            $this->isTemporary
+                ? 'Die Unterhaltung wurde erfolgreich in der Bibliothek gespeichert.'
+                : 'Die Unterhaltung wurde erfolgreich aktualisiert.',
         );
 
-        return $this->redirectToRoute('chat', ['conversation' => $this->conversation->id]);
+        return $this->redirectToRoute('chat', ['conversation' => $conversationData->getId()]);
     }
 }

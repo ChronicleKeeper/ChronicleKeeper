@@ -20,7 +20,7 @@ class DeleteConversationHandler
 
     public function __invoke(DeleteConversation $message): void
     {
-        $this->fileAccess->delete('library.conversations', $message->conversation->id . '.json');
+        $this->fileAccess->delete('library.conversations', $message->conversation->getId() . '.json');
         $this->eventDispatcher->dispatch(new ConversationDeleted($message->conversation));
     }
 }

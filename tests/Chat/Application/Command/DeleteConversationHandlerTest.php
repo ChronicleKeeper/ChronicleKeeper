@@ -29,7 +29,7 @@ class DeleteConversationHandlerTest extends TestCase
         $fileAccess = $this->createMock(FileAccess::class);
         $fileAccess->expects($this->once())
             ->method('delete')
-            ->with('library.conversations', $conversation->id . '.json');
+            ->with('library.conversations', $conversation->getId() . '.json');
 
         $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
         $eventDispatcher->expects($this->once())

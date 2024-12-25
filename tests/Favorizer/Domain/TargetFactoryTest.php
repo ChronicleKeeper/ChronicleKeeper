@@ -102,9 +102,9 @@ class TargetFactoryTest extends TestCase
             );
 
         $targetFactory = new TargetFactory($filesystemImageRepository, $queryService);
-        $target        = $targetFactory->create($conversation->id, $conversation::class);
+        $target        = $targetFactory->create($conversation->getId(), $conversation::class);
 
-        self::assertSame($conversation->id, $target->getId());
+        self::assertSame($conversation->getId(), $target->getId());
         self::assertSame('Foo Bar Baz Quoz Qu…', $target->getTitle());
     }
 

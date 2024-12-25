@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Library\Application\Event;
 
+use ChronicleKeeper\Chat\Domain\Event\ConversationCreated;
 use ChronicleKeeper\Chat\Domain\Event\ConversationDeleted;
+use ChronicleKeeper\Chat\Domain\Event\ConversationMovedToDirectory;
+use ChronicleKeeper\Chat\Domain\Event\ConversationRenamed;
 use ChronicleKeeper\Document\Domain\Event\DocumentCreated;
 use ChronicleKeeper\Document\Domain\Event\DocumentDeleted;
 use ChronicleKeeper\Document\Domain\Event\DocumentMovedToDirectory;
@@ -54,6 +57,25 @@ class DirectoryCacheUpdater
     #[AsEventListener]
     public function updateOnConversationDeleted(ConversationDeleted $event): void
     {
-        $this->cacheReader->refresh($event->conversation->directory);
+        $this->cacheReader->refresh($event->conversation->getDirectory());
+    }
+
+    #[AsEventListener]
+    public function updateOnConversationMovedToDirectory(ConversationMovedToDirectory $event): void
+    {
+        $this->cacheReader->refresh($event->conversation->getDirectory());
+        $this->cacheReader->refresh($event->oldDirectory);
+    }
+
+    #[AsEventListener]
+    public function updateOnConversationRenamed(ConversationRenamed $event): void
+    {
+        $this->cacheReader->refresh($event->conversation->getDirectory());
+    }
+
+    #[AsEventListener]
+    public function updateOnConversationCreated(ConversationCreated $event): void
+    {
+        $this->cacheReader->refresh($event->conversation->getDirectory());
     }
 }
