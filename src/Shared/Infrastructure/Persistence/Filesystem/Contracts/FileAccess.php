@@ -14,7 +14,6 @@ interface FileAccess
      * Read a file from the filesystem.
      *
      * @param non-empty-string $type
-     * @param non-empty-string $filename
      *
      * @throws UnableToReadFile
      */
@@ -24,7 +23,6 @@ interface FileAccess
      * Checks if the file exists in the filesystem.
      *
      * @param non-empty-string $type
-     * @param non-empty-string $filename
      */
     public function exists(string $type, string $filename): bool;
 
@@ -32,7 +30,6 @@ interface FileAccess
      * Write a file to the filesystem.
      *
      * @param non-empty-string $type
-     * @param non-empty-string $filename
      *
      * @throws UnableToWriteFile
      */
@@ -42,7 +39,6 @@ interface FileAccess
      * Delete a file from the filesystem.
      *
      * @param non-empty-string $type
-     * @param non-empty-string $filename
      *
      * @throws UnableToDeleteFile
      */

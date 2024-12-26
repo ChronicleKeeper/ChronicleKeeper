@@ -7,6 +7,8 @@ namespace ChronicleKeeper\Library\Application\Service;
 use ChronicleKeeper\Library\Domain\Entity\Directory as DirectoryEntity;
 use ChronicleKeeper\Library\Domain\ValueObject\DirectoryCache\Directory as DirectoryCache;
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
+use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\Finder;
+use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\PathRegistry;
 use Symfony\Component\Serializer\SerializerInterface;
 
 class CacheReader
@@ -15,6 +17,8 @@ class CacheReader
         private readonly FileAccess $fileAccess,
         private readonly CacheBuilder $cacheBuilder,
         private readonly SerializerInterface $serializer,
+        private readonly Finder $finder,
+        private readonly PathRegistry $pathRegistry,
     ) {
     }
 
@@ -36,6 +40,14 @@ class CacheReader
     {
         $filename = $directory->getId() . '.json';
         $this->fileAccess->delete('library.directories.cache', $filename);
+    }
+
+    public function clear(): void
+    {
+        $files = $this->finder->findFilesInDirectory($this->pathRegistry->get('library.directories.cache'));
+        foreach ($files as $file) {
+            $this->fileAccess->delete('library.directories.cache', $file->getFilename());
+        }
     }
 
     public function read(DirectoryEntity $directory): DirectoryCache
