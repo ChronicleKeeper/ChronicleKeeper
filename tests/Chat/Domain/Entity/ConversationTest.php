@@ -8,6 +8,7 @@ use ChronicleKeeper\Chat\Domain\Entity\Conversation;
 use ChronicleKeeper\Chat\Domain\Entity\ExtendedMessageBag;
 use ChronicleKeeper\Chat\Domain\Event\ConversationMovedToDirectory;
 use ChronicleKeeper\Chat\Domain\Event\ConversationRenamed;
+use ChronicleKeeper\Chat\Domain\Event\ConversationSettingsChanged;
 use ChronicleKeeper\Chat\Domain\ValueObject\Settings;
 use ChronicleKeeper\Library\Domain\RootDirectory;
 use ChronicleKeeper\Test\Library\Domain\Entity\DirectoryBuilder;
@@ -168,6 +169,38 @@ class ConversationTest extends TestCase
         $conversation = (new ConversationBuilder())->withDirectory($directory)->build();
 
         $conversation->moveToDirectory($directory);
+
+        $events = $conversation->flushEvents();
+        self::assertCount(0, $events);
+    }
+
+    #[Test]
+    public function itRecordsEventWhenSettingsChanged(): void
+    {
+        $conversation = (new ConversationBuilder())
+            ->withSettings(new Settings(temperature: 0.2))
+            ->build();
+
+        $settings = new Settings();
+        $conversation->changeSettings($settings);
+
+        $events = $conversation->flushEvents();
+        self::assertCount(1, $events);
+        self::assertInstanceOf(ConversationSettingsChanged::class, $events[0]);
+        self::assertNotSame($settings, $events[0]->oldSettings);
+        self::assertSame($settings, $conversation->getSettings());
+    }
+
+    #[Test]
+    public function itDoesNotRecordEventWhenSettingsNotChanged(): void
+    {
+        $conversation = (new ConversationBuilder())
+            ->withSettings(new Settings(temperature: 0.2))
+            ->build();
+
+        $newSettings = new Settings(temperature: 0.2);
+
+        $conversation->changeSettings($newSettings);
 
         $events = $conversation->flushEvents();
         self::assertCount(0, $events);

@@ -20,8 +20,6 @@ use PhpLlm\LlmChain\Model\Message\Message;
 use Symfony\Component\String\Slugger\AsciiSlugger;
 use Symfony\Component\Uid\Uuid;
 
-use function spl_object_hash;
-
 class Conversation extends AggregateRoot implements JsonSerializable, Sluggable
 {
     public function __construct(
@@ -141,7 +139,7 @@ class Conversation extends AggregateRoot implements JsonSerializable, Sluggable
 
     public function changeSettings(Settings $settings): void
     {
-        if (spl_object_hash($settings) === spl_object_hash($this->settings)) {
+        if ($this->settings->equals($settings)) {
             return;
         }
 
