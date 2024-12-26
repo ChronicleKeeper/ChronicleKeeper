@@ -38,8 +38,10 @@ class LibraryDocumentUpdater
         }
     }
 
-    private function updateOrCreateVectorsForDocument(Document $document, int $contentLength): void
-    {
+    public function updateOrCreateVectorsForDocument(
+        Document $document,
+        int $contentLength = self::VECTOR_CONTENT_LENGTH,
+    ): void {
         $existingStorage = $this->queryService->query(new FindVectorsOfDocument($document->getId()));
 
         if ($existingStorage === []) {

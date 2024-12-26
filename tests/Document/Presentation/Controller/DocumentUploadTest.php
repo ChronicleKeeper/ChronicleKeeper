@@ -8,8 +8,13 @@ use ChronicleKeeper\Document\Presentation\Controller\DocumentUpload;
 use ChronicleKeeper\Document\Presentation\Form\DocumentUploadType;
 use ChronicleKeeper\Library\Domain\RootDirectory;
 use ChronicleKeeper\Library\Presentation\Twig\DirectoryBreadcrumb;
+use ChronicleKeeper\Shared\Infrastructure\LLMChain\LLMChainFactory;
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
+use ChronicleKeeper\Test\Shared\Infrastructure\LLMChain\LLMChainFactoryDouble;
 use ChronicleKeeper\Test\Shared\Infrastructure\Persistence\Filesystem\FileAccessDouble;
+use PhpLlm\LlmChain\Bridge\OpenAI\Embeddings;
+use PhpLlm\LlmChain\Document\Vector;
+use PhpLlm\LlmChain\Model\Response\ResponseInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Large;
 use PHPUnit\Framework\Attributes\Test;
@@ -56,6 +61,21 @@ class DocumentUploadTest extends WebTestCase
         );
 
         $client = static::createClient();
+
+        $llmChainFactory = $client->getContainer()->get(LLMChainFactory::class);
+        assert($llmChainFactory instanceof LLMChainFactoryDouble);
+
+        $llmChainFactory->addPlatformResponse(
+            Embeddings::class,
+            new class implements ResponseInterface {
+                /** @return Vector[] */
+                public function getContent(): array
+                {
+                    return [new Vector([1.0, 2.0, 3.0])];
+                }
+            },
+        );
+
         $client->request(
             Request::METHOD_POST,
             '/library/directory/' . RootDirectory::ID . '/upload_document',

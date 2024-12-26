@@ -10,10 +10,15 @@ use ChronicleKeeper\Document\Presentation\Form\DocumentType;
 use ChronicleKeeper\Library\Domain\RootDirectory;
 use ChronicleKeeper\Library\Presentation\Twig\DirectoryBreadcrumb;
 use ChronicleKeeper\Library\Presentation\Twig\DirectorySelection;
+use ChronicleKeeper\Shared\Infrastructure\LLMChain\LLMChainFactory;
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
 use ChronicleKeeper\Test\Document\Domain\Entity\DocumentBuilder;
+use ChronicleKeeper\Test\Shared\Infrastructure\LLMChain\LLMChainFactoryDouble;
 use ChronicleKeeper\Test\Shared\Infrastructure\Persistence\Filesystem\FileAccessDouble;
 use Override;
+use PhpLlm\LlmChain\Bridge\OpenAI\Embeddings;
+use PhpLlm\LlmChain\Document\Vector;
+use PhpLlm\LlmChain\Model\Response\ResponseInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Large;
 use PHPUnit\Framework\Attributes\Test;
@@ -95,6 +100,20 @@ class DocumentEditTest extends WebTestCase
     #[Test]
     public function isIsEditingADocument(): void
     {
+        $llmChainFactory = $this->client->getContainer()->get(LLMChainFactory::class);
+        assert($llmChainFactory instanceof LLMChainFactoryDouble);
+
+        $llmChainFactory->addPlatformResponse(
+            Embeddings::class,
+            new class implements ResponseInterface {
+                /** @return Vector[] */
+                public function getContent(): array
+                {
+                    return [new Vector([1.0, 2.0, 3.0])];
+                }
+            },
+        );
+
         $this->client->request(
             Request::METHOD_POST,
             '/library/document/' . $this->fixtureDocument->getId() . '/edit',
