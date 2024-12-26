@@ -41,7 +41,7 @@ class DocumentEdit extends AbstractController
             $this->addFlashMessage(
                 $request,
                 Alert::SUCCESS,
-                'Das Dokument wurde bearbeitet, damit die Änderungen in der Suche aktiv sind muss der Index aktualisiert werden.',
+                'Das geänderte Dokument wurde in der Bbiliothek hinterlegt und steht in deinen Gesprächen nun zur Verfügung.',
             );
 
             return $this->redirectToRoute('library', ['directory' => $document->getDirectory()->getId()]);
