@@ -4,3 +4,6 @@ services:
 
   ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\Finder:
     class: ChronicleKeeper\Test\Shared\Infrastructure\Persistence\Filesystem\FinderDouble
+
+  ChronicleKeeper\Shared\Infrastructure\LLMChain\LLMChainFactory:
+    class: ChronicleKeeper\Test\Shared\Infrastructure\LLMChain\LLMChainFactoryDouble

@@ -32,7 +32,7 @@ class LibraryImageUpdater
         }
     }
 
-    private function updateOrCreateVectorsForImage(Image $image): void
+    public function updateOrCreateVectorsForImage(Image $image): void
     {
         $existingStorage = $this->vectorImageRepository->findAllByImageId($image->getId());
 
