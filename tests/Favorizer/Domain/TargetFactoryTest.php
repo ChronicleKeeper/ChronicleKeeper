@@ -13,7 +13,7 @@ use ChronicleKeeper\Shared\Application\Query\QueryParameters;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
 use ChronicleKeeper\Test\Chat\Domain\Entity\ConversationBuilder;
 use ChronicleKeeper\Test\Document\Domain\Entity\DocumentBuilder;
-use ChronicleKeeper\Test\Library\Domain\Entity\ImageBuilder;
+use ChronicleKeeper\Test\Image\Domain\Entity\ImageBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\Attributes\Test;
@@ -40,7 +40,7 @@ class TargetFactoryTest extends TestCase
             ->willReturnCallback(
                 static function (QueryParameters $query) use ($document): object {
                     if ($query instanceof GetDocument) {
-                        self::assertSame($document->id, $query->id);
+                        self::assertSame($document->getId(), $query->id);
 
                         return $document;
                     }
@@ -50,9 +50,9 @@ class TargetFactoryTest extends TestCase
             );
 
         $targetFactory = new TargetFactory($filesystemImageRepository, $queryService);
-        $target        = $targetFactory->create($document->id, $document::class);
+        $target        = $targetFactory->create($document->getId(), $document::class);
 
-        self::assertSame($document->id, $target->getId());
+        self::assertSame($document->getId(), $target->getId());
         self::assertSame('Foo Bar Baz Quoz Qu…', $target->getTitle());
     }
 
@@ -66,16 +66,16 @@ class TargetFactoryTest extends TestCase
         $filesystemImageRepository = $this->createMock(FilesystemImageRepository::class);
         $filesystemImageRepository->expects($this->once())
             ->method('findById')
-            ->with($image->id)
+            ->with($image->getId())
             ->willReturn($image);
 
         $queryService = $this->createMock(QueryService::class);
         $queryService->expects($this->never())->method('query');
 
         $targetFactory = new TargetFactory($filesystemImageRepository, $queryService);
-        $target        = $targetFactory->create($image->id, $image::class);
+        $target        = $targetFactory->create($image->getId(), $image::class);
 
-        self::assertSame($image->id, $target->getId());
+        self::assertSame($image->getId(), $target->getId());
         self::assertSame('Foo Bar Baz Quoz Qu…', $target->getTitle());
     }
 
@@ -102,9 +102,9 @@ class TargetFactoryTest extends TestCase
             );
 
         $targetFactory = new TargetFactory($filesystemImageRepository, $queryService);
-        $target        = $targetFactory->create($conversation->id, $conversation::class);
+        $target        = $targetFactory->create($conversation->getId(), $conversation::class);
 
-        self::assertSame($conversation->id, $target->getId());
+        self::assertSame($conversation->getId(), $target->getId());
         self::assertSame('Foo Bar Baz Quoz Qu…', $target->getTitle());
     }
 

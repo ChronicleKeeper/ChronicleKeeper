@@ -54,10 +54,10 @@ class DocumentUpload extends AbstractController
                 $this->addFlashMessage(
                     $request,
                     Alert::SUCCESS,
-                    'Das Dokument mit dem Titel "' . $document->title . '" wurde erfolgreich hochgeladen. Bitte überprüfe den Text nach einer Optimierung.',
+                    'Das Dokument mit dem Titel "' . $document->getTitle() . '" wurde erfolgreich hochgeladen. Bitte überprüfe den Text nach einer Optimierung.',
                 );
 
-                return $this->redirectToRoute('library_document_view', ['document' => $document->id]);
+                return $this->redirectToRoute('library_document_view', ['document' => $document->getId()]);
             } catch (PDFHasEmptyContent) {
                 $this->addFlashMessage(
                     $request,

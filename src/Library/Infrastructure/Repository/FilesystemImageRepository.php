@@ -4,13 +4,12 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Library\Infrastructure\Repository;
 
+use ChronicleKeeper\Image\Domain\Entity\Image;
+use ChronicleKeeper\Image\Domain\Event\ImageDeleted;
 use ChronicleKeeper\Library\Domain\Entity\Directory;
-use ChronicleKeeper\Library\Domain\Entity\Image;
-use ChronicleKeeper\Library\Domain\Event\ImageDeleted;
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Exception\UnableToReadFile;
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\PathRegistry;
-use DateTimeImmutable;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
@@ -45,11 +44,16 @@ class FilesystemImageRepository
 
     public function store(Image $image): void
     {
-        $image->updatedAt = new DateTimeImmutable();
-        $filename         = $this->generateFilename($image->id);
-        $content          = json_encode($image->toArray(), JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT);
+        $filename = $this->generateFilename($image->getId());
+        $content  = json_encode($image->toArray(), JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT);
 
         $this->fileAccess->write(self::STORAGE_NAME, $filename, $content);
+
+        // flush domain Events of the image
+        $events = $image->flushEvents();
+        foreach ($events as $event) {
+            $this->eventDispatcher->dispatch($event);
+        }
     }
 
     /** @return list<Image> */
@@ -71,7 +75,7 @@ class FilesystemImageRepository
 
         usort(
             $images,
-            static fn (Image $left, Image $right) => strcasecmp($left->title, $right->title),
+            static fn (Image $left, Image $right) => strcasecmp($left->getTitle(), $right->getTitle()),
         );
 
         return $images;
@@ -82,7 +86,7 @@ class FilesystemImageRepository
     {
         $images = $this->findAll();
 
-        return array_values(array_filter($images, static fn (Image $image) => $image->directory->id === $directory->id));
+        return array_values(array_filter($images, static fn (Image $image) => $image->getDirectory()->equals($directory)));
     }
 
     public function findById(string $id): Image|null
@@ -104,15 +108,15 @@ class FilesystemImageRepository
 
     public function remove(Image $image): void
     {
-        $filename = $this->generateFilename($image->id);
+        $filename = $this->generateFilename($image->getId());
 
-        foreach ($this->vectorRepository->findAllByImageId($image->id) as $vectors) {
+        foreach ($this->vectorRepository->findAllByImageId($image->getId()) as $vectors) {
             $this->vectorRepository->remove($vectors);
         }
 
         $this->fileAccess->delete(self::STORAGE_NAME, $filename);
 
-        $this->eventDispatcher->dispatch(new ImageDeleted($image->id));
+        $this->eventDispatcher->dispatch(new ImageDeleted($image));
     }
 
     /** @return non-empty-string */

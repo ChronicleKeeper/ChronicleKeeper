@@ -39,7 +39,7 @@ final class DirectoryChoiceType extends AbstractType
                 'required' => false,
                 'choices' => $this->directoryRepository->findAll(),
                 'placeholder' => false,
-                'choice_value' => static fn (Directory $directory): string => $directory->id,
+                'choice_value' => static fn (Directory $directory): string => $directory->getId(),
                 'choice_label' => static fn (Directory $directory): string => $directory->flattenHierarchyTitle(),
             ],
         );
@@ -92,7 +92,7 @@ final class DirectoryChoiceType extends AbstractType
         }
 
         $excludeDirectories = array_map(
-            static fn (Directory $directory): string => $directory->id,
+            static fn (Directory $directory): string => $directory->getId(),
             $excludeDirectories,
         );
 
@@ -100,7 +100,7 @@ final class DirectoryChoiceType extends AbstractType
         $existingChoices = $directories;
 
         foreach ($existingChoices as $index => $choice) {
-            if (! in_array($choice->id, $excludeDirectories, true)) {
+            if (! in_array($choice->getId(), $excludeDirectories, true)) {
                 continue;
             }
 

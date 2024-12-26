@@ -48,12 +48,12 @@ class FindConversationsByDirectoryQuery implements Query
 
         $conversations = array_filter(
             $conversations,
-            static fn (Conversation $conversation) => $conversation->directory->id === $parameters->directory->id,
+            static fn (Conversation $conversation) => $conversation->getDirectory()->equals($parameters->directory),
         );
 
         usort(
             $conversations,
-            static fn (Conversation $left, Conversation $right) => strcasecmp($left->title, $right->title),
+            static fn (Conversation $left, Conversation $right) => strcasecmp($left->getTitle(), $right->getTitle()),
         );
 
         return $conversations;

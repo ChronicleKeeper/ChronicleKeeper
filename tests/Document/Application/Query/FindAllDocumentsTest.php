@@ -147,8 +147,8 @@ class FindAllDocumentsTest extends TestCase
         $documents = $query->query(new FindAllDocuments());
 
         self::assertCount(2, $documents);
-        self::assertSame('bar', $documents[0]->title);
-        self::assertSame('foo', $documents[1]->title);
+        self::assertSame('bar', $documents[0]->getTitle());
+        self::assertSame('foo', $documents[1]->getTitle());
     }
 
     #[Test]

@@ -35,7 +35,7 @@ class SearchVectorTest extends TestCase
         $searchVector   = SearchVector::fromVectorDocument($vectorDocument);
 
         self::assertSame($vectorDocument->id, $searchVector->id);
-        self::assertSame($vectorDocument->document->id, $searchVector->documentId);
+        self::assertSame($vectorDocument->document->getId(), $searchVector->documentId);
         self::assertSame($vectorDocument->vector, $searchVector->vectors);
     }
 }

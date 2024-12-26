@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace ChronicleKeeper\Chat\Domain\ValueObject;
 
 use ChronicleKeeper\Document\Domain\Entity\Document;
-use ChronicleKeeper\Library\Domain\Entity\Image;
+use ChronicleKeeper\Image\Domain\Entity\Image;
 
 class Reference
 {
@@ -21,11 +21,11 @@ class Reference
 
     public static function forDocument(Document $document): Reference
     {
-        return new self($document->id, self::TYPE_DOCUMENT, $document->title);
+        return new self($document->getId(), self::TYPE_DOCUMENT, $document->getTitle());
     }
 
     public static function forImage(Image $image): Reference
     {
-        return new self($image->id, self::TYPE_IMAGE, $image->title);
+        return new self($image->getId(), self::TYPE_IMAGE, $image->getTitle());
     }
 }

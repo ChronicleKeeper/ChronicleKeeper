@@ -53,7 +53,7 @@ class FindVectorsOfDocumentTest extends TestCase
 
         $query = new FindVectorsOfDocumentQuery($queryService);
 
-        $documents = $query->query(new FindVectorsOfDocument($firstDocument->document->id));
+        $documents = $query->query(new FindVectorsOfDocument($firstDocument->document->getId()));
 
         self::assertCount(1, $documents);
     }

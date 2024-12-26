@@ -13,7 +13,7 @@ use ChronicleKeeper\Favorizer\Domain\ValueObject\ChatConversationTarget;
 use ChronicleKeeper\Favorizer\Domain\ValueObject\LibraryDocumentTarget;
 use ChronicleKeeper\Favorizer\Domain\ValueObject\LibraryImageTarget;
 use ChronicleKeeper\Favorizer\Domain\ValueObject\Target;
-use ChronicleKeeper\Library\Domain\Entity\Image;
+use ChronicleKeeper\Image\Domain\Entity\Image;
 use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemImageRepository;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
 
@@ -48,16 +48,19 @@ class TargetFactory
 
     private function createFromDocument(Document $document): Target
     {
-        return new LibraryDocumentTarget($document->id, u($document->title)->truncate(20, '…')->toString());
+        return new LibraryDocumentTarget($document->getId(), u($document->getTitle())->truncate(20, '…')->toString());
     }
 
     private function createFromImage(Image $image): Target
     {
-        return new LibraryImageTarget($image->id, u($image->title)->truncate(20, '…')->toString());
+        return new LibraryImageTarget($image->getId(), u($image->getTitle())->truncate(20, '…')->toString());
     }
 
     private function createFromConversation(Conversation $conversation): Target
     {
-        return new ChatConversationTarget($conversation->id, u($conversation->title)->truncate(20, '…')->toString());
+        return new ChatConversationTarget(
+            $conversation->getId(),
+            u($conversation->getTitle())->truncate(20, '…')->toString(),
+        );
     }
 }

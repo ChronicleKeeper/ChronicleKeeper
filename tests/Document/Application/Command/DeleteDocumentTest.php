@@ -29,9 +29,10 @@ class DeleteDocumentTest extends TestCase
     #[Test]
     public function commandIsInstantiatable(): void
     {
-        $command = new DeleteDocument('document-id');
+        $document = (new DocumentBuilder())->build();
+        $command  = new DeleteDocument($document);
 
-        self::assertSame('document-id', $command->id);
+        self::assertSame($document, $command->document);
     }
 
     #[Test]
@@ -49,7 +50,7 @@ class DeleteDocumentTest extends TestCase
         $fileAccess = $this->createMock(FileAccess::class);
         $fileAccess->expects($this->once())
             ->method('delete')
-            ->with('library.documents', $document->id . '.json');
+            ->with('library.documents', $document->getId() . '.json');
 
         $bus = $this->createMock(MessageBusInterface::class);
         $bus->expects($this->once())
@@ -63,6 +64,6 @@ class DeleteDocumentTest extends TestCase
             ->with(self::isInstanceOf(DocumentDeleted::class));
 
         $handler = new DeleteDocumentHandler($fileAccess, $eventDispatcher, $bus, $queryService);
-        $handler(new DeleteDocument($document->id));
+        $handler(new DeleteDocument($document));
     }
 }

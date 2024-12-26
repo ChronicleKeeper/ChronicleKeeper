@@ -4,8 +4,13 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Document\Domain\Entity;
 
+use ChronicleKeeper\Document\Domain\Event\DocumentChangedContent;
+use ChronicleKeeper\Document\Domain\Event\DocumentCreated;
+use ChronicleKeeper\Document\Domain\Event\DocumentMovedToDirectory;
+use ChronicleKeeper\Document\Domain\Event\DocumentRenamed;
 use ChronicleKeeper\Library\Domain\Entity\Directory;
 use ChronicleKeeper\Library\Domain\RootDirectory;
+use ChronicleKeeper\Shared\Domain\Entity\AggregateRoot;
 use ChronicleKeeper\Shared\Domain\Sluggable;
 use DateTimeImmutable;
 use DateTimeInterface;
@@ -25,16 +30,89 @@ use function strlen;
  *     last_updated?: string
  * }
  */
-class Document implements JsonSerializable, Sluggable
+class Document extends AggregateRoot implements JsonSerializable, Sluggable
 {
-    public string $id;
-    public DateTimeImmutable $updatedAt;
-    public Directory $directory;
+    public function __construct(
+        private readonly string $id,
+        private string $title,
+        private string $content,
+        private Directory $directory,
+        private DateTimeImmutable $updatedAt,
+    ) {
+    }
 
-    public function __construct(public string $title, public string $content)
+    public static function create(string $title, string $content, Directory|null $directory = null): self
     {
-        $this->id        = Uuid::v4()->toString();
-        $this->directory = RootDirectory::get();
+        $document = new self(
+            Uuid::v4()->toString(),
+            $title,
+            $content,
+            $directory ?? RootDirectory::get(),
+            new DateTimeImmutable(),
+        );
+        $document->record(new DocumentCreated($document));
+
+        return $document;
+    }
+
+    public function getId(): string
+    {
+        return $this->id;
+    }
+
+    public function getTitle(): string
+    {
+        return $this->title;
+    }
+
+    public function getContent(): string
+    {
+        return $this->content;
+    }
+
+    public function getDirectory(): Directory
+    {
+        return $this->directory;
+    }
+
+    public function getUpdatedAt(): DateTimeImmutable
+    {
+        return $this->updatedAt;
+    }
+
+    public function moveToDirectory(Directory $directory): void
+    {
+        if ($directory->equals($this->directory)) {
+            return;
+        }
+
+        $this->record(new DocumentMovedToDirectory($this, $this->directory));
+
+        $this->directory = $directory;
+        $this->updatedAt = new DateTimeImmutable();
+    }
+
+    public function rename(string $title): void
+    {
+        if ($title === $this->title) {
+            return;
+        }
+
+        $this->record(new DocumentRenamed($this, $this->title));
+
+        $this->title     = $title;
+        $this->updatedAt = new DateTimeImmutable();
+    }
+
+    public function changeContent(string $content): void
+    {
+        if ($content === $this->content) {
+            return;
+        }
+
+        $this->record(new DocumentChangedContent($this, $this->content));
+
+        $this->content   = $content;
         $this->updatedAt = new DateTimeImmutable();
     }
 
@@ -45,7 +123,7 @@ class Document implements JsonSerializable, Sluggable
             'id' => $this->id,
             'title' => $this->title,
             'content' => $this->content,
-            'directory' => $this->directory->id,
+            'directory' => $this->directory->getId(),
             'last_updated' => $this->updatedAt->format(DateTimeInterface::ATOM),
         ];
     }

@@ -1,0 +1,6 @@
+framework:
+  messenger:
+    buses:
+      command.bus:
+        middleware:
+          - ChronicleKeeper\Shared\Infrastructure\Messenger\DomainEventDispatcherMiddleware

@@ -40,7 +40,7 @@ class VectorDocument implements JsonSerializable
     {
         return [
             'id' => $this->id,
-            'documentId' => $this->document->id,
+            'documentId' => $this->document->getId(),
             'content' => $this->content,
             'vectorContentHash' => $this->vectorContentHash,
             'vector' => $this->vector,

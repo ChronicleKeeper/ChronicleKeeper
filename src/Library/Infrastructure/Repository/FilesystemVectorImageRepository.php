@@ -122,7 +122,7 @@ class FilesystemVectorImageRepository
     {
         return array_values(array_filter(
             $this->findAll(),
-            static fn (VectorImage $vectorImage): bool => $vectorImage->image->id === $id,
+            static fn (VectorImage $vectorImage): bool => $vectorImage->image->getId() === $id,
         ));
     }
 

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Library\Presentation\Controller\Image;
 
-use ChronicleKeeper\Library\Domain\Entity\Image;
+use ChronicleKeeper\Image\Domain\Entity\Image;
 use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemImageRepository;
 use ChronicleKeeper\Library\Presentation\Form\ImageType;
 use ChronicleKeeper\Shared\Presentation\FlashMessages\Alert;
@@ -50,7 +50,7 @@ class ImageEdit extends AbstractController
                 'Das Bild wurde bearbeitet, damit die Änderungen in der Suche aktiv sind muss der Index aktualisiert werden.',
             );
 
-            return new RedirectResponse($this->router->generate('library', ['directory' => $image->directory->id]));
+            return new RedirectResponse($this->router->generate('library', ['directory' => $image->getDirectory()->getId()]));
         }
 
         return new Response($this->environment->render(

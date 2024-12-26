@@ -38,20 +38,26 @@ class DocumentDeletion extends AbstractController
             $this->addFlashMessage(
                 $request,
                 Alert::WARNING,
-                'Das Löschen des Dokumentes "' . $document->title . '" muss erst bestätigt werden!',
+                'Das Löschen des Dokumentes "' . $document->getTitle() . '" muss erst bestätigt werden!',
             );
 
-            return new RedirectResponse($this->router->generate('library', ['directory' => $document->directory->id]));
+            return new RedirectResponse($this->router->generate(
+                'library',
+                ['directory' => $document->getDirectory()->getId()],
+            ));
         }
 
-        $this->bus->dispatch(new DeleteDocument($document->id));
+        $this->bus->dispatch(new DeleteDocument($document));
 
         $this->addFlashMessage(
             $request,
             Alert::SUCCESS,
-            'Das Dokument "' . $document->title . '" wurde erfolgreich gelöscht.',
+            'Das Dokument "' . $document->getTitle() . '" wurde erfolgreich gelöscht.',
         );
 
-        return new RedirectResponse($this->router->generate('library', ['directory' => $document->directory->id]));
+        return new RedirectResponse($this->router->generate(
+            'library',
+            ['directory' => $document->getDirectory()->getId()],
+        ));
     }
 }

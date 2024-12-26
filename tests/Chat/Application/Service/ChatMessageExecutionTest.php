@@ -58,7 +58,7 @@ class ChatMessageExecutionTest extends TestCase
         $conversation = (new ConversationBuilder())->build();
         $chatMessageExecution->execute('Hello?', $conversation);
 
-        $conversation = $conversation->messages->getArrayCopy();
+        $conversation = $conversation->getMessages()->getArrayCopy();
         self::assertCount(2, $conversation);
 
         $userMessage = $conversation[0];

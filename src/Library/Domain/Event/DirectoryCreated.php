@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Library\Domain\Event;
 
-final readonly class ImageDeleted
+use ChronicleKeeper\Library\Domain\Entity\Directory;
+
+final readonly class DirectoryCreated
 {
     public function __construct(
-        public string $id,
+        public Directory $directory,
     ) {
     }
 }

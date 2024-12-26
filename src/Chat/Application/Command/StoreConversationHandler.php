@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Chat\Application\Command;
 
+use ChronicleKeeper\Shared\Infrastructure\Messenger\MessageEventResult;
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Serializer\Encoder\JsonEncode;
@@ -22,16 +23,18 @@ class StoreConversationHandler
     ) {
     }
 
-    public function __invoke(StoreConversation $message): void
+    public function __invoke(StoreConversation $message): MessageEventResult
     {
         $this->fileAccess->write(
             'library.conversations',
-            $message->conversation->id . '.json',
+            $message->conversation->getId() . '.json',
             $this->serializer->serialize(
                 $message->conversation,
                 JsonEncoder::FORMAT,
                 [JsonEncode::OPTIONS => JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT],
             ),
         );
+
+        return new MessageEventResult($message->conversation->flushEvents());
     }
 }

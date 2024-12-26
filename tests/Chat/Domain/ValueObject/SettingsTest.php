@@ -37,4 +37,17 @@ class SettingsTest extends TestCase
         self::assertEqualsWithDelta(0.8, $settings->imagesMaxDistance, PHP_FLOAT_EPSILON);
         self::assertEqualsWithDelta(0.9, $settings->documentsMaxDistance, PHP_FLOAT_EPSILON);
     }
+
+    #[Test]
+    public function itCanCompareTheEqualityOfsettings(): void
+    {
+        $settings1 = new Settings(temperature: 0.7, imagesMaxDistance: 0.7, documentsMaxDistance: 0.85);
+        $settings2 = new Settings(temperature: 0.2, imagesMaxDistance: 0.7, documentsMaxDistance: 0.85);
+        $settings3 = new Settings(temperature: 0.7, imagesMaxDistance: 0.7, documentsMaxDistance: 0.3);
+
+        self::assertTrue($settings1->equals($settings1));
+        self::assertFalse($settings1->equals($settings2));
+        self::assertFalse($settings1->equals($settings3));
+        self::assertFalse($settings2->equals($settings3));
+    }
 }

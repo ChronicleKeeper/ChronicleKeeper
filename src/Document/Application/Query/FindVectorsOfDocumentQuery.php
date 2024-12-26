@@ -30,7 +30,7 @@ class FindVectorsOfDocumentQuery implements Query
 
         return array_values(array_filter(
             $documents,
-            static fn (VectorDocument $document) => $document->document->id === $parameters->id,
+            static fn (VectorDocument $document) => $document->document->getId() === $parameters->id,
         ));
     }
 }

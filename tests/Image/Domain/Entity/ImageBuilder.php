@@ -2,17 +2,19 @@
 
 declare(strict_types=1);
 
-namespace ChronicleKeeper\Test\Library\Domain\Entity;
+namespace ChronicleKeeper\Test\Image\Domain\Entity;
 
+use ChronicleKeeper\Image\Domain\Entity\Image;
 use ChronicleKeeper\Library\Domain\Entity\Directory;
-use ChronicleKeeper\Library\Domain\Entity\Image;
 use ChronicleKeeper\Library\Domain\RootDirectory;
 use DateTimeImmutable;
+use Symfony\Component\Uid\Uuid;
 
 use function base64_encode;
 
 class ImageBuilder
 {
+    private string $id;
     private string $title;
     private string $mimeType;
     private string $encodedImage;
@@ -22,6 +24,7 @@ class ImageBuilder
 
     public function __construct()
     {
+        $this->id           = Uuid::v4()->toString();
         $this->title        = 'Default Title';
         $this->mimeType     = 'image/png';
         $this->encodedImage = base64_encode('default image content');
@@ -30,9 +33,11 @@ class ImageBuilder
         $this->updatedAt    = new DateTimeImmutable();
     }
 
-    public static function create(): self
+    public function withId(string $id): self
     {
-        return new self();
+        $this->id = $id;
+
+        return $this;
     }
 
     public function withTitle(string $title): self
@@ -79,15 +84,14 @@ class ImageBuilder
 
     public function build(): Image
     {
-        $image            = new Image(
+        return new Image(
+            $this->id,
             $this->title,
             $this->mimeType,
             $this->encodedImage,
             $this->description,
+            $this->directory,
+            $this->updatedAt,
         );
-        $image->directory = $this->directory;
-        $image->updatedAt = $this->updatedAt;
-
-        return $image;
     }
 }

@@ -43,7 +43,7 @@
                             {% endif %}
 
 
-                            {% for directory in directories %}
+                            {% for directory in content.directories %}
                                 <tr>
                                     <td colspan="3">
                                         <a href="{{ path('library', {'directory': directory.id}) }}">
@@ -59,11 +59,11 @@
                                 </tr>
                             {% endfor %}
 
-                            {% if media is empty %}
+                            {% if content.elements is empty %}
                                 <tr><td colspan="4">Es wurden noch keine Dateien geladen.</td></tr>
                             {% endif %}
 
-                            {% for medium in media %}
+                            {% for medium in content.elements %}
                                 {% include 'library/_rows_media.html.twig' with { medium } %}
                             {% endfor %}
 

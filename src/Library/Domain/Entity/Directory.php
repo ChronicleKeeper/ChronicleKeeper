@@ -4,7 +4,11 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Library\Domain\Entity;
 
+use ChronicleKeeper\Library\Domain\Event\DirectoryCreated;
+use ChronicleKeeper\Library\Domain\Event\DirectoryMovedToDirectory;
+use ChronicleKeeper\Library\Domain\Event\DirectoryRenamed;
 use ChronicleKeeper\Library\Domain\RootDirectory;
+use ChronicleKeeper\Shared\Domain\Entity\AggregateRoot;
 use JsonSerializable;
 use Symfony\Component\Uid\Uuid;
 
@@ -18,15 +22,77 @@ use function implode;
  *     parent: string,
  * }
  */
-class Directory implements JsonSerializable
+class Directory extends AggregateRoot implements JsonSerializable
 {
-    public string $id;
-    public Directory|null $parent;
+    public function __construct(
+        private readonly string $id,
+        private string $title,
+        private Directory|null $parent = null,
+    ) {
+    }
 
-    public function __construct(public string $title)
+    public static function create(string $title, Directory|null $parent = null): Directory
     {
-        $this->id     = Uuid::v4()->toString();
-        $this->parent = RootDirectory::get(); // Initially root directory
+        $directory = new self(
+            Uuid::v4()->toString(),
+            $title,
+            $parent ?? RootDirectory::get(),
+        );
+        $directory->record(new DirectoryCreated($directory));
+
+        return $directory;
+    }
+
+    public function getId(): string
+    {
+        return $this->id;
+    }
+
+    public function getTitle(): string
+    {
+        return $this->title;
+    }
+
+    public function getParent(): Directory|null
+    {
+        return $this->parent;
+    }
+
+    public function isRoot(): bool
+    {
+        return $this->id === RootDirectory::ID;
+    }
+
+    public function rename(string $title): void
+    {
+        if ($this->title === $title) {
+            return;
+        }
+
+        $this->record(new DirectoryRenamed($this, $this->title));
+
+        $this->title = $title;
+    }
+
+    public function moveToDirectory(Directory $parent): void
+    {
+        if (! $this->parent instanceof self) {
+            // Moving is not possible, only the root directory should have this null and so it is fixed
+            return;
+        }
+
+        if ($this->parent === $parent) {
+            return;
+        }
+
+        $this->record(new DirectoryMovedToDirectory($this, $this->parent));
+
+        $this->parent = $parent;
+    }
+
+    public function equals(Directory $directory): bool
+    {
+        return $this->id === $directory->id;
     }
 
     public function flattenHierarchyTitle(): string
@@ -37,7 +103,7 @@ class Directory implements JsonSerializable
         do {
             $components[] = $directory->title;
             $directory    = $directory->parent;
-        } while ($directory instanceof Directory);
+        } while ($directory instanceof self);
 
         return implode(' > ', array_reverse($components));
     }

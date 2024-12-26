@@ -49,7 +49,7 @@ class VectorDocumentTest extends TestCase
         self::assertSame(
             [
                 'id' => $vectorDocument->id,
-                'documentId' => $document->id,
+                'documentId' => $document->getId(),
                 'content' => 'foo',
                 'vectorContentHash' => 'bar',
                 'vector' => [1.0, 2.0, 3.0],
@@ -73,7 +73,7 @@ class VectorDocumentTest extends TestCase
             json_encode(
                 [
                     'id' => $vectorDocument->id,
-                    'documentId' => $document->id,
+                    'documentId' => $document->getId(),
                     'content' => 'foo',
                     'vectorContentHash' => 'bar',
                     'vector' => [1.0, 2.0, 3.0],
@@ -98,7 +98,7 @@ class VectorDocumentTest extends TestCase
         $searchVector = $vectorDocument->toSearchVector();
 
         self::assertSame($vectorDocument->id, $searchVector->id);
-        self::assertSame($document->id, $searchVector->documentId);
+        self::assertSame($document->getId(), $searchVector->documentId);
         self::assertSame([1.0, 2.0, 3.0], $searchVector->vectors);
     }
 }

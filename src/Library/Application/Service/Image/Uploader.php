@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Library\Application\Service\Image;
 
+use ChronicleKeeper\Image\Domain\Entity\Image;
 use ChronicleKeeper\Library\Domain\Entity\Directory;
-use ChronicleKeeper\Library\Domain\Entity\Image;
 use ChronicleKeeper\Library\Domain\RootDirectory;
 use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemImageRepository;
 use RuntimeException;
@@ -35,15 +35,14 @@ class Uploader
             throw new RuntimeException('Image seems to be defect, no mime type detected.');
         }
 
-        $image = new Image(
+        $image = Image::create(
             $file->getClientOriginalName(),
             $mimeType,
             $base64Image,
             '',
+            $targetDirectory,
         );
-
-        $image->description = $this->LLMDescriber->getDescription($image);
-        $image->directory   = $targetDirectory;
+        $image->updateDescription($this->LLMDescriber->getDescription($image));
 
         $this->imageRepository->store($image);
 

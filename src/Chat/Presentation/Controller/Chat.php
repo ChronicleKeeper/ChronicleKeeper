@@ -38,18 +38,24 @@ class Chat extends AbstractController
     {
         if ($conversation !== null) {
             $conversation = $this->queryService->query(new FindConversationByIdParameters($conversation));
+
             if ($conversation === null) {
-                $this->addFlashMessage($request, Alert::DANGER, 'Das gesuchte Gespräch ist nicht vorhanden.');
+                $this->addFlashMessage(
+                    $request,
+                    Alert::DANGER,
+                    'Dein letztes Gespräch scheint aus dem Gedächtnis verbannt worden zu sein. Entschuldige.',
+                );
+                $request->getSession()->set('last_conversation', null);
 
                 return $this->redirectToRoute('chat');
             }
 
-            $request->getSession()->set('last_conversation', $conversation->id);
+            $request->getSession()->set('last_conversation', $conversation->getId());
         }
 
         return new Response($this->environment->render(
             'chat/chat.html.twig',
-            ['conversation' => $conversation],
+            ['conversation' => $conversation, 'isTemporary' => $conversation === null],
         ));
     }
 }

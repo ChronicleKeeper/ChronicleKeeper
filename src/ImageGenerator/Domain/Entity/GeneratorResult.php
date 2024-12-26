@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\ImageGenerator\Domain\Entity;
 
-use ChronicleKeeper\Library\Domain\Entity\Image;
+use ChronicleKeeper\Image\Domain\Entity\Image;
 use JsonSerializable;
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 use Symfony\Component\Uid\Uuid;
@@ -36,7 +36,7 @@ class GeneratorResult implements JsonSerializable
             'encodedImage' => $this->encodedImage,
             'revisedPrompt' => $this->revisedPrompt,
             'mimeType' => $this->mimeType,
-            'image' => $this->image?->id,
+            'image' => $this->image?->getId(),
         ];
     }
 }

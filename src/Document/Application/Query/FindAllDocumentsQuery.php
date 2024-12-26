@@ -53,7 +53,7 @@ class FindAllDocumentsQuery implements Query
 
         usort(
             $documents,
-            static fn (Document $left, Document $right) => strcasecmp($left->title, $right->title),
+            static fn (Document $left, Document $right) => strcasecmp($left->getTitle(), $right->getTitle()),
         );
 
         return $documents;

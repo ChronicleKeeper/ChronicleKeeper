@@ -73,17 +73,17 @@ class DocumentSearch
 
         $result = 'I have found the following information that are associated to the question:' . PHP_EOL;
         foreach ($documents as $document) {
-            $libraryDocument = $document['vector']->document;
+            $libraryDocument        = $document['vector']->document;
+            $documentHierarchyTitle = $libraryDocument->getDirectory()->flattenHierarchyTitle();
 
-            $result .= '# Title: ' . $libraryDocument->title . PHP_EOL;
-            $result .= 'Storage Directory: ' . $libraryDocument->directory->flattenHierarchyTitle() . PHP_EOL;
+            $result .= '# Title: ' . $libraryDocument->getTitle() . PHP_EOL;
+            $result .= 'Storage Directory: ' . $documentHierarchyTitle . PHP_EOL;
             $result .= $document['vector']->content . PHP_EOL . PHP_EOL;
 
             $this->runtimeCollector->addReference(Reference::forDocument($libraryDocument));
 
             $debugResponse[] = [
-                'document' => $libraryDocument->directory->flattenHierarchyTitle()
-                    . '/' . $libraryDocument->title,
+                'document' => $documentHierarchyTitle . '/' . $libraryDocument->getTitle(),
                 'distance' => $document['distance'],
                 'content' => $document['vector']->content,
             ];

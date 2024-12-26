@@ -43,7 +43,7 @@ class DirectoryDelete extends AbstractController
 
     public function __invoke(Request $request, Directory $directory): Response
     {
-        if ($directory->id === RootDirectory::ID) {
+        if ($directory->getId() === RootDirectory::ID) {
             throw new AccessDeniedHttpException();
         }
 
@@ -69,7 +69,7 @@ class DirectoryDelete extends AbstractController
                 'Das Verzeichnis und alle seine Daten wurden gelöscht.',
             );
 
-            return $this->redirectToRoute('library', ['directory' => $directory->parent?->id]);
+            return $this->redirectToRoute('library', ['directory' => $directory->getParent()?->getId()]);
         }
 
         // Ok, we just move all before deletion :)
@@ -84,28 +84,28 @@ class DirectoryDelete extends AbstractController
             'Das Verzeichnis wurde gelöscht und seine Inhalte verschoben.',
         );
 
-        return $this->redirectToRoute('library', ['directory' => $targetDirectory->id]);
+        return $this->redirectToRoute('library', ['directory' => $targetDirectory->getId()]);
     }
 
     private function moveDirectoryContentToOtherDirectory(Directory $sourceDirectory, Directory $targetDirectory): void
     {
         foreach ($this->directoryRepository->findByParent($sourceDirectory) as $directory) {
-            $directory->parent = $targetDirectory;
+            $directory->moveToDirectory($targetDirectory);
             $this->directoryRepository->store($directory);
         }
 
-        foreach ($this->queryService->query(new FindDocumentsByDirectory($sourceDirectory->id)) as $document) {
-            $document->directory = $targetDirectory;
-            $this->bus->dispatch(new StoreDocument($document, false));
+        foreach ($this->queryService->query(new FindDocumentsByDirectory($sourceDirectory->getId())) as $document) {
+            $document->moveToDirectory($targetDirectory);
+            $this->bus->dispatch(new StoreDocument($document));
         }
 
         foreach ($this->imageRepository->findByDirectory($sourceDirectory) as $image) {
-            $image->directory = $targetDirectory;
+            $image->moveToDirectory($targetDirectory);
             $this->imageRepository->store($image);
         }
 
         foreach ($this->queryService->query(new FindConversationsByDirectoryParameters($sourceDirectory)) as $conversation) {
-            $conversation->directory = $targetDirectory;
+            $conversation->moveToDirectory($targetDirectory);
             $this->bus->dispatch(new StoreConversation($conversation));
         }
     }

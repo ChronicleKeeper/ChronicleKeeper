@@ -44,7 +44,7 @@ class DocumentEdit extends AbstractController
                 'Das Dokument wurde bearbeitet, damit die Änderungen in der Suche aktiv sind muss der Index aktualisiert werden.',
             );
 
-            return $this->redirectToRoute('library', ['directory' => $document->directory->id]);
+            return $this->redirectToRoute('library', ['directory' => $document->getDirectory()->getId()]);
         }
 
         return $this->render(

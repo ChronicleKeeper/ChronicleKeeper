@@ -49,12 +49,14 @@ class PromptOptimizer
     {
         // Aus dem Prompt des Nutzers einen Prompt für die Bildgenerierung auf Basis des Inhaltes der Bibliothek machen
         $conversation = Conversation::createEmpty();
+        $messages     = $conversation->getMessages();
+
         // Create Prompt that makes clear the user message should be rewritten to a Dall-E prompt
-        $conversation->messages[] = new ExtendedMessage(Message::forSystem(self::DALL_E_PROMT_GENERATOR_PROMT));
+        $messages[] = new ExtendedMessage(Message::forSystem(self::DALL_E_PROMT_GENERATOR_PROMT));
 
         $this->chatMessageExecution->execute($originPrompt, $conversation);
 
-        $messages        = $conversation->messages->getLLMChainMessages()->getArrayCopy();
+        $messages        = $conversation->getMessages()->getLLMChainMessages()->getArrayCopy();
         $optimizedPrompt = $messages[array_key_last($messages)];
         assert($optimizedPrompt instanceof AssistantMessage);
 

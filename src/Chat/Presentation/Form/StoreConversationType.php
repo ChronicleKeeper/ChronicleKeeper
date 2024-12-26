@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ChronicleKeeper\Chat\Presentation\Form;
 
 use ChronicleKeeper\Chat\Domain\Entity\Conversation;
+use ChronicleKeeper\Library\Domain\Entity\Directory;
 use ChronicleKeeper\Library\Presentation\Form\DirectoryChoiceType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -30,13 +31,17 @@ final class StoreConversationType extends AbstractType
                 'translation_domain' => false,
                 'required' => false,
                 'constraints' => [new NotBlank()],
+                'setter' => static fn (Conversation $conversation, string $title) => $conversation->rename($title),
             ],
         );
 
         $builder->add(
             'directory',
             DirectoryChoiceType::class,
-            ['label' => 'Speichern in Verzeichnis ...'],
+            [
+                'label' => 'Speichern in Verzeichnis ...',
+                'setter' => static fn (Conversation $conversation, Directory $directory) => $conversation->moveToDirectory($directory),
+            ],
         );
     }
 }

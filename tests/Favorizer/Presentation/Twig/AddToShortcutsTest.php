@@ -28,8 +28,7 @@ class AddToShortcutsTest extends KernelTestCase
     #[Test]
     public function render(): void
     {
-        $document     = (new DocumentBuilder())->build();
-        $document->id = 'f3ce2cce-888d-4812-8470-72cdd96faf4c';
+        $document = (new DocumentBuilder())->withId('f3ce2cce-888d-4812-8470-72cdd96faf4c')->build();
 
         $fileAccess = self::getContainer()->get(FileAccess::class);
         assert($fileAccess instanceof FileAccess);

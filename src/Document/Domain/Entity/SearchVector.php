@@ -18,7 +18,7 @@ class SearchVector
     {
         return new self(
             $vectorDocument->id,
-            $vectorDocument->document->id,
+            $vectorDocument->document->getId(),
             $vectorDocument->vector,
         );
     }

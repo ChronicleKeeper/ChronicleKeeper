@@ -18,4 +18,12 @@ class Settings
     ) {
         $this->version = $version ?? GPT::GPT_4O_MINI;
     }
+
+    public function equals(Settings $settings): bool
+    {
+        return $this->version === $settings->version
+            && $this->temperature === $settings->temperature
+            && $this->imagesMaxDistance === $settings->imagesMaxDistance
+            && $this->documentsMaxDistance === $settings->documentsMaxDistance;
+    }
 }

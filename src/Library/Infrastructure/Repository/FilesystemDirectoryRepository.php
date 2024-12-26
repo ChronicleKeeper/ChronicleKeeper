@@ -9,6 +9,7 @@ use ChronicleKeeper\Chat\Application\Query\FindConversationsByDirectoryParameter
 use ChronicleKeeper\Document\Application\Command\DeleteDocument;
 use ChronicleKeeper\Document\Application\Query\FindDocumentsByDirectory;
 use ChronicleKeeper\Library\Domain\Entity\Directory;
+use ChronicleKeeper\Library\Domain\Event\DirectoryDeleted;
 use ChronicleKeeper\Library\Domain\RootDirectory;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
@@ -16,6 +17,7 @@ use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Exception\Unabl
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\PathRegistry;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -43,26 +45,34 @@ class FilesystemDirectoryRepository
         private readonly PathRegistry $pathRegistry,
         private readonly QueryService $queryService,
         private readonly MessageBusInterface $bus,
+        private readonly EventDispatcherInterface $eventDispatcher,
     ) {
     }
 
     public function store(Directory $directory): void
     {
-        $filename = $directory->id . '.json';
+        $filename = $directory->getId() . '.json';
         $content  = json_encode(
             $directory->toArray(),
             JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT,
         );
 
         $this->fileAccess->write(self::STORAGE_NAME, $filename, $content);
+
+        $events = $directory->flushEvents();
+        foreach ($events as $event) {
+            $this->eventDispatcher->dispatch($event);
+        }
     }
 
     public function remove(Directory $directory): void
     {
-        $filename = $directory->id . '.json';
+        $filename = $directory->getId() . '.json';
 
         $this->thePurge($directory);
         $this->fileAccess->delete(self::STORAGE_NAME, $filename);
+
+        $this->eventDispatcher->dispatch(new DirectoryDeleted($directory));
     }
 
     private function thePurge(Directory $sourceDirectory): void
@@ -72,8 +82,8 @@ class FilesystemDirectoryRepository
             $this->remove($directory);
         }
 
-        foreach ($this->queryService->query(new FindDocumentsByDirectory($sourceDirectory->id)) as $document) {
-            $this->bus->dispatch(new DeleteDocument($document->id));
+        foreach ($this->queryService->query(new FindDocumentsByDirectory($sourceDirectory->getId())) as $document) {
+            $this->bus->dispatch(new DeleteDocument($document));
         }
 
         foreach ($this->imageRepository->findByDirectory($sourceDirectory) as $image) {
@@ -81,7 +91,7 @@ class FilesystemDirectoryRepository
         }
 
         foreach ($this->queryService->query(new FindConversationsByDirectoryParameters($sourceDirectory)) as $conversation) {
-            $this->bus->dispatch(new DeleteConversation($conversation->id));
+            $this->bus->dispatch(new DeleteConversation($conversation));
         }
     }
 
@@ -137,7 +147,7 @@ class FilesystemDirectoryRepository
 
         return array_values(array_filter(
             $directories,
-            static fn (Directory $directory) => $directory->parent?->id === $parent->id,
+            static fn (Directory $directory) => $directory->getParent()?->getId() === $parent->getId(),
         ));
     }
 

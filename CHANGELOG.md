@@ -2,15 +2,20 @@
 
 ## [alpha-0.6] - Performance and Stability
 
+**Added**
+- Implemented a directory cache for better performance while browsing the library.
+- Added a library header function to clear the directory cache manually.
+
 **Changed**
 - Refactored the document-related code within the library to be a module on its own.
 - Upgraded many dependencies to the current stable versions.
 - Improved PHP configuration to be more efficient in the local PHP Desktop environment.
 - Optimized performance within document and image vectors by reducing the data loaded from the database for search.
 - Improved the performance of embedding generation by generating all document and image text chunks at once.
-- Utilized a minimum vector content chunk length to reduce the failure rate for "only-dot" content cases.
-- Optimized the conversation storage to not keep copies of the library within the own storage.
+- Utilized a minimum vector content chunk length to reduce the failure rate for \`only-dot\` content cases.
+- Optimized the conversation storage to not keep copies of the library within its own storage.
 - BC: Imported conversations older than version 0.6 will be deleted from the database.
+- Refactored Images, Conversations, Documents, and Directories to emit events on changes to allow hook extended logic into them.
 
 ## [alpha-0.5.1]
 

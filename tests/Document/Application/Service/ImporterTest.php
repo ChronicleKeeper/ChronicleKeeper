@@ -89,9 +89,9 @@ class ImporterTest extends TestCase
             false,
         );
 
-        self::assertSame('Hello World', $document->content);
-        self::assertSame('my_file.pdf', $document->title);
-        self::assertSame($directory, $document->directory);
+        self::assertSame('Hello World', $document->getContent());
+        self::assertSame('my_file.pdf', $document->getTitle());
+        self::assertSame($directory, $document->getDirectory());
     }
 
     #[Test]
@@ -123,8 +123,8 @@ class ImporterTest extends TestCase
             true,
         );
 
-        self::assertSame('Optimized World', $document->content);
-        self::assertSame('my_file.pdf', $document->title);
-        self::assertSame($directory, $document->directory);
+        self::assertSame('Optimized World', $document->getContent());
+        self::assertSame('my_file.pdf', $document->getTitle());
+        self::assertSame($directory, $document->getDirectory());
     }
 }

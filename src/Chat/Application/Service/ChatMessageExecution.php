@@ -34,12 +34,12 @@ class ChatMessageExecution
         string $useModel = 'gpt-4o',
         float $useTemperature = 1.0,
     ): void {
-        $messages   = $conversation->messages;
+        $messages   = $conversation->getMessages();
         $messages[] = new ExtendedMessage(message: Message::ofUser($message));
 
         // Set Maximum distances in tools
-        $this->libraryDocuments->setOneTimeMaxDistance($conversation->settings->documentsMaxDistance);
-        $this->libraryImages->setOneTimeMaxDistance($conversation->settings->imagesMaxDistance);
+        $this->libraryDocuments->setOneTimeMaxDistance($conversation->getSettings()->documentsMaxDistance);
+        $this->libraryImages->setOneTimeMaxDistance($conversation->getSettings()->imagesMaxDistance);
 
         $response = $this->chain->create()->call(
             $messages->getLLMChainMessages(),
@@ -59,8 +59,6 @@ class ChatMessageExecution
         $response->debug   = $this->buildMessageDebug();
 
         $messages[] = $response;
-
-        $conversation->messages = $messages;
     }
 
     private function buildMessageDebug(): MessageDebug

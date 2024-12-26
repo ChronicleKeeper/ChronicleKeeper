@@ -49,20 +49,18 @@ class DirectoryCreation extends AbstractController
             $directoryArray = $form->getData();
             assert(is_array($directoryArray) && array_key_exists('title', $directoryArray));
 
-            $directory         = new Directory($directoryArray['title']);
-            $directory->parent = $parentDirectory;
-
+            $directory = Directory::create($directoryArray['title'], $parentDirectory);
             $this->directoryRepository->store($directory);
 
             $this->addFlashMessage(
                 $request,
                 Alert::SUCCESS,
-                'Das Verzeichnis "' . $directory->title . '" wurde erfolgreich erstellt.',
+                'Das Verzeichnis "' . $directory->getTitle() . '" wurde erfolgreich erstellt.',
             );
 
             return new RedirectResponse($this->router->generate(
                 'library',
-                ['directory' => $directory->id],
+                ['directory' => $directory->getId()],
             ));
         }
 

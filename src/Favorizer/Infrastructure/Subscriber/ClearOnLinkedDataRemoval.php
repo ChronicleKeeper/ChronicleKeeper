@@ -11,7 +11,7 @@ use ChronicleKeeper\Favorizer\Application\Query\GetTargetBag;
 use ChronicleKeeper\Favorizer\Domain\ValueObject\ChatConversationTarget;
 use ChronicleKeeper\Favorizer\Domain\ValueObject\LibraryDocumentTarget;
 use ChronicleKeeper\Favorizer\Domain\ValueObject\LibraryImageTarget;
-use ChronicleKeeper\Library\Domain\Event\ImageDeleted;
+use ChronicleKeeper\Image\Domain\Event\ImageDeleted;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -28,7 +28,7 @@ class ClearOnLinkedDataRemoval
     public function removeOnImageDeleted(ImageDeleted $event): void
     {
         $targetBag = $this->queryService->query(new GetTargetBag());
-        $target    = new LibraryImageTarget($event->id, 'Irrelevant');
+        $target    = new LibraryImageTarget($event->image->getId(), 'Irrelevant');
 
         if (! $targetBag->exists($target)) {
             return;
@@ -42,7 +42,7 @@ class ClearOnLinkedDataRemoval
     public function removeOnDocumentDeleted(DocumentDeleted $event): void
     {
         $targetBag = $this->queryService->query(new GetTargetBag());
-        $target    = new LibraryDocumentTarget($event->id, 'Irrelevant');
+        $target    = new LibraryDocumentTarget($event->document->getId(), 'Irrelevant');
 
         if (! $targetBag->exists($target)) {
             return;
@@ -56,7 +56,7 @@ class ClearOnLinkedDataRemoval
     public function removeOnConversationDeleted(ConversationDeleted $event): void
     {
         $targetBag = $this->queryService->query(new GetTargetBag());
-        $target    = new ChatConversationTarget($event->id, 'Irrelevant');
+        $target    = new ChatConversationTarget($event->conversation->getId(), 'Irrelevant');
 
         if (! $targetBag->exists($target)) {
             return;

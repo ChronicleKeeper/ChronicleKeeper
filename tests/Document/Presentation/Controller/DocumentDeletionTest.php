@@ -51,20 +51,20 @@ class DocumentDeletionTest extends WebTestCase
 
         $fileAccess->write(
             'library.documents',
-            $document->id . '.json',
+            $document->getId() . '.json',
             json_encode($document, JSON_THROW_ON_ERROR),
         );
 
         // Execute deletion without confirmation
         $client->request(
             Request::METHOD_GET,
-            '/library/document/' . $document->id . '/delete',
+            '/library/document/' . $document->getId() . '/delete',
         );
 
         self::assertResponseRedirects('/library');
 
         // Check that file still exists
-        self::assertTrue($fileAccess->exists('library.documents', $document->id . '.json'));
+        self::assertTrue($fileAccess->exists('library.documents', $document->getId() . '.json'));
     }
 
     #[Test]
@@ -79,19 +79,19 @@ class DocumentDeletionTest extends WebTestCase
 
         $fileAccess->write(
             'library.documents',
-            $document->id . '.json',
+            $document->getId() . '.json',
             json_encode($document, JSON_THROW_ON_ERROR),
         );
 
         // Execute deletion without confirmation
         $client->request(
             Request::METHOD_GET,
-            '/library/document/' . $document->id . '/delete?confirm=1',
+            '/library/document/' . $document->getId() . '/delete?confirm=1',
         );
 
         self::assertResponseRedirects('/library');
 
         // Check that file is removed
-        self::assertFalse($fileAccess->exists('library.documents', $document->id . '.json'));
+        self::assertFalse($fileAccess->exists('library.documents', $document->getId() . '.json'));
     }
 }

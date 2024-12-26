@@ -51,7 +51,7 @@ class DocumentEditTest extends WebTestCase
         $this->fileAccess = $fileAccess;
         $this->fileAccess->write(
             'library.documents',
-            $this->fixtureDocument->id . '.json',
+            $this->fixtureDocument->getId() . '.json',
             json_encode($this->fixtureDocument, JSON_THROW_ON_ERROR),
         );
     }
@@ -80,7 +80,7 @@ class DocumentEditTest extends WebTestCase
     {
         $this->client->request(
             Request::METHOD_GET,
-            '/library/document/' . $this->fixtureDocument->id . '/edit',
+            '/library/document/' . $this->fixtureDocument->getId() . '/edit',
         );
 
         self::assertResponseIsSuccessful();
@@ -97,7 +97,7 @@ class DocumentEditTest extends WebTestCase
     {
         $this->client->request(
             Request::METHOD_POST,
-            '/library/document/' . $this->fixtureDocument->id . '/edit',
+            '/library/document/' . $this->fixtureDocument->getId() . '/edit',
             [
                 'document' => [
                     'title' => 'Test Edited Title',
