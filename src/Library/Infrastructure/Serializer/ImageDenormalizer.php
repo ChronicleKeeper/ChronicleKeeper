@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Library\Infrastructure\Serializer;
 
+use ChronicleKeeper\Image\Domain\Entity\Image;
 use ChronicleKeeper\Library\Domain\Entity\Directory;
-use ChronicleKeeper\Library\Domain\Entity\Image;
 use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemImageRepository;
 use DateTimeImmutable;
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
@@ -59,22 +59,21 @@ class ImageDenormalizer implements DenormalizerInterface, DenormalizerAwareInter
         }
 
         $image = new Image(
+            $data['id'],
             $data['title'],
             $data['mime_type'],
             $data['encoded_image'],
             $data['description'],
+            $this->denormalizer->denormalize(
+                $data['directory'],
+                Directory::class,
+                $format,
+                $context,
+            ),
+            new DateTimeImmutable($data['last_updated']),
         );
 
-        $image->id        = $data['id'];
-        $image->directory = $this->denormalizer->denormalize(
-            $data['directory'],
-            Directory::class,
-            $format,
-            $context,
-        );
-        $image->updatedAt = new DateTimeImmutable($data['last_updated']);
-
-        $this->cachedEntries[$image->id] = $image;
+        $this->cachedEntries[$image->getId()] = $image;
 
         return $image;
     }

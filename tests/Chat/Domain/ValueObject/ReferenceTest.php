@@ -6,7 +6,7 @@ namespace ChronicleKeeper\Test\Chat\Domain\ValueObject;
 
 use ChronicleKeeper\Chat\Domain\ValueObject\Reference;
 use ChronicleKeeper\Test\Document\Domain\Entity\DocumentBuilder;
-use ChronicleKeeper\Test\Library\Domain\Entity\ImageBuilder;
+use ChronicleKeeper\Test\Image\Domain\Entity\ImageBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\Attributes\Test;
@@ -44,7 +44,7 @@ class ReferenceTest extends TestCase
         $reference = Reference::forImage($image);
 
         self::assertSame('image', $reference->type);
-        self::assertSame($image->id, $reference->id);
-        self::assertSame($image->title, $reference->title);
+        self::assertSame($image->getId(), $reference->id);
+        self::assertSame($image->getTitle(), $reference->title);
     }
 }

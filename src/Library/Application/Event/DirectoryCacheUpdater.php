@@ -12,8 +12,11 @@ use ChronicleKeeper\Document\Domain\Event\DocumentCreated;
 use ChronicleKeeper\Document\Domain\Event\DocumentDeleted;
 use ChronicleKeeper\Document\Domain\Event\DocumentMovedToDirectory;
 use ChronicleKeeper\Document\Domain\Event\DocumentRenamed;
+use ChronicleKeeper\Image\Domain\Event\ImageCreated;
+use ChronicleKeeper\Image\Domain\Event\ImageDeleted;
+use ChronicleKeeper\Image\Domain\Event\ImageMovedToDirectory;
+use ChronicleKeeper\Image\Domain\Event\ImageRenamed;
 use ChronicleKeeper\Library\Application\Service\CacheReader;
-use ChronicleKeeper\Library\Domain\Event\ImageDeleted;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 class DirectoryCacheUpdater
@@ -26,7 +29,26 @@ class DirectoryCacheUpdater
     #[AsEventListener]
     public function updateOnImageDeleted(ImageDeleted $event): void
     {
-        $this->cacheReader->refresh($event->image->directory);
+        $this->cacheReader->refresh($event->image->getDirectory());
+    }
+
+    #[AsEventListener]
+    public function updateOnImageMovedToDirectory(ImageMovedToDirectory $event): void
+    {
+        $this->cacheReader->refresh($event->image->getDirectory());
+        $this->cacheReader->refresh($event->oldDirectory);
+    }
+
+    #[AsEventListener]
+    public function updateOnImageRenamed(ImageRenamed $event): void
+    {
+        $this->cacheReader->refresh($event->image->getDirectory());
+    }
+
+    #[AsEventListener]
+    public function updateOnImageCreated(ImageCreated $event): void
+    {
+        $this->cacheReader->refresh($event->image->getDirectory());
     }
 
     #[AsEventListener]

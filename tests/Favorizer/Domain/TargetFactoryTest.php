@@ -13,7 +13,7 @@ use ChronicleKeeper\Shared\Application\Query\QueryParameters;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
 use ChronicleKeeper\Test\Chat\Domain\Entity\ConversationBuilder;
 use ChronicleKeeper\Test\Document\Domain\Entity\DocumentBuilder;
-use ChronicleKeeper\Test\Library\Domain\Entity\ImageBuilder;
+use ChronicleKeeper\Test\Image\Domain\Entity\ImageBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\Attributes\Test;
@@ -66,16 +66,16 @@ class TargetFactoryTest extends TestCase
         $filesystemImageRepository = $this->createMock(FilesystemImageRepository::class);
         $filesystemImageRepository->expects($this->once())
             ->method('findById')
-            ->with($image->id)
+            ->with($image->getId())
             ->willReturn($image);
 
         $queryService = $this->createMock(QueryService::class);
         $queryService->expects($this->never())->method('query');
 
         $targetFactory = new TargetFactory($filesystemImageRepository, $queryService);
-        $target        = $targetFactory->create($image->id, $image::class);
+        $target        = $targetFactory->create($image->getId(), $image::class);
 
-        self::assertSame($image->id, $target->getId());
+        self::assertSame($image->getId(), $target->getId());
         self::assertSame('Foo Bar Baz Quoz Qu…', $target->getTitle());
     }
 

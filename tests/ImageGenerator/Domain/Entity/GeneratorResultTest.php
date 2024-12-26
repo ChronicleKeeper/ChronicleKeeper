@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Test\ImageGenerator\Domain\Entity;
 
+use ChronicleKeeper\Image\Domain\Entity\Image;
 use ChronicleKeeper\ImageGenerator\Domain\Entity\GeneratorResult;
-use ChronicleKeeper\Library\Domain\Entity\Image;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\Attributes\Test;

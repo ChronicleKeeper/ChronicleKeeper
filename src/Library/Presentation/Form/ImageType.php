@@ -4,9 +4,8 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Library\Presentation\Form;
 
+use ChronicleKeeper\Image\Domain\Entity\Image;
 use ChronicleKeeper\Library\Domain\Entity\Directory;
-use ChronicleKeeper\Library\Domain\Entity\Image;
-use DateTimeImmutable;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\DataMapperInterface;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
@@ -76,9 +75,9 @@ class ImageType extends AbstractType implements DataMapperInterface
         /** @var FormInterface[] $forms */
         $forms = iterator_to_array($forms);
 
-        $forms['title']->setData($viewData->title);
-        $forms['directory']->setData($viewData->directory);
-        $forms['description']->setData($viewData->description);
+        $forms['title']->setData($viewData->getTitle());
+        $forms['directory']->setData($viewData->getDirectory());
+        $forms['description']->setData($viewData->getDescription());
     }
 
     /** @param Traversable<FormInterface> $forms */
@@ -88,25 +87,23 @@ class ImageType extends AbstractType implements DataMapperInterface
             throw new UnexpectedTypeException($viewData, Image::class);
         }
 
-        $viewData->updatedAt = new DateTimeImmutable();
-
         try {
             /** @var FormInterface[] $forms */
             $forms = iterator_to_array($forms);
 
             $title = $forms['title']->getData();
             if (is_string($title)) {
-                $viewData->title = $title;
+                $viewData->rename($title);
             }
 
             $description = $forms['description']->getData();
             if (is_string($description)) {
-                $viewData->description = $description;
+                $viewData->updateDescription($description);
             }
 
             $directory = $forms['directory']->getData();
             if ($directory instanceof Directory) {
-                $viewData->directory = $directory;
+                $viewData->moveToDirectory($directory);
             }
         } catch (Throwable) {
             return;

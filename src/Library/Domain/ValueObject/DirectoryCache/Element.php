@@ -6,7 +6,7 @@ namespace ChronicleKeeper\Library\Domain\ValueObject\DirectoryCache;
 
 use ChronicleKeeper\Chat\Domain\Entity\Conversation;
 use ChronicleKeeper\Document\Domain\Entity\Document;
-use ChronicleKeeper\Library\Domain\Entity\Image;
+use ChronicleKeeper\Image\Domain\Entity\Image;
 use DateTimeImmutable;
 
 class Element
@@ -37,12 +37,12 @@ class Element
     public static function fromImageEntity(Image $image): Element
     {
         return new Element(
-            $image->id,
+            $image->getId(),
             'image',
-            $image->title,
+            $image->getTitle(),
             $image->getSlug(),
             $image->getSize(),
-            $image->updatedAt,
+            $image->getUpdatedAt(),
         );
     }
 

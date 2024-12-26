@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\ImageGenerator\Application\Command;
 
+use ChronicleKeeper\Image\Domain\Entity\Image;
 use ChronicleKeeper\ImageGenerator\Application\Query\GetGeneratorRequest;
 use ChronicleKeeper\ImageGenerator\Application\Query\GetImageOfGeneratorRequest;
 use ChronicleKeeper\ImageGenerator\Domain\Entity\GeneratorRequest;
 use ChronicleKeeper\ImageGenerator\Domain\Entity\GeneratorResult;
 use ChronicleKeeper\Library\Application\Service\Image\LLMDescriber;
-use ChronicleKeeper\Library\Domain\Entity\Image;
 use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemImageRepository;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
@@ -40,13 +40,13 @@ class StoreImageToLibraryHandler
         $generatorResult = $this->queryService->query(new GetImageOfGeneratorRequest($request->requestId, $request->imageId));
         assert($generatorResult instanceof GeneratorResult);
 
-        $image              = new Image(
+        $image = Image::create(
             $generatorRequest->title,
             $generatorResult->mimeType,
             $generatorResult->encodedImage,
             (string) $generatorRequest->prompt?->prompt,
         );
-        $image->description = $this->LLMDescriber->getDescription($image);
+        $image->updateDescription($this->LLMDescriber->getDescription($image));
 
         $this->imageRepository->store($image);
 

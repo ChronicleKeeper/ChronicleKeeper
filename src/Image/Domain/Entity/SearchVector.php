@@ -20,7 +20,7 @@ class SearchVector
     {
         return new self(
             $vectorImage->id,
-            $vectorImage->image->id,
+            $vectorImage->image->getId(),
             $vectorImage->vector,
         );
     }

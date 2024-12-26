@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Library\Infrastructure\VectorStorage;
 
+use ChronicleKeeper\Image\Domain\Entity\Image;
 use ChronicleKeeper\Image\Domain\Entity\SearchVector;
-use ChronicleKeeper\Library\Domain\Entity\Image;
 use Symfony\Component\Uid\Uuid;
 
 /**
@@ -35,7 +35,7 @@ class VectorImage
     {
         return new SearchVector(
             $this->id,
-            $this->image->id,
+            $this->image->getId(),
             $this->vector,
         );
     }
@@ -45,7 +45,7 @@ class VectorImage
     {
         return [
             'id' => $this->id,
-            'imageId' => $this->image->id,
+            'imageId' => $this->image->getId(),
             'content' => $this->content,
             'vectorContentHash' => $this->vectorContentHash,
             'vector' => $this->vector,

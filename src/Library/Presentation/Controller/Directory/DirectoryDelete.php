@@ -95,17 +95,17 @@ class DirectoryDelete extends AbstractController
         }
 
         foreach ($this->queryService->query(new FindDocumentsByDirectory($sourceDirectory->id)) as $document) {
-            $document->directory = $targetDirectory;
+            $document->moveToDirectory($targetDirectory);
             $this->bus->dispatch(new StoreDocument($document));
         }
 
         foreach ($this->imageRepository->findByDirectory($sourceDirectory) as $image) {
-            $image->directory = $targetDirectory;
+            $image->moveToDirectory($targetDirectory);
             $this->imageRepository->store($image);
         }
 
         foreach ($this->queryService->query(new FindConversationsByDirectoryParameters($sourceDirectory)) as $conversation) {
-            $conversation->directory = $targetDirectory;
+            $conversation->moveToDirectory($targetDirectory);
             $this->bus->dispatch(new StoreConversation($conversation));
         }
     }

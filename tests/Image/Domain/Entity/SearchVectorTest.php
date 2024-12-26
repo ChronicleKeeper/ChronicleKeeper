@@ -35,7 +35,7 @@ class SearchVectorTest extends TestCase
         $searchVector = SearchVector::formVectorImage($vectorImage);
 
         self::assertSame($vectorImage->id, $searchVector->id);
-        self::assertSame($vectorImage->image->id, $searchVector->imageId);
+        self::assertSame($vectorImage->image->getId(), $searchVector->imageId);
         self::assertSame($vectorImage->vector, $searchVector->vectors);
     }
 }

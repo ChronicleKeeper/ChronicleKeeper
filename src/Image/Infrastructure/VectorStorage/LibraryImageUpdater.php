@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Image\Infrastructure\VectorStorage;
 
-use ChronicleKeeper\Library\Domain\Entity\Image;
+use ChronicleKeeper\Image\Domain\Entity\Image;
 use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemImageRepository;
 use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemVectorImageRepository;
 use ChronicleKeeper\Library\Infrastructure\VectorStorage\VectorImage;
@@ -34,7 +34,7 @@ class LibraryImageUpdater
 
     private function updateOrCreateVectorsForImage(Image $image): void
     {
-        $existingStorage = $this->vectorImageRepository->findAllByImageId($image->id);
+        $existingStorage = $this->vectorImageRepository->findAllByImageId($image->getId());
 
         if ($existingStorage === []) {
             $this->createVectorDocument($image);
@@ -78,7 +78,7 @@ class LibraryImageUpdater
     private function splitImageDescriptionInVectorDocuments(Image $image): array
     {
         // Calculate Content Chunks
-        $contentChunks = $this->embeddingCalculator->createTextChunks($image->description);
+        $contentChunks = $this->embeddingCalculator->createTextChunks($image->getDescription());
         // Calculate vectors from the chunks
         $vectors = $this->embeddingCalculator->getMultipleEmbeddings($contentChunks);
 

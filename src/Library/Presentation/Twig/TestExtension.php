@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace ChronicleKeeper\Library\Presentation\Twig;
 
 use ChronicleKeeper\Document\Domain\Entity\Document;
-use ChronicleKeeper\Library\Domain\Entity\Image;
+use ChronicleKeeper\Image\Domain\Entity\Image;
 use Override;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigTest;

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace ChronicleKeeper\Library\Domain\Event;
+namespace ChronicleKeeper\Image\Domain\Event;
 
-use ChronicleKeeper\Library\Domain\Entity\Image;
+use ChronicleKeeper\Image\Domain\Entity\Image;
 
 final readonly class ImageDeleted
 {

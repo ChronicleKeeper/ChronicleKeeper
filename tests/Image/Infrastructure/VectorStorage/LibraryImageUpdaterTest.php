@@ -8,7 +8,7 @@ use ChronicleKeeper\Image\Infrastructure\VectorStorage\LibraryImageUpdater;
 use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemImageRepository;
 use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemVectorImageRepository;
 use ChronicleKeeper\Shared\Infrastructure\LLMChain\EmbeddingCalculator;
-use ChronicleKeeper\Test\Library\Domain\Entity\ImageBuilder;
+use ChronicleKeeper\Test\Image\Domain\Entity\ImageBuilder;
 use PhpLlm\LlmChain\Document\Vector;
 use PhpLlm\LlmChain\Model\Response\VectorResponse;
 use PhpLlm\LlmChain\PlatformInterface;

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Library\Infrastructure\ValueResolver;
 
-use ChronicleKeeper\Library\Domain\Entity\Image;
+use ChronicleKeeper\Image\Domain\Entity\Image;
 use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemImageRepository;
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Exception\UnableToReadFile;
 use RuntimeException;

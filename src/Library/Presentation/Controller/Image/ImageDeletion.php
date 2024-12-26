@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Library\Presentation\Controller\Image;
 
-use ChronicleKeeper\Library\Domain\Entity\Image;
+use ChronicleKeeper\Image\Domain\Entity\Image;
 use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemImageRepository;
 use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemVectorImageRepository;
 use ChronicleKeeper\Shared\Presentation\FlashMessages\Alert;
@@ -39,13 +39,13 @@ class ImageDeletion extends AbstractController
             $this->addFlashMessage(
                 $request,
                 Alert::WARNING,
-                'Das Löschen des Bildes "' . $image->title . '" muss erst bestätigt werden!',
+                'Das Löschen des Bildes "' . $image->getTitle() . '" muss erst bestätigt werden!',
             );
 
-            return new RedirectResponse($this->router->generate('library', ['directory' => $image->directory->id]));
+            return new RedirectResponse($this->router->generate('library', ['directory' => $image->getDirectory()->id]));
         }
 
-        foreach ($this->vectorImageRepository->findAllByImageId($image->id) as $vectorImage) {
+        foreach ($this->vectorImageRepository->findAllByImageId($image->getId()) as $vectorImage) {
             $this->vectorImageRepository->remove($vectorImage);
         }
 
@@ -54,9 +54,9 @@ class ImageDeletion extends AbstractController
         $this->addFlashMessage(
             $request,
             Alert::SUCCESS,
-            'Das Bild "' . $image->title . '" wurde erfolgreich gelöscht.',
+            'Das Bild "' . $image->getTitle() . '" wurde erfolgreich gelöscht.',
         );
 
-        return new RedirectResponse($this->router->generate('library', ['directory' => $image->directory->id]));
+        return new RedirectResponse($this->router->generate('library', ['directory' => $image->getDirectory()->id]));
     }
 }

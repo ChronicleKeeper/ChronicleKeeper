@@ -4,9 +4,8 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Test\Image\Domain\Entity;
 
-use ChronicleKeeper\Library\Domain\Entity\Image;
+use ChronicleKeeper\Image\Domain\Entity\Image;
 use ChronicleKeeper\Library\Infrastructure\VectorStorage\VectorImage;
-use ChronicleKeeper\Test\Library\Domain\Entity\ImageBuilder;
 use Symfony\Component\Uid\Uuid;
 
 class VectorImageBuilder

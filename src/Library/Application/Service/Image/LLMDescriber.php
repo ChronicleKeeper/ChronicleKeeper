@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Library\Application\Service\Image;
 
-use ChronicleKeeper\Library\Domain\Entity\Image;
+use ChronicleKeeper\Image\Domain\Entity\Image;
 use ChronicleKeeper\Settings\Application\SettingsHandler;
 use ChronicleKeeper\Shared\Infrastructure\LLMChain\LLMChainFactory;
 use PhpLlm\LlmChain\Bridge\OpenAI\GPT;
@@ -31,13 +31,13 @@ class LLMDescriber
         $messageBag = new MessageBag(Message::forSystem($settings->getChatbotSystemPrompt()->getSystemPrompt()));
 
         $userPromptText = $this->getUserPromptText($imageToAnalyze);
-        if ($imageToAnalyze->description !== '') {
+        if ($imageToAnalyze->getDescription() !== '') {
             /**
              * If the image already has a description we will also give it as context to the
              * message, so it will taken as context
              */
             $userPromptText .= PHP_EOL . '### Some additional information about the image.' . PHP_EOL;
-            $userPromptText .= $imageToAnalyze->description;
+            $userPromptText .= $imageToAnalyze->getDescription();
         }
 
         $messageBag[] = Message::ofUser(
@@ -63,7 +63,7 @@ class LLMDescriber
     private function getUserPromptText(Image $image): string
     {
         return <<<TEXT
-        Mit der Information, dass das Bild "{$image->title}" heißt, beschreibe bis ins kleinste Detail jede relevante
+        Mit der Information, dass das Bild "{$image->getTitle()}" heißt, beschreibe bis ins kleinste Detail jede relevante
         Information aus diesem Bild. Füge keine Links ein. Schlussfolgerungen möchtest du nicht machen, sondern nur den
         Inhalt beschreiben. Ziehe Informationen der Funktion library_documents andhand des Titels zu rate um das Bild
         noch besser zu bewerten.

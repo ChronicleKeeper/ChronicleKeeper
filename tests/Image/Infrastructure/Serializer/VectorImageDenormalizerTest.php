@@ -8,7 +8,7 @@ use ChronicleKeeper\Image\Application\Query\GetImage;
 use ChronicleKeeper\Image\Infrastructure\Serializer\VectorImageDenormalizer;
 use ChronicleKeeper\Library\Infrastructure\VectorStorage\VectorImage;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
-use ChronicleKeeper\Test\Library\Domain\Entity\ImageBuilder;
+use ChronicleKeeper\Test\Image\Domain\Entity\ImageBuilder;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;

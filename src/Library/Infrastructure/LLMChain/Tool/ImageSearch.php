@@ -75,11 +75,11 @@ class ImageSearch
 
             $imageUrl = $this->router->generate(
                 'library_image_download',
-                ['image' => $libraryImage->id],
+                ['image' => $libraryImage->getId()],
                 UrlGeneratorInterface::ABSOLUTE_URL,
             );
 
-            $result .= '# Image Name: ' . $libraryImage->title . PHP_EOL;
+            $result .= '# Image Name: ' . $libraryImage->getTitle() . PHP_EOL;
             $result .= 'Direct Link to the image: ' . $imageUrl . PHP_EOL;
             $result .= 'The image is described as the following: ' . PHP_EOL;
             $result .= $image['vector']->content . PHP_EOL . PHP_EOL;
@@ -87,8 +87,8 @@ class ImageSearch
             $this->runtimeCollector->addReference(Reference::forImage($libraryImage));
 
             $debugResponse[] = [
-                'image' => $libraryImage->directory->flattenHierarchyTitle()
-                    . '/' . $libraryImage->title,
+                'image' => $libraryImage->getDirectory()->flattenHierarchyTitle()
+                    . '/' . $libraryImage->getTitle(),
                 'distance' => $image['distance'],
                 'content' => $image['vector']->content,
             ];
