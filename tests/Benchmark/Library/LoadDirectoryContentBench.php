@@ -47,7 +47,7 @@ class LoadDirectoryContentBench
         $directory = RootDirectory::get();
 
         // See src/Library/Presentation/Controller/Library.php for all queries that are executed
-        $this->queryService->query(new FindDocumentsByDirectory($directory->id));
+        $this->queryService->query(new FindDocumentsByDirectory($directory->getId()));
         $this->imageRepository->findByDirectory($directory);
         $this->queryService->query(new FindConversationsByDirectoryParameters($directory));
         $this->directoryRepository->findByParent($directory);

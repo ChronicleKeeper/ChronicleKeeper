@@ -44,13 +44,13 @@ class DirectoryEdit extends AbstractController
 
     public function __invoke(Request $request, Directory $directory): Response
     {
-        if ($directory->id === RootDirectory::ID) {
+        if ($directory->getId() === RootDirectory::ID) {
             throw new AccessDeniedHttpException();
         }
 
         $form = $this->formFactory->create(
             DirectoryType::class,
-            ['title' => $directory->title, 'parent' => $directory->parent],
+            ['title' => $directory->getTitle(), 'parent' => $directory->getParent()],
             ['exclude_directories' => [$directory]],
         );
         $form->handleRequest($request);
@@ -59,20 +59,20 @@ class DirectoryEdit extends AbstractController
             $directoryArray = $form->getData();
             assert(is_array($directoryArray) && array_key_exists('title', $directoryArray));
 
-            $directory->title  = $directoryArray['title'];
-            $directory->parent = $directoryArray['parent'];
+            $directory->rename($directoryArray['title']);
+            $directory->moveToDirectory($directoryArray['parent']);
 
             $this->directoryRepository->store($directory);
 
             $this->addFlashMessage(
                 $request,
                 Alert::SUCCESS,
-                'Das Verzeichnis "' . $directory->title . '" wurde erfolgreich bearbeitet.',
+                'Das Verzeichnis "' . $directory->getTitle() . '" wurde erfolgreich bearbeitet.',
             );
 
             return new RedirectResponse($this->router->generate(
                 'library',
-                ['directory' => $directory->id],
+                ['directory' => $directory->getId()],
             ));
         }
 

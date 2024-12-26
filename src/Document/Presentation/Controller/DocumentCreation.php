@@ -61,7 +61,7 @@ class DocumentCreation extends AbstractController
                 'Das Dokument wurde erstellt, damit es in der Suche aktiv ist kannst du den Suchindex aktualisieren.',
             );
 
-            return $this->redirectToRoute('library', ['directory' => $document->getDirectory()->id]);
+            return $this->redirectToRoute('library', ['directory' => $document->getDirectory()->getId()]);
         }
 
         return $this->render(

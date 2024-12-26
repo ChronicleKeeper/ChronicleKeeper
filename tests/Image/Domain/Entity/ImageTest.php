@@ -67,7 +67,7 @@ final class ImageTest extends TestCase
         self::assertSame('mime_type', $image->getMimeType());
         self::assertSame('encoded_image', $image->getEncodedImage());
         self::assertSame('description', $image->getDescription());
-        self::assertSame(RootDirectory::ID, $image->getDirectory()->id);
+        self::assertSame(RootDirectory::ID, $image->getDirectory()->getId());
 
         // Test events are recorded
         $events = $image->flushEvents();
@@ -206,7 +206,7 @@ final class ImageTest extends TestCase
         self::assertSame($image->getMimeType(), $array['mime_type']);
         self::assertSame($image->getEncodedImage(), $array['encoded_image']);
         self::assertSame($image->getDescription(), $array['description']);
-        self::assertSame($image->getDirectory()->id, $array['directory']);
+        self::assertSame($image->getDirectory()->getId(), $array['directory']);
         self::assertSame(
             $image->getUpdatedAt()->format(DateTimeInterface::ATOM),
             $array['last_updated'],

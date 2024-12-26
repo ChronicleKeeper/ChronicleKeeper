@@ -28,17 +28,17 @@ class DirectoryBreadcrumb
 
         $unsortedBreadcrumbs = [];
         do {
-            $unsortedBreadcrumbs[$workOnBreadCrumb->title] = $this->router->generate(
+            $unsortedBreadcrumbs[$workOnBreadCrumb->getTitle()] = $this->router->generate(
                 'library',
-                ['directory' => $workOnBreadCrumb->id],
+                ['directory' => $workOnBreadCrumb->getId()],
             );
 
-            if (! $workOnBreadCrumb->parent instanceof Directory) {
+            if (! $workOnBreadCrumb->getParent() instanceof Directory) {
                 // Break the loop as soon as the root directory is reached
                 break;
             }
 
-            $workOnBreadCrumb = $workOnBreadCrumb->parent;
+            $workOnBreadCrumb = $workOnBreadCrumb->getParent();
         } while (true);
 
         $breadcrumbs = array_reverse($unsortedBreadcrumbs);

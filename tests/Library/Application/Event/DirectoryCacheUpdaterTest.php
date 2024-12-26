@@ -19,6 +19,10 @@ use ChronicleKeeper\Image\Domain\Event\ImageRenamed;
 use ChronicleKeeper\Library\Application\Event\DirectoryCacheUpdater;
 use ChronicleKeeper\Library\Application\Service\CacheReader;
 use ChronicleKeeper\Library\Domain\Entity\Directory;
+use ChronicleKeeper\Library\Domain\Event\DirectoryDeleted;
+use ChronicleKeeper\Library\Domain\Event\DirectoryMovedToDirectory;
+use ChronicleKeeper\Library\Domain\Event\DirectoryRenamed;
+use ChronicleKeeper\Library\Domain\RootDirectory;
 use ChronicleKeeper\Library\Domain\ValueObject\DirectoryCache\Directory as DirectoryCache;
 use ChronicleKeeper\Test\Chat\Domain\Entity\ConversationBuilder;
 use ChronicleKeeper\Test\Document\Domain\Entity\DocumentBuilder;
@@ -268,5 +272,83 @@ class DirectoryCacheUpdaterTest extends TestCase
             ->with($directory);
 
         $this->directoryCacheUpdater->updateOnConversationCreated($event);
+    }
+
+    #[Test]
+    public function updateOnDirectoryDeleted(): void
+    {
+        $parentDirectory = (new DirectoryBuilder())->build();
+        $directory       = (new DirectoryBuilder())->withParent($parentDirectory)->build();
+
+        $event = new DirectoryDeleted($directory);
+
+        $this->cacheReader->expects($this->once())
+            ->method('refresh')
+            ->with($parentDirectory);
+
+        $this->cacheReader->expects($this->once())
+            ->method('remove')
+            ->with($directory);
+
+        $this->directoryCacheUpdater->updateOnDirectoryDeleted($event);
+    }
+
+    #[Test]
+    public function updateOnDirectoryDeletedWhenParentDirectoryIsNull(): void
+    {
+        $directory = RootDirectory::get();
+
+        $event = new DirectoryDeleted($directory);
+
+        $this->cacheReader->expects($this->never())
+            ->method('refresh');
+
+        $this->cacheReader->expects($this->once())
+            ->method('remove')
+            ->with($directory);
+
+        $this->directoryCacheUpdater->updateOnDirectoryDeleted($event);
+    }
+
+    #[Test]
+    public function updateOnDirectoryMovedToDirectory(): void
+    {
+        $directory    = (new DirectoryBuilder())->build();
+        $oldDirectory = (new DirectoryBuilder())->build();
+
+        $event = new DirectoryMovedToDirectory($directory, $oldDirectory);
+
+        $invoker = $this->exactly(2);
+        $this->cacheReader->expects($invoker)
+            ->method('refresh')
+            ->willReturnCallback(
+                static function (Directory $argDirectory) use ($invoker, $directory, $oldDirectory): DirectoryCache {
+                    if ($invoker->numberOfInvocations() === 1) {
+                        self::assertSame($directory->getParent(), $argDirectory);
+
+                        return DirectoryCache::fromEntity($directory);
+                    }
+
+                    self::assertSame($oldDirectory, $argDirectory);
+
+                    return DirectoryCache::fromEntity($directory);
+                },
+            );
+
+        $this->directoryCacheUpdater->updateOnDirectoryMovedToDirectory($event);
+    }
+
+    #[Test]
+    public function updateOnDirectoryRenamed(): void
+    {
+        $directory = (new DirectoryBuilder())->build();
+
+        $event = new DirectoryRenamed($directory, 'new-name');
+
+        $this->cacheReader->expects($this->once())
+            ->method('refresh')
+            ->with($directory);
+
+        $this->directoryCacheUpdater->updateOnDirectoryRenamed($event);
     }
 }

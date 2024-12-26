@@ -130,7 +130,7 @@ class Conversation extends AggregateRoot implements JsonSerializable, Sluggable
 
     public function moveToDirectory(Directory $directory): void
     {
-        if ($directory->id === $this->directory->id) {
+        if ($directory->equals($this->directory)) {
             return;
         }
 
@@ -164,7 +164,7 @@ class Conversation extends AggregateRoot implements JsonSerializable, Sluggable
         return [
             'id' => $this->id,
             'title' => $this->title,
-            'directory' => $this->directory->id,
+            'directory' => $this->directory->getId(),
             'settings' => $this->settings,
             'messages' => $this->messages,
         ];

@@ -42,7 +42,7 @@ class ImageDeletion extends AbstractController
                 'Das Löschen des Bildes "' . $image->getTitle() . '" muss erst bestätigt werden!',
             );
 
-            return new RedirectResponse($this->router->generate('library', ['directory' => $image->getDirectory()->id]));
+            return new RedirectResponse($this->router->generate('library', ['directory' => $image->getDirectory()->getId()]));
         }
 
         foreach ($this->vectorImageRepository->findAllByImageId($image->getId()) as $vectorImage) {
@@ -57,6 +57,6 @@ class ImageDeletion extends AbstractController
             'Das Bild "' . $image->getTitle() . '" wurde erfolgreich gelöscht.',
         );
 
-        return new RedirectResponse($this->router->generate('library', ['directory' => $image->getDirectory()->id]));
+        return new RedirectResponse($this->router->generate('library', ['directory' => $image->getDirectory()->getId()]));
     }
 }

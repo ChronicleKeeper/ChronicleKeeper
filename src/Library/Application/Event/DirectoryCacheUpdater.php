@@ -17,7 +17,13 @@ use ChronicleKeeper\Image\Domain\Event\ImageDeleted;
 use ChronicleKeeper\Image\Domain\Event\ImageMovedToDirectory;
 use ChronicleKeeper\Image\Domain\Event\ImageRenamed;
 use ChronicleKeeper\Library\Application\Service\CacheReader;
+use ChronicleKeeper\Library\Domain\Entity\Directory;
+use ChronicleKeeper\Library\Domain\Event\DirectoryDeleted;
+use ChronicleKeeper\Library\Domain\Event\DirectoryMovedToDirectory;
+use ChronicleKeeper\Library\Domain\Event\DirectoryRenamed;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
+
+use function assert;
 
 class DirectoryCacheUpdater
 {
@@ -99,5 +105,34 @@ class DirectoryCacheUpdater
     public function updateOnConversationCreated(ConversationCreated $event): void
     {
         $this->cacheReader->refresh($event->conversation->getDirectory());
+    }
+
+    #[AsEventListener]
+    public function updateOnDirectoryDeleted(DirectoryDeleted $event): void
+    {
+        $this->cacheReader->remove($event->directory);
+
+        $parentDirectory = $event->directory->getParent();
+        if (! $parentDirectory instanceof Directory) {
+            return;
+        }
+
+        $this->cacheReader->refresh($parentDirectory);
+    }
+
+    #[AsEventListener]
+    public function updateOnDirectoryMovedToDirectory(DirectoryMovedToDirectory $event): void
+    {
+        $parentDirectory = $event->directory->getParent();
+        assert($parentDirectory instanceof Directory); // Ensured by tree logic, as the root can not be moved
+
+        $this->cacheReader->refresh($parentDirectory);
+        $this->cacheReader->refresh($event->oldParent);
+    }
+
+    #[AsEventListener]
+    public function updateOnDirectoryRenamed(DirectoryRenamed $event): void
+    {
+        $this->cacheReader->refresh($event->directory);
     }
 }

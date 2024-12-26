@@ -9,8 +9,8 @@ use ChronicleKeeper\Document\Domain\Event\DocumentChangedContent;
 use ChronicleKeeper\Document\Domain\Event\DocumentCreated;
 use ChronicleKeeper\Document\Domain\Event\DocumentMovedToDirectory;
 use ChronicleKeeper\Document\Domain\Event\DocumentRenamed;
-use ChronicleKeeper\Library\Domain\Entity\Directory;
 use ChronicleKeeper\Library\Domain\RootDirectory;
+use ChronicleKeeper\Test\Library\Domain\Entity\DirectoryBuilder;
 use DateTimeImmutable;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
@@ -36,7 +36,7 @@ class DocumentTest extends TestCase
         self::assertNotEmpty($document->getId());
         self::assertSame('Test Title', $document->getTitle());
         self::assertSame('Test Content', $document->getContent());
-        self::assertSame($directory->id, $document->getDirectory()->id);
+        self::assertSame($directory->getId(), $document->getDirectory()->getId());
         self::assertGreaterThanOrEqual($now, $document->getUpdatedAt());
 
         $events = $document->flushEvents();
@@ -48,7 +48,7 @@ class DocumentTest extends TestCase
     #[Test]
     public function canBeCreatedWithCustomDirectory(): void
     {
-        $directory = new Directory('custom-dir');
+        $directory = (new DirectoryBuilder())->build();
         $document  = Document::create('Test Title', 'Test Content', $directory);
 
         self::assertSame($directory, $document->getDirectory());
@@ -146,7 +146,7 @@ class DocumentTest extends TestCase
     public function canMoveToDirectory(): void
     {
         $document     = (new DocumentBuilder())->build();
-        $newDirectory = new Directory('new-dir');
+        $newDirectory = (new DirectoryBuilder())->build();
         $now          = new DateTimeImmutable();
 
         $document->moveToDirectory($newDirectory);
@@ -203,7 +203,7 @@ class DocumentTest extends TestCase
 
         $document->moveToDirectory(clone $originalDirectory);
 
-        self::assertSame($originalDirectory->id, $document->getDirectory()->id);
+        self::assertSame($originalDirectory->getId(), $document->getDirectory()->getId());
         self::assertSame($originalUpdatedAt, $document->getUpdatedAt());
 
         $events = $document->flushEvents();

@@ -43,8 +43,8 @@ class CacheReaderTest extends TestCase
     {
         $directory = (new DirectoryBuilder())->build();
 
-        $filename       = $directory->id . '.json';
-        $cacheData      = '{"id": "' . $directory->id . '","title":"Test Directory","elements":[],"directories":[]}';
+        $filename       = $directory->getId() . '.json';
+        $cacheData      = '{"id": "' . $directory->getId() . '","title":"Test Directory","elements":[],"directories":[]}';
         $directoryCache = new DirectoryCache('test-id', 'Test Directory', [], []);
 
         $this->fileAccess->expects($this->once())
@@ -71,7 +71,7 @@ class CacheReaderTest extends TestCase
     public function readCacheDoesNotExist(): void
     {
         $directory      = (new DirectoryBuilder())->build();
-        $filename       = $directory->id . '.json';
+        $filename       = $directory->getId() . '.json';
         $directoryCache = new DirectoryCache('test-id', 'Test Directory', [], []);
 
         $this->fileAccess->expects($this->once())

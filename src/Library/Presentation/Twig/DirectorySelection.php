@@ -26,11 +26,11 @@ class DirectorySelection
     public function getSortedList(): array
     {
         $rootDirectory = RootDirectory::get();
-        $directories   = [$rootDirectory->id => $rootDirectory->title];
+        $directories   = [$rootDirectory->getId() => $rootDirectory->getTitle()];
 
         $addedDirectories = [];
         foreach ($this->directoryRepository->findAll() as $foundDirectory) {
-            $addedDirectories[$foundDirectory->id] = $foundDirectory->flattenHierarchyTitle();
+            $addedDirectories[$foundDirectory->getId()] = $foundDirectory->flattenHierarchyTitle();
         }
 
         $directories = array_merge($directories, $addedDirectories);

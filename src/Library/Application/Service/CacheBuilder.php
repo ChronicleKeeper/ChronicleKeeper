@@ -49,7 +49,7 @@ class CacheBuilder
         );
 
         // Add documents to the cache
-        $documents = $this->queryService->query(new FindDocumentsByDirectory($directory->id));
+        $documents = $this->queryService->query(new FindDocumentsByDirectory($directory->getId()));
         foreach ($documents as $document) {
             $cacheDirectory->elements[] = Element::fromDocumentEntity($document);
         }

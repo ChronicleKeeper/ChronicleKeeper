@@ -126,7 +126,7 @@ class Image extends AggregateRoot implements JsonSerializable, Sluggable
 
     public function moveToDirectory(Directory $directory): void
     {
-        if ($directory->id === $this->directory->id) {
+        if ($directory->equals($this->directory)) {
             return;
         }
 
@@ -144,7 +144,7 @@ class Image extends AggregateRoot implements JsonSerializable, Sluggable
             'mime_type' => $this->mimeType,
             'encoded_image' => $this->encodedImage,
             'description' => $this->description,
-            'directory' => $this->directory->id,
+            'directory' => $this->directory->getId(),
             'last_updated' => $this->updatedAt->format(DateTimeInterface::ATOM),
         ];
     }

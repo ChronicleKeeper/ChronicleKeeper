@@ -48,11 +48,13 @@ class DirectoryDenormalizer implements DenormalizerInterface, DenormalizerAwareI
             return $this->cachedEntries[$data['id']];
         }
 
-        $directory         = new Directory($data['title']);
-        $directory->id     = $data['id'];
-        $directory->parent = $this->denormalizer->denormalize($data['parent'], Directory::class, $format, $context);
+        $directory = new Directory(
+            $data['id'],
+            $data['title'],
+            $this->denormalizer->denormalize($data['parent'], Directory::class, $format, $context),
+        );
 
-        $this->cachedEntries[$directory->id] = $directory;
+        $this->cachedEntries[$directory->getId()] = $directory;
 
         return $directory;
     }

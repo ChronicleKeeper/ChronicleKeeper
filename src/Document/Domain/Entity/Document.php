@@ -82,7 +82,7 @@ class Document extends AggregateRoot implements JsonSerializable, Sluggable
 
     public function moveToDirectory(Directory $directory): void
     {
-        if ($directory->id === $this->directory->id) {
+        if ($directory->equals($this->directory)) {
             return;
         }
 
@@ -123,7 +123,7 @@ class Document extends AggregateRoot implements JsonSerializable, Sluggable
             'id' => $this->id,
             'title' => $this->title,
             'content' => $this->content,
-            'directory' => $this->directory->id,
+            'directory' => $this->directory->getId(),
             'last_updated' => $this->updatedAt->format(DateTimeInterface::ATOM),
         ];
     }

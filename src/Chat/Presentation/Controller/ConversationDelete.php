@@ -38,7 +38,7 @@ class ConversationDelete extends AbstractController
                 'Das Löschen des Gespräches "' . $conversation->getTitle() . '" muss erst bestätigt werden!',
             );
 
-            return $this->redirectToRoute('library', ['directory' => $conversation->getDirectory()->id]);
+            return $this->redirectToRoute('library', ['directory' => $conversation->getDirectory()->getId()]);
         }
 
         $this->bus->dispatch(new DeleteConversation($conversation));
@@ -49,6 +49,6 @@ class ConversationDelete extends AbstractController
             'Das Gespräch "' . $conversation->getTitle() . '" wurde erfolgreich gelöscht.',
         );
 
-        return $this->redirectToRoute('library', ['directory' => $conversation->getDirectory()->id]);
+        return $this->redirectToRoute('library', ['directory' => $conversation->getDirectory()->getId()]);
     }
 }

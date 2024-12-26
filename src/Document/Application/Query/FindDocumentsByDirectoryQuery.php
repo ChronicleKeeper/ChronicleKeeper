@@ -55,7 +55,7 @@ class FindDocumentsByDirectoryQuery implements Query
 
         $documents = array_values(array_filter(
             $documents,
-            static fn (Document $document) => $document->getDirectory()->id === $parameters->id,
+            static fn (Document $document) => $document->getDirectory()->getId() === $parameters->id,
         ));
 
         usort(

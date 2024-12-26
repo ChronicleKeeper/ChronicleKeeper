@@ -145,7 +145,7 @@ class FindDocumentsByDirectoryTest extends TestCase
             $logger,
         );
 
-        $documents = $query->query(new FindDocumentsByDirectory($searchDirectory->id));
+        $documents = $query->query(new FindDocumentsByDirectory($searchDirectory->getId()));
 
         self::assertCount(1, $documents);
         self::assertSame('foo', $documents[0]->getTitle());
@@ -190,8 +190,7 @@ class FindDocumentsByDirectoryTest extends TestCase
                 static function (string $content, string $class): object {
                     self::assertSame(Document::class, $class);
 
-                    $directory     = new Directory('foo.directory');
-                    $directory->id = 'foo';
+                    $directory = new Directory('foo', 'foo.directory');
 
                     if ($content === 'foo.content') {
                         return (new DocumentBuilder())

@@ -22,6 +22,6 @@ class Directory
 
     public static function fromEntity(DirectoryEntity $directory): Directory
     {
-        return new Directory($directory->id, $directory->title, [], []);
+        return new Directory($directory->getId(), $directory->getTitle(), [], []);
     }
 }

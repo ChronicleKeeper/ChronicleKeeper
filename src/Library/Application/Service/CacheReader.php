@@ -20,7 +20,7 @@ class CacheReader
 
     public function refresh(DirectoryEntity $directory): DirectoryCache
     {
-        $filename = $directory->id . '.json';
+        $filename = $directory->getId() . '.json';
 
         $cache = $this->cacheBuilder->build($directory);
         $this->fileAccess->write(
@@ -32,9 +32,15 @@ class CacheReader
         return $cache;
     }
 
+    public function remove(DirectoryEntity $directory): void
+    {
+        $filename = $directory->getId() . '.json';
+        $this->fileAccess->delete('library.directories.cache', $filename);
+    }
+
     public function read(DirectoryEntity $directory): DirectoryCache
     {
-        $filename    = $directory->id . '.json';
+        $filename    = $directory->getId() . '.json';
         $cacheExists = $this->fileAccess->exists('library.directories.cache', $filename);
         if ($cacheExists) {
             return $this->serializer->deserialize(

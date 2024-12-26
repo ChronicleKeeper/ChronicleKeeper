@@ -115,6 +115,6 @@ class FindConversationsByDirectoryQueryTest extends TestCase
         $directory  = (new DirectoryBuilder())->withId('550e8400-e29b-41d4-a716-446655440000')->build();
         $parameters = new FindConversationsByDirectoryParameters($directory);
 
-        self::assertSame('550e8400-e29b-41d4-a716-446655440000', $parameters->directory->id);
+        self::assertSame('550e8400-e29b-41d4-a716-446655440000', $parameters->directory->getId());
     }
 }

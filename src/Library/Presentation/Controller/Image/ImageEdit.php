@@ -50,7 +50,7 @@ class ImageEdit extends AbstractController
                 'Das Bild wurde bearbeitet, damit die Änderungen in der Suche aktiv sind muss der Index aktualisiert werden.',
             );
 
-            return new RedirectResponse($this->router->generate('library', ['directory' => $image->getDirectory()->id]));
+            return new RedirectResponse($this->router->generate('library', ['directory' => $image->getDirectory()->getId()]));
         }
 
         return new Response($this->environment->render(

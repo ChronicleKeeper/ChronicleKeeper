@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ChronicleKeeper\Test\Library\Domain\Entity;
 
 use ChronicleKeeper\Library\Domain\Entity\Directory;
+use ChronicleKeeper\Library\Domain\RootDirectory;
 use Symfony\Component\Uid\Uuid;
 
 class DirectoryBuilder
@@ -15,8 +16,9 @@ class DirectoryBuilder
 
     public function __construct()
     {
-        $this->id    = Uuid::v4()->toString();
-        $this->title = 'Default Title';
+        $this->id     = Uuid::v4()->toString();
+        $this->title  = 'Default Title';
+        $this->parent = RootDirectory::get();
     }
 
     public function withId(string $id): self
@@ -42,10 +44,6 @@ class DirectoryBuilder
 
     public function build(): Directory
     {
-        $directory         = new Directory($this->title);
-        $directory->id     = $this->id;
-        $directory->parent = $this->parent;
-
-        return $directory;
+        return new Directory($this->id, $this->title, $this->parent);
     }
 }

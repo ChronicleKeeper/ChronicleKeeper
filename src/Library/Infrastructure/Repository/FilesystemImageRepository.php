@@ -86,7 +86,7 @@ class FilesystemImageRepository
     {
         $images = $this->findAll();
 
-        return array_values(array_filter($images, static fn (Image $image) => $image->getDirectory()->id === $directory->id));
+        return array_values(array_filter($images, static fn (Image $image) => $image->getDirectory()->equals($directory)));
     }
 
     public function findById(string $id): Image|null

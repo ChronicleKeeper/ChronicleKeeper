@@ -43,7 +43,7 @@ class DocumentDeletion extends AbstractController
 
             return new RedirectResponse($this->router->generate(
                 'library',
-                ['directory' => $document->getDirectory()->id],
+                ['directory' => $document->getDirectory()->getId()],
             ));
         }
 
@@ -57,7 +57,7 @@ class DocumentDeletion extends AbstractController
 
         return new RedirectResponse($this->router->generate(
             'library',
-            ['directory' => $document->getDirectory()->id],
+            ['directory' => $document->getDirectory()->getId()],
         ));
     }
 }

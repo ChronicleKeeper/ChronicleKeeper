@@ -72,7 +72,7 @@ class ConversationTest extends TestCase
             [
                 'id' => $id,
                 'title' => $title,
-                'directory' => $directory->id,
+                'directory' => $directory->getId(),
                 'settings' => $settings,
                 'messages' => $messageBag,
             ],
