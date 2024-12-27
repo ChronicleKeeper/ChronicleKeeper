@@ -188,6 +188,16 @@ final class SystemPromptTest extends TestCase
     }
 
     #[Test]
+    public function itIgnoresMakingADefaultForAlreadyDefaultEntry(): void
+    {
+        $systemPrompt = SystemPrompt::create(Purpose::CONVERSATION, 'name', 'content');
+        $systemPrompt->toDefault();
+        self::assertTrue($systemPrompt->isDefault());
+        $systemPrompt->toDefault();
+        self::assertTrue($systemPrompt->isDefault());
+    }
+
+    #[Test]
     public function itCanNotMakeSystemPromptsToDefault(): void
     {
         $systemPrompt = SystemPrompt::createSystemPrompt('id', Purpose::CONVERSATION, 'name', 'content');
