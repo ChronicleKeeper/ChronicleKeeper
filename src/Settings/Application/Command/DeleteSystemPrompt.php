@@ -7,7 +7,7 @@ namespace ChronicleKeeper\Settings\Application\Command;
 use ChronicleKeeper\Settings\Domain\Entity\SystemPrompt;
 use InvalidArgumentException;
 
-class StoreSystemPrompt
+class DeleteSystemPrompt
 {
     public function __construct(
         public readonly SystemPrompt $systemPrompt,

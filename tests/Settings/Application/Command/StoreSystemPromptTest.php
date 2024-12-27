@@ -8,6 +8,7 @@ use ChronicleKeeper\Settings\Application\Command\StoreSystemPrompt;
 use ChronicleKeeper\Settings\Application\Command\StoreSystemPromptHandler;
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
 use ChronicleKeeper\Test\Settings\Domain\Entity\SystemPromptBuilder;
+use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\Attributes\Test;
@@ -22,16 +23,27 @@ class StoreSystemPromptTest extends TestCase
     #[Test]
     public function itHasACreatableConmmand(): void
     {
-        $systemPrompt = (new SystemPromptBuilder())->build();
+        $systemPrompt = (new SystemPromptBuilder())->asUser()->build();
         $command      = new StoreSystemPrompt($systemPrompt);
 
         self::assertSame($systemPrompt, $command->systemPrompt);
     }
 
     #[Test]
+    public function itHasACommandThatFailsOnSystemPrompts(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('System prompts cannot be stored.');
+
+        $systemPrompt = (new SystemPromptBuilder())->asSystem()->build();
+
+        new StoreSystemPrompt($systemPrompt);
+    }
+
+    #[Test]
     public function itStoresThePromptWithoutAnExistingFile(): void
     {
-        $systemPrompt = (new SystemPromptBuilder())->build();
+        $systemPrompt = (new SystemPromptBuilder())->asUser()->build();
 
         $fileAccess = $this->createMock(FileAccess::class);
         $fileAccess->expects($this->once())
@@ -56,7 +68,7 @@ class StoreSystemPromptTest extends TestCase
     #[Test]
     public function itStoresThePromptWithAnExistingFile(): void
     {
-        $systemPrompt = (new SystemPromptBuilder())->build();
+        $systemPrompt = (new SystemPromptBuilder())->asUser()->build();
 
         $fileAccess = $this->createMock(FileAccess::class);
         $fileAccess->expects($this->once())
