@@ -17,7 +17,7 @@
 - Improved the performance of embedding generation by generating all document and image text chunks at once.
 - Utilized a minimum vector content chunk length to reduce the failure rate for \`only-dot\` content cases.
 - Optimized the conversation storage to not keep copies of the library within its own storage.
-- BC: Imported conversations older than version 0.6 will be deleted from the database.
+- BC: Imported conversations older than version 0.6 will be deleted from the database and from favorites.
 - Refactored Images, Conversations, Documents, and Directories to emit events on changes to allow hook extended logic into them.
 
 ## [alpha-0.5.1]
