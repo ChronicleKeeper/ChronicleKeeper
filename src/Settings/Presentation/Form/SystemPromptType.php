@@ -36,6 +36,7 @@ final class SystemPromptType extends AbstractType
             TextType::class,
             [
                 'label' => 'Name',
+                'translation_domain' => false,
                 'setter' => static fn (SystemPrompt $prompt, string $name) => $prompt->rename($name),
             ],
         );
@@ -46,6 +47,8 @@ final class SystemPromptType extends AbstractType
             [
                 'label' => 'Zweck',
                 'class' => Purpose::class,
+                'translation_domain' => false,
+                'choice_translation_domain' => false,
                 'choice_label' => static fn (Purpose $purpose) => $purpose->getLabel(),
                 'setter' => static fn (SystemPrompt $prompt, Purpose $purpose) => $prompt->changePurpose($purpose),
             ],
@@ -56,15 +59,18 @@ final class SystemPromptType extends AbstractType
             TextareaType::class,
             [
                 'label' => 'Beschreibung',
+                'translation_domain' => false,
                 'setter' => static fn (SystemPrompt $prompt, string $content) => $prompt->changeContent($content),
             ],
         );
 
         $builder->add('isDefault', ChoiceType::class, [
             'label' => 'Standard (Nur Nutzer)',
+            'translation_domain' => false,
+            'choice_translation_domain' => false,
             'choices' => [
-                'Ja' => true,
                 'Nein' => false,
+                'Ja' => true,
             ],
             'setter' => static function (SystemPrompt $prompt, bool|null $isDefault): void {
                 (bool) $isDefault ? $prompt->toDefault() : $prompt->toNotDefault();
