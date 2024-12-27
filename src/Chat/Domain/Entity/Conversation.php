@@ -16,7 +16,6 @@ use ChronicleKeeper\Shared\Domain\Entity\AggregateRoot;
 use ChronicleKeeper\Shared\Domain\Sluggable;
 use JsonSerializable;
 use PhpLlm\LlmChain\Bridge\OpenAI\GPT;
-use PhpLlm\LlmChain\Model\Message\Message;
 use Symfony\Component\String\Slugger\AsciiSlugger;
 use Symfony\Component\Uid\Uuid;
 
@@ -76,9 +75,7 @@ class Conversation extends AggregateRoot implements JsonSerializable, Sluggable
                 $settings->getChatbotTuning()->getDocumentsMaxDistance(),
                 $settings->getChatbotTuning()->getDocumentsMaxDistance(),
             ),
-            new ExtendedMessageBag(
-                new ExtendedMessage(Message::forSystem($settings->getChatbotSystemPrompt()->getSystemPrompt())),
-            ),
+            new ExtendedMessageBag(),
         );
         $conversation->record(new ConversationCreated($conversation));
 

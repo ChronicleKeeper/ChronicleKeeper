@@ -9,7 +9,6 @@ use ChronicleKeeper\Settings\Domain\ValueObject\Settings\Application;
 use ChronicleKeeper\Settings\Domain\ValueObject\Settings\Calendar;
 use ChronicleKeeper\Settings\Domain\ValueObject\Settings\ChatbotFunctions;
 use ChronicleKeeper\Settings\Domain\ValueObject\Settings\ChatbotGeneral;
-use ChronicleKeeper\Settings\Domain\ValueObject\Settings\ChatbotSystemPrompt;
 use ChronicleKeeper\Settings\Domain\ValueObject\Settings\ChatbotTuning;
 use ChronicleKeeper\Settings\Domain\ValueObject\Settings\Holiday;
 use ChronicleKeeper\Settings\Domain\ValueObject\Settings\MoonCalendar;
@@ -18,7 +17,6 @@ class SettingsBuilder
 {
     private Application $application;
     private ChatbotGeneral $chatbotGeneral;
-    private ChatbotSystemPrompt $chatbotSystemPrompt;
     private ChatbotTuning $chatbotTuning;
     private ChatbotFunctions $chatbotFunctions;
     private Calendar $calendar;
@@ -27,14 +25,13 @@ class SettingsBuilder
 
     public function __construct()
     {
-        $this->application         = new Application();
-        $this->chatbotGeneral      = new ChatbotGeneral();
-        $this->chatbotSystemPrompt = new ChatbotSystemPrompt();
-        $this->chatbotTuning       = new ChatbotTuning();
-        $this->chatbotFunctions    = new ChatbotFunctions();
-        $this->calendar            = new Calendar();
-        $this->moonCalendar        = new MoonCalendar();
-        $this->holiday             = new Holiday();
+        $this->application      = new Application();
+        $this->chatbotGeneral   = new ChatbotGeneral();
+        $this->chatbotTuning    = new ChatbotTuning();
+        $this->chatbotFunctions = new ChatbotFunctions();
+        $this->calendar         = new Calendar();
+        $this->moonCalendar     = new MoonCalendar();
+        $this->holiday          = new Holiday();
     }
 
     public function withApplication(Application $application): self
@@ -47,13 +44,6 @@ class SettingsBuilder
     public function withChatbotGeneral(ChatbotGeneral $chatbotGeneral): self
     {
         $this->chatbotGeneral = $chatbotGeneral;
-
-        return $this;
-    }
-
-    public function withChatbotSystemPrompt(ChatbotSystemPrompt $chatbotSystemPrompt): self
-    {
-        $this->chatbotSystemPrompt = $chatbotSystemPrompt;
 
         return $this;
     }
@@ -98,7 +88,6 @@ class SettingsBuilder
         $settings = new Settings();
         $settings->setApplication($this->application);
         $settings->setChatbotGeneral($this->chatbotGeneral);
-        $settings->setChatbotSystemPrompt($this->chatbotSystemPrompt);
         $settings->setChatbotTuning($this->chatbotTuning);
         $settings->setChatbotFunctions($this->chatbotFunctions);
         $settings->setCalendar($this->calendar);

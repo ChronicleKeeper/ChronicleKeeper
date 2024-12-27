@@ -10,7 +10,6 @@ use ChronicleKeeper\Settings\Presentation\Form\CalendarGeneralType;
 use ChronicleKeeper\Settings\Presentation\Form\CalendarHolidayType;
 use ChronicleKeeper\Settings\Presentation\Form\CalendarMoonType;
 use ChronicleKeeper\Settings\Presentation\Form\ChatbotGeneralType;
-use ChronicleKeeper\Settings\Presentation\Form\ChatbotSystemPromptType;
 use ChronicleKeeper\Settings\Presentation\Form\ChatbotTuningType;
 use ChronicleKeeper\Shared\Presentation\FlashMessages\Alert;
 use ChronicleKeeper\Shared\Presentation\FlashMessages\HandleFlashMessages;
@@ -34,7 +33,6 @@ class ChangeSettings extends AbstractController
     private const array FORM_MAPPING = [
         'application' => ApplicationType::class,
         'chatbot_general' => ChatbotGeneralType::class,
-        'chatbot_system_prompt' => ChatbotSystemPromptType::class,
         'chatbot_tuning' => ChatbotTuningType::class,
         'calendar_general' => CalendarGeneralType::class,
         'calendar_holiday' => CalendarHolidayType::class,
