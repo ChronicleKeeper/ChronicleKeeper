@@ -1,0 +1,63 @@
+{% extends 'layout.html.twig' %}
+
+{% block page_title %}Einstellungen - Chatbot - System Prompts{% endblock %}
+
+{% block page_content %}
+<div class="container-xl">
+    <div class="card">
+        <div class="row g-0">
+            {% include 'settings/_includes/settings_nav.html.twig' %}
+            <div class="col-12 col-md-9 d-flex flex-column">
+
+                <div class="card-body">
+
+                    <div class="alert alert-info">
+                        Du findest hier eine Übersicht aller vorhandenen System Prompts mit ihrem Zweck. Der Zweck ist
+                        deshalb relevant, da sich ein System Prompt im Gespräch mit dem Chronicle Keeper von Grunde
+                        auf anders definiert als er es bei der Optimierung von Dokumenten tun würde. Während man in
+                        dem einen Prompt eher definieren möchte wie auf ein Gespräch mit dir reagiert werden soll,
+                        ist die Definition für die Optimierung von Dokumenten eher darauf ausgelegt wie der Inhalt
+                        eines Dokumentes verbessert werden soll.
+                        <br /><br />
+                        Entsprechend hast du die Möglichkeit für jeden Zweck eigene Prompts anzulegen und später
+                        auszuwählen um das Verhalten an der jeweiligen Stelle auf das was du machen möchtest angepasst
+                        zu steuern.
+                        <br /><br />
+                        Bedenke bitte, dass wenn du mit deinen eigenen Prompts deutlich bessere Ergebnisse als mit den
+                        vom System vorgegeben erzielst es vielleicht gut wäre die Erkentnisse mit dem Projekt zu
+                        teilen, so dass auch andere Nutzer von deinen Erkenntnissen profitieren können.
+                    </div>
+
+                    <table class="table table-vcenter">
+                        <thead>
+                        <tr>
+                            <th>Titel</th>
+                            <th>Zweck</th>
+                            <th class="text-center">System</th>
+                            <th class="text-center">Standard</th>
+                            <th class="w-8">&nbsp;</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                            {% for prompt in systemPrompts %}
+                                <tr>
+                                    <td>{{ prompt.name }}</td>
+                                    <td>{{ prompt.purpose.label }}</td>
+                                    <td class="text-center">{{ prompt.system ? '✔' : '✘' }}</td>
+                                    <td class="text-center">{{ prompt.default ? '✔' : '✘'  }}</td>
+                                    <td>
+                                        {% if prompt.system %}
+                                            <a href="{{ path('settings_system_prompts_edit', {'id': prompt.id}) }}" title="Ansehen">{{ ux_icon('tabler:list-search') }}</a>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+
+                    </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

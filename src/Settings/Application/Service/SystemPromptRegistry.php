@@ -11,6 +11,7 @@ use Symfony\Component\DependencyInjection\Attribute\Lazy;
 
 use function array_filter;
 use function array_key_first;
+use function array_values;
 use function assert;
 use function count;
 
@@ -24,6 +25,12 @@ class SystemPromptRegistry
         private readonly SystemPromptLoader $loader,
     ) {
         $this->prompts = $this->loader->load();
+    }
+
+    /** @return list<SystemPrompt> */
+    public function all(): array
+    {
+        return array_values($this->prompts);
     }
 
     /** @return list<SystemPrompt> */

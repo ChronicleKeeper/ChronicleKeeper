@@ -24,7 +24,7 @@ class SystemPrompt extends AggregateRoot implements JsonSerializable
 {
     public function __construct(
         private readonly string $id,
-        private readonly Purpose $purpose,
+        private Purpose $purpose,
         private string $name,
         private string $content,
         private readonly bool $isSystem,
@@ -75,7 +75,7 @@ class SystemPrompt extends AggregateRoot implements JsonSerializable
     public function rename(string $name): void
     {
         if ($this->isSystem) {
-            throw new LogicException('System relevant prompts cannot be renamed.');
+            throw new LogicException('System relevant prompts cannot be changed.');
         }
 
         if ($name === $this->name) {
@@ -87,11 +87,28 @@ class SystemPrompt extends AggregateRoot implements JsonSerializable
 
     public function changeContent(string $content): void
     {
+        if ($this->isSystem) {
+            throw new LogicException('System relevant prompts cannot be changed.');
+        }
+
         if ($content === $this->content) {
             return;
         }
 
         $this->content = $content;
+    }
+
+    public function changePurpose(Purpose $purpose): void
+    {
+        if ($this->isSystem) {
+            throw new LogicException('System relevant prompts cannot be changed.');
+        }
+
+        if ($this->purpose === $purpose) {
+            return;
+        }
+
+        $this->purpose = $purpose;
     }
 
     public function toDefault(): void
@@ -105,6 +122,19 @@ class SystemPrompt extends AggregateRoot implements JsonSerializable
         }
 
         $this->isDefault = true;
+    }
+
+    public function toNotDefault(): void
+    {
+        if ($this->isSystem) {
+            throw new LogicException('System relevant prompts cannot be set as default as they are already fallbacks when no default defined.');
+        }
+
+        if (! $this->isDefault) {
+            return;
+        }
+
+        $this->isDefault = false;
     }
 
     /** @return SystemPromptArray */

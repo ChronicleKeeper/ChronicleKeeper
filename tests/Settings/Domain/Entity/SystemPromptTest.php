@@ -113,7 +113,7 @@ final class SystemPromptTest extends TestCase
         );
 
         $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('System relevant prompts cannot be renamed.');
+        $this->expectExceptionMessage('System relevant prompts cannot be changed.');
 
         $systemPrompt->rename('new name');
     }
@@ -161,6 +161,66 @@ final class SystemPromptTest extends TestCase
     }
 
     #[Test]
+    public function itCannotChangeTheContentIfSystem(): void
+    {
+        $systemPrompt = SystemPrompt::createSystemPrompt(
+            'id',
+            Purpose::CONVERSATION,
+            'name',
+            'content',
+        );
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('System relevant prompts cannot be changed.');
+
+        $systemPrompt->changeContent('new content');
+    }
+
+    #[Test]
+    public function itCanChangeThePurpose(): void
+    {
+        $systemPrompt = SystemPrompt::create(
+            Purpose::CONVERSATION,
+            'name',
+            'content',
+        );
+
+        $systemPrompt->changePurpose(Purpose::IMAGE_UPLOAD);
+
+        self::assertSame('image_upload', $systemPrompt->getPurpose()->value);
+    }
+
+    #[Test]
+    public function itCannotChangeThePurposeIfSystem(): void
+    {
+        $systemPrompt = SystemPrompt::createSystemPrompt(
+            'id',
+            Purpose::CONVERSATION,
+            'name',
+            'content',
+        );
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('System relevant prompts cannot be changed.');
+
+        $systemPrompt->changePurpose(Purpose::IMAGE_UPLOAD);
+    }
+
+    #[Test]
+    public function itWillNotChangeThePurposeIfInputIsTheSame(): void
+    {
+        $systemPrompt = SystemPrompt::create(
+            Purpose::CONVERSATION,
+            'name',
+            'content',
+        );
+
+        $systemPrompt->changePurpose(Purpose::CONVERSATION);
+
+        self::assertSame('conversation', $systemPrompt->getPurpose()->value);
+    }
+
+    #[Test]
     public function itCanBeJsonSerialized(): void
     {
         $systemPrompt = SystemPrompt::create(
@@ -205,5 +265,33 @@ final class SystemPromptTest extends TestCase
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('System relevant prompts cannot be set as default as they are already fallbacks when no default defined.');
         $systemPrompt->toDefault();
+    }
+
+    #[Test]
+    public function itCanBeMadeToNotDefault(): void
+    {
+        $systemPrompt = SystemPrompt::create(Purpose::CONVERSATION, 'name', 'content', true);
+        self::assertTrue($systemPrompt->isDefault());
+        $systemPrompt->toNotDefault();
+        self::assertFalse($systemPrompt->isDefault());
+    }
+
+    #[Test]
+    public function itIgnoresMakingANonDefaultToNotDefault(): void
+    {
+        $systemPrompt = SystemPrompt::create(Purpose::CONVERSATION, 'name', 'content');
+        self::assertFalse($systemPrompt->isDefault());
+        $systemPrompt->toNotDefault();
+        self::assertFalse($systemPrompt->isDefault());
+    }
+
+    #[Test]
+    public function itCanNotMakeSystemPromptsToNotDefault(): void
+    {
+        $systemPrompt = SystemPrompt::createSystemPrompt('id', Purpose::CONVERSATION, 'name', 'content');
+        self::assertTrue($systemPrompt->isSystem());
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('System relevant prompts cannot be set as default as they are already fallbacks when no default defined.');
+        $systemPrompt->toNotDefault();
     }
 }

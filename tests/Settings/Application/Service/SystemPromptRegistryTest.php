@@ -43,6 +43,29 @@ final class SystemPromptRegistryTest extends TestCase
     }
 
     #[Test]
+    public function itGetsAllPrompts(): void
+    {
+        $prompts = [
+            (new SystemPromptBuilder())->build(),
+            (new SystemPromptBuilder())->build(),
+        ];
+
+        $systemPromptLoader = $this->createMock(SystemPromptLoader::class);
+        $systemPromptLoader
+            ->expects($this->once())
+            ->method('load')
+            ->willReturn(array_combine(array_map(static fn ($prompt) => $prompt->getId(), $prompts), $prompts));
+
+        $registry = new SystemPromptRegistry($systemPromptLoader);
+
+        $allPrompts = $registry->all();
+
+        self::assertCount(2, $allPrompts);
+        self::assertSame($prompts[0], $allPrompts[0]);
+        self::assertSame($prompts[1], $allPrompts[1]);
+    }
+
+    #[Test]
     public function itGetsDefaultForPurposeWithoutDefaultEntry(): void
     {
         $prompts = [(new SystemPromptBuilder())->withPurpose(Purpose::CONVERSATION)->build()];
