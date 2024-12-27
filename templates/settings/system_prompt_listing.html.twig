@@ -54,6 +54,8 @@
                                     <td>
                                         {% if prompt.system %}
                                             <a href="{{ path('settings_system_prompts_edit', {'id': prompt.id}) }}" title="Ansehen">{{ ux_icon('tabler:list-search') }}</a>
+                                        {% else %}
+                                            <a href="{{ path('settings_system_prompts_edit', {'id': prompt.id}) }}" title="Bearbeiten">{{ ux_icon('tabler:list-search', {'color': 'var(--tblr-warning)'}) }}</a>
                                         {% endif %}
                                     </td>
                                 </tr>
