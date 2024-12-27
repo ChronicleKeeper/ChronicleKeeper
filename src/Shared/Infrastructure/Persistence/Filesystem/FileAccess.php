@@ -70,6 +70,17 @@ class FileAccess implements FileAccessContract
         }
     }
 
+    public function prune(string $type): void
+    {
+        $path = $this->pathRegistry->get($type);
+        if (! $this->filesystem->exists($path)) {
+            return;
+        }
+
+        // Remove the directory, so all files in it will also be removed
+        $this->filesystem->remove($path);
+    }
+
     private function buildPath(string $type, string $filename): string
     {
         return $this->pathRegistry->get($type) . DIRECTORY_SEPARATOR . $filename;

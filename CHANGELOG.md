@@ -4,6 +4,7 @@
 
 **Added**
 - Implemented a directory cache for better performance while browsing the library.
+- The directory cache will be fully cleared with every completed export to prevent inconsistencies between the cache and data.
 - Added a library header function to clear the directory cache manually.
 - The search index for documents and images of the library are now automized on changes, a global refresh is not generally needed anymore.
 - The file access now has a request based cache layer to improve file access performance.

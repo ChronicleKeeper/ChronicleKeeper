@@ -7,6 +7,7 @@ namespace ChronicleKeeper\Settings\Application\Service;
 use ChronicleKeeper\Settings\Application\Service\Importer\ImportedFileBag;
 use ChronicleKeeper\Settings\Application\Service\Importer\SingleImport;
 use ChronicleKeeper\Settings\Domain\Event\FileImported;
+use ChronicleKeeper\Settings\Domain\Event\ImportFinished;
 use League\Flysystem\Filesystem;
 use League\Flysystem\ZipArchive\FilesystemZipArchiveProvider;
 use League\Flysystem\ZipArchive\ZipArchiveAdapter;
@@ -54,6 +55,8 @@ class Importer
         }
 
         @unlink($archiveFile);
+
+        $this->eventDispatcher->dispatch(new ImportFinished($importSettings, $importedFiles));
 
         foreach ($importedFiles as $importedFile) {
             $this->eventDispatcher->dispatch(new FileImported($importSettings, $importedFile, $versionOfArchive));

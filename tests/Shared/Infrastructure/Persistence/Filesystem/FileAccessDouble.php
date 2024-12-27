@@ -72,6 +72,11 @@ class FileAccessDouble implements FileAccess, ResetInterface
         $this->storage = [];
     }
 
+    public function prune(string $type): void
+    {
+        unset($this->storage[$type]);
+    }
+
     private function getPath(string $type, string $filename): string
     {
         return $type . '/' . $filename;
