@@ -6,6 +6,7 @@
 - Implemented a directory cache for better performance while browsing the library.
 - Added a library header function to clear the directory cache manually.
 - The search index for documents and images of the library are now automized on changes, a global refresh is not generally needed anymore.
+- The file access now has a request based cache layer to improve file access performance.
 
 **Changed**
 - Refactored the document-related code within the library to be a module on its own.
