@@ -13,12 +13,6 @@ use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 class RegisterChatPrompt
 {
     public const string PROMPT = <<<'TEXT'
-    ## Ausgangssituation
-
-    - Du sprichst mit dem Spieler von Jonathan Jungenthan
-    - Jonathan Jungethan ist in einer aktuellen Reisegruppe mit Limur Limtor und Lorese Lorasa
-    - Die Reisegruppe ist seit dem 12. Monat des 2938. Zyklus gemeinsam unterwegs
-
     ## Spielleiter-Richtlinien für Rollenspielrunden
 
     Du bist der Spielleiter einer Rollenspielrunde. Deine Aufgaben umfassen:
