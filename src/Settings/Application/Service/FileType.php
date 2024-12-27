@@ -15,8 +15,9 @@ enum FileType: string
     case VECTOR_STORAGE_DOCUMENT = 'vector_document';
     case VECTOR_STORAGE_IMAGE    = 'vector_image';
 
-    case SETTINGS  = 'settings';
-    case FAVORITES = 'favorites';
-    case DOTENV    = 'dotenv';
-    case VERSION   = 'version';
+    case SETTINGS       = 'settings';
+    case FAVORITES      = 'favorites';
+    case DOTENV         = 'dotenv';
+    case VERSION        = 'version';
+    case SYSTEM_PROMPTS = 'system_prompts';
 }
