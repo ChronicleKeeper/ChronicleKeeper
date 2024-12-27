@@ -65,4 +65,22 @@ final class CachedFileAccessTest extends TestCase
         $cachedFileAccess->delete('type', 'filename');
         self::assertFalse($cachedFileAccess->exists('type', 'filename'));
     }
+
+    #[Test]
+    public function itPrunesCachedEntries(): void
+    {
+        $fileAccess = $this->createMock(FileAccess::class);
+        $fileAccess->expects($this->never())->method('read');
+        $fileAccess->expects($this->once())->method('prune')->with('type');
+
+        $cachedFileAccess = new CachedFileAccess($fileAccess);
+
+        // Write file and ensure it is cached
+        $cachedFileAccess->write('type', 'filename', 'content');
+        self::assertTrue($cachedFileAccess->exists('type', 'filename'));
+
+        // Prune files and ensure they are no longer cached
+        $cachedFileAccess->prune('type');
+        self::assertFalse($cachedFileAccess->exists('type', 'filename'));
+    }
 }

@@ -43,4 +43,7 @@ interface FileAccess
      * @throws UnableToDeleteFile
      */
     public function delete(string $type, string $filename): void;
+
+    /** @param non-empty-string $type */
+    public function prune(string $type): void;
 }

@@ -49,4 +49,10 @@ class CachedFileAccess implements FileAccessContract
 
         $this->fileAccess->delete($type, $filename);
     }
+
+    public function prune(string $type): void
+    {
+        unset($this->cachedFiles[$type]);
+        $this->fileAccess->prune($type);
+    }
 }

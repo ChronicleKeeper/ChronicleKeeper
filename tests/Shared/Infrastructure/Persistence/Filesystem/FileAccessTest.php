@@ -153,4 +153,51 @@ class FileAccessTest extends TestCase
 
         self::assertFalse($result);
     }
+
+    #[Test]
+    public function prune(): void
+    {
+        $type = 'documents';
+        $path = '/var/www/data/documents';
+
+        $this->pathRegistry->expects($this->once())
+            ->method('get')
+            ->with($type)
+            ->willReturn('/var/www/data/documents');
+
+        $this->filesystem
+            ->expects($this->once())
+            ->method('exists')
+            ->with($path)
+            ->willReturn(true);
+
+        $this->filesystem
+            ->expects($this->once())
+            ->method('remove')
+            ->with($path);
+
+        $this->fileAccess->prune($type);
+    }
+
+    #[Test]
+    public function pruneWhenDirectoryNotExists(): void
+    {
+        $type = 'documents';
+        $path = '/var/www/data/documents';
+
+        $this->pathRegistry
+            ->expects($this->once())
+            ->method('get')
+            ->with($type)
+            ->willReturn('/var/www/data/documents');
+
+        $this->filesystem
+            ->method('exists')
+            ->with($path)
+            ->willReturn(false);
+
+        $this->filesystem->expects($this->never())->method('remove');
+
+        $this->fileAccess->prune($type);
+    }
 }
