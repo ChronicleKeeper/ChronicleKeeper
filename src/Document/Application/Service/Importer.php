@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Document\Application\Service;
 
-use ChronicleKeeper\Chat\Application\Service\LLMContentOptimizer;
 use ChronicleKeeper\Document\Application\Command\StoreDocument;
 use ChronicleKeeper\Document\Application\Service\Importer\FileConverter;
 use ChronicleKeeper\Document\Domain\Entity\Document;

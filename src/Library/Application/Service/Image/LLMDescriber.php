@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace ChronicleKeeper\Library\Application\Service\Image;
 
 use ChronicleKeeper\Image\Domain\Entity\Image;
-use ChronicleKeeper\Settings\Application\SettingsHandler;
+use ChronicleKeeper\Settings\Application\Service\SystemPromptRegistry;
+use ChronicleKeeper\Settings\Domain\ValueObject\SystemPrompt\Purpose;
 use ChronicleKeeper\Shared\Infrastructure\LLMChain\LLMChainFactory;
 use PhpLlm\LlmChain\Bridge\OpenAI\GPT;
 use PhpLlm\LlmChain\Model\Message\Content\Image as LLMImage;
@@ -19,26 +20,19 @@ use const PHP_EOL;
 class LLMDescriber
 {
     public function __construct(
-        private readonly SettingsHandler $settingsHandler,
         private readonly LLMChainFactory $chain,
+        private readonly SystemPromptRegistry $systemPromptRegistry,
     ) {
     }
 
     public function getDescription(Image $imageToAnalyze): string
     {
-        $settings = $this->settingsHandler->get();
+        $systemPrompt = $this->systemPromptRegistry->getDefaultForPurpose(Purpose::IMAGE_UPLOAD)->getContent();
+        $messageBag   = new MessageBag(Message::forSystem($systemPrompt));
 
-        $messageBag = new MessageBag(Message::forSystem($settings->getChatbotSystemPrompt()->getSystemPrompt()));
-
-        $userPromptText = $this->getUserPromptText($imageToAnalyze);
-        if ($imageToAnalyze->getDescription() !== '') {
-            /**
-             * If the image already has a description we will also give it as context to the
-             * message, so it will taken as context
-             */
-            $userPromptText .= PHP_EOL . '### Some additional information about the image.' . PHP_EOL;
-            $userPromptText .= $imageToAnalyze->getDescription();
-        }
+        $userPromptText  = 'Please describe the image below.' . PHP_EOL;
+        $userPromptText .= '### Some additional information about the image.' . PHP_EOL;
+        $userPromptText .= 'Image Title: ' . $imageToAnalyze->getTitle() . PHP_EOL;
 
         $messageBag[] = Message::ofUser(
             $userPromptText,
@@ -49,7 +43,7 @@ class LLMDescriber
             $messageBag,
             [
                 'model' => GPT::GPT_4O,
-                'temperature' => $settings->getChatbotTuning()->getTemperature(),
+                'temperature' => 0.75,
             ],
         );
 
@@ -58,15 +52,5 @@ class LLMDescriber
         }
 
         return $response->getContent();
-    }
-
-    private function getUserPromptText(Image $image): string
-    {
-        return <<<TEXT
-        Mit der Information, dass das Bild "{$image->getTitle()}" heißt, beschreibe bis ins kleinste Detail jede relevante
-        Information aus diesem Bild. Füge keine Links ein. Schlussfolgerungen möchtest du nicht machen, sondern nur den
-        Inhalt beschreiben. Ziehe Informationen der Funktion library_documents andhand des Titels zu rate um das Bild
-        noch besser zu bewerten.
-        TEXT;
     }
 }

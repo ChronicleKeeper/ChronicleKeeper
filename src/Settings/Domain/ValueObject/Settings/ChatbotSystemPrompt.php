@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Settings\Domain\ValueObject\Settings;
 
-use ChronicleKeeper\Chat\SystemPrompt;
+use ChronicleKeeper\Chat\Application\Event\RegisterChatPrompt;
 
 /**
  * @phpstan-type ChatbotSystemPromptSettings = array{
@@ -14,7 +14,7 @@ use ChronicleKeeper\Chat\SystemPrompt;
 readonly class ChatbotSystemPrompt
 {
     public function __construct(
-        private string $systemPrompt = SystemPrompt::GAMEMASTER,
+        private string $systemPrompt = RegisterChatPrompt::PROMPT,
     ) {
     }
 

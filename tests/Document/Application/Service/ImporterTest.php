@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Test\Document\Application\Service;
 
-use ChronicleKeeper\Chat\Application\Service\LLMContentOptimizer;
 use ChronicleKeeper\Document\Application\Command\StoreDocument;
 use ChronicleKeeper\Document\Application\Service\Importer;
 use ChronicleKeeper\Document\Application\Service\Importer\FileConverter;
+use ChronicleKeeper\Document\Application\Service\LLMContentOptimizer;
 use ChronicleKeeper\Test\Library\Domain\Entity\DirectoryBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
