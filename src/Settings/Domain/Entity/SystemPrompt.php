@@ -16,7 +16,8 @@ use Symfony\Component\Uid\Uuid;
  *     purpose: string,
  *     name: string,
  *     content: string,
- *     isSystem: bool
+ *     isSystem: bool,
+ *     isDefault: bool,
  * }
  */
 class SystemPrompt extends AggregateRoot implements JsonSerializable
@@ -27,17 +28,18 @@ class SystemPrompt extends AggregateRoot implements JsonSerializable
         private string $name,
         private string $content,
         private readonly bool $isSystem,
+        private bool $isDefault,
     ) {
     }
 
     public static function createSystemPrompt(string $id, Purpose $purpose, string $name, string $content): self
     {
-        return new self($id, $purpose, $name, $content, true);
+        return new self($id, $purpose, $name, $content, true, false);
     }
 
-    public static function create(Purpose $purpose, string $name, string $content): self
+    public static function create(Purpose $purpose, string $name, string $content, bool $isDefault = false): self
     {
-        return new self(Uuid::v4()->toString(), $purpose, $name, $content, false);
+        return new self(Uuid::v4()->toString(), $purpose, $name, $content, false, $isDefault);
     }
 
     public function getId(): string
@@ -65,6 +67,11 @@ class SystemPrompt extends AggregateRoot implements JsonSerializable
         return $this->isSystem;
     }
 
+    public function isDefault(): bool
+    {
+        return $this->isDefault;
+    }
+
     public function rename(string $name): void
     {
         if ($this->isSystem) {
@@ -87,6 +94,19 @@ class SystemPrompt extends AggregateRoot implements JsonSerializable
         $this->content = $content;
     }
 
+    public function toDefault(): void
+    {
+        if ($this->isSystem) {
+            throw new LogicException('System relevant prompts cannot be set as default as they are already fallbacks when no default defined.');
+        }
+
+        if ($this->isDefault) {
+            return;
+        }
+
+        $this->isDefault = true;
+    }
+
     /** @return SystemPromptArray */
     public function jsonSerialize(): array
     {
@@ -96,6 +116,7 @@ class SystemPrompt extends AggregateRoot implements JsonSerializable
             'name' => $this->name,
             'content' => $this->content,
             'isSystem' => $this->isSystem,
+            'isDefault' => $this->isDefault,
         ];
     }
 }

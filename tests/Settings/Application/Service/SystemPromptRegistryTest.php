@@ -43,7 +43,7 @@ final class SystemPromptRegistryTest extends TestCase
     }
 
     #[Test]
-    public function itGetsDefaultForPurpose(): void
+    public function itGetsDefaultForPurposeWithoutDefaultEntry(): void
     {
         $prompts = [(new SystemPromptBuilder())->withPurpose(Purpose::CONVERSATION)->build()];
 
@@ -58,6 +58,27 @@ final class SystemPromptRegistryTest extends TestCase
         $prompt = $registry->getDefaultForPurpose(Purpose::CONVERSATION);
 
         self::assertSame($prompts[0], $prompt);
+    }
+
+    #[Test]
+    public function itGetsDefaultForPurposeWithDefaultEntry(): void
+    {
+        $prompts = [
+            (new SystemPromptBuilder())->withPurpose(Purpose::CONVERSATION)->build(),
+            (new SystemPromptBuilder())->withPurpose(Purpose::CONVERSATION)->asDefault()->build(),
+        ];
+
+        $systemPromptLoader = $this->createMock(SystemPromptLoader::class);
+        $systemPromptLoader
+            ->expects($this->once())
+            ->method('load')
+            ->willReturn($prompts);
+
+        $registry = new SystemPromptRegistry($systemPromptLoader);
+
+        $prompt = $registry->getDefaultForPurpose(Purpose::CONVERSATION);
+
+        self::assertSame($prompts[1], $prompt);
     }
 
     #[Test]

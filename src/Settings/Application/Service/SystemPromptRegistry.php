@@ -46,7 +46,12 @@ class SystemPromptRegistry
     {
         $promptsOfPurpose = $this->findByPurpose($purpose);
 
-        // TODO: Here the user default is searched as soon as they are implemented
+        // Search for a default entry and return it directly to stop execution of this method
+        foreach ($promptsOfPurpose as $prompt) {
+            if ($prompt->isDefault()) {
+                return $prompt;
+            }
+        }
 
         // There is no user specified default, so the system default is returned
         $systemDefaultWithinPurpose = array_filter(

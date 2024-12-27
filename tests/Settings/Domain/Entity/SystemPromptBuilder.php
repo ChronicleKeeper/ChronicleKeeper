@@ -15,6 +15,7 @@ class SystemPromptBuilder
     private string $name     = 'I am a prompt';
     private string $content  = 'You will act as a tiny bot that is funny with the user and answers everything with a joke.';
     private bool $isSystem   = true;
+    private bool $isDefault  = false;
 
     public function __construct()
     {
@@ -51,7 +52,16 @@ class SystemPromptBuilder
 
     public function asSystem(): self
     {
-        $this->isSystem = true;
+        $this->isSystem  = true;
+        $this->isDefault = false;
+
+        return $this;
+    }
+
+    public function asDefault(): self
+    {
+        $this->isDefault = true;
+        $this->isSystem  = false;
 
         return $this;
     }
@@ -71,6 +81,7 @@ class SystemPromptBuilder
             $this->name,
             $this->content,
             $this->isSystem,
+            $this->isDefault,
         );
     }
 }

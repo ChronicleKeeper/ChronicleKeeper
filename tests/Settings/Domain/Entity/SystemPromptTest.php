@@ -29,6 +29,7 @@ final class SystemPromptTest extends TestCase
             'name',
             'content',
             true,
+            false,
         );
 
         self::assertSame('id', $systemPrompt->getId());
@@ -36,6 +37,7 @@ final class SystemPromptTest extends TestCase
         self::assertSame('name', $systemPrompt->getName());
         self::assertSame('content', $systemPrompt->getContent());
         self::assertTrue($systemPrompt->isSystem());
+        self::assertFalse($systemPrompt->isDefault());
     }
 
     #[Test]
@@ -53,6 +55,7 @@ final class SystemPromptTest extends TestCase
         self::assertSame('name', $systemPrompt->getName());
         self::assertSame('content', $systemPrompt->getContent());
         self::assertTrue($systemPrompt->isSystem());
+        self::assertFalse($systemPrompt->isDefault());
     }
 
     #[Test]
@@ -69,6 +72,20 @@ final class SystemPromptTest extends TestCase
         self::assertSame('name', $systemPrompt->getName());
         self::assertSame('content', $systemPrompt->getContent());
         self::assertFalse($systemPrompt->isSystem());
+        self::assertFalse($systemPrompt->isDefault());
+    }
+
+    #[Test]
+    public function itCanBeCreatedAsDefault(): void
+    {
+        $systemPrompt = SystemPrompt::create(
+            Purpose::CONVERSATION,
+            'name',
+            'content',
+            true,
+        );
+
+        self::assertTrue($systemPrompt->isDefault());
     }
 
     #[Test]
@@ -156,8 +173,27 @@ final class SystemPromptTest extends TestCase
 
         self::assertJson($json);
         self::assertSame(
-            '{"id":"' . $systemPrompt->getId() . '","purpose":"conversation","name":"name","content":"content","isSystem":false}',
+            '{"id":"' . $systemPrompt->getId() . '","purpose":"conversation","name":"name","content":"content","isSystem":false,"isDefault":false}',
             $json,
         );
+    }
+
+    #[Test]
+    public function itCanBeMadeToDefault(): void
+    {
+        $systemPrompt = SystemPrompt::create(Purpose::CONVERSATION, 'name', 'content');
+        self::assertFalse($systemPrompt->isDefault());
+        $systemPrompt->toDefault();
+        self::assertTrue($systemPrompt->isDefault());
+    }
+
+    #[Test]
+    public function itCanNotMakeSystemPromptsToDefault(): void
+    {
+        $systemPrompt = SystemPrompt::createSystemPrompt('id', Purpose::CONVERSATION, 'name', 'content');
+        self::assertTrue($systemPrompt->isSystem());
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('System relevant prompts cannot be set as default as they are already fallbacks when no default defined.');
+        $systemPrompt->toDefault();
     }
 }
