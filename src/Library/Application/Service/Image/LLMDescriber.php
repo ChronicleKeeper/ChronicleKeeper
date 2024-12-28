@@ -5,8 +5,7 @@ declare(strict_types=1);
 namespace ChronicleKeeper\Library\Application\Service\Image;
 
 use ChronicleKeeper\Image\Domain\Entity\Image;
-use ChronicleKeeper\Settings\Application\Service\SystemPromptRegistry;
-use ChronicleKeeper\Settings\Domain\ValueObject\SystemPrompt\Purpose;
+use ChronicleKeeper\Settings\Domain\Entity\SystemPrompt;
 use ChronicleKeeper\Shared\Infrastructure\LLMChain\LLMChainFactory;
 use PhpLlm\LlmChain\Bridge\OpenAI\GPT;
 use PhpLlm\LlmChain\Model\Message\Content\Image as LLMImage;
@@ -21,17 +20,26 @@ class LLMDescriber
 {
     public function __construct(
         private readonly LLMChainFactory $chain,
-        private readonly SystemPromptRegistry $systemPromptRegistry,
     ) {
     }
 
-    public function getDescription(Image $imageToAnalyze): string
+    public function copyImageWithGeneratedDescription(Image $image, SystemPrompt $utilizePrompt): Image
     {
-        $systemPrompt = $this->systemPromptRegistry->getDefaultForPurpose(Purpose::IMAGE_UPLOAD)->getContent();
-        $messageBag   = new MessageBag(Message::forSystem($systemPrompt));
+        return Image::create(
+            $image->getTitle(),
+            $image->getMimeType(),
+            $image->getEncodedImage(),
+            $this->getDescription($image, $utilizePrompt),
+            $image->getDirectory(),
+        );
+    }
 
-        $userPromptText  = 'Please describe the image below.' . PHP_EOL;
-        $userPromptText .= '### Some additional information about the image.' . PHP_EOL;
+    public function getDescription(Image $imageToAnalyze, SystemPrompt $systemPrompt): string
+    {
+        $messageBag = new MessageBag(Message::forSystem($systemPrompt->getContent()));
+
+        $userPromptText  = $systemPrompt->getContent() . PHP_EOL;
+        $userPromptText .= PHP_EOL . '### Some additional information about the image.' . PHP_EOL;
         $userPromptText .= 'Image Title: ' . $imageToAnalyze->getTitle() . PHP_EOL;
 
         $messageBag[] = Message::ofUser(

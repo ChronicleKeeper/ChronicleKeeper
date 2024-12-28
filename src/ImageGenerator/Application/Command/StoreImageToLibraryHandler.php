@@ -9,7 +9,6 @@ use ChronicleKeeper\ImageGenerator\Application\Query\GetGeneratorRequest;
 use ChronicleKeeper\ImageGenerator\Application\Query\GetImageOfGeneratorRequest;
 use ChronicleKeeper\ImageGenerator\Domain\Entity\GeneratorRequest;
 use ChronicleKeeper\ImageGenerator\Domain\Entity\GeneratorResult;
-use ChronicleKeeper\Library\Application\Service\Image\LLMDescriber;
 use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemImageRepository;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
@@ -27,7 +26,6 @@ class StoreImageToLibraryHandler
         public readonly SerializerInterface $serializer,
         public readonly FilesystemImageRepository $imageRepository,
         public readonly QueryService $queryService,
-        public readonly LLMDescriber $LLMDescriber,
         public readonly MessageBusInterface $bus,
     ) {
     }
@@ -37,16 +35,18 @@ class StoreImageToLibraryHandler
         $generatorRequest = $this->queryService->query(new GetGeneratorRequest($request->requestId));
         assert($generatorRequest instanceof GeneratorRequest);
 
-        $generatorResult = $this->queryService->query(new GetImageOfGeneratorRequest($request->requestId, $request->imageId));
+        $generatorResult = $this->queryService->query(new GetImageOfGeneratorRequest(
+            $request->requestId,
+            $request->imageId,
+        ));
         assert($generatorResult instanceof GeneratorResult);
 
         $image = Image::create(
             $generatorRequest->title,
             $generatorResult->mimeType,
             $generatorResult->encodedImage,
-            (string) $generatorRequest->prompt?->prompt,
+            $generatorRequest->userInput->prompt,
         );
-        $image->updateDescription($this->LLMDescriber->getDescription($image));
 
         $this->imageRepository->store($image);
 

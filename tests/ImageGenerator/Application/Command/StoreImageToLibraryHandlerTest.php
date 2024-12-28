@@ -8,7 +8,6 @@ use ChronicleKeeper\Image\Domain\Entity\Image;
 use ChronicleKeeper\ImageGenerator\Application\Command\StoreImageToLibrary;
 use ChronicleKeeper\ImageGenerator\Application\Command\StoreImageToLibraryHandler;
 use ChronicleKeeper\ImageGenerator\Domain\ValueObject\OptimizedPrompt;
-use ChronicleKeeper\Library\Application\Service\Image\LLMDescriber;
 use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemImageRepository;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
@@ -66,7 +65,7 @@ class StoreImageToLibraryHandlerTest extends TestCase
                 self::assertSame('Foo Bar', $image->getTitle());
                 self::assertSame('image/png', $image->getMimeType());
                 self::assertSame('Encoded Image', $image->getEncodedImage());
-                self::assertSame('Generated Image Prompt', $image->getDescription());
+                self::assertSame('Default Prompt', $image->getDescription());
 
                 return true;
             }));
@@ -84,12 +83,6 @@ class StoreImageToLibraryHandlerTest extends TestCase
                 (new GeneratorResultBuilder())->withEncodedImage('Encoded Image')->build(),
             );
 
-        $LLMDescriber = $this->createMock(LLMDescriber::class);
-        $LLMDescriber->expects($this->once())
-            ->method('getDescription')
-            ->with(self::isInstanceOf(Image::class))
-            ->willReturn('Generated Image Prompt');
-
         $bus = $this->createMock(MessageBusInterface::class);
         $bus->expects($this->once())
             ->method('dispatch')
@@ -100,7 +93,6 @@ class StoreImageToLibraryHandlerTest extends TestCase
             $serializer,
             $imageRepository,
             $queryService,
-            $LLMDescriber,
             $bus,
         );
 
