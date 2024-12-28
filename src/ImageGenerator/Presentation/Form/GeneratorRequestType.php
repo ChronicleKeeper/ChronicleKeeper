@@ -7,6 +7,8 @@ namespace ChronicleKeeper\ImageGenerator\Presentation\Form;
 use ChronicleKeeper\ImageGenerator\Domain\Entity\GeneratorRequest;
 use ChronicleKeeper\ImageGenerator\Domain\ValueObject\OptimizedPrompt;
 use ChronicleKeeper\ImageGenerator\Domain\ValueObject\UserInput;
+use ChronicleKeeper\Settings\Domain\ValueObject\SystemPrompt\Purpose;
+use ChronicleKeeper\Settings\Presentation\Form\SystemPromptChoiceType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\DataMapperInterface;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
@@ -54,6 +56,15 @@ class GeneratorRequestType extends AbstractType implements DataMapperInterface
                 'translation_domain' => false,
                 'required' => true,
                 'constraints' => [new NotBlank()],
+            ],
+        );
+
+        $builder->add(
+            'systemPrompt',
+            SystemPromptChoiceType::class,
+            [
+                'for_purpose' => Purpose::IMAGE_GENERATOR_OPTIMIZER,
+                'label' => 'Template für die Ausarbeitung des Auftrages',
             ],
         );
 

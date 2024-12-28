@@ -6,13 +6,17 @@ namespace ChronicleKeeper\Test\ImageGenerator\Presentation\Form;
 
 use ChronicleKeeper\ImageGenerator\Domain\Entity\GeneratorRequest;
 use ChronicleKeeper\ImageGenerator\Presentation\Form\GeneratorRequestType;
+use ChronicleKeeper\Settings\Application\Service\SystemPromptRegistry;
+use ChronicleKeeper\Settings\Presentation\Form\SystemPromptChoiceType;
 use ChronicleKeeper\Test\ImageGenerator\Domain\Entity\GeneratorRequestBuilder;
 use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\FormExtensionInterface;
+use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Validator\Validation;
 
@@ -20,6 +24,23 @@ use Symfony\Component\Validator\Validation;
 #[Small]
 class GeneratorRequestTypeTest extends TypeTestCase
 {
+    private SystemPromptRegistry&MockObject $systemPromptRegistry;
+
+    #[Override]
+    public function setUp(): void
+    {
+        $this->systemPromptRegistry = $this->createMock(SystemPromptRegistry::class);
+
+        parent::setUp();
+    }
+
+    public function tearDown(): void
+    {
+        unset($this->systemPromptRegistry);
+
+        parent::tearDown();
+    }
+
     #[Test]
     public function formHandlingForNewEntry(): void
     {
@@ -95,6 +116,7 @@ class GeneratorRequestTypeTest extends TypeTestCase
     protected function getExtensions(): array
     {
         return [
+            new PreloadedExtension([new SystemPromptChoiceType($this->systemPromptRegistry)], []),
             new ValidatorExtension(Validation::createValidator()),
         ];
     }

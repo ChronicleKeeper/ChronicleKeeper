@@ -17,7 +17,7 @@ use function array_filter;
 use function array_values;
 use function uasort;
 
-final class SystemPromtChoiceType extends AbstractType
+final class SystemPromptChoiceType extends AbstractType
 {
     public function __construct(
         private readonly SystemPromptRegistry $systemPromptRegistry,

@@ -6,7 +6,7 @@ namespace ChronicleKeeper\Document\Presentation\Form;
 
 use ChronicleKeeper\Document\Application\Service\Importer;
 use ChronicleKeeper\Settings\Domain\ValueObject\SystemPrompt\Purpose;
-use ChronicleKeeper\Settings\Presentation\Form\SystemPromtChoiceType;
+use ChronicleKeeper\Settings\Presentation\Form\SystemPromptChoiceType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
@@ -35,7 +35,7 @@ class DocumentUploadType extends AbstractType
 
         $builder->add(
             'utilize_prompt',
-            SystemPromtChoiceType::class,
+            SystemPromptChoiceType::class,
             [
                 'label' => 'System Prompt',
                 'translation_domain' => false,

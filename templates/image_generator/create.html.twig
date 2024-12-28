@@ -21,6 +21,7 @@
 
                         <div class="row g-5">
                             <div class="col-12">{{ form_row(form.title) }}</div>
+                            <div class="col-12">{{ form_row(form.systemPrompt) }}</div>
                             <div class="col-12">
                                 {{ form_label(form.userInput) }}
                                 <twig:markdownEditor name="generator_request[userInput]" content="{{ form.userInput.vars.value }}" />

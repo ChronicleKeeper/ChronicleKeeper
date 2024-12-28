@@ -6,7 +6,7 @@ namespace ChronicleKeeper\Test\Settings\Presentation\Form;
 
 use ChronicleKeeper\Settings\Application\Service\SystemPromptRegistry;
 use ChronicleKeeper\Settings\Domain\ValueObject\SystemPrompt\Purpose;
-use ChronicleKeeper\Settings\Presentation\Form\SystemPromtChoiceType;
+use ChronicleKeeper\Settings\Presentation\Form\SystemPromptChoiceType;
 use ChronicleKeeper\Test\Settings\Domain\Entity\SystemPromptBuilder;
 use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -16,9 +16,9 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Test\TypeTestCase;
 
-#[CoversClass(SystemPromtChoiceType::class)]
+#[CoversClass(SystemPromptChoiceType::class)]
 #[Small]
-final class SystemPromtChoiceTypeTest extends TypeTestCase
+final class SystemPromptChoiceTypeTest extends TypeTestCase
 {
     private SystemPromptRegistry&MockObject $systemPromptRegistry;
 
@@ -48,7 +48,7 @@ final class SystemPromtChoiceTypeTest extends TypeTestCase
             ->willReturn([$imageUploadPrompt, $conversationPrompt]);
 
         $form = $this->factory->create(
-            SystemPromtChoiceType::class,
+            SystemPromptChoiceType::class,
             null,
             ['for_purpose' => Purpose::IMAGE_UPLOAD],
         );
@@ -69,7 +69,7 @@ final class SystemPromtChoiceTypeTest extends TypeTestCase
             ->willReturn([$imageUploadPrompt3, $imageUploadPrompt1, $imageUploadPrompt2]);
 
         $form = $this->factory->create(
-            SystemPromtChoiceType::class,
+            SystemPromptChoiceType::class,
             null,
             ['for_purpose' => Purpose::IMAGE_UPLOAD],
         );
@@ -83,7 +83,7 @@ final class SystemPromtChoiceTypeTest extends TypeTestCase
     protected function getExtensions(): array
     {
         return [
-            new PreloadedExtension([new SystemPromtChoiceType($this->systemPromptRegistry)], []),
+            new PreloadedExtension([new SystemPromptChoiceType($this->systemPromptRegistry)], []),
         ];
     }
 }
