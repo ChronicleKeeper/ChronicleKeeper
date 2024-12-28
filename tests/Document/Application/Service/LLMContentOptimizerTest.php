@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace ChronicleKeeper\Test\Document\Application\Service;
 
 use ChronicleKeeper\Document\Application\Service\LLMContentOptimizer;
-use ChronicleKeeper\Settings\Application\Service\SystemPromptRegistry;
 use ChronicleKeeper\Shared\Infrastructure\LLMChain\LLMChainFactory;
 use ChronicleKeeper\Test\Settings\Domain\Entity\SystemPromptBuilder;
 use PhpLlm\LlmChain\ChainInterface;
@@ -22,11 +21,7 @@ final class LLMContentOptimizerTest extends TestCase
     #[Test]
     public function itOptimizesContent(): void
     {
-        $systemPromptRegistry = $this->createMock(SystemPromptRegistry::class);
-        $systemPromptRegistry
-            ->expects($this->once())
-            ->method('getDefaultForPurpose')
-            ->willReturn((new SystemPromptBuilder())->build());
+        $systemPrompt = (new SystemPromptBuilder())->build();
 
         $chain = $this->createMock(ChainInterface::class);
         $chain
@@ -40,9 +35,9 @@ final class LLMContentOptimizerTest extends TestCase
             ->method('create')
             ->willReturn($chain);
 
-        $optimizer = new LLMContentOptimizer($llmChainFactory, $systemPromptRegistry);
+        $optimizer = new LLMContentOptimizer($llmChainFactory);
 
-        $optimizedContent = $optimizer->optimize('This is a test content.');
+        $optimizedContent = $optimizer->optimize($systemPrompt, 'This is a test content.');
 
         self::assertSame('This is an optimized content.', $optimizedContent);
     }

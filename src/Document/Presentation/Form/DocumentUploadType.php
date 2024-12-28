@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace ChronicleKeeper\Document\Presentation\Form;
 
 use ChronicleKeeper\Document\Application\Service\Importer;
+use ChronicleKeeper\Settings\Domain\ValueObject\SystemPrompt\Purpose;
+use ChronicleKeeper\Settings\Presentation\Form\SystemPromtChoiceType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
@@ -30,6 +32,17 @@ class DocumentUploadType extends AbstractType
                 'constraints' => [new NotNull(), new File(mimeTypes: $this->importer->getSupportedMimeTypes())],
             ],
         );
+
+        $builder->add(
+            'utilize_prompt',
+            SystemPromtChoiceType::class,
+            [
+                'label' => 'System Prompt',
+                'translation_domain' => false,
+                'for_purpose' => Purpose::DOCUMENT_OPTIMIZER,
+            ],
+        );
+
         $builder->add(
             'optimize',
             CheckboxType::class,

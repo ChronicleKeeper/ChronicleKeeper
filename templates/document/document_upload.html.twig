@@ -39,7 +39,18 @@
                                         eingegebenen Daten, zum Beispiel, über das Drucken als PDF speichern.
                                     </div>
                                     {{ form_row(form.document) }}
-                                    {{ form_row(form.optimize) }}
+
+                                    <fieldset class="form-fieldset">
+                                        <legend>Inhaltsoptimierung</legend>
+                                        <div class="row g-5 pb-5">
+                                            <div class="col-6">
+                                                {{ form_row(form.optimize) }}
+                                            </div>
+                                            <div class="col-6">
+                                                {{ form_row(form.utilize_prompt) }}
+                                            </div>
+                                        </div>
+                                    </fieldset>
                                 </div>
                             </div>
                         </div>

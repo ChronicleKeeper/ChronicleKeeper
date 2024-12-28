@@ -8,6 +8,7 @@ use ChronicleKeeper\Document\Application\Service\Exception\PDFHasEmptyContent;
 use ChronicleKeeper\Document\Application\Service\Importer;
 use ChronicleKeeper\Document\Presentation\Form\DocumentUploadType;
 use ChronicleKeeper\Library\Domain\Entity\Directory;
+use ChronicleKeeper\Settings\Domain\Entity\SystemPrompt;
 use ChronicleKeeper\Shared\Presentation\FlashMessages\Alert;
 use ChronicleKeeper\Shared\Presentation\FlashMessages\HandleFlashMessages;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -49,7 +50,10 @@ class DocumentUpload extends AbstractController
                 $optimize = $form->get('optimize')->getData();
                 assert(is_bool($optimize));
 
-                $document = $this->importer->import($documentUploaded, $directory, $optimize);
+                $systemPrompt = $form->get('utilize_prompt')->getData();
+                assert($systemPrompt instanceof SystemPrompt);
+
+                $document = $this->importer->import($documentUploaded, $directory, $optimize, $systemPrompt);
 
                 $this->addFlashMessage(
                     $request,

@@ -9,6 +9,7 @@ use ChronicleKeeper\Document\Application\Service\Importer;
 use ChronicleKeeper\Document\Application\Service\Importer\FileConverter;
 use ChronicleKeeper\Document\Application\Service\LLMContentOptimizer;
 use ChronicleKeeper\Test\Library\Domain\Entity\DirectoryBuilder;
+use ChronicleKeeper\Test\Settings\Domain\Entity\SystemPromptBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
@@ -60,7 +61,12 @@ class ImporterTest extends TestCase
             [],
             self::createStub(LLMContentOptimizer::class),
             self::createStub(MessageBusInterface::class),
-        ))->import($uploadedFile, (new DirectoryBuilder())->build(), false);
+        ))->import(
+            $uploadedFile,
+            (new DirectoryBuilder())->build(),
+            false,
+            (new SystemPromptBuilder())->build(),
+        );
     }
 
     #[Test]
@@ -87,6 +93,7 @@ class ImporterTest extends TestCase
             $uploadedFile,
             $directory = (new DirectoryBuilder())->build(),
             false,
+            (new SystemPromptBuilder())->build(),
         );
 
         self::assertSame('Hello World', $document->getContent());
@@ -97,6 +104,8 @@ class ImporterTest extends TestCase
     #[Test]
     public function itConvertsFileWithContentOptimization(): void
     {
+        $systemPrompt = (new SystemPromptBuilder())->build();
+
         $fileConverter = $this->createMock(FileConverter::class);
         $fileConverter->method('mimeTypes')->willReturn(['application/pdf']);
         $fileConverter->method('convert')->willReturn('Hello World');
@@ -109,7 +118,7 @@ class ImporterTest extends TestCase
         $contentOptimizer = $this->createMock(LLMContentOptimizer::class);
         $contentOptimizer->expects($this->once())
             ->method('optimize')
-            ->with('Hello World')
+            ->with($systemPrompt, 'Hello World')
             ->willReturn('Optimized World');
 
         $uploadedFile = self::createStub(UploadedFile::class);
@@ -121,6 +130,7 @@ class ImporterTest extends TestCase
             $uploadedFile,
             $directory = (new DirectoryBuilder())->build(),
             true,
+            $systemPrompt,
         );
 
         self::assertSame('Optimized World', $document->getContent());
