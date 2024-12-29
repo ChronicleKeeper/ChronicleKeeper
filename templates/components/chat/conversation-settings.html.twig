@@ -12,14 +12,18 @@
     </div>
 
     <div class="modal-body">
-        {{ form_row(form.version) }}
-        {{ form_row(form.temperature) }}
-        {{ form_row(form.imagesMaxDistance) }}
-        {{ form_row(form.documentsMaxDistance) }}
+        {{ form_row(form.version, {'attr': {'data-loading': 'addAttribute(disabled)'}}) }}
+        {{ form_row(form.temperature, {'attr': {'data-loading': 'addAttribute(disabled)'}}) }}
+        {{ form_row(form.imagesMaxDistance, {'attr': {'data-loading': 'addAttribute(disabled)'}}) }}
+        {{ form_row(form.documentsMaxDistance, {'attr': {'data-loading': 'addAttribute(disabled)'}}) }}
     </div>
 
     <div class="modal-footer">
-        <button class="btn btn-primary">Speichern</button>
+
+        <button class="btn btn-primary" data-loading="addAttribute(disabled)">
+            <span class="spinner-border spinner-border-sm d-none" data-loading="removeClass(d-none)" role="status" aria-hidden="true" style="margin-right: 5px;"></span>
+            Speichern
+        </button>
     </div>
 
     {{ form_end(form) }}

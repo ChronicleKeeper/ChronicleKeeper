@@ -12,12 +12,15 @@
     </div>
 
     <div class="modal-body">
-        {{ form_row(form.title) }}
-        {{ form_row(form.utilize_prompt) }}
+        {{ form_row(form.title, {'attr': {'data-loading': 'addAttribute(disabled)'}}) }}
+        {{ form_row(form.utilize_prompt, {'attr': {'data-loading': 'addAttribute(disabled)'}}) }}
     </div>
 
     <div class="modal-footer">
-        <button class="btn btn-primary">Speichern</button>
+        <button class="btn btn-primary" data-loading="addAttribute(disabled)">
+            <span class="spinner-border spinner-border-sm d-none" data-loading="removeClass(d-none)" role="status" aria-hidden="true" style="margin-right: 5px;"></span>
+            Speichern
+        </button>
     </div>
 
     {{ form_end(form) }}
