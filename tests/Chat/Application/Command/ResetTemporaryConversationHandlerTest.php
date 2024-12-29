@@ -6,13 +6,18 @@ namespace ChronicleKeeper\Test\Chat\Application\Command;
 
 use ChronicleKeeper\Chat\Application\Command\ResetTemporaryConversation;
 use ChronicleKeeper\Chat\Application\Command\ResetTemporaryConversationHandler;
-use ChronicleKeeper\Chat\Application\Query\GetTemporaryConversationParameters;
-use ChronicleKeeper\Shared\Application\Query\QueryService;
-use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
+use ChronicleKeeper\Chat\Application\Command\StoreTemporaryConversation;
+use ChronicleKeeper\Chat\Domain\Entity\ExtendedMessage;
+use ChronicleKeeper\Settings\Application\SettingsHandler;
+use ChronicleKeeper\Test\Settings\Domain\Entity\SystemPromptBuilder;
+use ChronicleKeeper\Test\Settings\Domain\ValueObject\SettingsBuilder;
+use PhpLlm\LlmChain\Model\Message\SystemMessage;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\MessageBusInterface;
 
 #[CoversClass(ResetTemporaryConversationHandler::class)]
 #[CoversClass(ResetTemporaryConversation::class)]
@@ -20,21 +25,46 @@ use PHPUnit\Framework\TestCase;
 class ResetTemporaryConversationHandlerTest extends TestCase
 {
     #[Test]
-    public function executeReset(): void
+    public function itCanConstructTheCommand(): void
     {
-        $message = new ResetTemporaryConversation();
+        $systemPrompt = (new SystemPromptBuilder())->build();
+        $command      = new ResetTemporaryConversation('foo', $systemPrompt);
 
-        $fileAccess = $this->createMock(FileAccess::class);
-        $fileAccess->expects($this->once())
-            ->method('delete')
-            ->with('temp', 'conversation_temporary.json');
+        self::assertSame('foo', $command->title);
+        self::assertSame($systemPrompt, $command->utilizePrompt);
+    }
 
-        $queryService = $this->createMock(QueryService::class);
-        $queryService->expects($this->once())
-            ->method('query')
-            ->with(self::isInstanceOf(GetTemporaryConversationParameters::class));
+    #[Test]
+    public function itWillResetAndCreateANewConversation(): void
+    {
+        $systemPrompt = (new SystemPromptBuilder())->build();
+        $settings     = (new SettingsBuilder())->build();
 
-        $handler = new ResetTemporaryConversationHandler($fileAccess, $queryService);
-        $handler($message);
+        $settingsHandler = $this->createMock(SettingsHandler::class);
+        $settingsHandler->expects($this->once())->method('get')->willReturn($settings);
+
+        $bus = $this->createMock(MessageBusInterface::class);
+        $bus->expects($this->once())->method('dispatch')->willReturnCallback(
+            static function (StoreTemporaryConversation $message) use ($systemPrompt): Envelope {
+                $conversation = $message->conversation;
+
+                self::assertSame('foo', $conversation->getTitle());
+
+                $messages = $conversation->getMessages();
+                self::assertCount(1, $conversation->getMessages());
+
+                $message = $messages[0];
+                self::assertInstanceOf(ExtendedMessage::class, $message);
+                self::assertInstanceOf(SystemMessage::class, $message->message);
+
+                self::assertSame($systemPrompt->getContent(), $message->message->content);
+
+                return new Envelope($message);
+            },
+        );
+
+        $command = new ResetTemporaryConversation('foo', $systemPrompt);
+        $handler = new ResetTemporaryConversationHandler($settingsHandler, $bus);
+        $handler($command);
     }
 }

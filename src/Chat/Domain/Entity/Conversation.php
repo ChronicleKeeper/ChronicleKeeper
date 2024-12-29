@@ -34,7 +34,7 @@ class Conversation extends AggregateRoot implements JsonSerializable, Sluggable
     {
         $conversation = new self(
             Uuid::v4()->toString(),
-            'Ungespeichert',
+            'Unbekanntes Gespräch',
             RootDirectory::get(),
             new Settings(),
             new ExtendedMessageBag(),
@@ -67,7 +67,7 @@ class Conversation extends AggregateRoot implements JsonSerializable, Sluggable
     {
         $conversation = new self(
             Uuid::v4()->toString(),
-            'Ungespeichert',
+            'Unbekanntes Gespräch',
             RootDirectory::get(),
             new Settings(
                 GPT::GPT_4O_MINI,

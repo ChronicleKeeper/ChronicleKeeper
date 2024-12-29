@@ -39,6 +39,7 @@ final class SystemPromptChoiceType extends AbstractType
                 'required' => false,
                 'choices' => $this->systemPromptRegistry->all(),
                 'placeholder' => false,
+                'data' => null,
                 'choice_value' => static fn (SystemPrompt|null $systemPrompt): string|null => $systemPrompt?->getId(),
                 'choice_label' => static fn (SystemPrompt|null $systemPrompt): string|null => $systemPrompt?->getName(),
             ],
@@ -48,6 +49,16 @@ final class SystemPromptChoiceType extends AbstractType
         $resolver->setAllowedTypes('for_purpose', Purpose::class);
 
         $resolver->setNormalizer('choices', $this->filterChoicesByPurpose(...));
+        $resolver->setNormalizer('data', $this->setEmptyDataFromChoices(...));
+    }
+
+    private function setEmptyDataFromChoices(Options $options, SystemPrompt|null $data): SystemPrompt
+    {
+        if ($data instanceof SystemPrompt) {
+            return $data;
+        }
+
+        return $this->systemPromptRegistry->getDefaultForPurpose($options['for_purpose']);
     }
 
     /**

@@ -78,6 +78,44 @@ final class SystemPromptChoiceTypeTest extends TypeTestCase
         self::assertSame([$imageUploadPrompt1, $imageUploadPrompt2, $imageUploadPrompt3], $choices);
     }
 
+    #[Test]
+    public function itIsSettingTheDefaultChoice(): void
+    {
+        $imageUploadPrompt = (new SystemPromptBuilder())->withPurpose(Purpose::IMAGE_UPLOAD)->build();
+
+        $this->systemPromptRegistry->expects($this->once())
+            ->method('getDefaultForPurpose')
+            ->with(Purpose::IMAGE_UPLOAD)
+            ->willReturn($imageUploadPrompt);
+
+        $form = $this->factory->create(
+            SystemPromptChoiceType::class,
+            null,
+            ['for_purpose' => Purpose::IMAGE_UPLOAD],
+        );
+
+        $data = $form->getData();
+        self::assertSame($imageUploadPrompt, $data);
+    }
+
+    #[Test]
+    public function itIsSettingTheDefaultChoiceWhenDataIsProvided(): void
+    {
+        $imageUploadPrompt = (new SystemPromptBuilder())->withPurpose(Purpose::IMAGE_UPLOAD)->build();
+
+        $this->systemPromptRegistry->expects($this->never())
+            ->method('getDefaultForPurpose');
+
+        $form = $this->factory->create(
+            SystemPromptChoiceType::class,
+            $imageUploadPrompt,
+            ['for_purpose' => Purpose::IMAGE_UPLOAD],
+        );
+
+        $data = $form->getData();
+        self::assertSame($imageUploadPrompt, $data);
+    }
+
     /** @inheritDoc */
     #[Override]
     protected function getExtensions(): array
