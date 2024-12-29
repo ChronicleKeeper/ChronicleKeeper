@@ -6,8 +6,13 @@
 - Implemented a directory cache for better performance while browsing the library.
 - The directory cache will be fully cleared with every completed export to prevent inconsistencies between the cache and data.
 - Added a library header function to clear the directory cache manually.
-- The search index for documents and images of the library are now automized on changes, a global refresh is not generally needed anymore.
-- The file access now has a request based cache layer to improve file access performance.
+- The search index for documents and images of the library is now automated on changes, a global refresh is not generally needed anymore.
+- The file access now has a request-based cache layer to improve file access performance.
+- Overhauled system prompt configuration to now allow configuring all system prompts in the system and have multiple prompts for different situations.
+- A new conversation is now not only a "reset" button but a dialog with title and prompt selection.
+- Added a prompt selection to the upload documents form.
+- Added a prompt selection to the upload image form.
+- Added a prompt selection to the image generator first step for creating the DALL-E prompt.
 
 **Changed**
 - Refactored the document-related code within the library to be a module on its own.
@@ -15,13 +20,14 @@
 - Improved PHP configuration to be more efficient in the local PHP Desktop environment.
 - Optimized performance within document and image vectors by reducing the data loaded from the database for search.
 - Improved the performance of embedding generation by generating all document and image text chunks at once.
-- Utilized a minimum vector content chunk length to reduce the failure rate for \`only-dot\` content cases.
+- Utilized a minimum vector content chunk length to reduce the failure rate for `only-dot` content cases.
 - Optimized the conversation storage to not keep copies of the library within its own storage.
 - BC: Imported conversations older than version 0.6 will be deleted from the database and from favorites.
 - Refactored Images, Conversations, Documents, and Directories to emit events on changes to allow hook extended logic into them.
+- BC: Existing system prompt configuration will be lost as it is not only a textbox anymore.
 
 ## [alpha-0.5.1]
-
++
 **Fixed**
 - Fixed a bug where a document upload with enabled LLM optimization had an error in data handling.
 

@@ -79,7 +79,7 @@ class DocumentUploadTest extends WebTestCase
         $client->request(
             Request::METHOD_POST,
             '/library/directory/' . RootDirectory::ID . '/upload_document',
-            parameters: [], // Do not mention the optimization checkbox to let it be false
+            parameters: ['document_upload' => ['utilize_prompt' => 'b1e1eb26-9460-4722-9704-8e7b068a8b5a']],
             files: ['document_upload' => ['document' => $uploadedFile]],
             server: ['CONTENT_TYPE' => 'multipart/form-data'],
         );

@@ -1,0 +1,48 @@
+{% extends 'layout.html.twig' %}
+
+{% block page_title %}Einstellungen - Chatbot - Prompts{% endblock %}
+
+{% block page_content %}
+    <div class="container-xl">
+        {{ form_start(form) }}
+        <div class="card">
+            <div class="row g-0">
+                {% include 'settings/_includes/settings_nav.html.twig' %}
+                <div class="col-12 col-md-9 d-flex flex-column">
+
+                    <div class="card-body">
+
+                        <div class="row g-5 pb-5">
+                            <div class="col-12">
+                                {{ form_row(form.name, {'attr': {'disabled': systemPrompt.isSystem }}) }}
+                            </div>
+                        </div>
+
+                        <div class="row g-5 pb-5">
+                            <div class="col-6">
+                                {{ form_row(form.purpose, {'attr': {'disabled': systemPrompt.isSystem }}) }}
+                            </div>
+                            <div class="col-6">
+                                {{ form_row(form.isDefault, {'attr': {'disabled': systemPrompt.isSystem }}) }}
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            {{ form_label(form.content) }}
+                            <twig:markdownEditor name="system_prompt[content]" content="{{ form.content.vars.data ?? '' }}" />
+                            {{ form_errors(form.content) }}
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer mt-auto">
+                <div class="btn-list justify-content-end">
+                    <a href="{{ path('settings_system_prompts') }}" class="btn btn-secondary">Zur Übersicht</a>
+                    {% if not systemPrompt.system %}<button type="submit" class="btn btn-primary">Speichern</button>{% endif %}
+                </div>
+            </div>
+        </div>
+        </form>
+    </div>
+{% endblock %}

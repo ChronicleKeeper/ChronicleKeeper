@@ -8,6 +8,7 @@ use ChronicleKeeper\Image\Domain\Entity\Image;
 use ChronicleKeeper\Library\Domain\Entity\Directory;
 use ChronicleKeeper\Library\Domain\RootDirectory;
 use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemImageRepository;
+use ChronicleKeeper\Settings\Domain\Entity\SystemPrompt;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
@@ -22,7 +23,7 @@ class Uploader
     ) {
     }
 
-    public function upload(UploadedFile $file, Directory|null $targetDirectory = null): Image
+    public function upload(UploadedFile $file, SystemPrompt $utilizePrompt, Directory|null $targetDirectory = null): Image
     {
         if (! $targetDirectory instanceof Directory) {
             $targetDirectory = RootDirectory::get();
@@ -35,14 +36,16 @@ class Uploader
             throw new RuntimeException('Image seems to be defect, no mime type detected.');
         }
 
-        $image = Image::create(
-            $file->getClientOriginalName(),
-            $mimeType,
-            $base64Image,
-            '',
-            $targetDirectory,
+        $image = $this->LLMDescriber->copyImageWithGeneratedDescription(
+            Image::create(
+                $file->getClientOriginalName(),
+                $mimeType,
+                $base64Image,
+                '',
+                $targetDirectory,
+            ),
+            $utilizePrompt,
         );
-        $image->updateDescription($this->LLMDescriber->getDescription($image));
 
         $this->imageRepository->store($image);
 

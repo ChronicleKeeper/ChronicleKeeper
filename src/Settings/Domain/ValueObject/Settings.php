@@ -8,7 +8,6 @@ use ChronicleKeeper\Settings\Domain\ValueObject\Settings\Application;
 use ChronicleKeeper\Settings\Domain\ValueObject\Settings\Calendar;
 use ChronicleKeeper\Settings\Domain\ValueObject\Settings\ChatbotFunctions;
 use ChronicleKeeper\Settings\Domain\ValueObject\Settings\ChatbotGeneral;
-use ChronicleKeeper\Settings\Domain\ValueObject\Settings\ChatbotSystemPrompt;
 use ChronicleKeeper\Settings\Domain\ValueObject\Settings\ChatbotTuning;
 use ChronicleKeeper\Settings\Domain\ValueObject\Settings\Holiday;
 use ChronicleKeeper\Settings\Domain\ValueObject\Settings\MoonCalendar;
@@ -16,7 +15,6 @@ use ChronicleKeeper\Settings\Domain\ValueObject\Settings\MoonCalendar;
 /**
  * @phpstan-import-type ApplicationSettings from Application
  * @phpstan-import-type ChatbotGeneralSettings from ChatbotGeneral
- * @phpstan-import-type ChatbotSystemPromptSettings from ChatbotSystemPrompt
  * @phpstan-import-type ChatbotTuningArray from ChatbotTuning
  * @phpstan-import-type ChatbotFunctionsArray from ChatbotFunctions
  * @phpstan-import-type CalendarSettings from Calendar
@@ -26,7 +24,6 @@ use ChronicleKeeper\Settings\Domain\ValueObject\Settings\MoonCalendar;
  *     application?: ApplicationSettings,
  *     chatbot: array{
  *         general: ChatbotGeneralSettings,
- *         system_prompt: ChatbotSystemPromptSettings,
  *         tuning: ChatbotTuningArray,
  *         functions: ChatbotFunctionsArray
  *     },
@@ -41,7 +38,6 @@ class Settings
 {
     private Application $application;
     private ChatbotGeneral $chatbotGeneral;
-    private ChatbotSystemPrompt $chatbotSystemPrompt;
     private ChatbotTuning $chatbotTuning;
     private ChatbotFunctions $chatbotFunctions;
     private Calendar $calendar;
@@ -50,14 +46,13 @@ class Settings
 
     public function __construct()
     {
-        $this->application         = new Application();
-        $this->chatbotGeneral      = new ChatbotGeneral();
-        $this->chatbotSystemPrompt = new ChatbotSystemPrompt();
-        $this->chatbotTuning       = new ChatbotTuning();
-        $this->chatbotFunctions    = new ChatbotFunctions();
-        $this->calendar            = new Calendar();
-        $this->moonCalendar        = new MoonCalendar();
-        $this->holiday             = new Holiday();
+        $this->application      = new Application();
+        $this->chatbotGeneral   = new ChatbotGeneral();
+        $this->chatbotTuning    = new ChatbotTuning();
+        $this->chatbotFunctions = new ChatbotFunctions();
+        $this->calendar         = new Calendar();
+        $this->moonCalendar     = new MoonCalendar();
+        $this->holiday          = new Holiday();
     }
 
     /** @param SettingsArray $settingsArray */
@@ -68,7 +63,6 @@ class Settings
             $settingsArray['application'] ?? ['open_ai_api_key' => ''],
         ));
         $settings->setChatbotGeneral(ChatbotGeneral::fromArray($settingsArray['chatbot']['general']));
-        $settings->setChatbotSystemPrompt(ChatbotSystemPrompt::fromArray($settingsArray['chatbot']['system_prompt']));
         $settings->setChatbotTuning(ChatbotTuning::fromArray($settingsArray['chatbot']['tuning']));
         $settings->setChatbotFunctions(ChatbotFunctions::fromArray($settingsArray['chatbot']['functions']));
         $settings->setCalendar(Calendar::fromArray($settingsArray['calendar']['general']));
@@ -85,7 +79,6 @@ class Settings
             'application' => $this->application->toArray(),
             'chatbot' => [
                 'general' => $this->chatbotGeneral->toArray(),
-                'system_prompt' => $this->chatbotSystemPrompt->toArray(),
                 'tuning' => $this->chatbotTuning->toArray(),
                 'functions' => $this->chatbotFunctions->toArray(),
             ],
@@ -115,16 +108,6 @@ class Settings
     public function setChatbotGeneral(ChatbotGeneral $chatbotGeneral): void
     {
         $this->chatbotGeneral = $chatbotGeneral;
-    }
-
-    public function getChatbotSystemPrompt(): ChatbotSystemPrompt
-    {
-        return $this->chatbotSystemPrompt;
-    }
-
-    public function setChatbotSystemPrompt(ChatbotSystemPrompt $chatbotSystemPrompt): void
-    {
-        $this->chatbotSystemPrompt = $chatbotSystemPrompt;
     }
 
     public function getChatbotTuning(): ChatbotTuning

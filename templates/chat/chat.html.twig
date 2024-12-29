@@ -1,6 +1,6 @@
 {% extends 'layout.html.twig' %}
 
-{% block page_title %}{{ conversation.title ?? 'Neues Gespräch' }}{% endblock %}
+{% block page_title %}{{ conversation.title }}{% endblock %}
 
 {% block page_title_actions %}
     <div class="col-auto ms-auto d-print-none">
@@ -11,13 +11,13 @@
             <a type="button" class="btn btn-icon" title="Einstellungen zum Gespräch" data-bs-toggle="modal" data-bs-target="#conversation-settings">
                 {{ ux_icon('tabler:settings') }}
             </a>
-            {% if conversation is not empty %}
+            {% if not isTemporary %}
                 <twig:Favorizer:AddToShortcuts id="{{ conversation.id }}" type="{{ constant('class', conversation) }}" asButton="true" />
             {% endif %}
             <a type="button" class="btn btn-icon" title="Letzte Gespräche anzeigen" data-bs-toggle="modal" data-bs-target="#latest-conversation-modal">
                 {{ ux_icon('tabler:history') }}
             </a>
-            <a href="{{ path('chat_reset') }}" title="Neues Gespräch anfangen" type="button" class="btn btn-icon" {{ stimulus_controller('confirm') }}>
+            <a type="button" class="btn btn-icon" title="Neues Gespräch anfangen" data-bs-toggle="modal" data-bs-target="#create-conversation-modal">
                 {{ ux_icon('tabler:message-plus') }}
             </a>
         </div>
@@ -25,7 +25,7 @@
 {% endblock %}
 
 {% block page_content %}
-    {% set chatOptions = conversation is not empty ? {'conversation': conversation} : {} %}
+    {% set chatOptions = not isTemporary ? {'conversation': conversation} : {} %}
 
     <div class="container-xl">
         {{ component('Chat:Chat', chatOptions) }}
@@ -46,6 +46,12 @@
     {% component "Tabler:Modal" with {id: 'conversation-settings'} %}
         {% block modal_full_content %}
             {{ component('Chat:ConversationSettings', chatOptions) }}
+        {% endblock %}
+    {% endcomponent %}
+
+    {% component "Tabler:Modal" with {id: 'create-conversation-modal'} %}
+        {% block modal_full_content %}
+            {{ component('Chat:CreateConversation') }}
         {% endblock %}
     {% endcomponent %}
 {% endblock %}

@@ -6,12 +6,16 @@ namespace ChronicleKeeper\Chat\Application\Query;
 
 use ChronicleKeeper\Chat\Application\Command\StoreTemporaryConversation;
 use ChronicleKeeper\Chat\Domain\Entity\Conversation;
+use ChronicleKeeper\Chat\Domain\Entity\ExtendedMessage;
 use ChronicleKeeper\Chat\Infrastructure\Serializer\ExtendedMessageDenormalizer;
+use ChronicleKeeper\Settings\Application\Service\SystemPromptRegistry;
 use ChronicleKeeper\Settings\Application\SettingsHandler;
+use ChronicleKeeper\Settings\Domain\ValueObject\SystemPrompt\Purpose;
 use ChronicleKeeper\Shared\Application\Query\Query;
 use ChronicleKeeper\Shared\Application\Query\QueryParameters;
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Exception\UnableToReadFile;
+use PhpLlm\LlmChain\Model\Message\Message;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -25,6 +29,7 @@ class GetTemporaryConversationQuery implements Query
         private readonly SerializerInterface $serializer,
         private readonly MessageBusInterface $bus,
         private readonly SettingsHandler $settingsHandler,
+        private readonly SystemPromptRegistry $systemPromptRegistry,
     ) {
     }
 
@@ -51,7 +56,11 @@ class GetTemporaryConversationQuery implements Query
         } catch (UnableToReadFile) {
             // All is fine, file not exists ... we create it.
 
-            $conversation = Conversation::createFromSettings($settings);
+            $defaultSystemPrompt = $this->systemPromptRegistry->getDefaultForPurpose(Purpose::CONVERSATION);
+
+            $conversation                  = Conversation::createFromSettings($settings);
+            $conversation->getMessages()[] = new ExtendedMessage(Message::forSystem($defaultSystemPrompt->getContent()));
+
             $this->bus->dispatch(new StoreTemporaryConversation($conversation));
 
             return $conversation;

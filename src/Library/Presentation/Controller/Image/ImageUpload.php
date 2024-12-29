@@ -7,6 +7,7 @@ namespace ChronicleKeeper\Library\Presentation\Controller\Image;
 use ChronicleKeeper\Library\Application\Service\Image\Uploader;
 use ChronicleKeeper\Library\Domain\Entity\Directory;
 use ChronicleKeeper\Library\Presentation\Form\ImageUploadType;
+use ChronicleKeeper\Settings\Domain\Entity\SystemPrompt;
 use ChronicleKeeper\Shared\Presentation\FlashMessages\Alert;
 use ChronicleKeeper\Shared\Presentation\FlashMessages\HandleFlashMessages;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -48,7 +49,10 @@ class ImageUpload extends AbstractController
             $imageUploaded = $form->get('image')->getData();
             assert($imageUploaded instanceof UploadedFile);
 
-            $image = $this->uploader->upload($imageUploaded, $directory);
+            $utilizePrompt = $form->get('utilize_prompt')->getData();
+            assert($utilizePrompt instanceof SystemPrompt);
+
+            $image = $this->uploader->upload($imageUploaded, $utilizePrompt, $directory);
 
             $this->addFlashMessage(
                 $request,

@@ -8,6 +8,9 @@ use ChronicleKeeper\Chat\Application\Service\ChatMessageExecution;
 use ChronicleKeeper\Chat\Domain\Entity\Conversation;
 use ChronicleKeeper\Chat\Domain\Entity\ExtendedMessage;
 use ChronicleKeeper\ImageGenerator\Application\Service\PromptOptimizer;
+use ChronicleKeeper\Settings\Application\Service\SystemPromptRegistry;
+use ChronicleKeeper\Settings\Domain\Entity\SystemPrompt;
+use ChronicleKeeper\Settings\Domain\ValueObject\SystemPrompt\Purpose;
 use PhpLlm\LlmChain\Model\Message\Message;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
@@ -21,6 +24,11 @@ class PromptOptimizerTest extends TestCase
     #[Test]
     public function optimizeAnInputPrompt(): void
     {
+        $systemPromptRegistry = $this->createMock(SystemPromptRegistry::class);
+        $systemPromptRegistry->expects($this->once())
+            ->method('getDefaultForPurpose')
+            ->willReturn(SystemPrompt::createSystemPrompt('foo', Purpose::IMAGE_GENERATOR_OPTIMIZER, 'bar', 'baz'));
+
         $chatMessageExecution = $this->createMock(ChatMessageExecution::class);
         $chatMessageExecution
             ->expects($this->once())
@@ -41,6 +49,9 @@ class PromptOptimizerTest extends TestCase
                 }),
             );
 
-        self::assertSame('Success!', (new PromptOptimizer($chatMessageExecution))->optimize('Foo Bar Baz'));
+        self::assertSame(
+            'Success!',
+            (new PromptOptimizer($chatMessageExecution, $systemPromptRegistry))->optimize('Foo Bar Baz'),
+        );
     }
 }

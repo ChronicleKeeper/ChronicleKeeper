@@ -29,7 +29,7 @@ class ConversationTest extends TestCase
         $conversation = Conversation::createEmpty();
 
         self::assertNotEmpty($conversation->getId());
-        self::assertSame('Ungespeichert', $conversation->getTitle());
+        self::assertSame('Unbekanntes Gespräch', $conversation->getTitle());
     }
 
     #[Test]
@@ -39,7 +39,7 @@ class ConversationTest extends TestCase
         $conversation = Conversation::createFromSettings($appSettings);
 
         self::assertNotEmpty($conversation->getId());
-        self::assertSame('Ungespeichert', $conversation->getTitle());
+        self::assertSame('Unbekanntes Gespräch', $conversation->getTitle());
     }
 
     #[Test]

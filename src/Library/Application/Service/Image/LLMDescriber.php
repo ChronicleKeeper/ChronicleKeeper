@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace ChronicleKeeper\Library\Application\Service\Image;
 
 use ChronicleKeeper\Image\Domain\Entity\Image;
-use ChronicleKeeper\Settings\Application\SettingsHandler;
+use ChronicleKeeper\Settings\Domain\Entity\SystemPrompt;
 use ChronicleKeeper\Shared\Infrastructure\LLMChain\LLMChainFactory;
 use PhpLlm\LlmChain\Bridge\OpenAI\GPT;
 use PhpLlm\LlmChain\Model\Message\Content\Image as LLMImage;
@@ -19,26 +19,28 @@ use const PHP_EOL;
 class LLMDescriber
 {
     public function __construct(
-        private readonly SettingsHandler $settingsHandler,
         private readonly LLMChainFactory $chain,
     ) {
     }
 
-    public function getDescription(Image $imageToAnalyze): string
+    public function copyImageWithGeneratedDescription(Image $image, SystemPrompt $utilizePrompt): Image
     {
-        $settings = $this->settingsHandler->get();
+        return Image::create(
+            $image->getTitle(),
+            $image->getMimeType(),
+            $image->getEncodedImage(),
+            $this->getDescription($image, $utilizePrompt),
+            $image->getDirectory(),
+        );
+    }
 
-        $messageBag = new MessageBag(Message::forSystem($settings->getChatbotSystemPrompt()->getSystemPrompt()));
+    public function getDescription(Image $imageToAnalyze, SystemPrompt $systemPrompt): string
+    {
+        $messageBag = new MessageBag(Message::forSystem($systemPrompt->getContent()));
 
-        $userPromptText = $this->getUserPromptText($imageToAnalyze);
-        if ($imageToAnalyze->getDescription() !== '') {
-            /**
-             * If the image already has a description we will also give it as context to the
-             * message, so it will taken as context
-             */
-            $userPromptText .= PHP_EOL . '### Some additional information about the image.' . PHP_EOL;
-            $userPromptText .= $imageToAnalyze->getDescription();
-        }
+        $userPromptText  = $systemPrompt->getContent() . PHP_EOL;
+        $userPromptText .= PHP_EOL . '### Some additional information about the image.' . PHP_EOL;
+        $userPromptText .= 'Image Title: ' . $imageToAnalyze->getTitle() . PHP_EOL;
 
         $messageBag[] = Message::ofUser(
             $userPromptText,
@@ -49,7 +51,7 @@ class LLMDescriber
             $messageBag,
             [
                 'model' => GPT::GPT_4O,
-                'temperature' => $settings->getChatbotTuning()->getTemperature(),
+                'temperature' => 0.75,
             ],
         );
 
@@ -58,15 +60,5 @@ class LLMDescriber
         }
 
         return $response->getContent();
-    }
-
-    private function getUserPromptText(Image $image): string
-    {
-        return <<<TEXT
-        Mit der Information, dass das Bild "{$image->getTitle()}" heißt, beschreibe bis ins kleinste Detail jede relevante
-        Information aus diesem Bild. Füge keine Links ein. Schlussfolgerungen möchtest du nicht machen, sondern nur den
-        Inhalt beschreiben. Ziehe Informationen der Funktion library_documents andhand des Titels zu rate um das Bild
-        noch besser zu bewerten.
-        TEXT;
     }
 }

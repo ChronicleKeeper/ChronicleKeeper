@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Document\Application\Service;
 
-use ChronicleKeeper\Chat\Application\Service\LLMContentOptimizer;
 use ChronicleKeeper\Document\Application\Command\StoreDocument;
 use ChronicleKeeper\Document\Application\Service\Importer\FileConverter;
 use ChronicleKeeper\Document\Domain\Entity\Document;
 use ChronicleKeeper\Library\Domain\Entity\Directory;
+use ChronicleKeeper\Settings\Domain\Entity\SystemPrompt;
 use RuntimeException;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -51,7 +51,8 @@ class Importer
     public function import(
         UploadedFile $file,
         Directory $directory,
-        bool $optimizeImportedDocument = true,
+        bool $optimizeImportedDocument,
+        SystemPrompt $systemPrompt,
     ): Document {
         $fileMimeType = (string) $file->getMimeType();
         if (! array_key_exists($fileMimeType, $this->fileConverters)) {
@@ -60,7 +61,7 @@ class Importer
 
         $convertedDocumentContent = $this->fileConverters[$fileMimeType]->convert($file->getRealPath());
         if ($optimizeImportedDocument === true) {
-            $convertedDocumentContent = $this->contentOptimizer->optimize($convertedDocumentContent);
+            $convertedDocumentContent = $this->contentOptimizer->optimize($systemPrompt, $convertedDocumentContent);
         }
 
         $document = Document::create($file->getClientOriginalName(), $convertedDocumentContent, $directory);
