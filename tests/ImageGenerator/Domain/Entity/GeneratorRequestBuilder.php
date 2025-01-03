@@ -7,17 +7,27 @@ namespace ChronicleKeeper\Test\ImageGenerator\Domain\Entity;
 use ChronicleKeeper\ImageGenerator\Domain\Entity\GeneratorRequest;
 use ChronicleKeeper\ImageGenerator\Domain\ValueObject\OptimizedPrompt;
 use ChronicleKeeper\ImageGenerator\Domain\ValueObject\UserInput;
+use Symfony\Component\Uid\Uuid;
 
 class GeneratorRequestBuilder
 {
+    private string $id;
     private string $title;
     private UserInput $userInput;
     private OptimizedPrompt|null $optimizedPrompt = null;
 
     public function __construct()
     {
+        $this->id        = Uuid::v4()->toString();
         $this->title     = 'Default Title';
         $this->userInput = new UserInput('Default Prompt');
+    }
+
+    public function withId(string $id): self
+    {
+        $this->id = $id;
+
+        return $this;
     }
 
     public function withTitle(string $title): self
@@ -44,6 +54,7 @@ class GeneratorRequestBuilder
     public function build(): GeneratorRequest
     {
         $generatorRequest         = new GeneratorRequest($this->title, $this->userInput);
+        $generatorRequest->id     = $this->id;
         $generatorRequest->prompt = $this->optimizedPrompt;
 
         return $generatorRequest;

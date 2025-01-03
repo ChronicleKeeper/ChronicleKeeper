@@ -10,17 +10,13 @@ use ChronicleKeeper\ImageGenerator\Application\Command\StoreImageToLibraryHandle
 use ChronicleKeeper\ImageGenerator\Domain\ValueObject\OptimizedPrompt;
 use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemImageRepository;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
-use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
+use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
 use ChronicleKeeper\Test\ImageGenerator\Domain\Entity\GeneratorRequestBuilder;
 use ChronicleKeeper\Test\ImageGenerator\Domain\Entity\GeneratorResultBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use stdClass;
-use Symfony\Component\Messenger\Envelope;
-use Symfony\Component\Messenger\MessageBusInterface;
-use Symfony\Component\Serializer\SerializerInterface;
 use Webmozart\Assert\InvalidArgumentException;
 
 #[CoversClass(StoreImageToLibraryHandler::class)]
@@ -55,8 +51,7 @@ class StoreImageToLibraryHandlerTest extends TestCase
     #[Test]
     public function testStoreImageToLibrary(): void
     {
-        $fileAccess = $this->createMock(FileAccess::class);
-        $serializer = $this->createMock(SerializerInterface::class);
+        $databasePlatform = $this->createMock(DatabasePlatform::class);
 
         $imageRepository = $this->createMock(FilesystemImageRepository::class);
         $imageRepository->expects($this->once())
@@ -77,24 +72,29 @@ class StoreImageToLibraryHandlerTest extends TestCase
             ->method('query')
             ->willReturnOnConsecutiveCalls(
                 (new GeneratorRequestBuilder())
+                    ->withId('123e4567-e89b-12d3-a456-426614174000')
                     ->withTitle('Foo Bar')
                     ->withOptimizedPrompt(new OptimizedPrompt('Optimized Prompt'))
                     ->build(),
-                (new GeneratorResultBuilder())->withEncodedImage('Encoded Image')->build(),
+                (new GeneratorResultBuilder())
+                    ->withId('123e4567-e89b-12d3-a456-426614174001')
+                    ->withEncodedImage('Encoded Image')
+                    ->build(),
             );
 
-        $bus = $this->createMock(MessageBusInterface::class);
-        $bus->expects($this->once())
-            ->method('dispatch')
-            ->willReturn(new Envelope(new stdClass()));
+        $databasePlatform->expects($this->once())
+            ->method('query')
+            ->with(
+                'UPDATE generator_results SET image = :image WHERE id = :id',
+                self::callback(static function (array $parameters): bool {
+                    self::assertNotEmpty($parameters['image']);
+                    self::assertSame('123e4567-e89b-12d3-a456-426614174001', $parameters['id']);
 
-        $handler = new StoreImageToLibraryHandler(
-            $fileAccess,
-            $serializer,
-            $imageRepository,
-            $queryService,
-            $bus,
-        );
+                    return true;
+                }),
+            );
+
+        $handler = new StoreImageToLibraryHandler($imageRepository, $queryService, $databasePlatform);
 
         $request = new StoreImageToLibrary(
             '123e4567-e89b-12d3-a456-426614174000',

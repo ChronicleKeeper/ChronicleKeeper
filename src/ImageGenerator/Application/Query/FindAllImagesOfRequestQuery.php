@@ -7,24 +7,17 @@ namespace ChronicleKeeper\ImageGenerator\Application\Query;
 use ChronicleKeeper\ImageGenerator\Domain\Entity\GeneratorResult;
 use ChronicleKeeper\Shared\Application\Query\Query;
 use ChronicleKeeper\Shared\Application\Query\QueryParameters;
-use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
-use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\Finder as FinderContract;
-use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\PathRegistry;
+use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\Serializer\Encoder\JsonEncoder;
-use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 use function assert;
-
-use const DIRECTORY_SEPARATOR;
 
 final readonly class FindAllImagesOfRequestQuery implements Query
 {
     public function __construct(
-        private PathRegistry $pathRegistry,
-        private FileAccess $fileAccess,
-        private SerializerInterface $serializer,
-        private FinderContract $finder,
+        private DenormalizerInterface $denormalizer,
+        private DatabasePlatform $platform,
     ) {
     }
 
@@ -33,35 +26,18 @@ final readonly class FindAllImagesOfRequestQuery implements Query
     {
         assert($parameters instanceof FindAllImagesOfRequest);
 
-        $requestImagesDirectory = DIRECTORY_SEPARATOR . $parameters->requestId;
-
-        $files = $this->finder->findFilesInDirectoryOrderedByAccessTimestamp(
-            $this->pathRegistry->get('generator.images') . $requestImagesDirectory,
+        $files = $this->platform->fetch(
+            'SELECT * FROM generator_results WHERE generatorRequest = :id',
+            ['id' => $parameters->requestId],
         );
 
         $images = [];
         foreach ($files as $file) {
-            $filename = $file->getFilename();
-            assert($filename !== '');
-
-            $content = $this->fileAccess->read(
-                'generator.images',
-                $requestImagesDirectory . DIRECTORY_SEPARATOR . $filename,
-            );
-            assert($content !== '');
-
             try {
-                $images[] = $this->serializer->deserialize(
-                    $content,
-                    GeneratorResult::class,
-                    JsonEncoder::FORMAT,
-                );
+                $images[] = $this->denormalizer->denormalize($file, GeneratorResult::class);
             } catch (NotFoundHttpException) {
                 // The File could not be converted, maybe the connected image is not existing anymore delete it
-                $this->fileAccess->delete(
-                    'generator.images',
-                    $requestImagesDirectory . DIRECTORY_SEPARATOR . $filename,
-                );
+                $this->platform->query('DELETE FROM generator_results WHERE id = :id', ['id' => $file->getId()]);
             }
         }
 

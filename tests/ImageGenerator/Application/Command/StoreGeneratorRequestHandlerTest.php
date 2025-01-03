@@ -7,7 +7,8 @@ namespace ChronicleKeeper\Test\ImageGenerator\Application\Command;
 use ChronicleKeeper\ImageGenerator\Application\Command\StoreGeneratorRequest;
 use ChronicleKeeper\ImageGenerator\Application\Command\StoreGeneratorRequestHandler;
 use ChronicleKeeper\ImageGenerator\Application\Service\PromptOptimizer;
-use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
+use ChronicleKeeper\ImageGenerator\Domain\ValueObject\OptimizedPrompt;
+use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
 use ChronicleKeeper\Test\ImageGenerator\Domain\Entity\GeneratorRequestBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
@@ -23,23 +24,27 @@ class StoreGeneratorRequestHandlerTest extends TestCase
     #[Test]
     public function testStoreRequestWithOptimizedPrompt(): void
     {
-        $fileAccess      = $this->createMock(FileAccess::class);
-        $serializer      = $this->createMock(SerializerInterface::class);
-        $promptOptimizer = $this->createMock(PromptOptimizer::class);
+        $serializer       = $this->createMock(SerializerInterface::class);
+        $promptOptimizer  = $this->createMock(PromptOptimizer::class);
+        $databasePlatform = $this->createMock(DatabasePlatform::class);
 
-        $handler = new StoreGeneratorRequestHandler($fileAccess, $serializer, $promptOptimizer);
+        $handler = new StoreGeneratorRequestHandler($serializer, $promptOptimizer, $databasePlatform);
         $request = new StoreGeneratorRequest((new GeneratorRequestBuilder())->build());
 
         $promptOptimizer->expects($this->once())
             ->method('optimize')
             ->willReturn('Optimized Prompt');
 
-        $fileAccess->expects($this->once())
-            ->method('write')
+        $databasePlatform->expects($this->once())
+            ->method('insertOrUpdate')
             ->with(
-                'generator.requests',
-                $request->request->id . '.json',
-                self::anything(),
+                'generator_requests',
+                [
+                    'id'       => $request->request->id,
+                    'title'    => $request->request->title,
+                    'userInput' => '',
+                    'prompt'   => 'Optimized Prompt',
+                ],
             );
 
         $handler($request);
@@ -50,19 +55,27 @@ class StoreGeneratorRequestHandlerTest extends TestCase
     #[Test]
     public function testStoreRequestWithoutOptimizedPrompt(): void
     {
-        $fileAccess      = $this->createMock(FileAccess::class);
-        $serializer      = $this->createMock(SerializerInterface::class);
-        $promptOptimizer = $this->createMock(PromptOptimizer::class);
+        $serializer       = $this->createMock(SerializerInterface::class);
+        $promptOptimizer  = $this->createMock(PromptOptimizer::class);
+        $databasePlatform = $this->createMock(DatabasePlatform::class);
 
-        $handler = new StoreGeneratorRequestHandler($fileAccess, $serializer, $promptOptimizer);
-        $request = new StoreGeneratorRequest((new GeneratorRequestBuilder())->build());
+        $handler = new StoreGeneratorRequestHandler($serializer, $promptOptimizer, $databasePlatform);
+        $request = new StoreGeneratorRequest((new GeneratorRequestBuilder())
+            ->withOptimizedPrompt(new OptimizedPrompt('Already Optimized Prompt'))
+            ->build());
 
-        $fileAccess->expects($this->once())
-            ->method('write')
+        $promptOptimizer->expects($this->never())->method('optimize');
+
+        $databasePlatform->expects($this->once())
+            ->method('insertOrUpdate')
             ->with(
-                'generator.requests',
-                $request->request->id . '.json',
-                self::anything(),
+                'generator_requests',
+                [
+                    'id'       => $request->request->id,
+                    'title'    => $request->request->title,
+                    'userInput' => '',
+                    'prompt'   => 'Already Optimized Prompt',
+                ],
             );
 
         $handler($request);

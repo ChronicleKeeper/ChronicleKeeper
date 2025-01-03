@@ -6,15 +6,15 @@ namespace ChronicleKeeper\Test\ImageGenerator\Presentation\Twig;
 
 use ChronicleKeeper\ImageGenerator\Presentation\Twig\GeneratedImages;
 use ChronicleKeeper\Test\ImageGenerator\Domain\Entity\GeneratorRequestBuilder;
+use ChronicleKeeper\Test\WebTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Large;
 use PHPUnit\Framework\Attributes\Test;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\UX\LiveComponent\Test\InteractsWithLiveComponents;
 
 #[CoversClass(GeneratedImages::class)]
 #[Large]
-class GeneratedImagesTest extends KernelTestCase
+class GeneratedImagesTest extends WebTestCase
 {
     use InteractsWithLiveComponents;
 

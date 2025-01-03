@@ -18,7 +18,10 @@ final class GeneratorRequestDenormalizer implements DenormalizerInterface
         string|null $format = null,
         array $context = [],
     ): GeneratorRequest {
-        $request     = new GeneratorRequest($data['title'], new UserInput($data['userInput']));
+        $request     = new GeneratorRequest(
+            $data['title'],
+            new UserInput($data['userInput']['prompt'], $data['userInput']['systemPrompt']),
+        );
         $request->id = $data['id'];
 
         if ($data['prompt'] !== null) {
