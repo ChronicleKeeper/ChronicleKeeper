@@ -37,7 +37,7 @@ class GeneratorRequestDenormalizerTest extends TestCase
     {
         $data = [
             'title' => 'foo',
-            'userInput' => 'bar',
+            'userInput' => ['prompt' => 'bar', 'systemPrompt' => null],
             'id' => '123-123',
             'prompt' => null,
         ];
@@ -55,7 +55,7 @@ class GeneratorRequestDenormalizerTest extends TestCase
     {
         $data = [
             'title' => 'foo',
-            'userInput' => 'bar',
+            'userInput' => ['prompt' => 'bar', 'systemPrompt' => null],
             'id' => '123-123',
             'prompt' => 'baz',
         ];

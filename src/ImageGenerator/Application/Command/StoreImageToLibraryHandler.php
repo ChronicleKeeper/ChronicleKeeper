@@ -11,10 +11,8 @@ use ChronicleKeeper\ImageGenerator\Domain\Entity\GeneratorRequest;
 use ChronicleKeeper\ImageGenerator\Domain\Entity\GeneratorResult;
 use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemImageRepository;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
-use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
+use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
-use Symfony\Component\Messenger\MessageBusInterface;
-use Symfony\Component\Serializer\SerializerInterface;
 
 use function assert;
 
@@ -22,11 +20,9 @@ use function assert;
 class StoreImageToLibraryHandler
 {
     public function __construct(
-        public readonly FileAccess $fileAccess,
-        public readonly SerializerInterface $serializer,
-        public readonly FilesystemImageRepository $imageRepository,
-        public readonly QueryService $queryService,
-        public readonly MessageBusInterface $bus,
+        private readonly FilesystemImageRepository $imageRepository,
+        private readonly QueryService $queryService,
+        private readonly DatabasePlatform $platform,
     ) {
     }
 
@@ -50,7 +46,9 @@ class StoreImageToLibraryHandler
 
         $this->imageRepository->store($image);
 
-        $generatorResult->image = $image;
-        $this->bus->dispatch(new StoreGeneratorResult($request->requestId, $generatorResult));
+        $this->platform->query('UPDATE generator_results SET image = :image WHERE id = :id', [
+            'image' => $image->getId(),
+            'id'    => $request->imageId,
+        ]);
     }
 }

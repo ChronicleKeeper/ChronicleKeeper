@@ -7,52 +7,32 @@ namespace ChronicleKeeper\ImageGenerator\Application\Query;
 use ChronicleKeeper\ImageGenerator\Domain\Entity\GeneratorRequest;
 use ChronicleKeeper\Shared\Application\Query\Query;
 use ChronicleKeeper\Shared\Application\Query\QueryParameters;
-use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
-use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\Finder;
-use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\PathRegistry;
-use Symfony\Component\Serializer\Encoder\JsonEncoder;
-use Symfony\Component\Serializer\SerializerInterface;
+use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
-use function assert;
-use function strcasecmp;
-use function usort;
+use function json_decode;
+
+use const JSON_THROW_ON_ERROR;
 
 final readonly class FindAllGeneratorRequestsQuery implements Query
 {
     public function __construct(
-        private PathRegistry $pathRegistry,
-        private FileAccess $fileAccess,
-        private SerializerInterface $serializer,
-        private Finder $finder,
+        private DenormalizerInterface $denormalizer,
+        private DatabasePlatform $databasePlatform,
     ) {
     }
 
     /** @return list<GeneratorRequest> */
     public function query(QueryParameters $parameters): array
     {
-        $files = $this->finder->findFilesInDirectory(
-            $this->pathRegistry->get('generator.requests'),
-        );
+        $files = $this->databasePlatform->fetch('SELECT * FROM generator_requests ORDER BY title');
 
         $requests = [];
         foreach ($files as $file) {
-            $filename = $file->getFilename();
-            assert($filename !== '');
+            $file['userInput'] = json_decode((string) $file['userInput'], true, 512, JSON_THROW_ON_ERROR);
 
-            $content = $this->fileAccess->read('generator.requests', $filename);
-            assert($content !== '');
-
-            $requests[] = $this->serializer->deserialize(
-                $content,
-                GeneratorRequest::class,
-                JsonEncoder::FORMAT,
-            );
+            $requests[] = $this->denormalizer->denormalize($file, GeneratorRequest::class);
         }
-
-        usort(
-            $requests,
-            static fn (GeneratorRequest $left, GeneratorRequest $right) => strcasecmp($left->title, $right->title),
-        );
 
         return $requests;
     }
