@@ -13,6 +13,7 @@ services:
     autoconfigure: true
     bind:
       string $environment: '%env(string:APP_ENV)%'
+      string $databasePath: '%app.data.base_dir%/%env(string:DATABASE_FILENAME)%'
 
   ChronicleKeeper\:
     resource: '../src/*'

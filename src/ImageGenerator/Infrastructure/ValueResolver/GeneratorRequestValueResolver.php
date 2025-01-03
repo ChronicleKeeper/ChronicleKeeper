@@ -7,7 +7,7 @@ namespace ChronicleKeeper\ImageGenerator\Infrastructure\ValueResolver;
 use ChronicleKeeper\ImageGenerator\Application\Query\GetGeneratorRequest;
 use ChronicleKeeper\ImageGenerator\Domain\Entity\GeneratorRequest;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
-use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Exception\UnableToReadFile;
+use InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
@@ -46,7 +46,7 @@ class GeneratorRequestValueResolver implements ValueResolverInterface
             $generatorRequest = $this->queryService->query(
                 new GetGeneratorRequest($identifier),
             ) ?? throw new NotFoundHttpException();
-        } catch (UnableToReadFile) {
+        } catch (InvalidArgumentException) {
             throw new NotFoundHttpException('Generator Request "' . $identifier . '" not found.');
         }
 

@@ -6,22 +6,18 @@ namespace ChronicleKeeper\ImageGenerator\Application\Command;
 
 use ChronicleKeeper\ImageGenerator\Application\Service\PromptOptimizer;
 use ChronicleKeeper\ImageGenerator\Domain\ValueObject\OptimizedPrompt;
-use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
+use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
-use Symfony\Component\Serializer\Encoder\JsonEncode;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\SerializerInterface;
-
-use const JSON_PRETTY_PRINT;
-use const JSON_UNESCAPED_UNICODE;
 
 #[AsMessageHandler]
 class StoreGeneratorRequestHandler
 {
     public function __construct(
-        public readonly FileAccess $fileAccess,
-        public readonly SerializerInterface $serializer,
-        public readonly PromptOptimizer $promptOptimizer,
+        private readonly SerializerInterface $serializer,
+        private readonly PromptOptimizer $promptOptimizer,
+        private readonly DatabasePlatform $platform,
     ) {
     }
 
@@ -32,14 +28,14 @@ class StoreGeneratorRequestHandler
             $request->request->prompt = new OptimizedPrompt($optimizedPrompt);
         }
 
-        $this->fileAccess->write(
-            'generator.requests',
-            $request->request->id . '.json',
-            $this->serializer->serialize(
-                $request->request,
-                JsonEncoder::FORMAT,
-                [JsonEncode::OPTIONS => JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT],
-            ),
+        $this->platform->insertOrUpdate(
+            'generator_requests',
+            [
+                'id'       => $request->request->id,
+                'title'    => $request->request->title,
+                'userInput' => $this->serializer->serialize($request->request->userInput, JsonEncoder::FORMAT),
+                'prompt'   => $request->request->prompt->prompt,
+            ],
         );
     }
 }
