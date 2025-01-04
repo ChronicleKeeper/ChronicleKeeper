@@ -4,19 +4,15 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Test\Chat\Application\Query;
 
-use ArrayIterator;
 use ChronicleKeeper\Chat\Application\Query\FindLatestConversationsParameters;
 use ChronicleKeeper\Chat\Application\Query\FindLatestConversationsQuery;
-use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
-use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\Finder;
-use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\PathRegistry;
 use ChronicleKeeper\Test\Chat\Domain\Entity\ConversationBuilder;
+use ChronicleKeeper\Test\Shared\Infrastructure\Database\DatabasePlatformMock;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Finder\SplFileInfo;
-use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 #[CoversClass(FindLatestConversationsQuery::class)]
 #[CoversClass(FindLatestConversationsParameters::class)]
@@ -35,34 +31,55 @@ class FindLatestConversationsQueryTest extends TestCase
     #[Test]
     public function queryReturnsConversations(): void
     {
-        $fileAccessMock   = $this->createMock(FileAccess::class);
-        $serializerMock   = $this->createMock(SerializerInterface::class);
-        $pathRegistryMock = $this->createMock(PathRegistry::class);
-        $finderMock       = $this->createMock(Finder::class);
-
-        $pathRegistryMock->method('get')->willReturn('/some/directory');
-
-        $fileMock = $this->createMock(SplFileInfo::class);
-        $fileMock->method('getFilename')->willReturn('conversation.json');
-
-        $finderMock->method('findFilesInDirectoryOrderedByAccessTimestamp')->willReturn(new ArrayIterator([$fileMock]));
-
         $conversation = (new ConversationBuilder())->build();
-        $serializerMock->method('deserialize')->willReturn($conversation);
 
-        $query = new FindLatestConversationsQuery(
-            $pathRegistryMock,
-            $fileAccessMock,
-            $serializerMock,
-            $finderMock,
+        $denormalizer = $this->createMock(DenormalizerInterface::class);
+        $denormalizer->expects($this->once())->method('denormalize')->willReturn($conversation);
+
+        $databasePlatform = new DatabasePlatformMock();
+        $databasePlatform->expectFetch(
+            'SELECT * FROM conversations ORDER BY title LIMIT :limit',
+            ['limit' => 1],
+            [
+                [
+                    'id'        => $conversation->getId(),
+                    'title'     => 'Test conversation',
+                    'directory' => $conversation->getDirectory()->getId(),
+                ],
+            ],
         );
 
-        $parameters = new FindLatestConversationsParameters(1);
+        $databasePlatform->expectFetch(
+            'SELECT * FROM conversation_settings WHERE conversation_id = :id',
+            ['id' => $conversation->getId()],
+            [
+                [
+                    'conversation_id'      => $conversation->getId(),
+                    'version'              => 1,
+                    'temperature'          => 1,
+                    'images_max_distance'  => 1,
+                    'documents_max_distance' => 1,
+                ],
+            ],
+        );
 
-        $result = $query->query($parameters);
+        $databasePlatform->expectFetch(
+            'SELECT * FROM conversation_messages WHERE conversation_id = :id',
+            ['id' => $conversation->getId()],
+            [
+                [
+                    'id' => '123e4567-e89b-12d3-a456-426614174000',
+                    'conversation_id' => $conversation->getId(),
+                    'role' => 'system',
+                    'content' => 'Test message',
+                    'context' => '{}',
+                    'debug' => '{}',
+                ],
+            ],
+        );
 
-        self::assertCount(1, $result);
-        self::assertSame($conversation, $result[0]);
+        $query = new FindLatestConversationsQuery($denormalizer, $databasePlatform);
+        $query->query(new FindLatestConversationsParameters(1));
     }
 
     #[Test]

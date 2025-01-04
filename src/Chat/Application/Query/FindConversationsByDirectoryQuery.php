@@ -7,28 +7,17 @@ namespace ChronicleKeeper\Chat\Application\Query;
 use ChronicleKeeper\Chat\Domain\Entity\Conversation;
 use ChronicleKeeper\Shared\Application\Query\Query;
 use ChronicleKeeper\Shared\Application\Query\QueryParameters;
-use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
-use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\Finder;
-use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\PathRegistry;
-use Psr\Log\LoggerInterface;
-use RuntimeException;
-use Symfony\Component\Serializer\Encoder\JsonEncoder;
-use Symfony\Component\Serializer\SerializerInterface;
-use Webmozart\Assert\Assert;
+use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
-use function array_filter;
 use function assert;
-use function strcasecmp;
-use function usort;
+use function json_decode;
 
 class FindConversationsByDirectoryQuery implements Query
 {
     public function __construct(
-        private readonly FileAccess $fileAccess,
-        private readonly SerializerInterface $serializer,
-        private readonly LoggerInterface $logger,
-        private readonly PathRegistry $pathRegistry,
-        private readonly Finder $finder,
+        private readonly DenormalizerInterface $denormalizer,
+        private readonly DatabasePlatform $databasePlatform,
     ) {
     }
 
@@ -37,36 +26,62 @@ class FindConversationsByDirectoryQuery implements Query
     {
         assert($parameters instanceof FindConversationsByDirectoryParameters);
 
+        $data = $this->databasePlatform->fetch(
+            'SELECT * FROM conversations WHERE directory = :directory ORDER BY title',
+            ['directory' => $parameters->directory->getId()],
+        );
+
         $conversations = [];
-        foreach ($this->finder->findFilesInDirectory($this->pathRegistry->get('library.conversations')) as $file) {
-            try {
-                $conversations[] = $this->deserialize($file->getFilename());
-            } catch (RuntimeException $e) {
-                $this->logger->error($e, ['file' => $file]);
-            }
+        foreach ($data as $conversation) {
+            $conversation['settings'] = $this->databasePlatform->fetch(
+                'SELECT * FROM conversation_settings WHERE conversation_id = :id',
+                ['id' => $conversation['id']],
+            )[0];
+            $conversation['messages'] = $this->databasePlatform->fetch(
+                'SELECT * FROM conversation_messages WHERE conversation_id = :id',
+                ['id' => $conversation['id']],
+            );
+
+            $conversation = $this->formatConversationFromDatabaseToArray($conversation);
+
+            $conversations[] = $this->denormalizer->denormalize($conversation, Conversation::class);
         }
-
-        $conversations = array_filter(
-            $conversations,
-            static fn (Conversation $conversation) => $conversation->getDirectory()->equals($parameters->directory),
-        );
-
-        usort(
-            $conversations,
-            static fn (Conversation $left, Conversation $right) => strcasecmp($left->getTitle(), $right->getTitle()),
-        );
 
         return $conversations;
     }
 
-    private function deserialize(string $file): Conversation
+    /**
+     * @param array<string, mixed> $rawConversation
+     *
+     * @return array<string, mixed>
+     */
+    private function formatConversationFromDatabaseToArray(array $rawConversation): array
     {
-        Assert::notEmpty($file, 'The given file must not be empty.');
+        $conversation = [
+            'id' => $rawConversation['id'],
+            'title' => $rawConversation['title'],
+            'directory' => $rawConversation['directory'],
+            'settings' => [
+                'version' => $rawConversation['settings']['version'],
+                'temperature' => $rawConversation['settings']['temperature'],
+                'imagesMaxDistance' => $rawConversation['settings']['images_max_distance'],
+                'documentsMaxDistance' => $rawConversation['settings']['documents_max_distance'],
+            ],
+            'messages' => [],
+        ];
 
-        return $this->serializer->deserialize(
-            $this->fileAccess->read('library.conversations', $file),
-            Conversation::class,
-            JsonEncoder::FORMAT,
-        );
+        foreach ($rawConversation['messages'] as $rawMessage) {
+            $conversation['messages'][] = [
+                'id' => $rawMessage['id'],
+                'message' => [
+                    'role' => $rawMessage['role'],
+                    'content' => $rawMessage['content'],
+                ],
+                'context' => json_decode((string) $rawMessage['context'], true),
+                'debug' => json_decode((string) $rawMessage['debug'], true),
+            ];
+        }
+
+        return $conversation;
     }
 }

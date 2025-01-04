@@ -8,10 +8,10 @@ use ChronicleKeeper\Document\Presentation\Controller\DocumentDeletion;
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
 use ChronicleKeeper\Test\Document\Domain\Entity\DocumentBuilder;
 use ChronicleKeeper\Test\Shared\Infrastructure\Persistence\Filesystem\FileAccessDouble;
+use ChronicleKeeper\Test\WebTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Large;
 use PHPUnit\Framework\Attributes\Test;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Uid\Uuid;
@@ -30,8 +30,7 @@ class DocumentDeletionTest extends WebTestCase
     {
         $documentId = Uuid::v4()->toString();
 
-        $client = static::createClient();
-        $client->request(
+        $this->client->request(
             Request::METHOD_GET,
             '/library/document/' . $documentId . '/delete',
         );
@@ -43,10 +42,9 @@ class DocumentDeletionTest extends WebTestCase
     public function itWillRedirectToLibraryIfNoConfirmation(): void
     {
         $document = (new DocumentBuilder())->build();
-        $client   = static::createClient();
 
         // Initialize a fixture to delete
-        $fileAccess = $client->getContainer()->get(FileAccess::class);
+        $fileAccess = $this->client->getContainer()->get(FileAccess::class);
         assert($fileAccess instanceof FileAccessDouble);
 
         $fileAccess->write(
@@ -56,7 +54,7 @@ class DocumentDeletionTest extends WebTestCase
         );
 
         // Execute deletion without confirmation
-        $client->request(
+        $this->client->request(
             Request::METHOD_GET,
             '/library/document/' . $document->getId() . '/delete',
         );
@@ -71,10 +69,9 @@ class DocumentDeletionTest extends WebTestCase
     public function itWillRedirectToLibraryAfterDeletion(): void
     {
         $document = (new DocumentBuilder())->build();
-        $client   = static::createClient();
 
         // Initialize a fixture to delete
-        $fileAccess = $client->getContainer()->get(FileAccess::class);
+        $fileAccess = $this->client->getContainer()->get(FileAccess::class);
         assert($fileAccess instanceof FileAccessDouble);
 
         $fileAccess->write(
@@ -84,7 +81,7 @@ class DocumentDeletionTest extends WebTestCase
         );
 
         // Execute deletion without confirmation
-        $client->request(
+        $this->client->request(
             Request::METHOD_GET,
             '/library/document/' . $document->getId() . '/delete?confirm=1',
         );

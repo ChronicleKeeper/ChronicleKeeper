@@ -17,13 +17,14 @@ use ChronicleKeeper\Test\Chat\Domain\Entity\ExtendedMessageBuilder;
 use ChronicleKeeper\Test\Chat\Domain\Entity\LLMChain\AssistantMessageBuilder;
 use ChronicleKeeper\Test\Shared\Infrastructure\LLMChain\LLMChainFactoryDouble;
 use ChronicleKeeper\Test\Shared\Infrastructure\Persistence\Filesystem\FileAccessDouble;
+use ChronicleKeeper\Test\WebTestCase;
 use PhpLlm\LlmChain\Bridge\OpenAI\Embeddings;
 use PhpLlm\LlmChain\Document\Vector;
+use PhpLlm\LlmChain\Model\Message\AssistantMessage;
 use PhpLlm\LlmChain\Model\Response\ResponseInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Large;
 use PHPUnit\Framework\Attributes\Test;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
 
 use function assert;
@@ -40,8 +41,7 @@ class DocumentCreationTest extends WebTestCase
     #[Test]
     public function itIsCompletelyLoadingFromScratch(): void
     {
-        $client = static::createClient();
-        $client->request(
+        $this->client->request(
             Request::METHOD_GET,
             '/library/directory/' . RootDirectory::ID . '/create_document',
         );
@@ -58,9 +58,7 @@ class DocumentCreationTest extends WebTestCase
     #[Test]
     public function itIsCreatingADocument(): void
     {
-        $client = static::createClient();
-
-        $llmChainFactory = $client->getContainer()->get(LLMChainFactory::class);
+        $llmChainFactory = $this->client->getContainer()->get(LLMChainFactory::class);
         assert($llmChainFactory instanceof LLMChainFactoryDouble);
 
         $llmChainFactory->addPlatformResponse(
@@ -74,7 +72,7 @@ class DocumentCreationTest extends WebTestCase
             },
         );
 
-        $client->request(
+        $this->client->request(
             Request::METHOD_POST,
             '/library/directory/' . RootDirectory::ID . '/create_document',
             [
@@ -89,7 +87,7 @@ class DocumentCreationTest extends WebTestCase
         self::assertResponseRedirects('/library');
 
         // Check the new document is stored
-        $fileAccess = $client->getContainer()->get(FileAccess::class);
+        $fileAccess = $this->client->getContainer()->get(FileAccess::class);
         assert($fileAccess instanceof FileAccessDouble);
 
         $files = $fileAccess->allOfType('library.documents');
@@ -103,8 +101,7 @@ class DocumentCreationTest extends WebTestCase
     #[Test]
     public function itIsNotCreatingADocumentWithInvalidData(): void
     {
-        $client = static::createClient();
-        $client->request(
+        $this->client->request(
             Request::METHOD_POST,
             '/library/directory/' . RootDirectory::ID . '/create_document',
             [
@@ -124,15 +121,13 @@ class DocumentCreationTest extends WebTestCase
     #[Test]
     public function itIsCreatingADocumentFromChatMessage(): void
     {
-        $client = static::createClient();
-
         // Setup Fixtures
-        $conversation = (new ConversationBuilder())
+        $conversation        = (new ConversationBuilder())
             ->withId('8e316807-592f-4e11-b298-259858dc2a2a')
             ->withTitle('Conversation Title')
             ->withMessages(
                 (new ExtendedMessageBagBuilder())->withMessages(
-                    (new ExtendedMessageBuilder())
+                    $message = (new ExtendedMessageBuilder())
                         ->withId('40a477e7-8e0a-4158-9dac-8dd9b1df9f87')
                         ->withMessage((new AssistantMessageBuilder())->withContent('Message Content')->build())
                         ->build(),
@@ -140,16 +135,34 @@ class DocumentCreationTest extends WebTestCase
             )
             ->build();
 
-        $fileAccess = $client->getContainer()->get(FileAccess::class);
+        $fileAccess = $this->client->getContainer()->get(FileAccess::class);
         assert($fileAccess instanceof FileAccessDouble);
 
-        $fileAccess->write(
-            'library.conversations',
-            '8e316807-592f-4e11-b298-259858dc2a2a.json',
-            (string) json_encode($conversation),
-        );
+        $this->databasePlatform->insert('conversations', [
+            'id' => $conversation->getId(),
+            'title' => $conversation->getTitle(),
+            'directory' => $conversation->getDirectory()->getId(),
+        ]);
 
-        $client->request(
+        $this->databasePlatform->insert('conversation_settings', [
+            'conversation_id' => $conversation->getId(),
+            'version' => $conversation->getSettings()->version,
+            'temperature' => $conversation->getSettings()->temperature,
+            'images_max_distance' => $conversation->getSettings()->imagesMaxDistance,
+            'documents_max_distance' => $conversation->getSettings()->imagesMaxDistance,
+        ]);
+
+        assert($message->message instanceof AssistantMessage);
+        $this->databasePlatform->insert('conversation_messages', [
+            'id' => $message->id,
+            'conversation_id' => $conversation->getId(),
+            'role' => $message->message->getRole()->value,
+            'content' => $message->message->content,
+            'context' => '{}',
+            'debug' => '{}',
+        ]);
+
+        $this->client->request(
             Request::METHOD_GET,
             '/library/directory/' . RootDirectory::ID . '/create_document',
             [
@@ -169,8 +182,6 @@ class DocumentCreationTest extends WebTestCase
     #[Test]
     public function itIsCreatingADocumentFromTemporaryChatMessage(): void
     {
-        $client = static::createClient();
-
         // Setup Fixtures
         $conversation = (new ConversationBuilder())
             ->withTitle('Unnamed Conversation')
@@ -184,7 +195,7 @@ class DocumentCreationTest extends WebTestCase
             )
             ->build();
 
-        $fileAccess = $client->getContainer()->get(FileAccess::class);
+        $fileAccess = $this->client->getContainer()->get(FileAccess::class);
         assert($fileAccess instanceof FileAccessDouble);
 
         $fileAccess->write(
@@ -193,7 +204,7 @@ class DocumentCreationTest extends WebTestCase
             (string) json_encode($conversation),
         );
 
-        $client->request(
+        $this->client->request(
             Request::METHOD_GET,
             '/library/directory/' . RootDirectory::ID . '/create_document',
             [

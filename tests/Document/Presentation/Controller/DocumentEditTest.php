@@ -15,6 +15,7 @@ use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileA
 use ChronicleKeeper\Test\Document\Domain\Entity\DocumentBuilder;
 use ChronicleKeeper\Test\Shared\Infrastructure\LLMChain\LLMChainFactoryDouble;
 use ChronicleKeeper\Test\Shared\Infrastructure\Persistence\Filesystem\FileAccessDouble;
+use ChronicleKeeper\Test\WebTestCase;
 use Override;
 use PhpLlm\LlmChain\Bridge\OpenAI\Embeddings;
 use PhpLlm\LlmChain\Document\Vector;
@@ -22,8 +23,6 @@ use PhpLlm\LlmChain\Model\Response\ResponseInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Large;
 use PHPUnit\Framework\Attributes\Test;
-use Symfony\Bundle\FrameworkBundle\KernelBrowser;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Uid\Uuid;
@@ -41,14 +40,15 @@ use const JSON_THROW_ON_ERROR;
 #[Large]
 class DocumentEditTest extends WebTestCase
 {
-    private KernelBrowser $client;
     private FileAccessDouble $fileAccess;
     private Document $fixtureDocument;
 
+    #[Override]
     protected function setUp(): void
     {
+        parent::setUp();
+
         $this->fixtureDocument = (new DocumentBuilder())->build();
-        $this->client          = self::createClient();
 
         $fileAccess = $this->client->getContainer()->get(FileAccess::class);
         assert($fileAccess instanceof FileAccessDouble);

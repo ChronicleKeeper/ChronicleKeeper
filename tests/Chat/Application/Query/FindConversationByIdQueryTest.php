@@ -12,15 +12,12 @@ use ChronicleKeeper\Chat\Domain\ValueObject\Settings;
 use ChronicleKeeper\Chat\Infrastructure\Serializer\ExtendedMessageDenormalizer;
 use ChronicleKeeper\Library\Domain\RootDirectory;
 use ChronicleKeeper\Settings\Application\SettingsHandler;
-use ChronicleKeeper\Settings\Domain\ValueObject\Settings\ChatbotFunctions;
-use ChronicleKeeper\Settings\Domain\ValueObject\Settings\ChatbotGeneral;
-use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
-use ChronicleKeeper\Test\Settings\Domain\ValueObject\SettingsBuilder;
+use ChronicleKeeper\Test\Shared\Infrastructure\Database\DatabasePlatformMock;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 #[CoversClass(FindConversationByIdQuery::class)]
 #[CoversClass(FindConversationByIdParameters::class)]
@@ -39,7 +36,6 @@ class FindConversationByIdQueryTest extends TestCase
     #[Test]
     public function queryReturnsConversation(): void
     {
-        $parameters   = new FindConversationByIdParameters('123e4567-e89b-12d3-a456-426614174000');
         $conversation = new Conversation(
             '123e4567-e89b-12d3-a456-426614174000',
             'Test conversation',
@@ -48,25 +44,55 @@ class FindConversationByIdQueryTest extends TestCase
             new ExtendedMessageBag(),
         );
 
-        $fileAccess = $this->createMock(FileAccess::class);
-        $serializer = $this->createMock(SerializerInterface::class);
+        $databasePlatform = new DatabasePlatformMock();
+        $databasePlatform->expectFetch(
+            'SELECT * FROM conversations WHERE id = :id',
+            ['id' => $conversation->getId()],
+            [
+                [
+                    'id' => $conversation->getId(),
+                    'title' => 'Test conversation',
+                    'directory' => $conversation->getDirectory()->getId(),
+                ],
+            ],
+        );
+        $databasePlatform->expectFetch(
+            'SELECT * FROM conversation_settings WHERE conversation_id = :id',
+            ['id' => $conversation->getId()],
+            [
+                [
+                    'conversation_id' => $conversation->getId(),
+                    'version' => $conversation->getSettings()->version,
+                    'temperature' => $conversation->getSettings()->temperature,
+                    'images_max_distance' => $conversation->getSettings()->imagesMaxDistance,
+                    'documents_max_distance' => $conversation->getSettings()->documentsMaxDistance,
+                ],
+            ],
+        );
+        $databasePlatform->expectFetch(
+            'SELECT * FROM conversation_messages WHERE conversation_id = :id',
+            ['id' => $conversation->getId()],
+            [],
+        );
 
-        $fileAccess->expects($this->once())
-            ->method('exists')
-            ->with('library.conversations', '123e4567-e89b-12d3-a456-426614174000.json')
-            ->willReturn(true);
-
-        $fileAccess->expects($this->once())
-            ->method('read')
-            ->with('library.conversations', '123e4567-e89b-12d3-a456-426614174000.json')
-            ->willReturn('{"id":"123e4567-e89b-12d3-a456-426614174000","title":"Test conversation"}');
-
-        $serializer->expects($this->once())
-            ->method('deserialize')
+        $denormalizer = $this->createMock(DenormalizerInterface::class);
+        $denormalizer->expects($this->once())
+            ->method('denormalize')
             ->with(
-                '{"id":"123e4567-e89b-12d3-a456-426614174000","title":"Test conversation"}',
+                [
+                    'id' => $conversation->getId(),
+                    'title' => 'Test conversation',
+                    'directory' => $conversation->getDirectory()->getId(),
+                    'settings' => [
+                        'version' => $conversation->getSettings()->version,
+                        'temperature' => $conversation->getSettings()->temperature,
+                        'imagesMaxDistance' => $conversation->getSettings()->imagesMaxDistance,
+                        'documentsMaxDistance' => $conversation->getSettings()->documentsMaxDistance,
+                    ],
+                    'messages' => [],
+                ],
                 Conversation::class,
-                'json',
+                null,
                 [
                     ExtendedMessageDenormalizer::WITH_CONTEXT_DOCUMENTS => false,
                     ExtendedMessageDenormalizer::WITH_CONTEXT_IMAGES => false,
@@ -76,88 +102,36 @@ class FindConversationByIdQueryTest extends TestCase
             ->willReturn($conversation);
 
         $query  = new FindConversationByIdQuery(
-            $fileAccess,
-            $serializer,
+            $denormalizer,
             self::createStub(SettingsHandler::class),
+            $databasePlatform,
         );
-        $result = $query->query($parameters);
+        $result = $query->query(new FindConversationByIdParameters('123e4567-e89b-12d3-a456-426614174000'));
 
+        $databasePlatform->assertFetchCount(3);
         self::assertSame($conversation, $result);
     }
 
     #[Test]
     public function queryReturnsNullWhenConversationNotFound(): void
     {
-        $parameters = new FindConversationByIdParameters('123e4567-e89b-12d3-a456-426614174000');
+        $normalizer = $this->createMock(DenormalizerInterface::class);
+        $normalizer->expects($this->never())->method('denormalize');
 
-        $fileAccess = $this->createMock(FileAccess::class);
-        $serializer = $this->createMock(SerializerInterface::class);
-
-        $fileAccess->expects($this->once())
-            ->method('exists')
-            ->with('library.conversations', '123e4567-e89b-12d3-a456-426614174000.json')
-            ->willReturn(false);
+        $databasePlatform = new DatabasePlatformMock();
+        $databasePlatform->expectFetch(
+            'SELECT * FROM conversations WHERE id = :id',
+            ['id' => '123e4567-e89b-12d3-a456-426614174000'],
+            [],
+        );
 
         $query  = new FindConversationByIdQuery(
-            $fileAccess,
-            $serializer,
+            $normalizer,
             self::createStub(SettingsHandler::class),
+            $databasePlatform,
         );
-        $result = $query->query($parameters);
+        $result = $query->query(new FindConversationByIdParameters('123e4567-e89b-12d3-a456-426614174000'));
 
         self::assertNull($result);
-    }
-
-    #[Test]
-    public function itWillDenormalizeAConversationWithCompleteContext(): void
-    {
-        $parameters   = new FindConversationByIdParameters('123e4567-e89b-12d3-a456-426614174000');
-        $conversation = new Conversation(
-            '123e4567-e89b-12d3-a456-426614174000',
-            'Test conversation',
-            RootDirectory::get(),
-            new Settings(),
-            new ExtendedMessageBag(),
-        );
-
-        $fileAccess = $this->createMock(FileAccess::class);
-        $serializer = $this->createMock(SerializerInterface::class);
-
-        $fileAccess->expects($this->once())
-            ->method('exists')
-            ->with('library.conversations', '123e4567-e89b-12d3-a456-426614174000.json')
-            ->willReturn(true);
-
-        $fileAccess->expects($this->once())
-            ->method('read')
-            ->with('library.conversations', '123e4567-e89b-12d3-a456-426614174000.json')
-            ->willReturn('{"id":"123e4567-e89b-12d3-a456-426614174000","title":"Test conversation"}');
-
-        $serializer->expects($this->once())
-            ->method('deserialize')
-            ->with(
-                '{"id":"123e4567-e89b-12d3-a456-426614174000","title":"Test conversation"}',
-                Conversation::class,
-                'json',
-                [
-                    ExtendedMessageDenormalizer::WITH_CONTEXT_DOCUMENTS => true,
-                    ExtendedMessageDenormalizer::WITH_CONTEXT_IMAGES => true,
-                    ExtendedMessageDenormalizer::WITH_DEBUG_FUNCTIONS => true,
-                ],
-            )
-            ->willReturn($conversation);
-
-        $settings = (new SettingsBuilder())
-            ->withChatbotGeneral(new ChatbotGeneral(showReferencedDocuments: true, showReferencedImages: true))
-            ->withChatbotFunctions(new ChatbotFunctions(allowDebugOutput: true))
-            ->build();
-
-        $settingsHandler = self::createStub(SettingsHandler::class);
-        $settingsHandler->method('get')->willReturn($settings);
-
-        $query  = new FindConversationByIdQuery($fileAccess, $serializer, $settingsHandler);
-        $result = $query->query($parameters);
-
-        self::assertSame($conversation, $result);
     }
 }
