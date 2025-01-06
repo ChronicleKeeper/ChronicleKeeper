@@ -7,6 +7,7 @@ namespace ChronicleKeeper\Test\Chat\Application\Query;
 use ChronicleKeeper\Chat\Application\Query\FindConversationsByDirectoryParameters;
 use ChronicleKeeper\Chat\Application\Query\FindConversationsByDirectoryQuery;
 use ChronicleKeeper\Library\Domain\RootDirectory;
+use ChronicleKeeper\Shared\Infrastructure\Database\Converter\DatabaseRowConverter;
 use ChronicleKeeper\Test\Chat\Domain\Entity\ConversationBuilder;
 use ChronicleKeeper\Test\Library\Domain\Entity\DirectoryBuilder;
 use ChronicleKeeper\Test\Shared\Infrastructure\Database\DatabasePlatformMock;
@@ -52,27 +53,18 @@ class FindConversationsByDirectoryQueryTest extends TestCase
             ],
         );
 
-        $databasePlatformMock->expectFetch(
-            'SELECT * FROM conversation_settings WHERE conversation_id = :id',
-            ['id' => $conversation->getId()],
-            [
-                [
-                    'conversation_id'      => $conversation->getId(),
-                    'version'              => 1,
-                    'temperature'          => 0.5,
-                    'images_max_distance'  => 0.5,
-                    'documents_max_distance' => 0.5,
-                ],
-            ],
-        );
+        $databaseRowConverter = $this->createMock(DatabaseRowConverter::class);
+        $databaseRowConverter->expects($this->once())->method('convert')->willReturn([
+            'id'        => $conversation->getId(),
+            'title'     => 'Test conversation',
+            'directory' => $directory->getId(),
+        ]);
 
-        $databasePlatformMock->expectFetch(
-            'SELECT * FROM conversation_messages WHERE conversation_id = :id',
-            ['id' => $conversation->getId()],
-            [],
+        $query      = new FindConversationsByDirectoryQuery(
+            $denormalizer,
+            $databasePlatformMock,
+            $databaseRowConverter,
         );
-
-        $query      = new FindConversationsByDirectoryQuery($denormalizer, $databasePlatformMock);
         $parameters = new FindConversationsByDirectoryParameters($directory);
 
         $result = $query->query($parameters);

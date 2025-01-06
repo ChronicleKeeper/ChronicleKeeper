@@ -7,8 +7,11 @@ namespace ChronicleKeeper\Test\Shared\Infrastructure\Database;
 use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
 use PHPUnit\Framework\Assert;
 
+use function count;
 use function json_encode;
 use function sprintf;
+
+use const JSON_THROW_ON_ERROR;
 
 final class DatabasePlatformMock implements DatabasePlatform
 {
@@ -17,7 +20,7 @@ final class DatabasePlatformMock implements DatabasePlatform
     /** @var array<int, array{table: string, data: array<string, mixed>}> */
     private array $executedInserts = [];
     private bool $inTransaction    = false;
-    /** @var array<int, array{sql: string, parameters: array<string, mixed>, result: array<int, mixed>}> */
+    /** @var array<int, array{sql: string, parameters: array<string, mixed>, result: list<mixed>}> */
     private array $fetchExpectations = [];
     /** @var array<int, array{sql: string, parameters: array<string, mixed>}> */
     private array $executedFetches = [];
@@ -64,7 +67,7 @@ final class DatabasePlatformMock implements DatabasePlatform
 
     /**
      * @param array<string, mixed> $parameters
-     * @param array<mixed>         $result
+     * @param list<mixed>          $result
      */
     public function expectFetch(string $sql, array $parameters, array $result): void
     {
@@ -81,7 +84,11 @@ final class DatabasePlatformMock implements DatabasePlatform
         Assert::assertContains(
             ['sql' => $sql, 'parameters' => $parameters],
             $this->executedFetches,
-            sprintf('Expected fetch "%s" with parameters %s was not executed', $sql, json_encode($parameters)),
+            sprintf(
+                'Expected fetch "%s" with parameters %s was not executed',
+                $sql,
+                json_encode($parameters, JSON_THROW_ON_ERROR),
+            ),
         );
     }
 
@@ -104,8 +111,17 @@ final class DatabasePlatformMock implements DatabasePlatform
         Assert::fail(sprintf(
             'No fetch expectation found for query "%s" with parameters %s',
             $sql,
-            json_encode($parameters),
+            json_encode($parameters, JSON_THROW_ON_ERROR),
         ));
+    }
+
+    /** @inheritDoc */
+    public function fetchSingleRow(string $sql, array $parameters = []): array
+    {
+        $result = $this->fetch($sql, $parameters);
+        Assert::assertLessThan(2, count($result), 'Expected single row, got ' . count($result));
+
+        return $result[0] ?? [];
     }
 
     /** @inheritDoc */

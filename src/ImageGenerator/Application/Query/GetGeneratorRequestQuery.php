@@ -15,6 +15,8 @@ use function assert;
 use function count;
 use function json_decode;
 
+use const JSON_THROW_ON_ERROR;
+
 final readonly class GetGeneratorRequestQuery implements Query
 {
     public function __construct(
@@ -27,7 +29,7 @@ final readonly class GetGeneratorRequestQuery implements Query
     {
         assert($parameters instanceof GetGeneratorRequest);
 
-        $request = $this->platform->fetch(
+        $request = $this->platform->fetchSingleRow(
             'SELECT * FROM generator_requests WHERE id = :id',
             ['id' => $parameters->id],
         );
@@ -36,8 +38,13 @@ final readonly class GetGeneratorRequestQuery implements Query
             throw new InvalidArgumentException('Generator Request not found');
         }
 
-        $request[0]['userInput'] = json_decode((string) $request[0]['userInput'], true);
+        $request['userInput'] = json_decode(
+            (string) $request['userInput'],
+            true,
+            512,
+            JSON_THROW_ON_ERROR,
+        );
 
-        return $this->denormalizer->denormalize($request[0], GeneratorRequest::class);
+        return $this->denormalizer->denormalize($request, GeneratorRequest::class);
     }
 }

@@ -9,9 +9,16 @@ interface DatabasePlatform
     /**
      * @param array<string, mixed> $parameters
      *
-     * @return array<int, mixed>
+     * @return list<mixed>
      */
     public function fetch(string $sql, array $parameters = []): array;
+
+    /**
+     * @param array<string, mixed> $parameters
+     *
+     * @return array<string, mixed>
+     */
+    public function fetchSingleRow(string $sql, array $parameters = []): array;
 
     /** @param array<string, mixed> $parameters */
     public function query(string $sql, array $parameters = []): void;

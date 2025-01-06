@@ -9,9 +9,9 @@ use ChronicleKeeper\Chat\Application\Query\FindConversationByIdQuery;
 use ChronicleKeeper\Chat\Domain\Entity\Conversation;
 use ChronicleKeeper\Chat\Domain\Entity\ExtendedMessageBag;
 use ChronicleKeeper\Chat\Domain\ValueObject\Settings;
-use ChronicleKeeper\Chat\Infrastructure\Serializer\ExtendedMessageDenormalizer;
 use ChronicleKeeper\Library\Domain\RootDirectory;
 use ChronicleKeeper\Settings\Application\SettingsHandler;
+use ChronicleKeeper\Shared\Infrastructure\Database\Converter\DatabaseRowConverter;
 use ChronicleKeeper\Test\Shared\Infrastructure\Database\DatabasePlatformMock;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
@@ -56,59 +56,26 @@ class FindConversationByIdQueryTest extends TestCase
                 ],
             ],
         );
-        $databasePlatform->expectFetch(
-            'SELECT * FROM conversation_settings WHERE conversation_id = :id',
-            ['id' => $conversation->getId()],
-            [
-                [
-                    'conversation_id' => $conversation->getId(),
-                    'version' => $conversation->getSettings()->version,
-                    'temperature' => $conversation->getSettings()->temperature,
-                    'images_max_distance' => $conversation->getSettings()->imagesMaxDistance,
-                    'documents_max_distance' => $conversation->getSettings()->documentsMaxDistance,
-                ],
-            ],
-        );
-        $databasePlatform->expectFetch(
-            'SELECT * FROM conversation_messages WHERE conversation_id = :id',
-            ['id' => $conversation->getId()],
-            [],
-        );
+
+        $databaseRowConverter = $this->createMock(DatabaseRowConverter::class);
+        $databaseRowConverter->expects($this->once())->method('convert')->willReturn([
+            'id' => $conversation->getId(),
+            'title' => 'Test conversation',
+            'directory' => $conversation->getDirectory()->getId(),
+        ]);
 
         $denormalizer = $this->createMock(DenormalizerInterface::class);
-        $denormalizer->expects($this->once())
-            ->method('denormalize')
-            ->with(
-                [
-                    'id' => $conversation->getId(),
-                    'title' => 'Test conversation',
-                    'directory' => $conversation->getDirectory()->getId(),
-                    'settings' => [
-                        'version' => $conversation->getSettings()->version,
-                        'temperature' => $conversation->getSettings()->temperature,
-                        'imagesMaxDistance' => $conversation->getSettings()->imagesMaxDistance,
-                        'documentsMaxDistance' => $conversation->getSettings()->documentsMaxDistance,
-                    ],
-                    'messages' => [],
-                ],
-                Conversation::class,
-                null,
-                [
-                    ExtendedMessageDenormalizer::WITH_CONTEXT_DOCUMENTS => false,
-                    ExtendedMessageDenormalizer::WITH_CONTEXT_IMAGES => false,
-                    ExtendedMessageDenormalizer::WITH_DEBUG_FUNCTIONS => false,
-                ],
-            )
-            ->willReturn($conversation);
+        $denormalizer->expects($this->once())->method('denormalize')->willReturn($conversation);
 
         $query  = new FindConversationByIdQuery(
             $denormalizer,
             self::createStub(SettingsHandler::class),
             $databasePlatform,
+            $databaseRowConverter,
         );
         $result = $query->query(new FindConversationByIdParameters('123e4567-e89b-12d3-a456-426614174000'));
 
-        $databasePlatform->assertFetchCount(3);
+        $databasePlatform->assertFetchCount(1);
         self::assertSame($conversation, $result);
     }
 
@@ -125,10 +92,14 @@ class FindConversationByIdQueryTest extends TestCase
             [],
         );
 
+        $databaseRowConverter = $this->createMock(DatabaseRowConverter::class);
+        $databaseRowConverter->expects($this->never())->method('convert');
+
         $query  = new FindConversationByIdQuery(
             $normalizer,
             self::createStub(SettingsHandler::class),
             $databasePlatform,
+            $databaseRowConverter,
         );
         $result = $query->query(new FindConversationByIdParameters('123e4567-e89b-12d3-a456-426614174000'));
 

@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace ChronicleKeeper\Shared\Infrastructure\Database\SQLite;
 
 use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
+use ChronicleKeeper\Shared\Infrastructure\Database\Exception\UnexpectedMultipleResults;
 use SQLite3;
 
 use function array_keys;
+use function count;
 use function implode;
 use function sprintf;
 
@@ -54,6 +56,17 @@ class SQLiteDatabasePlatform implements DatabasePlatform
         }
 
         return $result;
+    }
+
+    /** @inheritDoc */
+    public function fetchSingleRow(string $sql, array $parameters = []): array
+    {
+        $result = $this->fetch($sql, $parameters);
+        if (count($result) > 1) {
+            throw UnexpectedMultipleResults::withQuery($sql);
+        }
+
+        return $result[0] ?? [];
     }
 
     /** @inheritDoc */

@@ -9,12 +9,12 @@ use ChronicleKeeper\Chat\Infrastructure\Serializer\ExtendedMessageDenormalizer;
 use ChronicleKeeper\Settings\Application\SettingsHandler;
 use ChronicleKeeper\Shared\Application\Query\Query;
 use ChronicleKeeper\Shared\Application\Query\QueryParameters;
+use ChronicleKeeper\Shared\Infrastructure\Database\Converter\DatabaseRowConverter;
 use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 use function assert;
 use function count;
-use function json_decode;
 
 class FindConversationByIdQuery implements Query
 {
@@ -22,6 +22,7 @@ class FindConversationByIdQuery implements Query
         private readonly DenormalizerInterface $denormalizer,
         private readonly SettingsHandler $settingsHandler,
         private readonly DatabasePlatform $databasePlatform,
+        private readonly DatabaseRowConverter $databaseRowConverter,
     ) {
     }
 
@@ -29,22 +30,16 @@ class FindConversationByIdQuery implements Query
     {
         assert($parameters instanceof FindConversationByIdParameters);
 
-        $data = $this->databasePlatform->fetch('SELECT * FROM conversations WHERE id = :id', ['id' => $parameters->id]);
+        $data = $this->databasePlatform->fetchSingleRow(
+            'SELECT * FROM conversations WHERE id = :id',
+            ['id' => $parameters->id],
+        );
+
         if (count($data) === 0) {
             return null;
         }
 
-        $conversation             = $data[0];
-        $conversation['settings'] = $this->databasePlatform->fetch(
-            'SELECT * FROM conversation_settings WHERE conversation_id = :id',
-            ['id' => $parameters->id],
-        )[0];
-        $conversation['messages'] = $this->databasePlatform->fetch(
-            'SELECT * FROM conversation_messages WHERE conversation_id = :id',
-            ['id' => $parameters->id],
-        );
-
-        $conversation = $this->formatConversationFromDatabaseToArray($conversation);
+        $conversation = $this->databaseRowConverter->convert($data, Conversation::class);
 
         $settings                = $this->settingsHandler->get();
         $showReferencedDocuments = $settings->getChatbotGeneral()->showReferencedDocuments();
@@ -60,40 +55,5 @@ class FindConversationByIdQuery implements Query
                 ExtendedMessageDenormalizer::WITH_DEBUG_FUNCTIONS => $showDebugOutput,
             ],
         );
-    }
-
-    /**
-     * @param array<string, mixed> $rawConversation
-     *
-     * @return array<string, mixed>
-     */
-    private function formatConversationFromDatabaseToArray(array $rawConversation): array
-    {
-        $conversation = [
-            'id' => $rawConversation['id'],
-            'title' => $rawConversation['title'],
-            'directory' => $rawConversation['directory'],
-            'settings' => [
-                'version' => $rawConversation['settings']['version'],
-                'temperature' => $rawConversation['settings']['temperature'],
-                'imagesMaxDistance' => $rawConversation['settings']['images_max_distance'],
-                'documentsMaxDistance' => $rawConversation['settings']['documents_max_distance'],
-            ],
-            'messages' => [],
-        ];
-
-        foreach ($rawConversation['messages'] as $rawMessage) {
-            $conversation['messages'][] = [
-                'id' => $rawMessage['id'],
-                'message' => [
-                    'role' => $rawMessage['role'],
-                    'content' => $rawMessage['content'],
-                ],
-                'context' => json_decode((string) $rawMessage['context'], true),
-                'debug' => json_decode((string) $rawMessage['debug'], true),
-            ];
-        }
-
-        return $conversation;
     }
 }

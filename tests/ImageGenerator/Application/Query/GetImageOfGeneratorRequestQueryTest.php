@@ -61,12 +61,12 @@ class GetImageOfGeneratorRequestQueryTest extends TestCase
 
         $databasePlatform = $this->createMock(DatabasePlatform::class);
         $databasePlatform->expects($this->once())
-            ->method('fetch')
+            ->method('fetchSingleRow')
             ->with(
                 'SELECT * FROM generator_results WHERE generatorRequest = :requestId AND id = :imageId',
                 ['requestId' => $requestId, 'imageId' => $imageId],
             )
-            ->willReturn([['title' => 'foo']]);
+            ->willReturn(['title' => 'foo']);
 
         $denormalizer = $this->createMock(DenormalizerInterface::class);
         $denormalizer

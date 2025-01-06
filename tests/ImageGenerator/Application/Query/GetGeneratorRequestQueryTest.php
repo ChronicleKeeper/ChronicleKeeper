@@ -45,11 +45,9 @@ class GetGeneratorRequestQueryTest extends TestCase
 
         $databasePlatform = $this->createMock(DatabasePlatform::class);
         $databasePlatform->expects($this->once())
-            ->method('fetch')
+            ->method('fetchSingleRow')
             ->with('SELECT * FROM generator_requests WHERE id = :id', ['id' => $identifier])
-            ->willReturn([
-                ['title' => 'foo', 'userInput' => '{}'],
-            ]);
+            ->willReturn(['title' => 'foo', 'userInput' => '{}']);
 
         $denormalizer = $this->createMock(DenormalizerInterface::class);
         $denormalizer
