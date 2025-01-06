@@ -8,26 +8,26 @@ use ChronicleKeeper\Favorizer\Domain\TargetBag;
 use ChronicleKeeper\Favorizer\Domain\ValueObject\Target;
 use ChronicleKeeper\Shared\Application\Query\Query;
 use ChronicleKeeper\Shared\Application\Query\QueryParameters;
-use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
-use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Exception\UnableToReadFile;
-use Symfony\Component\Serializer\SerializerInterface;
+use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
+
+use function count;
 
 final readonly class GetTargetBagQuery implements Query
 {
     public function __construct(
-        private FileAccess $fileAccess,
-        private SerializerInterface $serializer,
+        private DenormalizerInterface $denormalizer,
+        private DatabasePlatform $databasePlatform,
     ) {
     }
 
     public function query(QueryParameters $parameters): TargetBag
     {
-        try {
-            $content = $this->fileAccess->read('storage', 'favorites.json');
-        } catch (UnableToReadFile) {
+        $content = $this->databasePlatform->fetch('SELECT * FROM favorites');
+        if (count($content) === 0) {
             return new TargetBag();
         }
 
-        return new TargetBag(...$this->serializer->deserialize($content, Target::class . '[]', 'json'));
+        return new TargetBag(...$this->denormalizer->denormalize($content, Target::class . '[]'));
     }
 }

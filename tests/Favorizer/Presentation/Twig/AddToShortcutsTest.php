@@ -8,10 +8,10 @@ use ChronicleKeeper\Document\Domain\Entity\Document;
 use ChronicleKeeper\Favorizer\Presentation\Twig\AddToShortcuts;
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
 use ChronicleKeeper\Test\Document\Domain\Entity\DocumentBuilder;
+use ChronicleKeeper\Test\WebTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Large;
 use PHPUnit\Framework\Attributes\Test;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\UX\LiveComponent\Test\InteractsWithLiveComponents;
 
 use function assert;
@@ -21,7 +21,7 @@ use const JSON_THROW_ON_ERROR;
 
 #[CoversClass(AddToShortcuts::class)]
 #[Large]
-class AddToShortcutsTest extends KernelTestCase
+class AddToShortcutsTest extends WebTestCase
 {
     use InteractsWithLiveComponents;
 

@@ -7,13 +7,12 @@ namespace ChronicleKeeper\Test\Favorizer\Application\Query;
 use ChronicleKeeper\Favorizer\Application\Query\GetTargetBag;
 use ChronicleKeeper\Favorizer\Application\Query\GetTargetBagQuery;
 use ChronicleKeeper\Favorizer\Domain\ValueObject\Target;
-use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
-use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Exception\UnableToReadFile;
+use ChronicleKeeper\Test\Shared\Infrastructure\Database\DatabasePlatformMock;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 #[CoversClass(GetTargetBagQuery::class)]
 #[CoversClass(GetTargetBag::class)]
@@ -31,16 +30,13 @@ class GetTargetBagQueryTest extends TestCase
     #[Test]
     public function emptyTargetBagIsDelivered(): void
     {
-        $fileAccess = $this->createMock(FileAccess::class);
-        $fileAccess->expects($this->once())
-            ->method('read')
-            ->with('storage', 'favorites.json')
-            ->willThrowException(new UnableToReadFile('favorites.json'));
+        $databasePlatform = new DatabasePlatformMock();
+        $databasePlatform->expectFetch('SELECT * FROM favorites', [], []);
 
-        $serializer = $this->createMock(SerializerInterface::class);
-        $serializer->expects($this->never())->method('deserialize');
+        $denormalizer = $this->createMock(DenormalizerInterface::class);
+        $denormalizer->expects($this->never())->method('denormalize');
 
-        $query     = new GetTargetBagQuery($fileAccess, $serializer);
+        $query     = new GetTargetBagQuery($denormalizer, $databasePlatform);
         $targetBag = $query->query(new GetTargetBag());
 
         self::assertCount(0, $targetBag);
@@ -49,19 +45,22 @@ class GetTargetBagQueryTest extends TestCase
     #[Test]
     public function targetBagFromFilesystemIsLoaded(): void
     {
-        $fileAccess = $this->createMock(FileAccess::class);
-        $fileAccess->expects($this->once())
-            ->method('read')
-            ->with('storage', 'favorites.json')
-            ->willReturn('{"targetBag":[]}');
+        $dbResult = ['id' => '4c0ad0b6-772d-4ef2-8fd6-8120c90e6e45', 'title' => 'Title 1'];
 
-        $serializer = $this->createMock(SerializerInterface::class);
-        $serializer->expects($this->once())
-            ->method('deserialize')
-            ->with('{"targetBag":[]}', 'ChronicleKeeper\Favorizer\Domain\ValueObject\Target[]', 'json')
+        $databasePlatform = new DatabasePlatformMock();
+        $databasePlatform->expectFetch(
+            'SELECT * FROM favorites',
+            [],
+            [$dbResult],
+        );
+
+        $denormalizer = $this->createMock(DenormalizerInterface::class);
+        $denormalizer->expects($this->once())
+            ->method('denormalize')
+            ->with([$dbResult], 'ChronicleKeeper\Favorizer\Domain\ValueObject\Target[]')
             ->willReturn([self::createStub(Target::class)]);
 
-        $query     = new GetTargetBagQuery($fileAccess, $serializer);
+        $query     = new GetTargetBagQuery($denormalizer, $databasePlatform);
         $targetBag = $query->query(new GetTargetBag());
 
         self::assertCount(1, $targetBag);

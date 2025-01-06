@@ -4,34 +4,33 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Favorizer\Application\Command;
 
-use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
+use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
+use ReflectionClass;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
-use Symfony\Component\Serializer\Encoder\JsonEncode;
-use Symfony\Component\Serializer\Encoder\JsonEncoder;
-use Symfony\Component\Serializer\SerializerInterface;
-
-use const JSON_PRETTY_PRINT;
-use const JSON_UNESCAPED_UNICODE;
 
 #[AsMessageHandler]
 class StoreTargetBagHandler
 {
     public function __construct(
-        private readonly FileAccess $fileAccess,
-        private readonly SerializerInterface $serializer,
+        private readonly DatabasePlatform $databasePlatform,
     ) {
     }
 
     public function __invoke(StoreTargetBag $command): void
     {
-        $this->fileAccess->write(
-            'storage',
-            'favorites.json',
-            $this->serializer->serialize(
-                $command->targetBag,
-                JsonEncoder::FORMAT,
-                [JsonEncode::OPTIONS => JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT],
-            ),
-        );
+        // Clear all existing favorites
+        $this->databasePlatform->query('DELETE FROM favorites');
+
+        // Store the delivered favorites for next fetching
+        foreach ($command->targetBag as $target) {
+            $this->databasePlatform->insert(
+                'favorites',
+                [
+                    'id' => $target->getId(),
+                    'title' => $target->getTitle(),
+                    'type' => (new ReflectionClass($target))->getShortName(),
+                ],
+            );
+        }
     }
 }
