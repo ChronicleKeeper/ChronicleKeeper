@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\ImageGenerator\Infrastructure\LLMChain\Bridge\OpenAI;
 
-use PhpLlm\LlmChain\Model\LanguageModel;
+use PhpLlm\LlmChain\Model\Model;
 
-final class DallE implements LanguageModel
+final class DallE implements Model
 {
     public const string DALL_E_3 = 'dall-e-3';
 
@@ -26,25 +26,5 @@ final class DallE implements LanguageModel
     public function getOptions(): array
     {
         return $this->options;
-    }
-
-    public function supportsImageInput(): bool
-    {
-        return false;
-    }
-
-    public function supportsStructuredOutput(): bool
-    {
-        return false;
-    }
-
-    public function supportsStreaming(): bool
-    {
-        return false;
-    }
-
-    public function supportsToolCalling(): bool
-    {
-        return false;
     }
 }

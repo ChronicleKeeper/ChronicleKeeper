@@ -42,7 +42,7 @@ class ExtendedMessageBagTest extends TestCase
         $extendedMessage2 = new ExtendedMessage($message2);
 
         $extendedMessageBag = new ExtendedMessageBag($extendedMessage1, $extendedMessage2);
-        $llmChainMessages   = $extendedMessageBag->getLLMChainMessages();
+        $llmChainMessages   = $extendedMessageBag->getLLMChainMessages()->getMessages();
 
         self::assertCount(2, $llmChainMessages);
         self::assertSame($message1, $llmChainMessages[0]);

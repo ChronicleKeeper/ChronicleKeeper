@@ -20,10 +20,6 @@ class DallETest extends TestCase
         $dallE = new DallE();
         self::assertSame(DallE::DALL_E_3, $dallE->getVersion());
         self::assertSame(['response_format' => 'b64_json'], $dallE->getOptions());
-        self::assertFalse($dallE->supportsImageInput());
-        self::assertFalse($dallE->supportsStructuredOutput());
-        self::assertFalse($dallE->supportsStreaming());
-        self::assertFalse($dallE->supportsToolCalling());
     }
 
     #[Test]
