@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7fe8575be508f7c24a5be8b53897f9cc",
+    "content-hash": "793aa8701eeb10d855dc54dcf38f14bf",
     "packages": [
         {
             "name": "composer/semver",
@@ -974,6 +974,54 @@
             "time": "2024-08-07T15:39:19+00:00"
         },
         {
+            "name": "oskarstark/enum-helper",
+            "version": "1.5.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/OskarStark/enum-helper.git",
+                "reference": "839bbde09f66d50553c71e87d1eae378bbcec4ff"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/OskarStark/enum-helper/zipball/839bbde09f66d50553c71e87d1eae378bbcec4ff",
+                "reference": "839bbde09f66d50553c71e87d1eae378bbcec4ff",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.2"
+            },
+            "require-dev": {
+                "ergebnis/php-cs-fixer-config": "^5.16",
+                "phpstan/phpstan": "^1.11.8",
+                "phpunit/phpunit": "^9.6.20"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "OskarStark\\Enum\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Oskar Stark",
+                    "email": "oskarstark@googlemail.com"
+                }
+            ],
+            "description": "This library provides helpers for several enum operations",
+            "keywords": [
+                "enum"
+            ],
+            "support": {
+                "issues": "https://github.com/OskarStark/enum-helper/issues",
+                "source": "https://github.com/OskarStark/enum-helper/tree/1.5.0"
+            },
+            "time": "2024-09-19T20:02:53+00:00"
+        },
+        {
             "name": "oskarstark/readable-filesize-extension",
             "version": "1.2.1",
             "source": {
@@ -1029,19 +1077,20 @@
         },
         {
             "name": "php-llm/llm-chain",
-            "version": "0.10.0",
+            "version": "0.14.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-llm/llm-chain.git",
-                "reference": "8365e13aa892abfc3a2c54d2067c82cf8e30e830"
+                "reference": "86b80f9719cc1a4feb632c7ce391ded40cb3715b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-llm/llm-chain/zipball/8365e13aa892abfc3a2c54d2067c82cf8e30e830",
-                "reference": "8365e13aa892abfc3a2c54d2067c82cf8e30e830",
+                "url": "https://api.github.com/repos/php-llm/llm-chain/zipball/86b80f9719cc1a4feb632c7ce391ded40cb3715b",
+                "reference": "86b80f9719cc1a4feb632c7ce391ded40cb3715b",
                 "shasum": ""
             },
             "require": {
+                "oskarstark/enum-helper": "^1.5",
                 "php": ">=8.2",
                 "phpdocumentor/reflection-docblock": "^5.4",
                 "psr/cache": "^3.0",
@@ -1072,6 +1121,7 @@
                 "symfony/css-selector": "^6.4 || ^7.1",
                 "symfony/dom-crawler": "^6.4 || ^7.1",
                 "symfony/dotenv": "^6.4 || ^7.1",
+                "symfony/event-dispatcher": "^6.4 || ^7.1",
                 "symfony/finder": "^6.4 || ^7.1",
                 "symfony/process": "^6.4 || ^7.1",
                 "symfony/var-dumper": "^6.4 || ^7.1"
@@ -1102,9 +1152,9 @@
             "description": "A slim PHP component with tooling around LLMs.",
             "support": {
                 "issues": "https://github.com/php-llm/llm-chain/issues",
-                "source": "https://github.com/php-llm/llm-chain/tree/0.10.0"
+                "source": "https://github.com/php-llm/llm-chain/tree/0.14.0"
             },
-            "time": "2024-12-19T07:34:29+00:00"
+            "time": "2025-01-06T17:45:04+00:00"
         },
         {
             "name": "phpdocumentor/reflection-common",

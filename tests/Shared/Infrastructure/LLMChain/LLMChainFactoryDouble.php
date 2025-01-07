@@ -7,7 +7,7 @@ namespace ChronicleKeeper\Test\Shared\Infrastructure\LLMChain;
 use ChronicleKeeper\Shared\Infrastructure\LLMChain\LLMChainFactory;
 use Override;
 use PhpLlm\LlmChain\ChainInterface;
-use PhpLlm\LlmChain\Model\Message\MessageBag;
+use PhpLlm\LlmChain\Model\Message\MessageBagInterface;
 use PhpLlm\LlmChain\Model\Model;
 use PhpLlm\LlmChain\Model\Response\ResponseInterface;
 use PhpLlm\LlmChain\PlatformInterface;
@@ -27,7 +27,7 @@ class LLMChainFactoryDouble extends LLMChainFactory
     {
         return new class implements ChainInterface {
             /** @inheritDoc */
-            public function call(MessageBag $messages, array $options = []): ResponseInterface
+            public function call(MessageBagInterface $messages, array $options = []): ResponseInterface
             {
                 return new class implements ResponseInterface {
                     public function getContent(): string

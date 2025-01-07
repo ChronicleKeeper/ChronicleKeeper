@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace ChronicleKeeper\Test\ImageGenerator\Application\Service;
 
 use ChronicleKeeper\ImageGenerator\Application\Service\OpenAIGenerator;
-use ChronicleKeeper\ImageGenerator\Infrastructure\LLMChain\Bridge\OpenAI\DallE;
-use ChronicleKeeper\ImageGenerator\Infrastructure\LLMChain\Bridge\OpenAI\DallE\Base64ImageResponse;
 use ChronicleKeeper\Shared\Infrastructure\LLMChain\LLMChainFactory;
+use PhpLlm\LlmChain\Bridge\OpenAI\DallE;
+use PhpLlm\LlmChain\Bridge\OpenAI\DallE\Base64Image;
+use PhpLlm\LlmChain\Bridge\OpenAI\DallE\ImageResponse;
 use PhpLlm\LlmChain\PlatformInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
@@ -29,7 +30,7 @@ class OpenAIGeneratorTest extends TestCase
                 self::isInstanceOf(DallE::class),
                 'bar',
             )
-            ->willReturn(new Base64ImageResponse('bar', 'foo'));
+            ->willReturn(new ImageResponse('bar', new Base64Image('foo')));
 
         $chainFactory = $this->createMock(LLMChainFactory::class);
         $chainFactory->expects($this->once())

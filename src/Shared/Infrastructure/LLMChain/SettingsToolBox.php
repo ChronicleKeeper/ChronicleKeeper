@@ -52,7 +52,7 @@ class SettingsToolBox implements ToolBoxInterface
      * possibility of changing the names and descriptions parsed from the class attributes if
      * there are custom settings of the application are available.
      */
-    public function execute(ToolCall $toolCall): string
+    public function execute(ToolCall $toolCall): mixed
     {
         return $this->llmToolBox->execute($toolCall);
     }

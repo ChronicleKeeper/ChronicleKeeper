@@ -37,7 +37,7 @@ class PromptOptimizer
 
         $this->chatMessageExecution->execute($originPrompt, $conversation);
 
-        $messages        = $conversation->getMessages()->getLLMChainMessages()->getArrayCopy();
+        $messages        = $conversation->getMessages()->getLLMChainMessages()->getMessages();
         $optimizedPrompt = $messages[array_key_last($messages)];
         assert($optimizedPrompt instanceof AssistantMessage);
 

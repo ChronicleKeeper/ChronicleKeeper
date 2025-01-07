@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Shared\Infrastructure\LLMChain;
 
-use ChronicleKeeper\ImageGenerator\Infrastructure\LLMChain\Bridge\OpenAI\DallE\ModelClient as DalleModelClient;
 use ChronicleKeeper\Settings\Application\SettingsHandler;
+use PhpLlm\LlmChain\Bridge\OpenAI\DallE\ModelClient as DallEModelClient;
 use PhpLlm\LlmChain\Bridge\OpenAI\Embeddings\ModelClient as EmbeddingsModelClient;
 use PhpLlm\LlmChain\Bridge\OpenAI\Embeddings\ResponseConverter as EmbeddingsResponseConverter;
 use PhpLlm\LlmChain\Bridge\OpenAI\GPT;

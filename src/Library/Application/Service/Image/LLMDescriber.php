@@ -42,10 +42,10 @@ class LLMDescriber
         $userPromptText .= PHP_EOL . '### Some additional information about the image.' . PHP_EOL;
         $userPromptText .= 'Image Title: ' . $imageToAnalyze->getTitle() . PHP_EOL;
 
-        $messageBag[] = Message::ofUser(
+        $messageBag->add(Message::ofUser(
             $userPromptText,
             new LLMImage($imageToAnalyze->getImageUrl()),
-        );
+        ));
 
         $response = $this->chain->create()->call(
             $messageBag,
