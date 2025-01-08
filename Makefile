@@ -89,4 +89,19 @@ fix-all: ## fix all code issues
 	make rector
 	make fix-cs
 
+reset-filesystem:
+	rm -rf var/cache/dev/library/*
+	rm -rf var/data/document/*
+	rm -rf var/data/image/*
+	rm -rf var/data/database*
+	rm -rf var/directories/*
+	rm -rf var/documents/*
+	rm -rf var/generated_images/images/*
+	rm -rf var/generated_images/request/*
+	rm -rf var/library/conversations/*
+	rm -rf var/library/images/*
+	rm -rf var/tmp/*
+	rm -rf var/favorites.json
+	rm -rf var/system_prompts.json
+
 build: lint-php check-cs static-analysis phpunit
