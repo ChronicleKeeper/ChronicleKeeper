@@ -6,7 +6,9 @@ namespace ChronicleKeeper\Image\Application\Command;
 
 use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
 use ChronicleKeeper\Shared\Infrastructure\Messenger\MessageEventResult;
+use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
+#[AsMessageHandler]
 class StoreImageHandler
 {
     public function __construct(

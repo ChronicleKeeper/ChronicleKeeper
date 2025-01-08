@@ -16,8 +16,10 @@ use ChronicleKeeper\Library\Domain\Event\DirectoryDeleted;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
 use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
 use ChronicleKeeper\Shared\Infrastructure\Messenger\MessageEventResult;
+use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Messenger\MessageBusInterface;
 
+#[AsMessageHandler]
 class DeleteDirectoryHandler
 {
     public function __construct(

@@ -8,7 +8,9 @@ use ChronicleKeeper\Image\Domain\Event\ImageDeleted;
 use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemVectorImageRepository;
 use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
 use ChronicleKeeper\Shared\Infrastructure\Messenger\MessageEventResult;
+use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
+#[AsMessageHandler]
 class DeleteImageHandler
 {
     public function __construct(
