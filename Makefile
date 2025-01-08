@@ -3,6 +3,7 @@ SHELL := /bin/bash
 
 OPTS=
 ROOT_DIR:=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
+PHP=PHP_INI_SCAN_DIR=:$(ROOT_DIR)/config/sqlite/ php
 
 help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
@@ -52,23 +53,20 @@ phpdesktop: ## build phpdesktop release
 	cd build/www; rm composer.lock composer.json
 
 serve-symfony: ## start dev webserver with symfony cli
-	symfony local:server:start --no-tls
-
-serve-frankenphp: ## start dev webserver with frankenphp cli
-	PHP_INI_SCAN_DIR=$(ROOT_DIR)/config/phpdesktop/php.ini frankenphp php-server -l 127.0.0.1:8000 -r public
+	PHP_INI_SCAN_DIR=:$(ROOT_DIR)/config/sqlite/ symfony local:server:start --no-tls
 
 check-cs: ## check coding standards
-	vendor/bin/phpcs -n
+	$(PHP) vendor/bin/phpcs -n
 
 fix-cs: ## auto-fix coding standards
-	vendor/bin/phpcbf -n
+	$(PHP) vendor/bin/phpcbf -n
 
 static-analysis: ## runs static analysis
-	 vendor/bin/phpstan analyse -c phpstan.neon
+	 $(PHP) vendor/bin/phpstan analyse -c phpstan.neon
 
 phpunit: ## run phpunit
-	APP_ENV=test php bin/console cache:clear
-	 vendor/bin/phpunit --colors
+	APP_ENV=test $(PHP) bin/console cache:clear
+	$(PHP) vendor/bin/phpunit --colors
 
 coverage: ## run phpunit with generating coverage report
 	XDEBUG_MODE=coverage vendor/bin/phpunit --coverage-html=coverage --coverage-clover=coverage.xml
@@ -78,12 +76,12 @@ lint-php: ## linting php files
 	 if find tests -name "*.php" -exec php -l {} \; | grep -v "No syntax errors detected"; then exit 1; fi
 
 frontend: ## run symfony frontend build commands
-	php bin/console assets:install public
-	php bin/console importmap:install
-	php bin/console ux:icons:lock
+	$(PHP) bin/console assets:install public
+	$(PHP) bin/console importmap:install
+	$(PHP) bin/console ux:icons:lock
 
 rector: ## Exectute all rector rules
-	php vendor/bin/rector
+	$(PHP) vendor/bin/rector
 
 fix-all: ## fix all code issues
 	make rector

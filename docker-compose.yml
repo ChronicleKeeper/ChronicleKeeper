@@ -1,9 +1,0 @@
-services:
-  frankenphp:
-    ports:
-      - '80:80'
-      - '443:443'
-      - '443:443/udp'
-    volumes:
-      - $PWD:/app
-    image: 'dunglas/frankenphp:latest'
