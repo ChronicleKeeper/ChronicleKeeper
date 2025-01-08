@@ -16,9 +16,9 @@ interface DatabasePlatform
     /**
      * @param array<string, mixed> $parameters
      *
-     * @return array<string, mixed>
+     * @return array<string, mixed>|null
      */
-    public function fetchSingleRow(string $sql, array $parameters = []): array;
+    public function fetchSingleRow(string $sql, array $parameters = []): array|null;
 
     /** @param array<string, mixed> $parameters */
     public function query(string $sql, array $parameters = []): void;

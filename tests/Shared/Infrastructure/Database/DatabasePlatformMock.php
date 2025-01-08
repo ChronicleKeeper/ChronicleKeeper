@@ -116,12 +116,12 @@ final class DatabasePlatformMock implements DatabasePlatform
     }
 
     /** @inheritDoc */
-    public function fetchSingleRow(string $sql, array $parameters = []): array
+    public function fetchSingleRow(string $sql, array $parameters = []): array|null
     {
         $result = $this->fetch($sql, $parameters);
         Assert::assertLessThan(2, count($result), 'Expected single row, got ' . count($result));
 
-        return $result[0] ?? [];
+        return $result[0] ?? null;
     }
 
     /** @inheritDoc */

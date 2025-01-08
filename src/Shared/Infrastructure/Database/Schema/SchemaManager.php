@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace ChronicleKeeper\Shared\Infrastructure\Database\Schema;
 
 use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\DependencyInjection\Attribute\Lazy;
 use Throwable;
@@ -25,6 +27,7 @@ class SchemaManager
         private readonly iterable $schemaProviders,
         #[AutowireIterator('chronicle_keeper.data_provider')]
         private readonly iterable $dataProviders,
+        private readonly LoggerInterface $logger = new NullLogger(),
     ) {
     }
 
@@ -37,6 +40,7 @@ class SchemaManager
             usort($providers, static fn (SchemaProvider $a, SchemaProvider $b) => $a->getPriority() <=> $b->getPriority());
 
             foreach ($providers as $schemaProvider) {
+                $this->logger->debug('Creating schema with provider ' . $schemaProvider::class);
                 $schemaProvider->createSchema($this->platform);
             }
 
@@ -44,6 +48,7 @@ class SchemaManager
             usort($providers, static fn (DataProvider $a, DataProvider $b) => $a->getPriority() <=> $b->getPriority());
 
             foreach ($providers as $dataProvider) {
+                $this->logger->debug('Loading data with provider ' . $dataProvider::class);
                 $dataProvider->loadData($this->platform);
             }
 

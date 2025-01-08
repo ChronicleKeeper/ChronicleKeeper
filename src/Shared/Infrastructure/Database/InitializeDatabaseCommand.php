@@ -12,6 +12,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Filesystem\Filesystem;
+use Throwable;
 
 #[AsCommand(
     name: 'app:db:init',
@@ -50,8 +51,16 @@ final class InitializeDatabaseCommand extends Command
         }
 
         $this->filesystem->remove($filename);
-        $this->schemaManager->createSchema();
+        try {
+            $this->schemaManager->createSchema();
+        } catch (Throwable $e) {
+            $io->writeln('');
+            $io->error('An error occurred while creating the database: ' . $e->getMessage());
 
+            return self::FAILURE;
+        }
+
+        $io->writeln('');
         $io->success('Database was created and successfully stored at "' . $filename . '".');
 
         return self::SUCCESS;

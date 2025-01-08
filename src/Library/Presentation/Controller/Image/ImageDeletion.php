@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Library\Presentation\Controller\Image;
 
+use ChronicleKeeper\Image\Application\Command\DeleteImage;
 use ChronicleKeeper\Image\Domain\Entity\Image;
-use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemImageRepository;
-use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemVectorImageRepository;
 use ChronicleKeeper\Shared\Presentation\FlashMessages\Alert;
 use ChronicleKeeper\Shared\Presentation\FlashMessages\HandleFlashMessages;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Requirement\Requirement;
 use Symfony\Component\Routing\RouterInterface;
@@ -28,8 +28,7 @@ class ImageDeletion extends AbstractController
 
     public function __construct(
         private readonly RouterInterface $router,
-        private readonly FilesystemImageRepository $imageRepository,
-        private readonly FilesystemVectorImageRepository $vectorImageRepository,
+        private readonly MessageBusInterface $bus,
     ) {
     }
 
@@ -45,11 +44,7 @@ class ImageDeletion extends AbstractController
             return new RedirectResponse($this->router->generate('library', ['directory' => $image->getDirectory()->getId()]));
         }
 
-        foreach ($this->vectorImageRepository->findAllByImageId($image->getId()) as $vectorImage) {
-            $this->vectorImageRepository->remove($vectorImage);
-        }
-
-        $this->imageRepository->remove($image);
+        $this->bus->dispatch(new DeleteImage($image));
 
         $this->addFlashMessage(
             $request,

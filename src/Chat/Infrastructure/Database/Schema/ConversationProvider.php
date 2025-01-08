@@ -16,8 +16,14 @@ final class ConversationProvider extends DefaultSchemaProvider
             CREATE TABLE conversations (
                 id TEXT PRIMARY KEY,
                 title TEXT NOT NULL,
-                directory TEXT NOT NULL
+                directory TEXT NOT NULL,
+                FOREIGN KEY(directory) REFERENCES directories(id)
             );
+        SQL);
+
+        $platform->query(<<<'SQL'
+            CREATE INDEX idx_conversation_directory
+            ON conversations (directory);
         SQL);
 
         $platform->query(<<<'SQL'

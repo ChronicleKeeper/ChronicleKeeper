@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Library\Presentation\Twig;
 
+use ChronicleKeeper\Library\Application\Query\FindAllDirectories;
 use ChronicleKeeper\Library\Domain\RootDirectory;
-use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemDirectoryRepository;
+use ChronicleKeeper\Shared\Application\Query\QueryService;
 use Symfony\UX\TwigComponent\Attribute\AsTwigComponent;
 
 use function array_merge;
@@ -18,7 +19,7 @@ class DirectorySelection
     public string $preSelected = RootDirectory::ID;
 
     public function __construct(
-        private readonly FilesystemDirectoryRepository $directoryRepository,
+        private readonly QueryService $queryService,
     ) {
     }
 
@@ -29,7 +30,7 @@ class DirectorySelection
         $directories   = [$rootDirectory->getId() => $rootDirectory->getTitle()];
 
         $addedDirectories = [];
-        foreach ($this->directoryRepository->findAll() as $foundDirectory) {
+        foreach ($this->queryService->query(new FindAllDirectories()) as $foundDirectory) {
             $addedDirectories[$foundDirectory->getId()] = $foundDirectory->flattenHierarchyTitle();
         }
 

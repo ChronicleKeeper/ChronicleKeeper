@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Library\Infrastructure\Serializer;
 
+use ChronicleKeeper\Image\Application\Query\GetImage;
 use ChronicleKeeper\Image\Domain\Entity\Image;
 use ChronicleKeeper\Library\Domain\Entity\Directory;
-use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemImageRepository;
+use ChronicleKeeper\Shared\Application\Query\QueryService;
 use DateTimeImmutable;
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Serializer\Normalizer\DenormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Webmozart\Assert\Assert;
@@ -26,7 +26,7 @@ class ImageDenormalizer implements DenormalizerInterface, DenormalizerAwareInter
 
     private DenormalizerInterface $denormalizer;
 
-    public function __construct(private readonly FilesystemImageRepository $imageRepository)
+    public function __construct(private readonly QueryService $queryService)
     {
     }
 
@@ -39,7 +39,7 @@ class ImageDenormalizer implements DenormalizerInterface, DenormalizerAwareInter
     public function denormalize(mixed $data, string $type, string|null $format = null, array $context = []): Image
     {
         if (is_string($data)) {
-            return $this->imageRepository->findById($data) ?? throw new NotFoundHttpException();
+            return $this->queryService->query(new GetImage($data));
         }
 
         Assert::isArray($data);

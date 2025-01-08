@@ -12,7 +12,6 @@ use InvalidArgumentException;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 use function assert;
-use function count;
 use function json_decode;
 
 use const JSON_THROW_ON_ERROR;
@@ -34,7 +33,7 @@ final readonly class GetGeneratorRequestQuery implements Query
             ['id' => $parameters->id],
         );
 
-        if (count($request) === 0) {
+        if ($request === null) {
             throw new InvalidArgumentException('Generator Request not found');
         }
 

@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Library\Infrastructure\Serializer;
 
+use ChronicleKeeper\Library\Application\Query\FindDirectoryById;
 use ChronicleKeeper\Library\Domain\Entity\Directory;
 use ChronicleKeeper\Library\Domain\RootDirectory;
-use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemDirectoryRepository;
+use ChronicleKeeper\Shared\Application\Query\QueryService;
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 use Symfony\Component\Serializer\Normalizer\DenormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
@@ -24,7 +25,7 @@ class DirectoryDenormalizer implements DenormalizerInterface, DenormalizerAwareI
 
     private DenormalizerInterface $denormalizer;
 
-    public function __construct(private readonly FilesystemDirectoryRepository $documentRepository)
+    public function __construct(private readonly QueryService $queryService)
     {
     }
 
@@ -37,7 +38,11 @@ class DirectoryDenormalizer implements DenormalizerInterface, DenormalizerAwareI
     public function denormalize(mixed $data, string $type, string|null $format = null, array $context = []): Directory
     {
         if (is_string($data)) {
-            return $this->documentRepository->findById($data) ?? RootDirectory::get(); // Throw Exception instead?
+            if ($data === RootDirectory::ID) {
+                return RootDirectory::get();
+            }
+
+            return $this->queryService->query(new FindDirectoryById($data));
         }
 
         Assert::isArray($data);
@@ -48,11 +53,12 @@ class DirectoryDenormalizer implements DenormalizerInterface, DenormalizerAwareI
             return $this->cachedEntries[$data['id']];
         }
 
-        $directory = new Directory(
-            $data['id'],
-            $data['title'],
-            $this->denormalizer->denormalize($data['parent'], Directory::class, $format, $context),
-        );
+        $parent = $data['parent'] ?? RootDirectory::get();
+        if (! $parent instanceof Directory) {
+            $parent = $this->denormalizer->denormalize($parent, Directory::class, $format, $context);
+        }
+
+        $directory = new Directory($data['id'], $data['title'], $parent);
 
         $this->cachedEntries[$directory->getId()] = $directory;
 

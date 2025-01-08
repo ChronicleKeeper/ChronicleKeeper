@@ -13,8 +13,8 @@ use ChronicleKeeper\Favorizer\Domain\ValueObject\ChatConversationTarget;
 use ChronicleKeeper\Favorizer\Domain\ValueObject\LibraryDocumentTarget;
 use ChronicleKeeper\Favorizer\Domain\ValueObject\LibraryImageTarget;
 use ChronicleKeeper\Favorizer\Domain\ValueObject\Target;
+use ChronicleKeeper\Image\Application\Query\GetImage;
 use ChronicleKeeper\Image\Domain\Entity\Image;
-use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemImageRepository;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
 
 use function Symfony\Component\String\u;
@@ -22,7 +22,6 @@ use function Symfony\Component\String\u;
 class TargetFactory
 {
     public function __construct(
-        private readonly FilesystemImageRepository $filesystemImageRepository,
         private readonly QueryService $queryService,
     ) {
     }
@@ -34,9 +33,7 @@ class TargetFactory
         }
 
         if ($type === Image::class) {
-            return $this->createFromImage(
-                $this->filesystemImageRepository->findById($id) ?? throw UnknownMedium::notFound($id, $type),
-            );
+            return $this->createFromImage($this->queryService->query(new GetImage($id)));
         }
 
         if ($type === Conversation::class) {

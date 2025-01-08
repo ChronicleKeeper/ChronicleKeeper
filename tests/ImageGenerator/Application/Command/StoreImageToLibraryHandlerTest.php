@@ -4,11 +4,10 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Test\ImageGenerator\Application\Command;
 
-use ChronicleKeeper\Image\Domain\Entity\Image;
+use ChronicleKeeper\Image\Application\Command\StoreImage;
 use ChronicleKeeper\ImageGenerator\Application\Command\StoreImageToLibrary;
 use ChronicleKeeper\ImageGenerator\Application\Command\StoreImageToLibraryHandler;
 use ChronicleKeeper\ImageGenerator\Domain\ValueObject\OptimizedPrompt;
-use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemImageRepository;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
 use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
 use ChronicleKeeper\Test\ImageGenerator\Domain\Entity\GeneratorRequestBuilder;
@@ -17,6 +16,8 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Webmozart\Assert\InvalidArgumentException;
 
 #[CoversClass(StoreImageToLibraryHandler::class)]
@@ -53,17 +54,20 @@ class StoreImageToLibraryHandlerTest extends TestCase
     {
         $databasePlatform = $this->createMock(DatabasePlatform::class);
 
-        $imageRepository = $this->createMock(FilesystemImageRepository::class);
-        $imageRepository->expects($this->once())
-            ->method('store')
-            ->with(self::callback(static function (Image $image): bool {
+        $messageBus = $this->createMock(MessageBusInterface::class);
+        $messageBus->expects($this->once())
+            ->method('dispatch')
+            ->with(self::callback(static function (StoreImage $command): bool {
+                $image = $command->image;
+
                 self::assertSame('Foo Bar', $image->getTitle());
                 self::assertSame('image/png', $image->getMimeType());
                 self::assertSame('Encoded Image', $image->getEncodedImage());
                 self::assertSame('Default Prompt', $image->getDescription());
 
                 return true;
-            }));
+            }))
+            ->willReturn(new Envelope($this->createMock(StoreImage::class)));
 
         $queryService = $this->createMock(QueryService::class);
 
@@ -94,7 +98,7 @@ class StoreImageToLibraryHandlerTest extends TestCase
                 }),
             );
 
-        $handler = new StoreImageToLibraryHandler($imageRepository, $queryService, $databasePlatform);
+        $handler = new StoreImageToLibraryHandler($queryService, $databasePlatform, $messageBus);
 
         $request = new StoreImageToLibrary(
             '123e4567-e89b-12d3-a456-426614174000',

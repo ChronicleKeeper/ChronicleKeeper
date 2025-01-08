@@ -6,11 +6,11 @@ namespace ChronicleKeeper\Library\Application\Service;
 
 use ChronicleKeeper\Chat\Application\Query\FindConversationsByDirectoryParameters;
 use ChronicleKeeper\Document\Application\Query\FindDocumentsByDirectory;
+use ChronicleKeeper\Image\Application\Query\FindImagesByDirectory;
+use ChronicleKeeper\Library\Application\Query\FindDirectoriesByParent;
 use ChronicleKeeper\Library\Domain\Entity\Directory as DirectoryEntity;
 use ChronicleKeeper\Library\Domain\ValueObject\DirectoryCache\Directory;
 use ChronicleKeeper\Library\Domain\ValueObject\DirectoryCache\Element;
-use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemDirectoryRepository;
-use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemImageRepository;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
 
 use function strcasecmp;
@@ -19,8 +19,6 @@ use function usort;
 class CacheBuilder
 {
     public function __construct(
-        private readonly FilesystemImageRepository $imageRepository,
-        private readonly FilesystemDirectoryRepository $directoryRepository,
         private readonly QueryService $queryService,
     ) {
     }
@@ -35,7 +33,7 @@ class CacheBuilder
         $cacheDirectory = Directory::fromEntity($directory);
 
         // Add directories to the cache
-        $childDirectories = $this->directoryRepository->findByParent($directory);
+        $childDirectories = $this->queryService->query(new FindDirectoriesByParent($directory->getId()));
         foreach ($childDirectories as $childDirectory) {
             $cacheDirectory->directories[] = Directory::fromEntity($childDirectory);
         }
@@ -57,7 +55,7 @@ class CacheBuilder
         unset($documents);
 
         // Add images to the cache
-        $images = $this->imageRepository->findByDirectory($directory);
+        $images = $this->queryService->query(new FindImagesByDirectory($directory->getId()));
         foreach ($images as $image) {
             $cacheDirectory->elements[] = Element::fromImageEntity($image);
         }

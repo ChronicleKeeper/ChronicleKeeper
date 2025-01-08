@@ -14,7 +14,6 @@ use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 use function assert;
-use function count;
 
 class FindConversationByIdQuery implements Query
 {
@@ -35,7 +34,7 @@ class FindConversationByIdQuery implements Query
             ['id' => $parameters->id],
         );
 
-        if (count($data) === 0) {
+        if ($data === null) {
             return null;
         }
 

@@ -87,15 +87,12 @@ class DocumentCreationTest extends WebTestCase
         self::assertResponseRedirects('/library');
 
         // Check the new document is stored
-        $fileAccess = $this->client->getContainer()->get(FileAccess::class);
-        assert($fileAccess instanceof FileAccessDouble);
+        $documents = $this->databasePlatform->fetch('SELECT * FROM documents');
+        self::assertCount(1, $documents);
 
-        $files = $fileAccess->allOfType('library.documents');
-        self::assertCount(1, $files);
-
-        $document = reset($files);
-        self::assertStringContainsString('Test Title', $document);
-        self::assertStringContainsString('Test Content', $document);
+        $document = reset($documents);
+        self::assertStringContainsString('Test Title', $document['title']);
+        self::assertStringContainsString('Test Content', $document['content']);
     }
 
     #[Test]

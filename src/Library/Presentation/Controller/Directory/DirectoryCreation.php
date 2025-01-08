@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Library\Presentation\Controller\Directory;
 
+use ChronicleKeeper\Library\Application\Command\StoreDirectory;
 use ChronicleKeeper\Library\Domain\Entity\Directory;
-use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemDirectoryRepository;
 use ChronicleKeeper\Library\Presentation\Form\DirectoryType;
 use ChronicleKeeper\Shared\Presentation\FlashMessages\Alert;
 use ChronicleKeeper\Shared\Presentation\FlashMessages\HandleFlashMessages;
@@ -14,6 +14,7 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Requirement\Requirement;
 use Symfony\Component\Routing\RouterInterface;
@@ -35,8 +36,8 @@ class DirectoryCreation extends AbstractController
     public function __construct(
         private readonly Environment $environment,
         private readonly RouterInterface $router,
-        private readonly FilesystemDirectoryRepository $directoryRepository,
         private readonly FormFactoryInterface $formFactory,
+        private readonly MessageBusInterface $bus,
     ) {
     }
 
@@ -50,7 +51,7 @@ class DirectoryCreation extends AbstractController
             assert(is_array($directoryArray) && array_key_exists('title', $directoryArray));
 
             $directory = Directory::create($directoryArray['title'], $parentDirectory);
-            $this->directoryRepository->store($directory);
+            $this->bus->dispatch(new StoreDirectory($directory));
 
             $this->addFlashMessage(
                 $request,

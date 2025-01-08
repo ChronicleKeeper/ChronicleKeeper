@@ -6,9 +6,10 @@ namespace ChronicleKeeper\Test\Library\Application\Service;
 
 use ChronicleKeeper\Chat\Application\Query\FindConversationsByDirectoryParameters;
 use ChronicleKeeper\Document\Application\Query\FindDocumentsByDirectory;
+use ChronicleKeeper\Image\Application\Query\FindImagesByDirectory;
+use ChronicleKeeper\Library\Application\Query\FindDirectoriesByParent;
 use ChronicleKeeper\Library\Application\Service\CacheBuilder;
-use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemDirectoryRepository;
-use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemImageRepository;
+use ChronicleKeeper\Shared\Application\Query\QueryParameters;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
 use ChronicleKeeper\Test\Chat\Domain\Entity\ConversationBuilder;
 use ChronicleKeeper\Test\Document\Domain\Entity\DocumentBuilder;
@@ -24,26 +25,18 @@ use PHPUnit\Framework\TestCase;
 #[Small]
 class CacheBuilderTest extends TestCase
 {
-    private FilesystemImageRepository&MockObject $imageRepository;
-    private FilesystemDirectoryRepository&MockObject $directoryRepository;
     private QueryService&MockObject $queryService;
     private CacheBuilder $cacheBuilder;
 
     protected function setUp(): void
     {
-        $this->imageRepository     = $this->createMock(FilesystemImageRepository::class);
-        $this->directoryRepository = $this->createMock(FilesystemDirectoryRepository::class);
-        $this->queryService        = $this->createMock(QueryService::class);
-        $this->cacheBuilder        = new CacheBuilder(
-            $this->imageRepository,
-            $this->directoryRepository,
-            $this->queryService,
-        );
+        $this->queryService = $this->createMock(QueryService::class);
+        $this->cacheBuilder = new CacheBuilder($this->queryService);
     }
 
     protected function tearDown(): void
     {
-        unset($this->imageRepository, $this->directoryRepository, $this->queryService, $this->cacheBuilder);
+        unset($this->queryService, $this->cacheBuilder);
     }
 
     #[Test]
@@ -55,31 +48,37 @@ class CacheBuilderTest extends TestCase
         $image          = (new ImageBuilder())->withDirectory($directory)->build();
         $conversation   = (new ConversationBuilder())->withDirectory($directory)->build();
 
-        $this->directoryRepository->expects($this->once())
-            ->method('findByParent')
-            ->with($directory)
-            ->willReturn([$childDirectory]);
-
-        $this->queryService->expects($this->exactly(2))
+        $this->queryService->expects($this->exactly(4))
             ->method('query')
             ->willReturnCallback(
-                static function (FindDocumentsByDirectory|FindConversationsByDirectoryParameters $query) use ($document, $conversation) {
+                static function (QueryParameters $query) use ($document, $conversation, $childDirectory, $image) {
                     if ($query instanceof FindDocumentsByDirectory) {
                         self::assertSame($document->getDirectory()->getId(), $query->id);
 
                         return [$document];
                     }
 
-                    self::assertSame($conversation->getDirectory()->getId(), $query->directory->getId());
+                    if ($query instanceof FindConversationsByDirectoryParameters) {
+                        self::assertSame($conversation->getDirectory()->getId(), $query->directory->getId());
 
-                    return [$conversation];
+                        return [$conversation];
+                    }
+
+                    if ($query instanceof FindDirectoriesByParent) {
+                        self::assertSame($document->getDirectory()->getId(), $query->parentId);
+
+                        return [$childDirectory];
+                    }
+
+                    if ($query instanceof FindImagesByDirectory) {
+                        self::assertSame($image->getDirectory()->getId(), $query->id);
+
+                        return [$image];
+                    }
+
+                    self::fail('Unexpected query executed: ' . $query::class);
                 },
             );
-
-        $this->imageRepository->expects($this->once())
-            ->method('findByDirectory')
-            ->with($directory)
-            ->willReturn([$image]);
 
         $cacheDirectory = $this->cacheBuilder->build($directory);
 

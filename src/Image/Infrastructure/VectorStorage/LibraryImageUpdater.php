@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Image\Infrastructure\VectorStorage;
 
+use ChronicleKeeper\Image\Application\Query\FindAllImages;
 use ChronicleKeeper\Image\Domain\Entity\Image;
-use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemImageRepository;
 use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemVectorImageRepository;
 use ChronicleKeeper\Library\Infrastructure\VectorStorage\VectorImage;
+use ChronicleKeeper\Shared\Application\Query\QueryService;
 use ChronicleKeeper\Shared\Infrastructure\LLMChain\EmbeddingCalculator;
 use Psr\Log\LoggerInterface;
 
@@ -20,14 +21,14 @@ class LibraryImageUpdater
     public function __construct(
         private readonly LoggerInterface $logger,
         private readonly EmbeddingCalculator $embeddingCalculator,
-        private readonly FilesystemImageRepository $imageRepository,
         private readonly FilesystemVectorImageRepository $vectorImageRepository,
+        private readonly QueryService $queryService,
     ) {
     }
 
     public function updateAll(): void
     {
-        foreach ($this->imageRepository->findAll() as $image) {
+        foreach ($this->queryService->query(new FindAllImages()) as $image) {
             $this->updateOrCreateVectorsForImage($image);
         }
     }

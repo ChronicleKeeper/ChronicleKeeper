@@ -7,16 +7,16 @@ namespace ChronicleKeeper\Document\Application\Query;
 use ChronicleKeeper\Document\Domain\Entity\Document;
 use ChronicleKeeper\Shared\Application\Query\Query;
 use ChronicleKeeper\Shared\Application\Query\QueryParameters;
-use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
-use Symfony\Component\Serializer\SerializerInterface;
+use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 use function assert;
 
 class GetDocumentQuery implements Query
 {
     public function __construct(
-        private readonly FileAccess $fileAccess,
-        private readonly SerializerInterface $serializer,
+        private readonly DenormalizerInterface $denormalizer,
+        private readonly DatabasePlatform $databasePlatform,
     ) {
     }
 
@@ -24,10 +24,11 @@ class GetDocumentQuery implements Query
     {
         assert($parameters instanceof GetDocument);
 
-        return $this->serializer->deserialize(
-            $this->fileAccess->read('library.documents', $parameters->id . '.json'),
-            Document::class,
-            'json',
+        $document = $this->databasePlatform->fetchSingleRow(
+            'SELECT * FROM documents WHERE id = :id',
+            ['id' => $parameters->id],
         );
+
+        return $this->denormalizer->denormalize($document, Document::class);
     }
 }

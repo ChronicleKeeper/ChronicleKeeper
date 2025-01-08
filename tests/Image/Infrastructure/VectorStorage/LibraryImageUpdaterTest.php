@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Test\Image\Infrastructure\VectorStorage;
 
+use ChronicleKeeper\Image\Application\Query\FindAllImages;
 use ChronicleKeeper\Image\Infrastructure\VectorStorage\LibraryImageUpdater;
-use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemImageRepository;
 use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemVectorImageRepository;
 use ChronicleKeeper\Library\Infrastructure\VectorStorage\VectorImage;
+use ChronicleKeeper\Shared\Application\Query\QueryService;
 use ChronicleKeeper\Shared\Infrastructure\LLMChain\EmbeddingCalculator;
 use ChronicleKeeper\Test\Image\Domain\Entity\ImageBuilder;
 use ChronicleKeeper\Test\Image\Domain\Entity\VectorImageBuilder;
@@ -29,9 +30,10 @@ class LibraryImageUpdaterTest extends TestCase
     #[Test]
     public function itDoesNothingWhenThereAreNoImages(): void
     {
-        $imageRepository = $this->createMock(FilesystemImageRepository::class);
-        $imageRepository->expects($this->once())
-            ->method('findAll')
+        $queryService = $this->createMock(QueryService::class);
+        $queryService->expects($this->once())
+            ->method('query')
+            ->with(new FindAllImages())
             ->willReturn([]);
 
         $vectorImageRepository = $this->createMock(FilesystemVectorImageRepository::class);
@@ -45,8 +47,8 @@ class LibraryImageUpdaterTest extends TestCase
         $updater = new LibraryImageUpdater(
             new NullLogger(),
             $embeddingCalculator,
-            $imageRepository,
             $vectorImageRepository,
+            $queryService,
         );
         $updater->updateAll();
     }
@@ -59,9 +61,10 @@ class LibraryImageUpdaterTest extends TestCase
             ->withDescription('This is a test image.')
             ->build();
 
-        $imageRepository = $this->createMock(FilesystemImageRepository::class);
-        $imageRepository->expects($this->once())
-            ->method('findAll')
+        $queryService = $this->createMock(QueryService::class);
+        $queryService->expects($this->once())
+            ->method('query')
+            ->with(new FindAllImages())
             ->willReturn([$image]);
 
         $vectorImageRepository = $this->createMock(FilesystemVectorImageRepository::class);
@@ -97,8 +100,8 @@ class LibraryImageUpdaterTest extends TestCase
         $updater = new LibraryImageUpdater(
             new NullLogger(),
             $embeddingCalculator,
-            $imageRepository,
             $vectorImageRepository,
+            $queryService,
         );
         $updater->updateAll();
     }
@@ -117,9 +120,10 @@ class LibraryImageUpdaterTest extends TestCase
             ->withVector([10.1])
             ->build();
 
-        $imageRepository = $this->createMock(FilesystemImageRepository::class);
-        $imageRepository->expects($this->once())
-            ->method('findAll')
+        $queryService = $this->createMock(QueryService::class);
+        $queryService->expects($this->once())
+            ->method('query')
+            ->with(new FindAllImages())
             ->willReturn([$image]);
 
         $vectorImageRepository = $this->createMock(FilesystemVectorImageRepository::class);
@@ -136,8 +140,8 @@ class LibraryImageUpdaterTest extends TestCase
         $updater = new LibraryImageUpdater(
             new NullLogger(),
             $embeddingCalculator,
-            $imageRepository,
             $vectorImageRepository,
+            $queryService,
         );
         $updater->updateAll();
     }
@@ -156,9 +160,10 @@ class LibraryImageUpdaterTest extends TestCase
             ->withVector([10.1])
             ->build();
 
-        $imageRepository = $this->createMock(FilesystemImageRepository::class);
-        $imageRepository->expects($this->once())
-            ->method('findAll')
+        $queryService = $this->createMock(QueryService::class);
+        $queryService->expects($this->once())
+            ->method('query')
+            ->with(new FindAllImages())
             ->willReturn([$image]);
 
         $vectorImageRepository = $this->createMock(FilesystemVectorImageRepository::class);
@@ -194,8 +199,8 @@ class LibraryImageUpdaterTest extends TestCase
         $updater = new LibraryImageUpdater(
             new NullLogger(),
             $embeddingCalculator,
-            $imageRepository,
             $vectorImageRepository,
+            $queryService,
         );
         $updater->updateAll();
     }
@@ -221,8 +226,8 @@ class LibraryImageUpdaterTest extends TestCase
         $updater = new LibraryImageUpdater(
             self::createStub(LoggerInterface::class),
             $embeddingCalculator,
-            self::createStub(FilesystemImageRepository::class),
             self::createStub(FilesystemVectorImageRepository::class),
+            self::createStub(QueryService::class),
         );
 
         $reflection = new ReflectionClass(LibraryImageUpdater::class);

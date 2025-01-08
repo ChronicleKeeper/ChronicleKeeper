@@ -9,9 +9,7 @@ use ChronicleKeeper\Document\Presentation\Form\DocumentUploadType;
 use ChronicleKeeper\Library\Domain\RootDirectory;
 use ChronicleKeeper\Library\Presentation\Twig\DirectoryBreadcrumb;
 use ChronicleKeeper\Shared\Infrastructure\LLMChain\LLMChainFactory;
-use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
 use ChronicleKeeper\Test\Shared\Infrastructure\LLMChain\LLMChainFactoryDouble;
-use ChronicleKeeper\Test\Shared\Infrastructure\Persistence\Filesystem\FileAccessDouble;
 use ChronicleKeeper\Test\WebTestCase;
 use PhpLlm\LlmChain\Bridge\OpenAI\Embeddings;
 use PhpLlm\LlmChain\Document\Vector;
@@ -23,7 +21,6 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 
 use function assert;
-use function json_decode;
 use function reset;
 
 #[CoversClass(DocumentUpload::class)]
@@ -82,15 +79,10 @@ class DocumentUploadTest extends WebTestCase
         );
 
         // Check the new document is stored
-        $fileAccess = $this->client->getContainer()->get(FileAccess::class);
-        assert($fileAccess instanceof FileAccessDouble);
+        $documents = $this->databasePlatform->fetch('SELECT * FROM documents');
+        self::assertCount(1, $documents);
 
-        $files = $fileAccess->allOfType('library.documents');
-        self::assertCount(1, $files);
-
-        $document = reset($files);
-        $document = json_decode($document, associative: true);
-
+        $document = reset($documents);
         self::assertResponseRedirects('/library/document/' . $document['id']);
     }
 }

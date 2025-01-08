@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Library\Presentation\Form;
 
+use ChronicleKeeper\Library\Application\Query\FindAllDirectories;
+use ChronicleKeeper\Library\Application\Query\FindDirectoriesByParent;
 use ChronicleKeeper\Library\Domain\Entity\Directory;
-use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemDirectoryRepository;
+use ChronicleKeeper\Shared\Application\Query\QueryService;
 use Override;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -20,7 +22,7 @@ use function in_array;
 final class DirectoryChoiceType extends AbstractType
 {
     public function __construct(
-        private readonly FilesystemDirectoryRepository $directoryRepository,
+        private readonly QueryService $queryService,
     ) {
     }
 
@@ -37,7 +39,7 @@ final class DirectoryChoiceType extends AbstractType
                 'label' => 'Verschieben in Verzeichnis ...',
                 'translation_domain' => false,
                 'required' => false,
-                'choices' => $this->directoryRepository->findAll(),
+                'choices' => $this->queryService->query(new FindAllDirectories()),
                 'placeholder' => false,
                 'choice_value' => static fn (Directory $directory): string => $directory->getId(),
                 'choice_label' => static fn (Directory $directory): string => $directory->flattenHierarchyTitle(),
@@ -71,11 +73,27 @@ final class DirectoryChoiceType extends AbstractType
         foreach ($directories as $directory) {
             $reMappedDirectories = array_merge(
                 $reMappedDirectories,
-                $this->directoryRepository->fetchFlattenedTree($directory),
+                $this->fetchFlattenedTree($directory),
             );
         }
 
         return $reMappedDirectories;
+    }
+
+    /** @return list<Directory> */
+    public function fetchFlattenedTree(Directory $root): array
+    {
+        $flattenedTree = [$root];
+
+        $children = $this->queryService->query(new FindDirectoriesByParent($root->getId()));
+        foreach ($children as $child) {
+            $flattenedTree = array_merge(
+                $flattenedTree,
+                $this->fetchFlattenedTree($child),
+            );
+        }
+
+        return $flattenedTree;
     }
 
     /**
