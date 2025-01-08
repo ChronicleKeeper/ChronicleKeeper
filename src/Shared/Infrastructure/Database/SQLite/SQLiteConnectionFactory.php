@@ -8,7 +8,9 @@ use RuntimeException;
 use SQLite3;
 
 use function sprintf;
+use function substr;
 
+use const DIRECTORY_SEPARATOR;
 use const PHP_OS_FAMILY;
 
 final class SQLiteConnectionFactory
@@ -47,7 +49,20 @@ final class SQLiteConnectionFactory
 
     private function loadExtension(SQLite3 $connection, string $extension): void
     {
-        $extensionFileName = $this->projectRoot . '/config/sqlite/' . $extension;
+        $extensionFileName = $this->projectRoot
+            . DIRECTORY_SEPARATOR . 'config'
+            . DIRECTORY_SEPARATOR . 'sqlite'
+            . DIRECTORY_SEPARATOR . $extension;
+
+        if (PHP_OS_FAMILY === 'Windows') {
+            /**
+             * Because the extension loader prefixes anything with Backslash we have to remove the drive from
+             * the extension path. This will result in an incompability for running the application in other
+             * drives than C: but this is a limitation of the SQLite3 extension loader on Windows until we
+             * may find another soltution with an installer that is automatically changing the php.ini file.
+             */
+            $extensionFileName = substr($extensionFileName, 3);
+        }
 
         if (! $connection->loadExtension($extensionFileName)) {
             throw new RuntimeException(

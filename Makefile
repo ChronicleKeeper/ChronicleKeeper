@@ -40,16 +40,17 @@ phpdesktop: ## build phpdesktop release
 	cd build/www; rm -rf *
 	cd build; rm -rf php/*
 	cd build; mv php-desktop.exe ChronicleKeeper.exe
-	cd build/php; wget https://windows.php.net/downloads/releases/latest/php-8.3-nts-Win32-vs16-x64-latest.zip
-	cd build/php; unzip php-8.3-nts-Win32-vs16-x64-latest.zip
-	cd build/php; rm php-8.3-nts-Win32-vs16-x64-latest.zip
+	cd build/php; wget https://windows.php.net/downloads/releases/latest/php-8.4-nts-Win32-vs17-x64-latest.zip
+	cd build/php; unzip php-8.4-nts-Win32-vs17-x64-latest.zip
+	cd build/php; rm php-8.4-nts-Win32-vs17-x64-latest.zip
 
 	git archive HEAD | (cd build/www; tar x)
 	cd build/www; mv config/phpdesktop/php.ini ../php
 	cd build/www; mv config/phpdesktop/settings.json ../
 	cd build/www; APP_ENV=prod composer install --optimize-autoloader --no-dev --prefer-dist --no-progress
-	cd build/www; APP_ENV=prod php bin/console asset-map:compile
-	cd build/www; APP_ENV=prod php bin/console cache:warmup
+	cd build/www; APP_ENV=prod $(PHP) bin/console asset-map:compile
+	cd build/www; APP_ENV=prod $(PHP) bin/console cache:warmup
+	cd build/www; APP_ENV=prod $(PHP) bin/console app:db:init --force -vvv
 	cd build/www; rm composer.lock composer.json
 
 serve-symfony: ## start dev webserver with symfony cli
@@ -82,6 +83,9 @@ frontend: ## run symfony frontend build commands
 
 rector: ## Exectute all rector rules
 	$(PHP) vendor/bin/rector
+
+init-db: ## Initializes the database, forces recreation
+	$(PHP) bin/console app:db:init --force -vvv
 
 fix-all: ## fix all code issues
 	make rector

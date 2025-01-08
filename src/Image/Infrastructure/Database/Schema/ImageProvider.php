@@ -19,7 +19,7 @@ final class ImageProvider extends DefaultSchemaProvider
                 encoded_image TEXT NOT NULL,
                 description TEXT NOT NULL,
                 directory TEXT NOT NULL,
-                updated_at TEXT NOT NULL,
+                last_updated TEXT NOT NULL,
                 FOREIGN KEY(directory) REFERENCES directories(id)
             );
         SQL);
