@@ -25,7 +25,7 @@ class StoreImageHandler
             'encoded_image' => $command->image->getEncodedImage(),
             'description' => $command->image->getDescription(),
             'directory' => $command->image->getDirectory()->getId(),
-            'updated_at' => $command->image->getUpdatedAt()->format('Y-m-d H:i:s'),
+            'last_updated' => $command->image->getUpdatedAt()->format('Y-m-d H:i:s'),
         ]);
 
         return new MessageEventResult($command->image->flushEvents());
