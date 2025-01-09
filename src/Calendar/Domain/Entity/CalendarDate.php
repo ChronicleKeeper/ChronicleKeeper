@@ -27,6 +27,21 @@ class CalendarDate
         }
     }
 
+    public function getYear(): int
+    {
+        return $this->year;
+    }
+
+    public function getMonth(): int
+    {
+        return $this->month;
+    }
+
+    public function getDay(): int
+    {
+        return $this->day;
+    }
+
     public function format(): string
     {
         $currentMonth = $this->calendar->getMonthOfTheYear($this->month);
