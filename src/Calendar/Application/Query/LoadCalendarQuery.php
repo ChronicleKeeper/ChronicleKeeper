@@ -14,12 +14,16 @@ final class LoadCalendarQuery implements Query
     {
         $calendar = new Calendar();
         $calendar->setMonths(
-            new Calendar\Month($calendar, 1, 'Januar', new Calendar\DayCollection(31)),
-            new Calendar\Month($calendar, 2, 'Februar', new Calendar\DayCollection(
-                28,
-                new Calendar\LeapDay(29, 'Heiliger Schalttag'),
+            new Calendar\Month($calendar, 1, 'Januar', new Calendar\DayCollection(
+                30,
+                new Calendar\LeapDay(31, 'Drei Könige'),
+                new Calendar\LeapDay(32, 'Vier Könige'),
             )),
-            new Calendar\Month($calendar, 3, 'März', new Calendar\DayCollection(31)),
+            new Calendar\Month($calendar, 2, 'Februar', new Calendar\DayCollection(
+                30,
+                new Calendar\LeapDay(31, 'Heiliger Schalttag'),
+            )),
+            new Calendar\Month($calendar, 3, 'März', new Calendar\DayCollection(30)),
             new Calendar\Month($calendar, 4, 'April', new Calendar\DayCollection(30)),
         );
 

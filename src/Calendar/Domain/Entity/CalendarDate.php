@@ -22,6 +22,7 @@ class CalendarDate
 
         // Check if day is valid for the given month
         $maxDaysInMonth = $month->days->count();
+
         if ($this->day < 1 || $this->day > $maxDaysInMonth) {
             throw new DayNotExistsInMonth($this->day, $this->month);
         }
