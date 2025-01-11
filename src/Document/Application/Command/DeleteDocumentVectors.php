@@ -7,7 +7,7 @@ namespace ChronicleKeeper\Document\Application\Command;
 class DeleteDocumentVectors
 {
     public function __construct(
-        public readonly string $id,
+        public readonly string $documentId,
     ) {
     }
 }

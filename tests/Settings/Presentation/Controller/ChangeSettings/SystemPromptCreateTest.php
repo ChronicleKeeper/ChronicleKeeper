@@ -8,10 +8,10 @@ use ChronicleKeeper\Settings\Domain\ValueObject\SystemPrompt\Purpose;
 use ChronicleKeeper\Settings\Presentation\Controller\ChangeSettings\SystemPromptCreate;
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
 use ChronicleKeeper\Test\Shared\Infrastructure\Persistence\Filesystem\FileAccessDouble;
+use ChronicleKeeper\Test\WebTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Large;
 use PHPUnit\Framework\Attributes\Test;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
 
 use function assert;
@@ -27,12 +27,11 @@ class SystemPromptCreateTest extends WebTestCase
     #[Test]
     public function itIsShowingTheEmptyForm(): void
     {
-        $client = static::createClient();
-        $client->request(Request::METHOD_GET, '/settings/chatbot_system_prompts/create');
+        $this->client->request(Request::METHOD_GET, '/settings/chatbot_system_prompts/create');
 
         self::assertResponseIsSuccessful();
 
-        $content = (string) $client->getResponse()->getContent();
+        $content = (string) $this->client->getResponse()->getContent();
 
         self::assertStringContainsString(
             'Standard (Nur Nutzer)',
@@ -43,10 +42,9 @@ class SystemPromptCreateTest extends WebTestCase
     #[Test]
     public function itIsCreatingASystemPrompt(): void
     {
-        $client = static::createClient();
-        $client->request(Request::METHOD_GET, '/settings/chatbot_system_prompts/create');
+        $this->client->request(Request::METHOD_GET, '/settings/chatbot_system_prompts/create');
 
-        $client->submitForm('Speichern', [
+        $this->client->submitForm('Speichern', [
             'system_prompt[name]' => 'Test System Prompt',
             'system_prompt[purpose]' => Purpose::DOCUMENT_OPTIMIZER->value,
             'system_prompt[content]' => 'Test Content',
@@ -55,7 +53,7 @@ class SystemPromptCreateTest extends WebTestCase
         self::assertResponseRedirects('/settings/chatbot_system_prompts');
 
         // Check the new System Prompt is stored
-        $fileAccess = $client->getContainer()->get(FileAccess::class);
+        $fileAccess = $this->client->getContainer()->get(FileAccess::class);
         assert($fileAccess instanceof FileAccessDouble);
 
         $files = $fileAccess->allOfType('storage');

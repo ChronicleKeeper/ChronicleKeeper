@@ -91,7 +91,7 @@ fix-all: ## fix all code issues
 	make rector
 	make fix-cs
 
-reset-filesystem:
+reset-filesystem: ## reset of filesystem storage
 	rm -rf var/cache/dev/library/*
 	rm -rf var/data/document/*
 	rm -rf var/data/image/*

@@ -6,8 +6,7 @@ namespace ChronicleKeeper\Test\Document\Application\Command;
 
 use ChronicleKeeper\Document\Application\Command\DeleteDocumentVectors;
 use ChronicleKeeper\Document\Application\Command\DeleteDocumentVectorsHandler;
-use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
-use ChronicleKeeper\Test\Document\Domain\Entity\VectorDocumentBuilder;
+use ChronicleKeeper\Test\Shared\Infrastructure\Database\DatabasePlatformMock;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\Attributes\Test;
@@ -23,20 +22,16 @@ class DeleteDocumentVectorsTest extends TestCase
     {
         $command = new DeleteDocumentVectors('document-id');
 
-        self::assertSame('document-id', $command->id);
+        self::assertSame('document-id', $command->documentId);
     }
 
     #[Test]
     public function documentIsFullyDeleted(): void
     {
-        $vectorDocument = (new VectorDocumentBuilder())->build();
+        $databasePlatform = new DatabasePlatformMock();
+        $handler          = new DeleteDocumentVectorsHandler($databasePlatform);
+        $handler(new DeleteDocumentVectors('9f86d75f-fc93-4522-b01d-3059aa887971'));
 
-        $fileAccess = $this->createMock(FileAccess::class);
-        $fileAccess->expects($this->once())
-            ->method('delete')
-            ->with('vector.documents', $vectorDocument->id . '.json');
-
-        $handler = new DeleteDocumentVectorsHandler($fileAccess);
-        $handler(new DeleteDocumentVectors($vectorDocument->id));
+        $databasePlatform->assertExecutedQuery('DELETE FROM documents_vectors WHERE document_id = :id', ['id' => '9f86d75f-fc93-4522-b01d-3059aa887971']);
     }
 }

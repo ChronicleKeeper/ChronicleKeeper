@@ -78,6 +78,19 @@ final class DatabasePlatformMock implements DatabasePlatform
         ];
     }
 
+    /**
+     * @param array<string, mixed> $parameters
+     * @param list<mixed>          $result
+     */
+    public function expectAnyFetchWithJustParameters(array $parameters, array $result): void
+    {
+        $this->fetchExpectations[] = [
+            'sql' => '*',
+            'parameters' => $parameters,
+            'result' => $result,
+        ];
+    }
+
     /** @param array<string, mixed> $parameters */
     public function assertFetchExecuted(string $sql, array $parameters = []): void
     {
@@ -102,8 +115,16 @@ final class DatabasePlatformMock implements DatabasePlatform
     {
         $this->executedFetches[] = ['sql' => $sql, 'parameters' => $parameters];
 
+        // Check for explicit fetch query
         foreach ($this->fetchExpectations as $expectation) {
             if ($expectation['sql'] === $sql && $expectation['parameters'] === $parameters) {
+                return $expectation['result'];
+            }
+        }
+
+        // Check for any query
+        foreach ($this->fetchExpectations as $expectation) {
+            if ($expectation['sql'] === '*' && $expectation['parameters'] === $parameters) {
                 return $expectation['result'];
             }
         }

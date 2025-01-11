@@ -4,25 +4,29 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Document\Application\Command;
 
-use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
+use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
-use Symfony\Component\Serializer\SerializerInterface;
+
+use function implode;
 
 #[AsMessageHandler]
 class StoreDocumentVectorsHandler
 {
     public function __construct(
-        private readonly FileAccess $fileAccess,
-        private readonly SerializerInterface $serializer,
+        private readonly DatabasePlatform $platform,
     ) {
     }
 
     public function __invoke(StoreDocumentVectors $command): void
     {
-        $this->fileAccess->write(
-            'vector.documents',
-            $command->vectorDocument->id . '.json',
-            $this->serializer->serialize($command->vectorDocument, 'json'),
+        $this->platform->insertOrUpdate(
+            'documents_vectors',
+            [
+                'document_id' => $command->vectorDocument->document->getId(),
+                'embedding' => '[' . implode(',', $command->vectorDocument->vector) . ']',
+                'content' => $command->vectorDocument->content,
+                'vectorContentHash' => $command->vectorDocument->vectorContentHash,
+            ],
         );
     }
 }

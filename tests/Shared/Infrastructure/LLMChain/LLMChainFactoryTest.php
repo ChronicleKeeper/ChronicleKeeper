@@ -14,6 +14,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 #[CoversClass(LLMChainFactory::class)]
 #[Small]
@@ -30,7 +31,9 @@ class LLMChainFactoryTest extends TestCase
         $toolboxFactory = $this->createMock(ToolboxFactory::class);
         $toolboxFactory->expects($this->once())->method('create');
 
-        $llmChainFactory = new LLMChainFactory($settingsHandler, $toolboxFactory);
+        $httpCllient = self::createStub(HttpClientInterface::class);
+
+        $llmChainFactory = new LLMChainFactory($settingsHandler, $toolboxFactory, $httpCllient);
         $llmChainFactory->create();
     }
 
@@ -41,8 +44,9 @@ class LLMChainFactoryTest extends TestCase
         $settingsHandler->expects($this->once())->method('get')->willReturn($this->getSettings());
 
         $toolboxFactory = $this->createMock(ToolboxFactory::class);
+        $httpCllient    = self::createStub(HttpClientInterface::class);
 
-        $llmChainFactory = new LLMChainFactory($settingsHandler, $toolboxFactory);
+        $llmChainFactory = new LLMChainFactory($settingsHandler, $toolboxFactory, $httpCllient);
         $llmChainFactory->createPlatform();
     }
 
@@ -55,7 +59,9 @@ class LLMChainFactoryTest extends TestCase
         $toolboxFactory = $this->createMock(ToolboxFactory::class);
         $toolboxFactory->expects($this->once())->method('create');
 
-        $llmChainFactory = new LLMChainFactory($settingsHandler, $toolboxFactory);
+        $httpCllient = self::createStub(HttpClientInterface::class);
+
+        $llmChainFactory = new LLMChainFactory($settingsHandler, $toolboxFactory, $httpCllient);
 
         self::assertSame(
             $llmChainFactory->create(),

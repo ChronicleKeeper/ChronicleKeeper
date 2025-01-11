@@ -67,6 +67,10 @@ class SchemaManager
 
             $tables = $this->platform->fetch("SELECT name FROM sqlite_master WHERE type='table'");
             foreach ($tables as $table) {
+                if ($table['name'] === 'sqlite_sequence') {
+                    continue;
+                }
+
                 $this->platform->query('DROP TABLE IF EXISTS ' . $table['name']);
             }
 

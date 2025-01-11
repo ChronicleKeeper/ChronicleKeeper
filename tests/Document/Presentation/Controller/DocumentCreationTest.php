@@ -27,8 +27,12 @@ use PHPUnit\Framework\Attributes\Large;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Component\HttpFoundation\Request;
 
+use function array_map;
 use function assert;
 use function json_encode;
+use function mt_getrandmax;
+use function mt_rand;
+use function range;
 use function reset;
 
 #[CoversClass(DocumentCreation::class)]
@@ -67,7 +71,7 @@ class DocumentCreationTest extends WebTestCase
                 /** @return Vector[] */
                 public function getContent(): array
                 {
-                    return [new Vector([1.0, 2.0, 3.0])];
+                    return [new Vector(array_map(static fn () => mt_rand() / mt_getrandmax(), range(1, 1536)))];
                 }
             },
         );

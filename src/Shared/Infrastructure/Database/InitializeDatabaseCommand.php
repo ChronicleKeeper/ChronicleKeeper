@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ChronicleKeeper\Shared\Infrastructure\Database;
 
 use ChronicleKeeper\Shared\Infrastructure\Database\Schema\SchemaManager;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -24,6 +25,7 @@ final class InitializeDatabaseCommand extends Command
         private readonly string $databasePath,
         private readonly Filesystem $filesystem,
         private readonly SchemaManager $schemaManager,
+        private readonly LoggerInterface $logger,
     ) {
         parent::__construct();
     }
@@ -50,6 +52,7 @@ final class InitializeDatabaseCommand extends Command
             return self::FAILURE;
         }
 
+        $this->logger->debug('Removing existing database file at "' . $filename . '".');
         $this->filesystem->remove($filename);
         try {
             $this->schemaManager->createSchema();
