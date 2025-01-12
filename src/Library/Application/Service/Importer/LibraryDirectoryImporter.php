@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Library\Application\Service\Importer;
 
-use ChronicleKeeper\Settings\Application\Service\FileType;
-use ChronicleKeeper\Settings\Application\Service\Importer\ImportedFile;
-use ChronicleKeeper\Settings\Application\Service\Importer\ImportedFileBag;
 use ChronicleKeeper\Settings\Application\Service\Importer\SingleImport;
 use ChronicleKeeper\Settings\Application\Service\ImportSettings;
 use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
@@ -26,9 +23,8 @@ final readonly class LibraryDirectoryImporter implements SingleImport
     ) {
     }
 
-    public function import(Filesystem $filesystem, ImportSettings $settings): ImportedFileBag
+    public function import(Filesystem $filesystem, ImportSettings $settings): void
     {
-        $importedFileBag      = new ImportedFileBag();
         $libraryDirectoryPath = 'library/directory/';
 
         foreach ($filesystem->listContents($libraryDirectoryPath) as $zippedFile) {
@@ -44,7 +40,6 @@ final readonly class LibraryDirectoryImporter implements SingleImport
                 $settings->overwriteLibrary === false
                 && $this->databasePlatform->hasRows('directories', ['id' => $content['id']])
             ) {
-                $importedFileBag->append(ImportedFile::asIgnored($filename, FileType::LIBRARY_DIRECTORY));
                 continue;
             }
 
@@ -56,10 +51,6 @@ final readonly class LibraryDirectoryImporter implements SingleImport
                     'parent' => $content['parent'],
                 ],
             );
-
-            $importedFileBag->append(ImportedFile::asSuccess($filename, FileType::LIBRARY_DIRECTORY));
         }
-
-        return $importedFileBag;
     }
 }

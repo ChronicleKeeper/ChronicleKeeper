@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Chat\Application\Service;
 
-use ChronicleKeeper\Settings\Application\Service\FileType;
-use ChronicleKeeper\Settings\Application\Service\Importer\ImportedFile;
-use ChronicleKeeper\Settings\Application\Service\Importer\ImportedFileBag;
 use ChronicleKeeper\Settings\Application\Service\Importer\SingleImport;
 use ChronicleKeeper\Settings\Application\Service\ImportSettings;
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
@@ -23,9 +20,8 @@ final readonly class ConversationImporter implements SingleImport
     ) {
     }
 
-    public function import(Filesystem $filesystem, ImportSettings $settings): ImportedFileBag
+    public function import(Filesystem $filesystem, ImportSettings $settings): void
     {
-        $importedFileBag      = new ImportedFileBag();
         $libraryDirectoryPath = 'library/conversations/';
 
         foreach ($filesystem->listContents($libraryDirectoryPath) as $zippedFile) {
@@ -38,16 +34,11 @@ final readonly class ConversationImporter implements SingleImport
                 $settings->overwriteLibrary === false
                 && $this->fileAccess->exists('library.conversations', $targetFilename)
             ) {
-                $importedFileBag->append(ImportedFile::asIgnored($targetFilename, FileType::CHAT_CONVERSATION));
                 continue;
             }
 
             $content = $filesystem->read($zippedFile->path());
             $this->fileAccess->write('library.conversations', $targetFilename, $content);
-
-            $importedFileBag->append(ImportedFile::asSuccess($targetFilename, FileType::CHAT_CONVERSATION));
         }
-
-        return $importedFileBag;
     }
 }

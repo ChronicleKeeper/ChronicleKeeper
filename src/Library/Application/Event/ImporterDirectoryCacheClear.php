@@ -9,7 +9,7 @@ use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileA
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 #[AsEventListener]
-class DirectoryCacheClear
+class ImporterDirectoryCacheClear
 {
     public function __construct(
         private readonly FileAccess $fileAccess,

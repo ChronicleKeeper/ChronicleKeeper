@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Settings\Application\Service;
 
-use ChronicleKeeper\Settings\Application\Service\Importer\ImportedFileBag;
 use ChronicleKeeper\Settings\Application\Service\Importer\SingleImport;
 use ChronicleKeeper\Settings\Domain\Event\ExecuteImportPruning;
 use ChronicleKeeper\Settings\Domain\Event\ImportFinished;
@@ -31,7 +30,7 @@ class Importer
     ) {
     }
 
-    public function import(string $archiveFile, ImportSettings $importSettings): ImportedFileBag
+    public function import(string $archiveFile, ImportSettings $importSettings): void
     {
         $adapter          = new ZipArchiveAdapter(new FilesystemZipArchiveProvider($archiveFile));
         $filesystem       = new Filesystem($adapter);
@@ -54,10 +53,9 @@ class Importer
             $this->logger->debug('Skipping pruning of data before import.');
         }
 
-        $importedFiles = new ImportedFileBag();
         foreach ($this->importer as $import) {
             $this->logger->info('Executing import of type: ' . $import::class);
-            $importedFiles = $importedFiles->extend(...$import->import($filesystem, $importSettings));
+            $import->import($filesystem, $importSettings);
             $this->logger->info('Import of type: ' . $import::class . ' was executed');
         }
 
@@ -65,8 +63,6 @@ class Importer
             @unlink($archiveFile);
         }
 
-        $this->eventDispatcher->dispatch(new ImportFinished($importSettings, $importedFiles));
-
-        return $importedFiles;
+        $this->eventDispatcher->dispatch(new ImportFinished($importSettings));
     }
 }

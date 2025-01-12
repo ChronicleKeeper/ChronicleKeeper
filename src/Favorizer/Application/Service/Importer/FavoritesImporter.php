@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Favorizer\Application\Service\Importer;
 
-use ChronicleKeeper\Settings\Application\Service\FileType;
-use ChronicleKeeper\Settings\Application\Service\Importer\ImportedFile;
-use ChronicleKeeper\Settings\Application\Service\Importer\ImportedFileBag;
 use ChronicleKeeper\Settings\Application\Service\Importer\SingleImport;
 use ChronicleKeeper\Settings\Application\Service\ImportSettings;
 use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
@@ -24,7 +21,7 @@ final readonly class FavoritesImporter implements SingleImport
     ) {
     }
 
-    public function import(Filesystem $filesystem, ImportSettings $settings): ImportedFileBag
+    public function import(Filesystem $filesystem, ImportSettings $settings): void
     {
         if ($settings->pruneLibrary === true) {
             // As the library was pruned this has to be cleared as well
@@ -35,7 +32,7 @@ final readonly class FavoritesImporter implements SingleImport
             $content = $filesystem->read('favorites.json');
         } catch (UnableToReadFile) {
             // It is totally fine, when the file is not available during import
-            return new ImportedFileBag(ImportedFile::asIgnored('favorites.json', FileType::FAVORITES));
+            return;
         }
 
         $content = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
@@ -49,7 +46,5 @@ final readonly class FavoritesImporter implements SingleImport
                 ],
             );
         }
-
-        return new ImportedFileBag(ImportedFile::asSuccess('favorites.json', FileType::FAVORITES));
     }
 }
