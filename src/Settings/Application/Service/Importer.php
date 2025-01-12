@@ -6,11 +6,13 @@ namespace ChronicleKeeper\Settings\Application\Service;
 
 use ChronicleKeeper\Settings\Application\Service\Importer\ImportedFileBag;
 use ChronicleKeeper\Settings\Application\Service\Importer\SingleImport;
+use ChronicleKeeper\Settings\Domain\Event\ExecuteImportPruning;
 use ChronicleKeeper\Settings\Domain\Event\FileImported;
 use ChronicleKeeper\Settings\Domain\Event\ImportFinished;
 use League\Flysystem\Filesystem;
 use League\Flysystem\ZipArchive\FilesystemZipArchiveProvider;
 use League\Flysystem\ZipArchive\ZipArchiveAdapter;
+use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -25,8 +27,8 @@ class Importer
         #[AutowireIterator('application_exporer_single_import')]
         private readonly iterable $importer,
         private readonly Version $version,
-        private readonly LibraryPruner $pruner,
         private readonly EventDispatcherInterface $eventDispatcher,
+        private readonly LoggerInterface $logger,
     ) {
     }
 
@@ -46,7 +48,11 @@ class Importer
         }
 
         if ($importSettings->pruneLibrary === true) {
-            $this->pruner->prune();
+            $this->logger->info('Executing pruning of data before import.');
+            $this->eventDispatcher->dispatch(new ExecuteImportPruning($importSettings));
+            $this->logger->info('Pruning of data was executed.');
+        } else {
+            $this->logger->debug('Skipping pruning of data before import.');
         }
 
         $importedFiles = new ImportedFileBag();
