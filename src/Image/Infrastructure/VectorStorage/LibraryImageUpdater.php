@@ -4,16 +4,17 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Image\Infrastructure\VectorStorage;
 
+use ChronicleKeeper\Image\Application\Command\DeleteImageVectors;
+use ChronicleKeeper\Image\Application\Command\StoreImageVectors;
 use ChronicleKeeper\Image\Application\Query\FindAllImages;
 use ChronicleKeeper\Image\Domain\Entity\Image;
-use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemVectorImageRepository;
 use ChronicleKeeper\Library\Infrastructure\VectorStorage\VectorImage;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
 use ChronicleKeeper\Shared\Infrastructure\LLMChain\EmbeddingCalculator;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Messenger\MessageBusInterface;
 
 use function count;
-use function reset;
 use function trim;
 
 class LibraryImageUpdater
@@ -21,8 +22,8 @@ class LibraryImageUpdater
     public function __construct(
         private readonly LoggerInterface $logger,
         private readonly EmbeddingCalculator $embeddingCalculator,
-        private readonly FilesystemVectorImageRepository $vectorImageRepository,
         private readonly QueryService $queryService,
+        private readonly MessageBusInterface $bus,
     ) {
     }
 
@@ -35,26 +36,8 @@ class LibraryImageUpdater
 
     public function updateOrCreateVectorsForImage(Image $image): void
     {
-        $existingStorage = $this->vectorImageRepository->findAllByImageId($image->getId());
-
-        if ($existingStorage === []) {
-            $this->createVectorDocument($image);
-
-            return;
-        }
-
-        // Check the existing storage content hash and update only if necessary
-        $singleOriginalVectorDocument = reset($existingStorage);
-        if ($singleOriginalVectorDocument->vectorContentHash === $image->getDescriptionHash()) {
-            $this->logger->debug('Vector storage for image is up to date.', ['image' => $image]);
-
-            return;
-        }
-
         // Clean Vector Storage
-        foreach ($existingStorage as $vectorDocument) {
-            $this->vectorImageRepository->remove($vectorDocument);
-        }
+        $this->bus->dispatch(new DeleteImageVectors($image->getId()));
 
         $this->logger->debug('Vector storage for document was cleared.', ['image' => $image]);
 
@@ -66,7 +49,7 @@ class LibraryImageUpdater
     {
         $vectorDocuments = $this->splitImageDescriptionInVectorDocuments($image);
         foreach ($vectorDocuments as $vectorDocument) {
-            $this->vectorImageRepository->store($vectorDocument);
+            $this->bus->dispatch(new StoreImageVectors($vectorDocument));
         }
 
         $this->logger->debug(

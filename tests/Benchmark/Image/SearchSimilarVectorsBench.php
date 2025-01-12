@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Test\Benchmark\Image;
 
-use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemVectorImageRepository;
+use ChronicleKeeper\Image\Application\Query\SearchSimilarImages;
+use ChronicleKeeper\Shared\Application\Query\QueryService;
 use ChronicleKeeper\Test\Benchmark\UseSymfonyKernel;
 use PhpBench\Benchmark\Metadata\Annotations\BeforeMethods;
 
@@ -15,7 +16,7 @@ class SearchSimilarVectorsBench
 {
     use UseSymfonyKernel;
 
-    private FilesystemVectorImageRepository $vectorImageRepository;
+    private QueryService $queryService;
 
     /** @var list<float> */
     private array $searchForVectors;
@@ -24,17 +25,23 @@ class SearchSimilarVectorsBench
     {
         $kernel = $this->getKernel();
 
-        $vectorImageRepository = $kernel->getContainer()->get(FilesystemVectorImageRepository::class);
-        assert($vectorImageRepository instanceof FilesystemVectorImageRepository);
+        $queryService = $kernel->getContainer()->get(QueryService::class);
+        assert($queryService instanceof QueryService);
 
-        $this->vectorImageRepository = $vectorImageRepository;
-        $this->searchForVectors      = self::getExampleSearchedVector();
+        $this->queryService     = $queryService;
+        $this->searchForVectors = self::getExampleSearchedVector();
     }
 
     /** @BeforeMethods("setUp") */
     public function benchSearchSimlarImages(): void
     {
-        $this->vectorImageRepository->findSimilar($this->searchForVectors, 1.0, 10);
+        $this->queryService->query(
+            new SearchSimilarImages(
+                $this->searchForVectors,
+                1.0,
+                10,
+            ),
+        );
     }
 
     /** @return list<float> */
