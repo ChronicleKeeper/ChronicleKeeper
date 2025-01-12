@@ -146,6 +146,14 @@ final class DatabasePlatformMock implements DatabasePlatform
     }
 
     /** @inheritDoc */
+    public function hasRows(string $table, array $parameters = []): bool
+    {
+        $count = $this->fetchSingleRow(sprintf('SELECT COUNT(*) as count FROM %s', $table), $parameters);
+
+        return $count !== null && $count['count'] > 0;
+    }
+
+    /** @inheritDoc */
     public function query(string $sql, array $parameters = []): void
     {
         $this->executedQueries[] = ['sql' => $sql, 'parameters' => $parameters];
@@ -161,5 +169,10 @@ final class DatabasePlatformMock implements DatabasePlatform
     public function insertOrUpdate(string $table, array $data): void
     {
         $this->executedInserts[] = ['table' => $table, 'data' => $data];
+    }
+
+    public function truncateTable(string $table): void
+    {
+        $this->executedQueries[] = ['sql' => 'DELETE FROM ' . $table, 'parameters' => []];
     }
 }

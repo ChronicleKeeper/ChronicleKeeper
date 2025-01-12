@@ -54,7 +54,9 @@ class Importer
             $importedFiles = $importedFiles->extend(...$import->import($filesystem, $importSettings));
         }
 
-        @unlink($archiveFile);
+        if ($importSettings->removeArchive === true) {
+            @unlink($archiveFile);
+        }
 
         $this->eventDispatcher->dispatch(new ImportFinished($importSettings, $importedFiles));
 

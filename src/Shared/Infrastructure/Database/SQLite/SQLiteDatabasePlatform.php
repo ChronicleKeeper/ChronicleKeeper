@@ -9,6 +9,7 @@ use ChronicleKeeper\Shared\Infrastructure\Database\Exception\UnexpectedMultipleR
 use SQLite3;
 
 use function array_keys;
+use function array_map;
 use function count;
 use function implode;
 use function sprintf;
@@ -68,6 +69,18 @@ class SQLiteDatabasePlatform implements DatabasePlatform
         }
 
         return $result[0] ?? null;
+    }
+
+    /** @inheritDoc */
+    public function hasRows(string $table, array $parameters = []): bool
+    {
+        $count = $this->fetchSingleRow(sprintf(
+            'SELECT COUNT(*) as count FROM %s WHERE %s',
+            $table,
+            implode(' AND ', array_map(static fn ($column) => $column . ' = :' . $column, array_keys($parameters))),
+        ), $parameters);
+
+        return $count !== null && $count['count'] > 0;
     }
 
     /** @inheritDoc */
@@ -136,5 +149,10 @@ class SQLiteDatabasePlatform implements DatabasePlatform
     public function rollback(): void
     {
         $this->getConnection()->exec('ROLLBACK');
+    }
+
+    public function truncateTable(string $table): void
+    {
+        $this->query(sprintf('DELETE FROM %s', $table));
     }
 }

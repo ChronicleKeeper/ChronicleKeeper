@@ -21,6 +21,9 @@ interface DatabasePlatform
     public function fetchSingleRow(string $sql, array $parameters = []): array|null;
 
     /** @param array<string, mixed> $parameters */
+    public function hasRows(string $table, array $parameters = []): bool;
+
+    /** @param array<string, mixed> $parameters */
     public function query(string $sql, array $parameters = []): void;
 
     /** @param array<string, mixed> $data */
@@ -34,4 +37,6 @@ interface DatabasePlatform
     public function commit(): void;
 
     public function rollback(): void;
+
+    public function truncateTable(string $table): void;
 }

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ChronicleKeeper\Shared\Infrastructure\Database;
+namespace ChronicleKeeper\Shared\Presentation\Command;
 
 use ChronicleKeeper\Shared\Infrastructure\Database\Schema\SchemaManager;
 use Psr\Log\LoggerInterface;
