@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ChronicleKeeper\Calendar\Domain\Entity;
 
 use ChronicleKeeper\Calendar\Domain\Entity\Calendar\Month;
+use ChronicleKeeper\Calendar\Domain\Entity\Calendar\WeekConfiguration;
 use ChronicleKeeper\Calendar\Domain\Exception\MonthNotExists;
 use ChronicleKeeper\Calendar\Domain\Exception\YearHasNotASequentialListOfMonths;
 use ChronicleKeeper\Calendar\Domain\Exception\YearIsNotStartingWithFirstMonth;
@@ -23,9 +24,7 @@ class Calendar
     /** @var array<int, Month> $months */
     private array $months = [];
 
-    public function __construct()
-    {
-    }
+    private WeekConfiguration $weekConfiguration;
 
     public function setMonths(Month ...$months): void
     {
@@ -50,6 +49,20 @@ class Calendar
         if (array_keys($this->months) !== range(1, count($this->months))) {
             throw new YearHasNotASequentialListOfMonths();
         }
+    }
+
+    public function setWeekConfiguration(WeekConfiguration $weekConfiguration): void
+    {
+        if (isset($this->weekConfiguration)) {
+            return;
+        }
+
+        $this->weekConfiguration = $weekConfiguration;
+    }
+
+    public function getWeeks(): WeekConfiguration
+    {
+        return $this->weekConfiguration;
     }
 
     public function getMonthOfTheYear(int $index): Month

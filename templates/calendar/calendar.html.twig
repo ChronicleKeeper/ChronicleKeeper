@@ -33,21 +33,14 @@
                     <table class="table table-vcenter table-bordered text-center">
                         <thead>
                             <tr>
-                                <th>Fra</th>
-                                <th>Fu</th>
-                                <th>Fue</th>
-                                <th>Fisu</th>
-                                <th>FooBar</th>
-                                <th>Fra</th>
-                                <th>Fu</th>
-                                <th>Fue</th>
-                                <th>Fisu</th>
-                                <th>FooBar</th>
+                                {% for weekDay in calendar.weeks.days %}
+                                    <th>{{ weekDay.name }}</th>
+                                {% endfor %}
                             </tr>
                         </thead>
                         <tbody>
                             {% set dates = currentMonth.daysInYear(currentDate.year) %}
-                            {% for week in dates|batch(10) %}
+                            {% for week in dates|batch(calendar.weeks.countDays) %}
                                 <tr>
                                     {% for date in week %}
                                         <td class="{% if date.day == currentDate.day %}bg-primary-subtle{% endif %}">
