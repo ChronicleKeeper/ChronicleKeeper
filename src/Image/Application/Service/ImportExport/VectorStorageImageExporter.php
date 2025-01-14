@@ -12,6 +12,7 @@ use ChronicleKeeper\Settings\Application\Service\Exporter\SingleExport;
 use ChronicleKeeper\Settings\Application\Service\Exporter\Type;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
 use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 use ZipArchive;
 
@@ -26,6 +27,7 @@ final readonly class VectorStorageImageExporter implements SingleExport
         private QueryService $queryService,
         private SerializerInterface $serializer,
         private DatabasePlatform $databasePlatform,
+        private LoggerInterface $logger,
     ) {
     }
 
@@ -33,6 +35,11 @@ final readonly class VectorStorageImageExporter implements SingleExport
     {
         /** @var Image[] $images */
         $images = $this->queryService->query(new FindAllImages());
+        if (count($images) === 0) {
+            $this->logger->debug('No images found, skipping export of vector storage.');
+
+            return;
+        }
 
         $query = <<<'SQL'
             SELECT
@@ -50,9 +57,15 @@ final readonly class VectorStorageImageExporter implements SingleExport
             $embeddingsOfImage = $this->databasePlatform->fetch($query, ['id' => $image->getId()]);
 
             if (count($embeddingsOfImage) === 0) {
+                $this->logger->debug(
+                    'No embeddings found for image, skipping export.',
+                    ['id' => $image->getId()],
+                );
+
                 continue;
             }
 
+            $this->logger->debug('Exporting image embeddings.', ['id' => $image->getId()]);
             $archive->addFromString(
                 'library/image_embeddings/' . $image->getId() . '.json',
                 $this->serializer->serialize(

@@ -31,9 +31,8 @@ class Exporter
         $zip->open($zipName, ZipArchive::CREATE);
 
         foreach ($this->exporter as $exporter) {
-            $this->logger->info('Executing exporte of type: ' . $exporter::class);
+            $this->logger->info('Executing Exporter', ['exporter' => $exporter::class]);
             $exporter->export($zip, new ExportSettings($this->version->getCurrentNumericVersion()));
-            $this->logger->info('Export of type: ' . $exporter::class . ' was executed');
         }
 
         $zip->close();

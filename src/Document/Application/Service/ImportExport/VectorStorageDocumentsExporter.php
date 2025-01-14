@@ -12,6 +12,7 @@ use ChronicleKeeper\Settings\Application\Service\Exporter\SingleExport;
 use ChronicleKeeper\Settings\Application\Service\Exporter\Type;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
 use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 use ZipArchive;
 
@@ -26,6 +27,7 @@ final readonly class VectorStorageDocumentsExporter implements SingleExport
         private QueryService $queryService,
         private SerializerInterface $serializer,
         private DatabasePlatform $databasePlatform,
+        private LoggerInterface $logger,
     ) {
     }
 
@@ -33,6 +35,11 @@ final readonly class VectorStorageDocumentsExporter implements SingleExport
     {
         /** @var Document[] $documents */
         $documents = $this->queryService->query(new FindAllDocuments());
+        if (count($documents) === 0) {
+            $this->logger->debug('No documents found, skipping export of vector storage.');
+
+            return;
+        }
 
         $query = <<<'SQL'
             SELECT
@@ -50,8 +57,15 @@ final readonly class VectorStorageDocumentsExporter implements SingleExport
             $embeddingsOfDocument = $this->databasePlatform->fetch($query, ['id' => $document->getId()]);
 
             if (count($embeddingsOfDocument) === 0) {
+                $this->logger->debug(
+                    'No embeddings found for document, skipping export.',
+                    ['id' => $document->getId()],
+                );
+
                 continue;
             }
+
+            $this->logger->debug('Exporting document embeddings.', ['id' => $document->getId()]);
 
             $archive->addFromString(
                 'library/document_embeddings/' . $document->getId() . '.json',

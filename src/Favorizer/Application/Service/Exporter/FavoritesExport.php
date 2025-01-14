@@ -23,9 +23,9 @@ use const JSON_THROW_ON_ERROR;
 final readonly class FavoritesExport implements SingleExport
 {
     public function __construct(
-        private LoggerInterface $logger,
         private QueryService $queryService,
         private SerializerInterface $serializer,
+        private LoggerInterface $logger,
     ) {
     }
 

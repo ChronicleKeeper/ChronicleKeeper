@@ -46,6 +46,8 @@ final readonly class ConversationExporter implements SingleExport
             $conversation = $this->queryService->query(new FindConversationByIdParameters($identifier));
             assert($conversation instanceof Conversation);
 
+            $this->logger->debug('Exporting conversation.', ['id' => $conversation->getId()]);
+
             $archive->addFromString(
                 'library/conversations/' . $conversation->getId() . '.json',
                 $this->serializer->serialize(
