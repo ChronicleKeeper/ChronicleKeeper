@@ -41,13 +41,6 @@ readonly class DayCollection implements Countable
         if (count($this->leapDays) !== count($leapDays)) {
             throw InvalidLeapDays::leapDaysAreNotUnique();
         }
-
-        // validate leap days are sequence of the month from the max days of the months on
-        $maxDaysInMonth = $this->maxRegularDays;
-
-        if (array_keys($this->leapDays) !== range($maxDaysInMonth + 1, $maxDaysInMonth + count($this->leapDays))) {
-            throw InvalidLeapDays::leapDaysAreNotSequence();
-        }
     }
 
     /** @return LeapDay[] */

@@ -15,6 +15,20 @@ class TableCalendar
     public Calendar $calendar;
     public CalendarDate $currentDate;
 
+    public function getFirstRegularDay(CalendarDate $date): CalendarDate
+    {
+        $date = $date->getFirstDayOfMonth()->getFirstDayOfWeek();
+        if (! $date->isLeapDay()) {
+            return $date;
+        }
+
+        do {
+            $date = $date->subDays(1);
+        } while ($date->isLeapDay() === true);
+
+        return $date;
+    }
+
     public function getNextRegularDay(CalendarDate $date): CalendarDate
     {
         do {

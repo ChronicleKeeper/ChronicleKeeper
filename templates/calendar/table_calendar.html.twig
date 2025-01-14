@@ -14,7 +14,7 @@
                         </tr>
                         </thead>
                         <tbody>
-                        {% set handleDay = currentDate.firstDayOfMonth.firstDayOfWeek %}
+                        {% set handleDay = this.firstRegularDay(currentDate) %}
                         {% set amountOfWeeks = currentMonth.amountOfWeeks %}
                         {% set amountOfDaysPerWeek = calendar.weeks.countDays %}
 
