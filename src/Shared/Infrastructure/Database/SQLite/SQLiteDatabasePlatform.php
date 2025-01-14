@@ -6,6 +6,7 @@ namespace ChronicleKeeper\Shared\Infrastructure\Database\SQLite;
 
 use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
 use ChronicleKeeper\Shared\Infrastructure\Database\Exception\UnexpectedMultipleResults;
+use Psr\Log\LoggerInterface;
 use SQLite3;
 
 use function array_keys;
@@ -22,12 +23,14 @@ class SQLiteDatabasePlatform implements DatabasePlatform
 
     public function __construct(
         private readonly SQLiteConnectionFactory $connectionFactory,
+        private readonly LoggerInterface $databaseLogger,
     ) {
     }
 
     private function getConnection(): SQLite3
     {
         if (! $this->connection instanceof SQLite3) {
+            $this->databaseLogger->debug('Establish SQLite Connection');
             $this->connection = $this->connectionFactory->create();
         }
 
@@ -37,8 +40,11 @@ class SQLiteDatabasePlatform implements DatabasePlatform
     /** @inheritDoc */
     public function fetch(string $sql, array $parameters = []): array
     {
+        $this->databaseLogger->debug($sql, $parameters);
         $stmt = $this->getConnection()->prepare($sql);
         if ($stmt === false) {
+            $this->databaseLogger->debug('Failed to prepare statement');
+
             return [];
         }
 
@@ -49,6 +55,8 @@ class SQLiteDatabasePlatform implements DatabasePlatform
         $statementResult = $stmt->execute();
 
         if ($statementResult === false) {
+            $this->databaseLogger->debug('Failed to execute statement');
+
             return [];
         }
 
@@ -86,8 +94,11 @@ class SQLiteDatabasePlatform implements DatabasePlatform
     /** @inheritDoc */
     public function query(string $sql, array $parameters = []): void
     {
+        $this->databaseLogger->debug($sql, $parameters);
         $stmt = $this->getConnection()->prepare($sql);
         if ($stmt === false) {
+            $this->databaseLogger->debug('Failed to prepare statement');
+
             return;
         }
 
@@ -105,8 +116,11 @@ class SQLiteDatabasePlatform implements DatabasePlatform
         $placeholders = ':' . implode(', :', array_keys($data));
         $sql          = sprintf('INSERT INTO %s (%s) VALUES (%s)', $table, $columns, $placeholders);
 
+        $this->databaseLogger->debug($sql, $data);
         $stmt = $this->getConnection()->prepare($sql);
         if ($stmt === false) {
+            $this->databaseLogger->debug('Failed to prepare statement');
+
             return;
         }
 
@@ -124,8 +138,10 @@ class SQLiteDatabasePlatform implements DatabasePlatform
         $placeholders = ':' . implode(', :', array_keys($data));
         $sql          = sprintf('INSERT OR REPLACE INTO %s (%s) VALUES (%s)', $table, $columns, $placeholders);
 
+        $this->databaseLogger->debug($sql, $data);
         $stmt = $this->getConnection()->prepare($sql);
         if ($stmt === false) {
+            $this->databaseLogger->debug('Failed to prepare statement');
             return;
         }
 
@@ -138,16 +154,19 @@ class SQLiteDatabasePlatform implements DatabasePlatform
 
     public function beginTransaction(): void
     {
+        $this->databaseLogger->debug('SQL: BEGIN TRANSACTION');
         $this->getConnection()->exec('BEGIN TRANSACTION');
     }
 
     public function commit(): void
     {
+        $this->databaseLogger->debug('SQL: COMMIT');
         $this->getConnection()->exec('COMMIT');
     }
 
     public function rollback(): void
     {
+        $this->databaseLogger->debug('SQL: ROLLBACK');
         $this->getConnection()->exec('ROLLBACK');
     }
 
