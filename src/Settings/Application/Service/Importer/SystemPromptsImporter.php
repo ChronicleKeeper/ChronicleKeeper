@@ -11,6 +11,7 @@ use League\Flysystem\UnableToReadFile;
 use Psr\Log\LoggerInterface;
 
 use function array_key_exists;
+use function count;
 use function json_decode;
 use function json_encode;
 
@@ -40,6 +41,8 @@ final readonly class SystemPromptsImporter implements SingleImport
             $content = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
             if (array_key_exists('appVersion', $content)) {
                 $content = $content['data'];
+
+                $this->logger->debug('Imported system prompts from new format', ['count' => count($content)]);
             }
 
             $this->fileAccess->write(

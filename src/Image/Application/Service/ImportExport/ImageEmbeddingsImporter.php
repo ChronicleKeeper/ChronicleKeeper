@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ChronicleKeeper\Document\Application\Service\ImportExport;
+namespace ChronicleKeeper\Image\Application\Service\ImportExport;
 
 use ChronicleKeeper\Settings\Application\Service\Importer\SingleImport;
 use ChronicleKeeper\Settings\Application\Service\ImportSettings;
@@ -16,11 +16,10 @@ use function count;
 use function implode;
 use function json_decode;
 use function reset;
-use function str_replace;
 
 use const JSON_THROW_ON_ERROR;
 
-final readonly class VectorStorageDocumentsImporter implements SingleImport
+final readonly class ImageEmbeddingsImporter implements SingleImport
 {
     public function __construct(
         private DatabasePlatform $databasePlatform,
@@ -30,16 +29,13 @@ final readonly class VectorStorageDocumentsImporter implements SingleImport
 
     public function import(Filesystem $filesystem, ImportSettings $settings): void
     {
-        if (count($filesystem->listContents('vector/document/')->toArray()) > 0) {
-            $this->logger->debug('Starting the classic import of the vector storage documents.');
-            $this->classicImport($filesystem, $settings);
+        if (count($filesystem->listContents('vector/image/')->toArray()) > 0) {
+            $this->classicImport($filesystem);
 
             return;
         }
 
-        $this->logger->debug('Utilizing the modern import of the vector storage documents.');
-
-        foreach ($filesystem->listContents('library/document_embeddings/') as $file) {
+        foreach ($filesystem->listContents('library/image_embeddings/') as $file) {
             assert($file instanceof FileAttributes);
 
             $fileContent = $filesystem->read($file->path());
@@ -47,24 +43,30 @@ final readonly class VectorStorageDocumentsImporter implements SingleImport
 
             if (count($content['data']) === 0) {
                 // Vector Storage is empty, no need to store something
+                $this->logger->debug('Vector storage is empty, skipping.', ['file' => $file->path()]);
                 continue;
             }
 
-            $documentId = reset($content['data'])['document_id'];
+            $imageId = reset($content['data'])['image_id'];
             if (
                 $settings->overwriteLibrary === false
-                && $this->databasePlatform->hasRows('documents_vectors', ['document_id' => $documentId])
+                && $this->databasePlatform->hasRows('images_vectors', ['image_id' => $imageId])
             ) {
-                // The document already has a vector storage, no need to overwrite
+                // The image already has a vector storage, no need to overwrite
+                $this->logger->debug('Image already has a vector storage, skipping.', ['image_id' => $imageId]);
                 continue;
             }
 
-            $this->databasePlatform->query('DELETE FROM documents_vectors WHERE document_id = :documentId', ['documentId' => $documentId]);
+            $this->databasePlatform->query(
+                'DELETE FROM images_vectors WHERE image_id = :imageId',
+                ['imageId' => $imageId],
+            );
+
             foreach ($content['data'] as $row) {
                 $this->databasePlatform->insert(
-                    'documents_vectors',
+                    'images_vectors',
                     [
-                        'document_id' => $row['document_id'],
+                        'image_id' => $row['image_id'],
                         'embedding' => $row['embedding'],
                         'content' => $row['content'],
                         'vectorContentHash' => $row['vectorContentHash'],
@@ -74,36 +76,33 @@ final readonly class VectorStorageDocumentsImporter implements SingleImport
         }
     }
 
-    private function classicImport(Filesystem $filesystem, ImportSettings $settings): void
+    private function classicImport(Filesystem $filesystem): void
     {
-        if ($settings->overwriteLibrary === false) {
-            $this->logger->debug('Skipping the classic import of the vector storage documents, as the overwrite is disabled.');
-
-            return;
-        }
-
-        $libraryDirectoryPath = 'vector/document/';
+        $libraryDirectoryPath = 'vector/image/';
         foreach ($filesystem->listContents($libraryDirectoryPath) as $zippedFile) {
             assert($zippedFile instanceof FileAttributes);
 
-            $filename = str_replace($libraryDirectoryPath, '', $zippedFile->path());
-            assert($filename !== '');
-
             $fileContent = $filesystem->read($zippedFile->path());
 
-            /** @var array{documentId: string, content: string, vectorContentHash: string, vector: list<float>} $content */
+            /** @var array{id: string, imageId: string, content: string, vectorContentHash: string, vector: list<float>} $content */
             $content = json_decode($fileContent, true, 512, JSON_THROW_ON_ERROR);
 
-            $this->databasePlatform->query('DELETE FROM documents_vectors WHERE document_id = :documentId', ['documentId' => $content['documentId']]);
+            $this->databasePlatform->query(
+                'DELETE FROM images_vectors WHERE image_id = :imageId',
+                ['imageId' => $content['imageId']],
+            );
+
             $this->databasePlatform->insertOrUpdate(
-                'documents_vectors',
+                'images_vectors',
                 [
-                    'document_id' => $content['documentId'],
+                    'image_id' => $content['imageId'],
                     'embedding' => '[' . implode(',', $content['vector']) . ']',
                     'content' => $content['content'],
                     'vectorContentHash' => $content['vectorContentHash'],
                 ],
             );
+
+            $this->logger->debug('Image vector storage imported.', ['vector_id' => $content['id']]);
         }
     }
 }
