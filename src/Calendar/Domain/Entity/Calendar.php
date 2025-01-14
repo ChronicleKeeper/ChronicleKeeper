@@ -65,6 +65,12 @@ class Calendar
         return $this->weekConfiguration;
     }
 
+    /** @return Month[] */
+    public function getMonths(): array
+    {
+        return $this->months;
+    }
+
     public function getMonthOfTheYear(int $index): Month
     {
         return $this->months[$index] ?? throw new MonthNotExists($index);

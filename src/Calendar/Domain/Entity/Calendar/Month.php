@@ -8,6 +8,7 @@ use ChronicleKeeper\Calendar\Domain\Entity\Calendar;
 use ChronicleKeeper\Calendar\Domain\Entity\CalendarDate;
 
 use function array_map;
+use function ceil;
 use function range;
 
 readonly class Month
@@ -27,5 +28,10 @@ readonly class Month
             fn (int $day) => new CalendarDate($this->calendar, $year, $this->indexInYear, $day),
             range(1, $this->days->count()),
         );
+    }
+
+    public function getAmountOfWeeks(): int
+    {
+        return (int) ceil($this->days->count() / $this->calendar->getWeeks()->countDays());
     }
 }

@@ -39,19 +39,30 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {% set dates = currentMonth.daysInYear(currentDate.year) %}
-                            {% for week in dates|batch(calendar.weeks.countDays) %}
+                            {% set handleDay = currentDate.firstDayOfMonth.firstDayOfWeek %}
+                            {% set amountOfWeeks = currentMonth.amountOfWeeks %}
+                            {% set amountOfDaysPerWeek = calendar.weeks.countDays %}
+
+                            {% for week in 1..amountOfWeeks %}
                                 <tr>
-                                    {% for date in week %}
-                                        <td class="{% if date.day == currentDate.day %}bg-primary-subtle{% endif %}">
-                                            {% if date.isLeapDay %}
+                                    {%  for day in 1..amountOfDaysPerWeek %}
+                                        <td class="{% if handleDay.day == currentDate.day %}bg-primary-subtle{% endif %}">
+                                            {% if handleDay.isLeapDay %}
                                                 <div class="text-muted small">
-                                                    {{ date.format }}
+                                                    {{ handleDay.format }}
                                                 </div>
                                             {% else %}
-                                                {{ date.day }}
+                                                {% if handleDay.month != currentDate.month %}
+                                                    <div class="text-muted small">
+                                                        {{ handleDay.day }}
+                                                    </div>
+                                                {% else %}
+                                                    {{ handleDay.day }}
+                                                {% endif %}
                                             {% endif %}
                                         </td>
+
+                                        {% set handleDay = handleDay.addDays(1) %}
                                     {% endfor %}
                                 </tr>
                             {% endfor %}

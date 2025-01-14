@@ -109,16 +109,26 @@ class CalendarDate
             $previousMonth            = $this->calendar->getMonthOfTheYear($this->month - 1);
             $daysLeftAfterMonthChange = $days - $this->day;
 
-            $monthChangeDate = new CalendarDate($this->calendar, $this->year, $previousMonth->indexInYear, $previousMonth->days->count());
+            $monthChangeDate = new CalendarDate(
+                $this->calendar,
+                $this->year,
+                $previousMonth->indexInYear,
+                $previousMonth->days->count(),
+            );
 
             return $monthChangeDate->subDays($daysLeftAfterMonthChange);
         } catch (MonthNotExists) {
             // There is no previous month, so we have to go back a year and start with the last month
             $previousYear             = $this->year - 1;
-            $previousMonth            = $this->calendar->getMonthOfTheYear(12);
+            $previousMonth            = $this->calendar->getMonthOfTheYear(count($this->calendar->getMonths()));
             $daysLeftAfterMonthChange = $days - $this->day;
 
-            $yearStartDate = new CalendarDate($this->calendar, $previousYear, $previousMonth->indexInYear, $previousMonth->days->count());
+            $yearStartDate = new CalendarDate(
+                $this->calendar,
+                $previousYear,
+                $previousMonth->indexInYear,
+                $previousMonth->days->count(),
+            );
 
             return $yearStartDate->subDays($daysLeftAfterMonthChange);
         }
@@ -131,6 +141,16 @@ class CalendarDate
         $index     = ($totalDays - 1) % count($weekDays) + 1;
 
         return $weekDays[$index];
+    }
+
+    public function getFirstDayOfWeek(): CalendarDate
+    {
+        return $this->calendar->getWeeks()->getFirstDayOfWeekByDate($this);
+    }
+
+    public function getFirstDayOfMonth(): CalendarDate
+    {
+        return new CalendarDate($this->calendar, $this->year, $this->month, 1);
     }
 
     private function calculateTotalDaysUntilToday(): int
