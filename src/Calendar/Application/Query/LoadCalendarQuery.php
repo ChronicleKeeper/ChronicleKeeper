@@ -23,6 +23,7 @@ final class LoadCalendarQuery implements Query
         $calendar->setMonths(
             new Month($calendar, 1, 'Januar', new DayCollection(
                 30,
+                // TODO LEAP days have to be settable within the month
                 new LeapDay(31, 'Drei Könige'),
                 new LeapDay(32, 'Vier Könige'),
             )),

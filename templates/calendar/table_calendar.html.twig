@@ -1,0 +1,69 @@
+{% set currentMonth = calendar.getMonthOfTheYear(currentDate.month) %}
+
+<div class="container-xl">
+    <div class="row row-cards">
+        <div class="col-12">
+            <div class="card">
+                <div class="table-responsive">
+                    <table class="table table-vcenter card-table">
+                        <thead>
+                        <tr>
+                            {% for weekDay in calendar.weeks.days %}
+                                <th>{{ weekDay.name }}</th>
+                            {% endfor %}
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% set handleDay = currentDate.firstDayOfMonth.firstDayOfWeek %}
+                        {% set amountOfWeeks = currentMonth.amountOfWeeks %}
+                        {% set amountOfDaysPerWeek = calendar.weeks.countDays %}
+
+                        {% for week in 1..amountOfWeeks %}
+                            <tr>
+                                {%  for day in 1..amountOfDaysPerWeek %}
+                                    <td class="{% if handleDay.day == currentDate.day %}bg-primary-subtle{% endif %}">
+                                        {% if handleDay.isLeapDay %}
+                                            <div class="text-muted small">
+                                                {{ handleDay.format }}
+                                            </div>
+                                        {% else %}
+                                            {% if handleDay.month != currentDate.month %}
+                                                <div class="text-muted small">
+                                                    {{ handleDay.day }}
+                                                </div>
+                                            {% else %}
+                                                {{ handleDay.day }}
+                                            {% endif %}
+                                        {% endif %}
+                                    </td>
+
+                                    {% set handleDay = this.nextRegularDay(handleDay) %}
+                                {% endfor %}
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        {% for leapDay in this.leapDaysOfCurrentMonth %}
+            <div class="col-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">{{ leapDay.name }}</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-5">Zwischen</div>
+                            <div class="col-7 text-muted">
+                                {{ this.previousDayOfLeapDay(leapDay) }}<br />
+                                {{ this.nextDayOfLeapDay(leapDay) }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>

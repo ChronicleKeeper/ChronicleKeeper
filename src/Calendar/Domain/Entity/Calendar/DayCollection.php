@@ -50,6 +50,12 @@ readonly class DayCollection implements Countable
         }
     }
 
+    /** @return LeapDay[] */
+    public function getLeapDays(): array
+    {
+        return $this->leapDays;
+    }
+
     public function isLeapDay(int $day): bool
     {
         return isset($this->leapDays[$day]);

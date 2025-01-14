@@ -19,58 +19,5 @@
 {% endblock %}
 
 {% block page_content %}
-
-{# Fetch current month from calendar #}
-    {% set currentMonth = calendar.getMonthOfTheYear(currentDate.month) %}
-
-    <div class="container-xl">
-        <div class="card">
-            <div class="card-header">
-                <h3 class="card-title">{{ currentMonth.name }} {{ currentDate.year }}</h3>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-vcenter table-bordered text-center">
-                        <thead>
-                            <tr>
-                                {% for weekDay in calendar.weeks.days %}
-                                    <th>{{ weekDay.name }}</th>
-                                {% endfor %}
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% set handleDay = currentDate.firstDayOfMonth.firstDayOfWeek %}
-                            {% set amountOfWeeks = currentMonth.amountOfWeeks %}
-                            {% set amountOfDaysPerWeek = calendar.weeks.countDays %}
-
-                            {% for week in 1..amountOfWeeks %}
-                                <tr>
-                                    {%  for day in 1..amountOfDaysPerWeek %}
-                                        <td class="{% if handleDay.day == currentDate.day %}bg-primary-subtle{% endif %}">
-                                            {% if handleDay.isLeapDay %}
-                                                <div class="text-muted small">
-                                                    {{ handleDay.format }}
-                                                </div>
-                                            {% else %}
-                                                {% if handleDay.month != currentDate.month %}
-                                                    <div class="text-muted small">
-                                                        {{ handleDay.day }}
-                                                    </div>
-                                                {% else %}
-                                                    {{ handleDay.day }}
-                                                {% endif %}
-                                            {% endif %}
-                                        </td>
-
-                                        {% set handleDay = handleDay.addDays(1) %}
-                                    {% endfor %}
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-
+    {{ component('Calendar:Table', {calendar: calendar, currentDate: currentDate}) }}
 {% endblock %}
