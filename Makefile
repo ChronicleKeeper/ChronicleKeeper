@@ -84,7 +84,7 @@ frontend: ## run symfony frontend build commands
 rector: ## Exectute all rector rules
 	$(PHP) vendor/bin/rector
 
-init-db: ## Initializes the database, forces recreation
+init-db: reset-filesystem ## Initializes the database, forces recreation
 	$(PHP) bin/console app:db:init --force -vvv
 
 fix-all: ## fix all code issues

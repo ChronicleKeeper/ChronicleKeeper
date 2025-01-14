@@ -15,9 +15,14 @@ final class DirectoryProvider extends DefaultSchemaProvider
             CREATE TABLE directories (
                 id TEXT PRIMARY KEY,
                 title TEXT NOT NULL,
-                parent TEXT NULL,
+                parent TEXT NOT NULL,
                 FOREIGN KEY(parent) REFERENCES directories(id)
             );
+        SQL);
+
+        $platform->query(<<<'SQL'
+            CREATE INDEX idx_directories_parent
+            ON directories (parent);
         SQL);
     }
 }
