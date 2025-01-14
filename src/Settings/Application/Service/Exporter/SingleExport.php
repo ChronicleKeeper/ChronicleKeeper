@@ -10,5 +10,5 @@ use ZipArchive;
 #[AutoconfigureTag('application_exporer_single_export')]
 interface SingleExport
 {
-    public function export(ZipArchive $archive): void;
+    public function export(ZipArchive $archive, ExportSettings $exportSettings): void;
 }

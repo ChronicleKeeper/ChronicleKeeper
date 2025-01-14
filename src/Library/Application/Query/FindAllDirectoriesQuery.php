@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ChronicleKeeper\Library\Application\Query;
 
 use ChronicleKeeper\Library\Domain\Entity\Directory;
+use ChronicleKeeper\Library\Domain\RootDirectory;
 use ChronicleKeeper\Shared\Application\Query\Query;
 use ChronicleKeeper\Shared\Application\Query\QueryParameters;
 use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
@@ -34,6 +35,9 @@ final class FindAllDirectoriesQuery implements Query
             fn (array $directory) => $this->denormalizer->denormalize($directory, Directory::class),
             $directories,
         );
+
+        // Always add the root directory to the list
+        $directories[] = RootDirectory::get();
 
         usort(
             $directories,

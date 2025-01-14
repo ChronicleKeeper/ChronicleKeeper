@@ -4,30 +4,43 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Settings\Application\Service\Exporter;
 
-use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
-use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\PathRegistry;
+use ChronicleKeeper\Settings\Application\Query\FindUserPrompts;
+use ChronicleKeeper\Settings\Domain\Entity\SystemPrompt;
+use ChronicleKeeper\Shared\Application\Query\QueryService;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\Serializer\SerializerInterface;
 use ZipArchive;
 
-use const DIRECTORY_SEPARATOR;
+use const JSON_PRETTY_PRINT;
+use const JSON_THROW_ON_ERROR;
 
 final readonly class SystemPromptsExporter implements SingleExport
 {
     public function __construct(
-        private PathRegistry $pathRegistry,
-        private FileAccess $fileAccess,
+        private QueryService $queryService,
+        private SerializerInterface $serializer,
+        private LoggerInterface $logger,
     ) {
     }
 
-    public function export(ZipArchive $archive): void
+    public function export(ZipArchive $archive, ExportSettings $exportSettings): void
     {
-        if (! $this->fileAccess->exists('storage', 'system_prompts.json')) {
-            // Nothing to export, the user has no custom system prompts
-            return;
-        }
+        /** @var SystemPrompt[] $userPrompts */
+        $userPrompts = $this->queryService->query(new FindUserPrompts());
 
-        $archive->addFile(
-            $this->pathRegistry->get('storage') . DIRECTORY_SEPARATOR . 'system_prompts.json',
+        $archive->addFromString(
             'system_prompts.json',
+            $this->serializer->serialize(
+                ExportData::create(
+                    $exportSettings,
+                    Type::PROMPTS,
+                    $userPrompts,
+                ),
+                'json',
+                ['json_encode_options' => JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR],
+            ),
         );
+
+        $this->logger->debug('System prompts exported to "system_prompts.json" in archive.');
     }
 }

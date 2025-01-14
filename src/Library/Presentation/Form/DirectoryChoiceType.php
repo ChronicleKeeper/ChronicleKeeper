@@ -7,6 +7,7 @@ namespace ChronicleKeeper\Library\Presentation\Form;
 use ChronicleKeeper\Library\Application\Query\FindAllDirectories;
 use ChronicleKeeper\Library\Application\Query\FindDirectoriesByParent;
 use ChronicleKeeper\Library\Domain\Entity\Directory;
+use ChronicleKeeper\Library\Domain\RootDirectory;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
 use Override;
 use Symfony\Component\Form\AbstractType;
@@ -41,6 +42,7 @@ final class DirectoryChoiceType extends AbstractType
                 'required' => false,
                 'choices' => $this->queryService->query(new FindAllDirectories()),
                 'placeholder' => false,
+                'empty_data' => RootDirectory::ID,
                 'choice_value' => static fn (Directory $directory): string => $directory->getId(),
                 'choice_label' => static fn (Directory $directory): string => $directory->flattenHierarchyTitle(),
             ],

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ChronicleKeeper\Image\Application\Service;
+namespace ChronicleKeeper\Library\Application\Service\ImportExport;
 
 use ChronicleKeeper\Settings\Application\Service\Importer\SingleImport;
 use ChronicleKeeper\Settings\Application\Service\ImportSettings;
@@ -16,7 +16,7 @@ use function str_replace;
 
 use const JSON_THROW_ON_ERROR;
 
-final readonly class LibraryImagesImporter implements SingleImport
+final readonly class LibraryDirectoryImporter implements SingleImport
 {
     public function __construct(
         private DatabasePlatform $databasePlatform,
@@ -25,7 +25,31 @@ final readonly class LibraryImagesImporter implements SingleImport
 
     public function import(Filesystem $filesystem, ImportSettings $settings): void
     {
-        $libraryDirectoryPath = 'library/images/';
+        // Import with version < 0.7
+        if ($filesystem->fileExists('library/directories.json') === false) {
+            $this->handleOlderImports($filesystem, $settings);
+
+            return;
+        }
+
+        $content = $filesystem->read('library/directories.json');
+        $content = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
+        foreach ($content['data'] as $directoryArray) {
+            $this->databasePlatform->insertOrUpdate(
+                'directories',
+                [
+                    'id' => $directoryArray['id'],
+                    'title' => $directoryArray['title'],
+                    'parent' => $directoryArray['parent'],
+                ],
+            );
+        }
+    }
+
+    private function handleOlderImports(Filesystem $filesystem, ImportSettings $settings): void
+    {
+        // Old import
+        $libraryDirectoryPath = 'library/directory/';
 
         foreach ($filesystem->listContents($libraryDirectoryPath) as $zippedFile) {
             assert($zippedFile instanceof FileAttributes);
@@ -38,21 +62,17 @@ final readonly class LibraryImagesImporter implements SingleImport
 
             if (
                 $settings->overwriteLibrary === false
-                && $this->databasePlatform->hasRows('images', ['id' => $content['id']])
+                && $this->databasePlatform->hasRows('directories', ['id' => $content['id']])
             ) {
                 continue;
             }
 
             $this->databasePlatform->insertOrUpdate(
-                'images',
+                'directories',
                 [
                     'id' => $content['id'],
                     'title' => $content['title'],
-                    'mime_type' => $content['mime_type'],
-                    'encoded_image' => $content['encoded_image'],
-                    'description' => $content['description'],
-                    'directory' => $content['directory'],
-                    'last_updated' => $content['last_updated'],
+                    'parent' => $content['parent'],
                 ],
             );
         }

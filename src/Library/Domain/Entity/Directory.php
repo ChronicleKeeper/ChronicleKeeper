@@ -97,6 +97,10 @@ class Directory extends AggregateRoot implements JsonSerializable
 
     public function flattenHierarchyTitle(): string
     {
+        if ($this->id === RootDirectory::ID) {
+            return $this->title;
+        }
+
         $directory = $this;
 
         $components = [];

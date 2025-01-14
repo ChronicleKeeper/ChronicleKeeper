@@ -20,7 +20,7 @@ use function realpath;
     name: 'app:import',
     description: 'Imports a ZIP Archive directly on the CLI. It is the same as using the web interface.',
 )]
-final class ExecuteImportCommand extends Command
+final class ImportCommand extends Command
 {
     public function __construct(
         private readonly Importer $importer,

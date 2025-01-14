@@ -2,28 +2,24 @@
 
 declare(strict_types=1);
 
-namespace ChronicleKeeper\Favorizer\Application\Service\Exporter;
+namespace ChronicleKeeper\Library\Application\Service\ImportExport;
 
-use ChronicleKeeper\Favorizer\Application\Query\GetTargetBag;
-use ChronicleKeeper\Favorizer\Domain\TargetBag;
+use ChronicleKeeper\Library\Application\Query\FindAllDirectories;
+use ChronicleKeeper\Library\Domain\Entity\Directory;
 use ChronicleKeeper\Settings\Application\Service\Exporter\ExportData;
 use ChronicleKeeper\Settings\Application\Service\Exporter\ExportSettings;
 use ChronicleKeeper\Settings\Application\Service\Exporter\SingleExport;
 use ChronicleKeeper\Settings\Application\Service\Exporter\Type;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
-use Psr\Log\LoggerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 use ZipArchive;
-
-use function assert;
 
 use const JSON_PRETTY_PRINT;
 use const JSON_THROW_ON_ERROR;
 
-final readonly class FavoritesExport implements SingleExport
+final readonly class LibraryDirectoryExporter implements SingleExport
 {
     public function __construct(
-        private LoggerInterface $logger,
         private QueryService $queryService,
         private SerializerInterface $serializer,
     ) {
@@ -31,22 +27,25 @@ final readonly class FavoritesExport implements SingleExport
 
     public function export(ZipArchive $archive, ExportSettings $exportSettings): void
     {
-        $favoritesBag = $this->queryService->query(new GetTargetBag());
-        assert($favoritesBag instanceof TargetBag);
+        /** @var Directory[] $directories */
+        $directories = $this->queryService->query(new FindAllDirectories());
+
+        $directoriesAsArray = [];
+        foreach ($directories as $directory) {
+            $directoriesAsArray[] = $directory->toArray();
+        }
 
         $archive->addFromString(
-            'favorites.json',
+            'library/directories.json',
             $this->serializer->serialize(
                 ExportData::create(
                     $exportSettings,
-                    Type::FAVORITES,
-                    $favoritesBag->jsonSerialize(),
+                    Type::DIRECTORY,
+                    $directoriesAsArray,
                 ),
                 'json',
                 ['json_encode_options' => JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR],
             ),
         );
-
-        $this->logger->debug('Favorites exported to "favorites.json" in archive.');
     }
 }
