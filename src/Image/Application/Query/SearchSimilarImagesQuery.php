@@ -27,7 +27,7 @@ class SearchSimilarImagesQuery implements Query
         assert($parameters instanceof SearchSimilarImages);
 
         $foundVectors = $this->databasePlatform->fetch(
-            'SELECT image_id, distance, content FROM images_vectors WHERE embedding match :embedding AND distance < :maxDistance ORDER BY distance LIMIT :maxResults',
+            'SELECT image_id, distance, content FROM images_vectors WHERE embedding match :embedding AND k = :maxResults AND distance < :maxDistance ORDER BY distance',
             [
                 'embedding' => '[' . implode(',', $parameters->searchedVectors) . ']',
                 'maxDistance' => $parameters->maxDistance,
