@@ -1,4 +1,4 @@
-name: Build PHPDesktop Archive
+name: Build Symfony CLI Package for Windows
 
 on:
   release:
@@ -8,8 +8,8 @@ permissions:
   contents: write
 
 jobs:
-  phpdesktop:
-    name: build phpdesktop
+  symfony-cli-windows:
+    name: build symfony-cli-windows
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
@@ -19,19 +19,19 @@ jobs:
           php-version: '8.3'
 
       - name: do application build
-        run: make phpdesktop
+        run: make symfony-cli
 
       - name: Archive Release
         uses: thedoctor0/zip-release@0.7.5
         with:
           type: 'zip'
-          command: 'mv build/ ChronicleKeeper-Desktop-${{ github.ref_name }}/'
-          path: "ChronicleKeeper-Desktop-${{ github.ref_name }}"
-          filename: "ChronicleKeeper-Desktop-${{ github.ref_name }}.zip"
+          command: 'mv build/ ChronicleKeeper-Server-Windows-${{ github.ref_name }}/'
+          path: "ChronicleKeeper-Server-Windows-${{ github.ref_name }}"
+          filename: "ChronicleKeeper-Server-Windows-${{ github.ref_name }}.zip"
 
       - name: Upload Release
         uses: ncipollo/release-action@v1.12.0
         with:
           allowUpdates: true
           omitBodyDuringUpdate: true
-          artifacts: "ChronicleKeeper-Desktop-${{ github.ref_name }}.zip"
+          artifacts: "ChronicleKeeper-Server-Windows-${{ github.ref_name }}.zip"

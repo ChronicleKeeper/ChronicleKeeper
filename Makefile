@@ -7,7 +7,7 @@ ROOT_DIR:=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
-symfony: ## build a symfony cli backed release
+symfony-cli: ## build a symfony cli backed release
 	rm -rf build
 
 	mkdir -p build/php
@@ -20,13 +20,14 @@ symfony: ## build a symfony cli backed release
 	cd build; rm symfony-cli_windows_amd64.zip
 	cd build; rm README.md LICENSE
 
+	mkdir -p build/www
 	git archive HEAD | (cd build/www; tar x)
 	cd build/www; APP_ENV=prod composer install --optimize-autoloader --no-dev --prefer-dist --no-progress
 	cd build/www; APP_ENV=prod php bin/console asset-map:compile
 	cd build/www; APP_ENV=prod php bin/console cache:warmup
 	cd build/www; rm composer.lock composer.json
 
-	cd build; cp www/config/symfony/chronicle-keeper.bat ChronicleKeeper.bat
+	cd build; cp www/config/symfony-cli/chronicle-keeper.bat ChronicleKeeper.bat
 
 phpdesktop: ## build phpdesktop release
 	rm -rf build
