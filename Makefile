@@ -22,6 +22,7 @@ symfony-cli: ## build a symfony cli backed release
 
 	mkdir -p build/www
 	git archive HEAD | (cd build/www; tar x)
+	cd build/www; mv config/phpdesktop/php.ini ../php
 	cd build/www; APP_ENV=prod composer install --optimize-autoloader --no-dev --prefer-dist --no-progress
 	cd build/www; APP_ENV=prod php bin/console asset-map:compile
 	cd build/www; APP_ENV=prod php bin/console cache:warmup
