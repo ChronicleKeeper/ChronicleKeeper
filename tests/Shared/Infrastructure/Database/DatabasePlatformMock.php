@@ -6,7 +6,9 @@ namespace ChronicleKeeper\Test\Shared\Infrastructure\Database;
 
 use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
 use PHPUnit\Framework\Assert;
+use Throwable;
 
+use function array_key_exists;
 use function count;
 use function json_encode;
 use function sprintf;
@@ -24,23 +26,33 @@ final class DatabasePlatformMock implements DatabasePlatform
     private array $fetchExpectations = [];
     /** @var array<int, array{sql: string, parameters: array<string, mixed>}> */
     private array $executedFetches = [];
+    /** @var array<string, Throwable> */
+    private array $throwExceptionOnInsertToTable = [];
 
     public function beginTransaction(): void
     {
         Assert::assertFalse($this->inTransaction, 'Transaction already started');
-        $this->inTransaction = true;
+        $this->inTransaction     = true;
+        $this->executedQueries[] = ['sql' => 'BEGIN TRANSACTION', 'parameters' => []];
     }
 
     public function commit(): void
     {
         Assert::assertTrue($this->inTransaction, 'No transaction to commit');
-        $this->inTransaction = false;
+        $this->inTransaction     = false;
+        $this->executedQueries[] = ['sql' => 'COMMIT', 'parameters' => []];
     }
 
     public function rollback(): void
     {
         Assert::assertTrue($this->inTransaction, 'No transaction to rollback');
-        $this->inTransaction = false;
+        $this->inTransaction     = false;
+        $this->executedQueries[] = ['sql' => 'ROLLBACK', 'parameters' => []];
+    }
+
+    public function throwExceptionOnInsertToTable(string $table, Throwable $exception): void
+    {
+        $this->throwExceptionOnInsertToTable[$table] = $exception;
     }
 
     /** @param array<string, mixed> $parameters */
@@ -162,12 +174,20 @@ final class DatabasePlatformMock implements DatabasePlatform
     /** @inheritDoc */
     public function insert(string $table, array $data): void
     {
+        if (array_key_exists($table, $this->throwExceptionOnInsertToTable)) {
+            throw $this->throwExceptionOnInsertToTable[$table];
+        }
+
         $this->executedInserts[] = ['table' => $table, 'data' => $data];
     }
 
     /** @inheritDoc */
     public function insertOrUpdate(string $table, array $data): void
     {
+        if (array_key_exists($table, $this->throwExceptionOnInsertToTable)) {
+            throw $this->throwExceptionOnInsertToTable[$table];
+        }
+
         $this->executedInserts[] = ['table' => $table, 'data' => $data];
     }
 

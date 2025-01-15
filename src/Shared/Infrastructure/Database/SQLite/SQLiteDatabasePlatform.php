@@ -142,6 +142,7 @@ class SQLiteDatabasePlatform implements DatabasePlatform
         $stmt = $this->getConnection()->prepare($sql);
         if ($stmt === false) {
             $this->databaseLogger->debug('Failed to prepare statement');
+
             return;
         }
 

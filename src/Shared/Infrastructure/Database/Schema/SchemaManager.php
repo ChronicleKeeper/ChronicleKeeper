@@ -11,6 +11,9 @@ use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\DependencyInjection\Attribute\Lazy;
 use Throwable;
 
+use function array_column;
+use function array_filter;
+use function array_values;
 use function iterator_to_array;
 use function usort;
 
@@ -60,18 +63,28 @@ class SchemaManager
         }
     }
 
+    /** @return array<int, string> */
+    public function getTables(): array
+    {
+        $tables = array_column(
+            $this->platform->fetch("SELECT name FROM sqlite_master WHERE type='table'"),
+            'name',
+        );
+
+        return array_values(array_filter(
+            $tables,
+            static fn (string $table) => $table !== 'sqlite_sequence',
+        ));
+    }
+
     public function dropSchema(): void
     {
         try {
             $this->platform->beginTransaction();
 
-            $tables = $this->platform->fetch("SELECT name FROM sqlite_master WHERE type='table'");
+            $tables = $this->getTables();
             foreach ($tables as $table) {
-                if ($table['name'] === 'sqlite_sequence') {
-                    continue;
-                }
-
-                $this->platform->query('DROP TABLE IF EXISTS ' . $table['name']);
+                $this->platform->query('DROP TABLE IF EXISTS ' . $table);
             }
 
             $this->platform->commit();

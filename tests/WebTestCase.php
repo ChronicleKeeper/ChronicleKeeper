@@ -31,7 +31,17 @@ class WebTestCase extends SymfonyWebTestCase
         assert($schemaManager instanceof SchemaManager);
 
         $this->schemaManager = $schemaManager;
+
+        if (! self::willSetupSchema()) {
+            return;
+        }
+
         $this->schemaManager->createSchema();
+    }
+
+    protected static function willSetupSchema(): bool
+    {
+        return true;
     }
 
     #[Override]

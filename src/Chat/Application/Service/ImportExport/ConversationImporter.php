@@ -40,6 +40,11 @@ final readonly class ConversationImporter implements SingleImport
             $content = $filesystem->read($zippedFile->path());
             $content = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
 
+            if (array_key_exists('data', $content)) {
+                // Workaround for Imports from versions < 0.7
+                $content = $content['data'];
+            }
+
             if (
                 $settings->overwriteLibrary === false
                 && $this->databasePlatform->hasRows('conversations', ['id' => $content['id']])
@@ -50,15 +55,6 @@ final readonly class ConversationImporter implements SingleImport
                 );
 
                 continue;
-            }
-
-            if (array_key_exists('data', $content)) {
-                // Workaround for Imports from versions < 0.7
-                $content = $content['data'];
-
-                $this->logger->debug('Imported conversation from new format', ['id' => $content['id']]);
-            } else {
-                $this->logger->debug('Imported conversation from old format', ['id' => $content['id']]);
             }
 
             $conversation = $this->denormalizer->denormalize($content, Conversation::class);

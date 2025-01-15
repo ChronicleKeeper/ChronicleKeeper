@@ -20,12 +20,6 @@ class ImportPruner
 
     public function __invoke(ExecuteImportPruning $event): void
     {
-        if ($event->importSettings->pruneLibrary === false) {
-            $this->logger->debug('Import - Skipping pruning of favorites.', ['pruner' => self::class]);
-
-            return;
-        }
-
         $this->logger->debug(
             'Import - Pruning favorites.',
             ['pruner' => self::class, 'tables' => ['favorites']],

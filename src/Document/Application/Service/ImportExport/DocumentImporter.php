@@ -46,6 +46,11 @@ final readonly class DocumentImporter implements SingleImport
         $content = $filesystem->read($file->path());
         $content = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
 
+        if (array_key_exists('data', $content)) {
+            // Workaround for Imports from versions < 0.7
+            $content = $content['data'];
+        }
+
         if (
             $settings->overwriteLibrary === false
             && $this->databasePlatform->hasRows('documents', ['id' => $content['id']])
@@ -53,15 +58,6 @@ final readonly class DocumentImporter implements SingleImport
             $this->logger->debug('Document already exists, skipping.', ['document_id' => $content['id']]);
 
             return;
-        }
-
-        if (array_key_exists('data', $content)) {
-            // Workaround for Imports from versions < 0.7
-            $content = $content['data'];
-
-            $this->logger->debug('Imported document from new format', ['id' => $content['id']]);
-        } else {
-            $this->logger->debug('Imported document from old format', ['id' => $content['id']]);
         }
 
         $this->databasePlatform->insertOrUpdate(

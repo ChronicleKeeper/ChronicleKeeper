@@ -20,12 +20,6 @@ class ImportPruner
 
     public function __invoke(ExecuteImportPruning $event): void
     {
-        if ($event->importSettings->pruneLibrary === false) {
-            $this->logger->debug('Import - Skipping pruning of images.', ['pruner' => self::class]);
-
-            return;
-        }
-
         $this->logger->debug(
             'Import - Pruning documents and their vectors.',
             ['pruner' => self::class, 'tables' => ['images', 'images_vectors']],

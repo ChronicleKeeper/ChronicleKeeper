@@ -39,6 +39,11 @@ final readonly class ImageImporter implements SingleImport
         $content = $filesystem->read($file->path());
         $content = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
 
+        if (array_key_exists('data', $content)) {
+            // Workaround for Imports from versions < 0.7
+            $content = $content['data'];
+        }
+
         if (
             $settings->overwriteLibrary === false
             && $this->databasePlatform->hasRows('images', ['id' => $content['id']])
@@ -46,11 +51,6 @@ final readonly class ImageImporter implements SingleImport
             $this->logger->debug('Image already exists, skipping.', ['image_id' => $content['id']]);
 
             return;
-        }
-
-        if (array_key_exists('data', $content)) {
-            // Workaround for Imports from versions < 0.7
-            $content = $content['data'];
         }
 
         $this->logger->debug('Importing image.', ['image_id' => $content['id']]);
