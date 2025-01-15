@@ -11,3 +11,4 @@ phpcs.xml.dist export-ignore
 phpstan.neon export-ignore
 phpunit.xml.dist export-ignore
 Makefile export-ignore
+rector.php export-ignore
