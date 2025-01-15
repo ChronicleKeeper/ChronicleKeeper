@@ -12,9 +12,9 @@ symfony-cli: ## build a symfony cli backed release
 	rm -rf build
 
 	mkdir -p build/php
-	cd build/php; wget https://windows.php.net/downloads/releases/latest/php-8.3-nts-Win32-vs16-x64-latest.zip
-	cd build/php; unzip php-8.3-nts-Win32-vs16-x64-latest.zip
-	cd build/php; rm php-8.3-nts-Win32-vs16-x64-latest.zip
+	cd build/php; wget https://windows.php.net/downloads/releases/latest/php-8.4-nts-Win32-vs17-x64-latest.zip
+	cd build/php; unzip php-8.4-nts-Win32-vs17-x64-latest.zip
+	cd build/php; rm php-8.4-nts-Win32-vs17-x64-latest.zip
 
 	cd build; wget https://github.com/symfony-cli/symfony-cli/releases/download/v5.10.6/symfony-cli_windows_amd64.zip
 	cd build; unzip symfony-cli_windows_amd64.zip
