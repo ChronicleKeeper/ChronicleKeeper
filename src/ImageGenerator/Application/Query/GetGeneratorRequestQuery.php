@@ -7,17 +7,20 @@ namespace ChronicleKeeper\ImageGenerator\Application\Query;
 use ChronicleKeeper\ImageGenerator\Domain\Entity\GeneratorRequest;
 use ChronicleKeeper\Shared\Application\Query\Query;
 use ChronicleKeeper\Shared\Application\Query\QueryParameters;
-use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
-use Symfony\Component\Serializer\Encoder\JsonEncoder;
-use Symfony\Component\Serializer\SerializerInterface;
+use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
+use InvalidArgumentException;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 use function assert;
+use function json_decode;
+
+use const JSON_THROW_ON_ERROR;
 
 final readonly class GetGeneratorRequestQuery implements Query
 {
     public function __construct(
-        private FileAccess $fileAccess,
-        private SerializerInterface $serializer,
+        private DenormalizerInterface $denormalizer,
+        private DatabasePlatform $platform,
     ) {
     }
 
@@ -25,10 +28,22 @@ final readonly class GetGeneratorRequestQuery implements Query
     {
         assert($parameters instanceof GetGeneratorRequest);
 
-        return $this->serializer->deserialize(
-            $content = $this->fileAccess->read('generator.requests', $parameters->id . '.json'),
-            GeneratorRequest::class,
-            JsonEncoder::FORMAT,
+        $request = $this->platform->fetchSingleRow(
+            'SELECT * FROM generator_requests WHERE id = :id',
+            ['id' => $parameters->id],
         );
+
+        if ($request === null) {
+            throw new InvalidArgumentException('Generator Request not found');
+        }
+
+        $request['userInput'] = json_decode(
+            (string) $request['userInput'],
+            true,
+            512,
+            JSON_THROW_ON_ERROR,
+        );
+
+        return $this->denormalizer->denormalize($request, GeneratorRequest::class);
     }
 }

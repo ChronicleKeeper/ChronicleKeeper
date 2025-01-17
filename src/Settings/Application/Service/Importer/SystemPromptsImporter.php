@@ -4,46 +4,54 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Settings\Application\Service\Importer;
 
-use ChronicleKeeper\Settings\Application\Service\FileType;
 use ChronicleKeeper\Settings\Application\Service\ImportSettings;
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
-use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\PathRegistry;
 use League\Flysystem\Filesystem;
 use League\Flysystem\UnableToReadFile;
+use Psr\Log\LoggerInterface;
 
-use const DIRECTORY_SEPARATOR;
+use function array_key_exists;
+use function count;
+use function json_decode;
+use function json_encode;
+
+use const JSON_PRETTY_PRINT;
+use const JSON_THROW_ON_ERROR;
 
 final readonly class SystemPromptsImporter implements SingleImport
 {
     public function __construct(
         private FileAccess $fileAccess,
-        private PathRegistry $pathRegistry,
+        private LoggerInterface $logger,
     ) {
     }
 
-    public function import(Filesystem $filesystem, ImportSettings $settings): ImportedFileBag
+    public function import(Filesystem $filesystem, ImportSettings $settings): void
     {
-        $file = $this->pathRegistry->get('storage') . DIRECTORY_SEPARATOR . 'system_prompts.json';
-
         if ($settings->overwriteSettings === false) {
-            return new ImportedFileBag(ImportedFile::asIgnored(
-                $file,
-                FileType::SYSTEM_PROMPTS,
-                'Settings overwrite is disabled.',
-            ));
+            $this->logger->debug('Skipping import of system prompts as overwrite is disabled.');
+
+            return;
         }
 
         try {
             $content = $filesystem->read('system_prompts.json');
-            $this->fileAccess->write('storage', 'system_prompts.json', $content);
 
-            return new ImportedFileBag(ImportedFile::asSuccess($file, FileType::SYSTEM_PROMPTS));
+            // The following decoding and encoding is needed as a compatibility layer for the old format
+            $content = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
+            if (array_key_exists('appVersion', $content)) {
+                $content = $content['data'];
+
+                $this->logger->debug('Imported system prompts from new format', ['count' => count($content)]);
+            }
+
+            $this->fileAccess->write(
+                'storage',
+                'system_prompts.json',
+                json_encode($content, JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR),
+            );
         } catch (UnableToReadFile) {
-            return new ImportedFileBag(ImportedFile::asIgnored(
-                $file,
-                FileType::SYSTEM_PROMPTS,
-                'File not in archive.',
-            ));
+            // It is totally fine when this fails as there are maybe no user created system prompts
         }
     }
 }

@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Library\Presentation\Controller\Directory;
 
+use ChronicleKeeper\Library\Application\Command\StoreDirectory;
 use ChronicleKeeper\Library\Domain\Entity\Directory;
 use ChronicleKeeper\Library\Domain\RootDirectory;
-use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemDirectoryRepository;
 use ChronicleKeeper\Library\Presentation\Form\DirectoryType;
 use ChronicleKeeper\Shared\Presentation\FlashMessages\Alert;
 use ChronicleKeeper\Shared\Presentation\FlashMessages\HandleFlashMessages;
@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Requirement\Requirement;
 use Symfony\Component\Routing\RouterInterface;
@@ -37,8 +38,8 @@ class DirectoryEdit extends AbstractController
     public function __construct(
         private readonly Environment $environment,
         private readonly RouterInterface $router,
-        private readonly FilesystemDirectoryRepository $directoryRepository,
         private readonly FormFactoryInterface $formFactory,
+        private readonly MessageBusInterface $bus,
     ) {
     }
 
@@ -62,7 +63,7 @@ class DirectoryEdit extends AbstractController
             $directory->rename($directoryArray['title']);
             $directory->moveToDirectory($directoryArray['parent']);
 
-            $this->directoryRepository->store($directory);
+            $this->bus->dispatch(new StoreDirectory($directory));
 
             $this->addFlashMessage(
                 $request,

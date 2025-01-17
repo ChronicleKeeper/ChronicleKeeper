@@ -9,18 +9,19 @@ use ChronicleKeeper\Chat\Infrastructure\Serializer\ExtendedMessageDenormalizer;
 use ChronicleKeeper\Settings\Application\SettingsHandler;
 use ChronicleKeeper\Shared\Application\Query\Query;
 use ChronicleKeeper\Shared\Application\Query\QueryParameters;
-use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
-use Symfony\Component\Serializer\Encoder\JsonEncoder;
-use Symfony\Component\Serializer\SerializerInterface;
+use ChronicleKeeper\Shared\Infrastructure\Database\Converter\DatabaseRowConverter;
+use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 use function assert;
 
 class FindConversationByIdQuery implements Query
 {
     public function __construct(
-        private readonly FileAccess $fileAccess,
-        private readonly SerializerInterface $serializer,
+        private readonly DenormalizerInterface $denormalizer,
         private readonly SettingsHandler $settingsHandler,
+        private readonly DatabasePlatform $databasePlatform,
+        private readonly DatabaseRowConverter $databaseRowConverter,
     ) {
     }
 
@@ -28,21 +29,26 @@ class FindConversationByIdQuery implements Query
     {
         assert($parameters instanceof FindConversationByIdParameters);
 
+        $data = $this->databasePlatform->fetchSingleRow(
+            'SELECT * FROM conversations WHERE id = :id',
+            ['id' => $parameters->id],
+        );
+
+        if ($data === null) {
+            return null;
+        }
+
+        $conversation = $this->databaseRowConverter->convert($data, Conversation::class);
+
         $settings                = $this->settingsHandler->get();
         $showReferencedDocuments = $settings->getChatbotGeneral()->showReferencedDocuments();
         $showReferencedImages    = $settings->getChatbotGeneral()->showReferencedImages();
         $showDebugOutput         = $settings->getChatbotFunctions()->isAllowDebugOutput();
 
-        $filename = $parameters->id . '.json';
-        if (! $this->fileAccess->exists('library.conversations', $filename)) {
-            return null;
-        }
-
-        return $this->serializer->deserialize(
-            $this->fileAccess->read('library.conversations', $filename),
-            Conversation::class,
-            JsonEncoder::FORMAT,
-            [
+        return $this->denormalizer->denormalize(
+            data: $conversation,
+            type: Conversation::class,
+            context: [
                 ExtendedMessageDenormalizer::WITH_CONTEXT_DOCUMENTS => $showReferencedDocuments,
                 ExtendedMessageDenormalizer::WITH_CONTEXT_IMAGES => $showReferencedImages,
                 ExtendedMessageDenormalizer::WITH_DEBUG_FUNCTIONS => $showDebugOutput,

@@ -5,46 +5,16 @@ declare(strict_types=1);
 namespace ChronicleKeeper\Test\ImageGenerator\Presentation\Controller;
 
 use ChronicleKeeper\ImageGenerator\Presentation\Controller\Delete;
-use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
-use Override;
+use ChronicleKeeper\Test\WebTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Large;
 use PHPUnit\Framework\Attributes\Test;
-use Symfony\Bundle\FrameworkBundle\KernelBrowser;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Contracts\Service\ResetInterface;
-
-use function assert;
 
 #[CoversClass(Delete::class)]
 #[Large]
 class DeleteTest extends WebTestCase
 {
-    private KernelBrowser $client;
-    private FileAccess&ResetInterface $fileAccess;
-
-    public function setUp(): void
-    {
-        $this->client = static::createClient();
-
-        $fileAccess = $this->client->getContainer()->get(FileAccess::class);
-        assert($fileAccess instanceof FileAccess);
-        assert($fileAccess instanceof ResetInterface);
-
-        $this->fileAccess = $fileAccess;
-    }
-
-    #[Override]
-    protected function tearDown(): void
-    {
-        parent::tearDown();
-
-        $this->fileAccess->reset();
-
-        unset($this->client, $this->fileAccess);
-    }
-
     #[Test]
     public function thatRequestingPageWithoutConfirmFails(): void
     {
@@ -70,11 +40,11 @@ class DeleteTest extends WebTestCase
     #[Test]
     public function thatRequestingPageWithExistentDataIsSuccess(): void
     {
-        $this->fileAccess->write(
-            'generator.requests',
-            'c6f5d897-175c-4938-abe1-613fb51fdd68.json',
-            'Foo Bar Baz',
-        );
+        $this->databasePlatform->insert('generator_requests', [
+            'id'       => 'c6f5d897-175c-4938-abe1-613fb51fdd68',
+            'title'    => 'Foo Bar Baz',
+            'userInput' => '{"foo": "bar"}',
+        ]);
 
         $this->client->request(
             Request::METHOD_GET,
@@ -82,9 +52,11 @@ class DeleteTest extends WebTestCase
         );
 
         self::assertResponseRedirects('/image_generator');
-        self::assertFalse($this->fileAccess->exists(
-            'generator.requests',
-            'c6f5d897-175c-4938-abe1-613fb51fdd68.json',
-        ));
+
+        $existingEntries = $this->databasePlatform->fetch(
+            'SELECT * FROM generator_requests WHERE id = :id',
+            ['id' => 'c6f5d897-175c-4938-abe1-613fb51fdd68'],
+        );
+        self::assertEmpty($existingEntries);
     }
 }

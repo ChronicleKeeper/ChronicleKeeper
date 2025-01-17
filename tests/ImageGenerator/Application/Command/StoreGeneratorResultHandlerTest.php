@@ -6,19 +6,13 @@ namespace ChronicleKeeper\Test\ImageGenerator\Application\Command;
 
 use ChronicleKeeper\ImageGenerator\Application\Command\StoreGeneratorResult;
 use ChronicleKeeper\ImageGenerator\Application\Command\StoreGeneratorResultHandler;
-use ChronicleKeeper\ImageGenerator\Application\Service\PromptOptimizer;
-use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
+use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
 use ChronicleKeeper\Test\ImageGenerator\Domain\Entity\GeneratorResultBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Serializer\SerializerInterface;
 use Webmozart\Assert\InvalidArgumentException;
-
-use const DIRECTORY_SEPARATOR;
-use const JSON_PRETTY_PRINT;
-use const JSON_UNESCAPED_UNICODE;
 
 #[CoversClass(StoreGeneratorResultHandler::class)]
 #[CoversClass(StoreGeneratorResult::class)]
@@ -38,32 +32,26 @@ class StoreGeneratorResultHandlerTest extends TestCase
     #[Test]
     public function testStoreGeneratorResult(): void
     {
-        $fileAccess      = $this->createMock(FileAccess::class);
-        $serializer      = $this->createMock(SerializerInterface::class);
-        $promptOptimizer = $this->createMock(PromptOptimizer::class);
+        $databasePlatform = $this->createMock(DatabasePlatform::class);
 
-        $handler = new StoreGeneratorResultHandler($fileAccess, $serializer, $promptOptimizer);
+        $handler = new StoreGeneratorResultHandler($databasePlatform);
         $request = new StoreGeneratorResult(
             '67e4e2a2-8afa-4788-83aa-53507cf39e00',
             (new GeneratorResultBuilder())->build(),
         );
 
-        $serializedData = '{"id":"result-id","data":"some data"}';
-        $serializer->expects($this->once())
-            ->method('serialize')
+        $databasePlatform->expects($this->once())
+            ->method('insertOrUpdate')
             ->with(
-                $request->generatorResult,
-                'json',
-                ['json_encode_options' => JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT],
-            )
-            ->willReturn($serializedData);
-
-        $fileAccess->expects($this->once())
-            ->method('write')
-            ->with(
-                'generator.images',
-                DIRECTORY_SEPARATOR . $request->requestId . DIRECTORY_SEPARATOR . $request->generatorResult->id . '.json',
-                $serializedData,
+                'generator_results',
+                [
+                    'id'             => $request->generatorResult->id,
+                    'generatorRequest' => $request->requestId,
+                    'encodedImage'   => $request->generatorResult->encodedImage,
+                    'revisedPrompt'  => $request->generatorResult->revisedPrompt,
+                    'mimeType'       => $request->generatorResult->mimeType,
+                    'image'          => $request->generatorResult->image,
+                ],
             );
 
         $handler($request);

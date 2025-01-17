@@ -4,14 +4,12 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Test\Document\Application\Query;
 
-use ChronicleKeeper\Document\Application\Query\GetAllVectorSearchDocuments;
-use ChronicleKeeper\Document\Application\Query\GetVectorDocument;
+use ChronicleKeeper\Document\Application\Query\GetDocument;
 use ChronicleKeeper\Document\Application\Query\SearchSimilarVectors;
 use ChronicleKeeper\Document\Application\Query\SearchSimilarVectorsQuery;
-use ChronicleKeeper\Library\Infrastructure\VectorStorage\Distance\CosineDistance;
-use ChronicleKeeper\Shared\Application\Query\QueryParameters;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
-use ChronicleKeeper\Test\Document\Domain\Entity\VectorDocumentBuilder;
+use ChronicleKeeper\Test\Document\Domain\Entity\DocumentBuilder;
+use ChronicleKeeper\Test\Shared\Infrastructure\Database\DatabasePlatformMock;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\Attributes\Test;
@@ -35,131 +33,57 @@ class SearchSimilarVectorsTest extends TestCase
     }
 
     #[Test]
-    public function queryWorkingWithoutResults(): void
+    public function itWillResultInAnEmptyArrayWhenNotResultsFound(): void
     {
+        $query = new SearchSimilarVectors([12.0], 0.5, 10);
+
         $queryService = $this->createMock(QueryService::class);
-        $queryService->expects($this->once())->method('query')->willReturn([]);
+        $queryService->expects($this->never())->method('query')->willReturn([]);
 
-        $cosineDistance = $this->createMock(CosineDistance::class);
-        $cosineDistance->expects($this->never())->method('measure');
+        $databasePlatform = new DatabasePlatformMock();
+        $databasePlatform->expectAnyFetchWithJustParameters(
+            [
+                'embedding' => '[12]',
+                'maxDistance' => 0.5,
+                'maxResults' => 10,
+            ],
+            [],
+        );
 
-        $query = new SearchSimilarVectorsQuery($queryService, $cosineDistance);
+        $searchSimilarVectorsQuery = new SearchSimilarVectorsQuery($databasePlatform, $queryService);
+        $results                   = $searchSimilarVectorsQuery->query($query);
 
-        $documents = $query->query(new SearchSimilarVectors([12.0, 13.0], 0.5, 10));
-
-        self::assertSame([], $documents);
+        self::assertEmpty($results);
     }
 
     #[Test]
-    public function queryWithFilteredResults(): void
+    public function itWillReturnResultsWhenFound(): void
     {
-        $firstDocument  = (new VectorDocumentBuilder())->build();
-        $secondDocument = (new VectorDocumentBuilder())->build();
-
-        $queryService = $this->createMock(QueryService::class);
-        $queryService->expects($this->exactly(2))
+        $responseDocument = (new DocumentBuilder())->build();
+        $queryService     = $this->createMock(QueryService::class);
+        $queryService->expects($this->once())
             ->method('query')
             ->willReturnCallback(
-                static function (QueryParameters $query) use ($firstDocument, $secondDocument) {
-                    if ($query instanceof GetAllVectorSearchDocuments) {
-                        return [
-                            $firstDocument->toSearchVector(),
-                            $secondDocument->toSearchVector(),
-                        ];
-                    }
+                static function (GetDocument $query) use ($responseDocument) {
+                    self::assertSame('1', $query->id);
 
-                    return [
-                        $firstDocument,
-                        $secondDocument,
-                    ];
+                    return $responseDocument;
                 },
             );
 
-        $cosineDistance = $this->createMock(CosineDistance::class);
-        $cosineDistance->expects($this->exactly(2))
-            ->method('measure')
-            ->willReturnOnConsecutiveCalls(0.4, 0.6);
+        $databasePlatform = new DatabasePlatformMock();
+        $databasePlatform->expectAnyFetchWithJustParameters(
+            [
+                'embedding' => '[12]',
+                'maxDistance' => 0.5,
+                'maxResults' => 10,
+            ],
+            [['document_id' => '1', 'distance' => 0.1, 'content' => 'content']],
+        );
 
-        $query = new SearchSimilarVectorsQuery($queryService, $cosineDistance);
+        $searchSimilarVectorsQuery = new SearchSimilarVectorsQuery($databasePlatform, $queryService);
+        $results                   = $searchSimilarVectorsQuery->query(new SearchSimilarVectors([12.0], 0.5, 10));
 
-        $documents = $query->query(new SearchSimilarVectors([12.0, 13.0], 0.5, 10));
-
-        self::assertCount(1, $documents);
-    }
-
-    #[Test]
-    public function queryRespectsMaximalResults(): void
-    {
-        $firstDocument  = (new VectorDocumentBuilder())->build();
-        $secondDocument = (new VectorDocumentBuilder())->build();
-
-        $queryService = $this->createMock(QueryService::class);
-        $queryService->expects($this->exactly(2))
-            ->method('query')
-            ->willReturnCallback(
-                static function (QueryParameters $query) use ($firstDocument, $secondDocument) {
-                    if ($query instanceof GetAllVectorSearchDocuments) {
-                        return [
-                            $firstDocument->toSearchVector(),
-                            $secondDocument->toSearchVector(),
-                        ];
-                    }
-
-                    return [
-                        $firstDocument,
-                        $secondDocument,
-                    ];
-                },
-            );
-
-        $cosineDistance = $this->createMock(CosineDistance::class);
-        $cosineDistance->expects($this->exactly(2))
-            ->method('measure')->willReturn(0.4);
-
-        $query = new SearchSimilarVectorsQuery($queryService, $cosineDistance);
-
-        $documents = $query->query(new SearchSimilarVectors([12.0, 13.0], 0.5, 1));
-
-        self::assertCount(1, $documents);
-    }
-
-    #[Test]
-    public function documentsAreOrderedByVectorDistance(): void
-    {
-        $firstDocument  = (new VectorDocumentBuilder())->withVector([12.0, 13.0])->build();
-        $secondDocument = (new VectorDocumentBuilder())->withVector([14.0, 15.0])->build();
-
-        $queryService = $this->createMock(QueryService::class);
-        $queryService->expects($this->exactly(3))
-            ->method('query')
-            ->willReturnCallback(
-                static function (QueryParameters $query) use ($firstDocument, $secondDocument) {
-                    if ($query instanceof GetAllVectorSearchDocuments) {
-                        return [
-                            $firstDocument->toSearchVector(),
-                            $secondDocument->toSearchVector(),
-                        ];
-                    }
-
-                    self::assertInstanceOf(GetVectorDocument::class, $query);
-                    if ($query->id === $firstDocument->id) {
-                        return $firstDocument;
-                    }
-
-                    return $secondDocument;
-                },
-            );
-
-        $cosineDistance = $this->createMock(CosineDistance::class);
-        $cosineDistance->expects($this->exactly(2))
-            ->method('measure')
-            ->willReturnOnConsecutiveCalls(0.6, 0.4);
-
-        $query = new SearchSimilarVectorsQuery($queryService, $cosineDistance);
-
-        $documents = $query->query(new SearchSimilarVectors([12.0, 13.0], 1, 10));
-
-        self::assertSame($secondDocument, $documents[0]['vector']);
-        self::assertSame($firstDocument, $documents[1]['vector']);
+        self::assertSame([['document' => $responseDocument, 'content' => 'content', 'distance' => 0.1]], $results);
     }
 }

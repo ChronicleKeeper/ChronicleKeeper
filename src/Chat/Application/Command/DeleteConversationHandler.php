@@ -5,22 +5,25 @@ declare(strict_types=1);
 namespace ChronicleKeeper\Chat\Application\Command;
 
 use ChronicleKeeper\Chat\Domain\Event\ConversationDeleted;
-use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
+use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
+use ChronicleKeeper\Shared\Infrastructure\Messenger\MessageEventResult;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 #[AsMessageHandler]
 class DeleteConversationHandler
 {
     public function __construct(
-        private readonly FileAccess $fileAccess,
-        private readonly EventDispatcherInterface $eventDispatcher,
+        private readonly DatabasePlatform $databasePlatform,
     ) {
     }
 
-    public function __invoke(DeleteConversation $message): void
+    public function __invoke(DeleteConversation $message): MessageEventResult
     {
-        $this->fileAccess->delete('library.conversations', $message->conversation->getId() . '.json');
-        $this->eventDispatcher->dispatch(new ConversationDeleted($message->conversation));
+        $this->databasePlatform->query(
+            'DELETE FROM conversation_messages WHERE conversation_id = :conversation_id',
+            ['conversation_id' => $message->conversation->getId()],
+        );
+
+        return new MessageEventResult([new ConversationDeleted($message->conversation)]);
     }
 }

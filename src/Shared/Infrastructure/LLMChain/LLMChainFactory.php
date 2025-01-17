@@ -16,7 +16,7 @@ use PhpLlm\LlmChain\Chain\ToolBox\ChainProcessor;
 use PhpLlm\LlmChain\ChainInterface;
 use PhpLlm\LlmChain\Platform;
 use PhpLlm\LlmChain\PlatformInterface;
-use Symfony\Component\HttpClient\EventSourceHttpClient;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class LLMChainFactory
 {
@@ -25,6 +25,7 @@ class LLMChainFactory
     public function __construct(
         private readonly SettingsHandler $settingsHandler,
         private readonly ToolboxFactory $toolboxFactory,
+        private readonly HttpClientInterface $httpClient,
     ) {
     }
 
@@ -42,15 +43,13 @@ class LLMChainFactory
 
     public function createPlatform(): PlatformInterface
     {
-        $apiKey     = $this->settingsHandler->get()->getApplication()->openAIApiKey ?? '';
-        $httpClient = new EventSourceHttpClient();
-
-        $dallEModelClient = new DalleModelClient($httpClient, $apiKey);
+        $apiKey           = $this->settingsHandler->get()->getApplication()->openAIApiKey ?? '';
+        $dallEModelClient = new DalleModelClient($this->httpClient, $apiKey);
 
         return new Platform(
             [
-                new GPTModelClient($httpClient, $apiKey),
-                new EmbeddingsModelClient($httpClient, $apiKey),
+                new GPTModelClient($this->httpClient, $apiKey),
+                new EmbeddingsModelClient($this->httpClient, $apiKey),
                 $dallEModelClient,
             ],
             [

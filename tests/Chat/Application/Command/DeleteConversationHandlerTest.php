@@ -7,13 +7,12 @@ namespace ChronicleKeeper\Test\Chat\Application\Command;
 use ChronicleKeeper\Chat\Application\Command\DeleteConversation;
 use ChronicleKeeper\Chat\Application\Command\DeleteConversationHandler;
 use ChronicleKeeper\Chat\Domain\Event\ConversationDeleted;
-use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
+use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
 use ChronicleKeeper\Test\Chat\Domain\Entity\ConversationBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 #[CoversClass(DeleteConversationHandler::class)]
 #[CoversClass(DeleteConversation::class)]
@@ -24,19 +23,20 @@ class DeleteConversationHandlerTest extends TestCase
     public function executeDeletion(): void
     {
         $conversation = (new ConversationBuilder())->build();
-        $message      = new DeleteConversation($conversation);
 
-        $fileAccess = $this->createMock(FileAccess::class);
-        $fileAccess->expects($this->once())
-            ->method('delete')
-            ->with('library.conversations', $conversation->getId() . '.json');
+        $databasePlatform = $this->createMock(DatabasePlatform::class);
+        $databasePlatform->expects($this->once())
+            ->method('query')
+            ->with(
+                'DELETE FROM conversation_messages WHERE conversation_id = :conversation_id',
+                ['conversation_id' => $conversation->getId()],
+            );
 
-        $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
-        $eventDispatcher->expects($this->once())
-            ->method('dispatch')
-            ->with(self::isInstanceOf(ConversationDeleted::class));
+        $handler       = new DeleteConversationHandler($databasePlatform);
+        $messageResult = $handler(new DeleteConversation($conversation));
 
-        $handler = new DeleteConversationHandler($fileAccess, $eventDispatcher);
-        $handler($message);
+        self::assertCount(1, $messageResult->getEvents());
+        self::assertInstanceOf(ConversationDeleted::class, $messageResult->getEvents()[0]);
+        self::assertSame($conversation, $messageResult->getEvents()[0]->conversation);
     }
 }

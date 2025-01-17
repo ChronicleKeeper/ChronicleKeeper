@@ -7,28 +7,18 @@ namespace ChronicleKeeper\Chat\Application\Query;
 use ChronicleKeeper\Chat\Domain\Entity\Conversation;
 use ChronicleKeeper\Shared\Application\Query\Query;
 use ChronicleKeeper\Shared\Application\Query\QueryParameters;
-use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
-use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\Finder;
-use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\PathRegistry;
-use Psr\Log\LoggerInterface;
-use RuntimeException;
-use Symfony\Component\Serializer\Encoder\JsonEncoder;
-use Symfony\Component\Serializer\SerializerInterface;
-use Webmozart\Assert\Assert;
+use ChronicleKeeper\Shared\Infrastructure\Database\Converter\DatabaseRowConverter;
+use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
-use function array_filter;
 use function assert;
-use function strcasecmp;
-use function usort;
 
 class FindConversationsByDirectoryQuery implements Query
 {
     public function __construct(
-        private readonly FileAccess $fileAccess,
-        private readonly SerializerInterface $serializer,
-        private readonly LoggerInterface $logger,
-        private readonly PathRegistry $pathRegistry,
-        private readonly Finder $finder,
+        private readonly DenormalizerInterface $denormalizer,
+        private readonly DatabasePlatform $databasePlatform,
+        private readonly DatabaseRowConverter $databaseRowConverter,
     ) {
     }
 
@@ -37,36 +27,19 @@ class FindConversationsByDirectoryQuery implements Query
     {
         assert($parameters instanceof FindConversationsByDirectoryParameters);
 
+        $data = $this->databasePlatform->fetch(
+            'SELECT * FROM conversations WHERE directory = :directory ORDER BY title',
+            ['directory' => $parameters->directory->getId()],
+        );
+
         $conversations = [];
-        foreach ($this->finder->findFilesInDirectory($this->pathRegistry->get('library.conversations')) as $file) {
-            try {
-                $conversations[] = $this->deserialize($file->getFilename());
-            } catch (RuntimeException $e) {
-                $this->logger->error($e, ['file' => $file]);
-            }
+        foreach ($data as $conversation) {
+            $conversations[] = $this->denormalizer->denormalize(
+                $this->databaseRowConverter->convert($conversation, Conversation::class),
+                Conversation::class,
+            );
         }
 
-        $conversations = array_filter(
-            $conversations,
-            static fn (Conversation $conversation) => $conversation->getDirectory()->equals($parameters->directory),
-        );
-
-        usort(
-            $conversations,
-            static fn (Conversation $left, Conversation $right) => strcasecmp($left->getTitle(), $right->getTitle()),
-        );
-
         return $conversations;
-    }
-
-    private function deserialize(string $file): Conversation
-    {
-        Assert::notEmpty($file, 'The given file must not be empty.');
-
-        return $this->serializer->deserialize(
-            $this->fileAccess->read('library.conversations', $file),
-            Conversation::class,
-            JsonEncoder::FORMAT,
-        );
     }
 }

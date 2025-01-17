@@ -7,47 +7,36 @@ namespace ChronicleKeeper\Test\Document\Presentation\Controller;
 use ChronicleKeeper\Document\Domain\Entity\Document;
 use ChronicleKeeper\Document\Presentation\Controller\DocumentView;
 use ChronicleKeeper\Library\Presentation\Twig\DirectoryBreadcrumb;
-use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
 use ChronicleKeeper\Test\Document\Domain\Entity\DocumentBuilder;
-use ChronicleKeeper\Test\Shared\Infrastructure\Persistence\Filesystem\FileAccessDouble;
+use ChronicleKeeper\Test\WebTestCase;
 use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Large;
 use PHPUnit\Framework\Attributes\Test;
-use Symfony\Bundle\FrameworkBundle\KernelBrowser;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Uid\Uuid;
-
-use function assert;
-use function json_encode;
-
-use const JSON_THROW_ON_ERROR;
 
 #[CoversClass(DocumentView::class)]
 #[CoversClass(DirectoryBreadcrumb::class)]
 #[Large]
 class DocumentViewTest extends WebTestCase
 {
-    private KernelBrowser $client;
-    private FileAccessDouble $fileAccess;
     private Document $fixtureDocument;
 
+    #[Override]
     protected function setUp(): void
     {
+        parent::setUp();
+
         $this->fixtureDocument = (new DocumentBuilder())->build();
-        $this->client          = self::createClient();
-
-        $fileAccess = $this->client->getContainer()->get(FileAccess::class);
-        assert($fileAccess instanceof FileAccessDouble);
-
-        $this->fileAccess = $fileAccess;
-        $this->fileAccess->write(
-            'library.documents',
-            $this->fixtureDocument->getId() . '.json',
-            json_encode($this->fixtureDocument, JSON_THROW_ON_ERROR),
-        );
+        $this->databasePlatform->insert('documents', [
+            'id'    => $this->fixtureDocument->getId(),
+            'title' => $this->fixtureDocument->getTitle(),
+            'content' => $this->fixtureDocument->getContent(),
+            'directory' => $this->fixtureDocument->getDirectory()->getId(),
+            'last_updated' => $this->fixtureDocument->getUpdatedAt()->format('Y-m-d H:i:s'),
+        ]);
     }
 
     #[Override]
@@ -55,7 +44,7 @@ class DocumentViewTest extends WebTestCase
     {
         parent::tearDown();
 
-        unset($this->client, $this->fileAccess, $this->fixtureDocument);
+        unset($this->fixtureDocument);
     }
 
     #[Test]

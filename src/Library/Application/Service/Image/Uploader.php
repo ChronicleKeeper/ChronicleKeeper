@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Library\Application\Service\Image;
 
+use ChronicleKeeper\Image\Application\Command\StoreImage;
 use ChronicleKeeper\Image\Domain\Entity\Image;
 use ChronicleKeeper\Library\Domain\Entity\Directory;
 use ChronicleKeeper\Library\Domain\RootDirectory;
-use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemImageRepository;
 use ChronicleKeeper\Settings\Domain\Entity\SystemPrompt;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\Messenger\MessageBusInterface;
 
 use function base64_encode;
 use function is_string;
@@ -19,7 +20,7 @@ class Uploader
 {
     public function __construct(
         private readonly LLMDescriber $LLMDescriber,
-        private readonly FilesystemImageRepository $imageRepository,
+        private readonly MessageBusInterface $bus,
     ) {
     }
 
@@ -47,7 +48,7 @@ class Uploader
             $utilizePrompt,
         );
 
-        $this->imageRepository->store($image);
+        $this->bus->dispatch(new StoreImage($image));
 
         return $image;
     }

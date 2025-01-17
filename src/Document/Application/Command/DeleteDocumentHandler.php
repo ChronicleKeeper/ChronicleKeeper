@@ -4,33 +4,30 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Document\Application\Command;
 
-use ChronicleKeeper\Document\Application\Query\FindVectorsOfDocument;
 use ChronicleKeeper\Document\Domain\Event\DocumentDeleted;
-use ChronicleKeeper\Shared\Application\Query\QueryService;
-use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
+use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
+use ChronicleKeeper\Shared\Infrastructure\Messenger\MessageEventResult;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Messenger\MessageBusInterface;
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 #[AsMessageHandler]
 class DeleteDocumentHandler
 {
     public function __construct(
-        private readonly FileAccess $fileAccess,
-        private readonly EventDispatcherInterface $eventDispatcher,
         private readonly MessageBusInterface $bus,
-        private readonly QueryService $queryService,
+        private readonly DatabasePlatform $databasePlatform,
     ) {
     }
 
-    public function __invoke(DeleteDocument $command): void
+    public function __invoke(DeleteDocument $command): MessageEventResult
     {
-        foreach ($this->queryService->query(new FindVectorsOfDocument($command->document->getId())) as $vectors) {
-            $this->bus->dispatch(new DeleteDocumentVectors($vectors->id));
-        }
+        $this->bus->dispatch(new DeleteDocumentVectors($command->document->getId()));
 
-        $this->fileAccess->delete('library.documents', $command->document->getId() . '.json');
+        $this->databasePlatform->query(
+            'DELETE FROM documents WHERE id = :id',
+            ['id' => $command->document->getId()],
+        );
 
-        $this->eventDispatcher->dispatch(new DocumentDeleted($command->document));
+        return new MessageEventResult([new DocumentDeleted($command->document)]);
     }
 }

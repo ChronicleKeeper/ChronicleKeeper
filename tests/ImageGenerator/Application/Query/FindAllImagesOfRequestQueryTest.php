@@ -7,15 +7,13 @@ namespace ChronicleKeeper\Test\ImageGenerator\Application\Query;
 use ChronicleKeeper\ImageGenerator\Application\Query\FindAllImagesOfRequest;
 use ChronicleKeeper\ImageGenerator\Application\Query\FindAllImagesOfRequestQuery;
 use ChronicleKeeper\ImageGenerator\Domain\Entity\GeneratorResult;
-use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
-use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\Finder;
-use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\PathRegistry;
+use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
+use ChronicleKeeper\Test\ImageGenerator\Domain\Entity\GeneratorResultBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use SplFileInfo;
-use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Webmozart\Assert\InvalidArgumentException;
 
 #[CoversClass(FindAllImagesOfRequestQuery::class)]
@@ -46,76 +44,37 @@ class FindAllImagesOfRequestQueryTest extends TestCase
     {
         $requestId = 'b06bd1f2-f7bb-43ca-948e-7fe38956667e';
 
-        $pathRegistry = $this->createMock(PathRegistry::class);
-        $pathRegistry
-            ->expects($this->once())
-            ->method('get')
-            ->willReturnCallback(static function ($type): string {
-                self::assertSame('generator.images', $type);
+        $databasePlatform = $this->createMock(DatabasePlatform::class);
+        $databasePlatform->expects($this->once())
+            ->method('fetch')
+            ->with('SELECT * FROM generator_results WHERE generatorRequest = :id', ['id' => $requestId])
+            ->willReturn([
+                ['title' => 'Image 1'],
+                ['title' => 'Image 2'],
+            ]);
 
-                return 'root';
-            });
-
-        $finder = $this->createMock(Finder::class);
-        $finder
-            ->expects($this->once())
-            ->method('findFilesInDirectoryOrderedByAccessTimestamp')
-            ->willReturnCallback(static function (string $path) use ($requestId): array {
-                self::assertSame('root/' . $requestId, $path);
-
-                $file1 = self::createStub(SplFileInfo::class);
-                $file1->method('getFilename')->willReturn('foo');
-
-                $file2 = self::createStub(SplFileInfo::class);
-                $file2->method('getFilename')->willReturn('bar');
-
-                return [
-                    $file1,
-                    $file2,
-                ];
-            });
-
-        $fileAccess        = $this->createMock(FileAccess::class);
-        $fileAccessInvoker = $this->exactly(2);
-        $fileAccess
-            ->expects($fileAccessInvoker)
-            ->method('read')
+        $denormalizer        = $this->createMock(DenormalizerInterface::class);
+        $denormalizerInvoker = $this->exactly(2);
+        $denormalizer
+            ->expects($denormalizerInvoker)
+            ->method('denormalize')
             ->willReturnCallback(
-                static function (string $type, string $filename) use ($fileAccessInvoker, $requestId): string {
-                    self::assertSame('generator.images', $type);
-
-                    if ($fileAccessInvoker->numberOfInvocations() === 1) {
-                        self::assertSame('/' . $requestId . '/foo', $filename);
-
-                        return '{"foo": true}';
-                    }
-
-                    self::assertSame('/' . $requestId . '/bar', $filename);
-
-                    return '{"bar": true}';
-                },
-            );
-
-        $serializer        = $this->createMock(SerializerInterface::class);
-        $serializerInvoker = $this->exactly(2);
-        $serializer
-            ->expects($serializerInvoker)
-            ->method('deserialize')
-            ->willReturnCallback(
-                static function (string $fileContent, string $target) use ($serializerInvoker): GeneratorResult {
+                static function (array $data, string $target) use ($denormalizerInvoker): GeneratorResult {
                     self::assertSame(GeneratorResult::class, $target);
 
-                    match ($serializerInvoker->numberOfInvocations()) {
-                        1 => self::assertSame('{"foo": true}', $fileContent),
-                        3 => self::assertSame('{"bar": true}', $fileContent),
-                        default => 'Kind'
-                    };
+                    if ($denormalizerInvoker->numberOfInvocations() === 1) {
+                        self::assertSame('Image 1', $data['title']);
 
-                    return self::createStub(GeneratorResult::class);
+                        return (new GeneratorResultBuilder())->build();
+                    }
+
+                    self::assertSame('Image 2', $data['title']);
+
+                    return (new GeneratorResultBuilder())->build();
                 },
             );
 
-        $response = (new FindAllImagesOfRequestQuery($pathRegistry, $fileAccess, $serializer, $finder))
+        $response = (new FindAllImagesOfRequestQuery($denormalizer, $databasePlatform))
             ->query(new FindAllImagesOfRequest($requestId));
 
         self::assertCount(2, $response);

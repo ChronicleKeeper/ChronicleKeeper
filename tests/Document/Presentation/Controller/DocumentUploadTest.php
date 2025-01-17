@@ -9,21 +9,22 @@ use ChronicleKeeper\Document\Presentation\Form\DocumentUploadType;
 use ChronicleKeeper\Library\Domain\RootDirectory;
 use ChronicleKeeper\Library\Presentation\Twig\DirectoryBreadcrumb;
 use ChronicleKeeper\Shared\Infrastructure\LLMChain\LLMChainFactory;
-use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
 use ChronicleKeeper\Test\Shared\Infrastructure\LLMChain\LLMChainFactoryDouble;
-use ChronicleKeeper\Test\Shared\Infrastructure\Persistence\Filesystem\FileAccessDouble;
+use ChronicleKeeper\Test\WebTestCase;
 use PhpLlm\LlmChain\Bridge\OpenAI\Embeddings;
 use PhpLlm\LlmChain\Document\Vector;
 use PhpLlm\LlmChain\Model\Response\ResponseInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Large;
 use PHPUnit\Framework\Attributes\Test;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 
+use function array_map;
 use function assert;
-use function json_decode;
+use function mt_getrandmax;
+use function mt_rand;
+use function range;
 use function reset;
 
 #[CoversClass(DocumentUpload::class)]
@@ -35,8 +36,7 @@ class DocumentUploadTest extends WebTestCase
     #[Test]
     public function itIsCompletelyLoadingFromScratch(): void
     {
-        $client = static::createClient();
-        $client->request(
+        $this->client->request(
             Request::METHOD_GET,
             '/library/directory/' . RootDirectory::ID . '/upload_document',
         );
@@ -60,9 +60,7 @@ class DocumentUploadTest extends WebTestCase
             true,
         );
 
-        $client = static::createClient();
-
-        $llmChainFactory = $client->getContainer()->get(LLMChainFactory::class);
+        $llmChainFactory = $this->client->getContainer()->get(LLMChainFactory::class);
         assert($llmChainFactory instanceof LLMChainFactoryDouble);
 
         $llmChainFactory->addPlatformResponse(
@@ -71,12 +69,12 @@ class DocumentUploadTest extends WebTestCase
                 /** @return Vector[] */
                 public function getContent(): array
                 {
-                    return [new Vector([1.0, 2.0, 3.0])];
+                    return [new Vector(array_map(static fn () => mt_rand() / mt_getrandmax(), range(1, 1536)))];
                 }
             },
         );
 
-        $client->request(
+        $this->client->request(
             Request::METHOD_POST,
             '/library/directory/' . RootDirectory::ID . '/upload_document',
             parameters: ['document_upload' => ['utilize_prompt' => 'b1e1eb26-9460-4722-9704-8e7b068a8b5a']],
@@ -85,15 +83,10 @@ class DocumentUploadTest extends WebTestCase
         );
 
         // Check the new document is stored
-        $fileAccess = $client->getContainer()->get(FileAccess::class);
-        assert($fileAccess instanceof FileAccessDouble);
+        $documents = $this->databasePlatform->fetch('SELECT * FROM documents');
+        self::assertCount(1, $documents);
 
-        $files = $fileAccess->allOfType('library.documents');
-        self::assertCount(1, $files);
-
-        $document = reset($files);
-        $document = json_decode($document, associative: true);
-
+        $document = reset($documents);
         self::assertResponseRedirects('/library/document/' . $document['id']);
     }
 }

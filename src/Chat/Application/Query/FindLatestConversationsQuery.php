@@ -7,22 +7,18 @@ namespace ChronicleKeeper\Chat\Application\Query;
 use ChronicleKeeper\Chat\Domain\Entity\Conversation;
 use ChronicleKeeper\Shared\Application\Query\Query;
 use ChronicleKeeper\Shared\Application\Query\QueryParameters;
-use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
-use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\Finder;
-use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\PathRegistry;
-use Symfony\Component\Serializer\Encoder\JsonEncoder;
-use Symfony\Component\Serializer\SerializerInterface;
+use ChronicleKeeper\Shared\Infrastructure\Database\Converter\DatabaseRowConverter;
+use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 use function assert;
-use function count;
 
 class FindLatestConversationsQuery implements Query
 {
     public function __construct(
-        private readonly PathRegistry $pathRegistry,
-        private readonly FileAccess $fileAccess,
-        private readonly SerializerInterface $serializer,
-        private readonly Finder $finder,
+        private readonly DenormalizerInterface $denormalizer,
+        private readonly DatabasePlatform $databasePlatform,
+        private readonly DatabaseRowConverter $databaseRowConverter,
     ) {
     }
 
@@ -31,27 +27,17 @@ class FindLatestConversationsQuery implements Query
     {
         assert($parameters instanceof FindLatestConversationsParameters);
 
-        $files = $this->finder->findFilesInDirectoryOrderedByAccessTimestamp(
-            $this->pathRegistry->get('library.conversations'),
+        $data = $this->databasePlatform->fetch(
+            'SELECT * FROM conversations ORDER BY title LIMIT :limit',
+            ['limit' => $parameters->maxEntries],
         );
 
         $conversations = [];
-        foreach ($files as $file) {
-            $filename = $file->getFilename();
-            assert($filename !== '');
-
-            $content = $this->fileAccess->read('library.conversations', $filename);
-            assert($content !== '');
-
-            $conversations[] = $this->serializer->deserialize(
-                $content,
+        foreach ($data as $conversation) {
+            $conversations[] = $this->denormalizer->denormalize(
+                $this->databaseRowConverter->convert($conversation, Conversation::class),
                 Conversation::class,
-                JsonEncoder::FORMAT,
             );
-
-            if (count($conversations) === $parameters->maxEntries) {
-                break;
-            }
         }
 
         return $conversations;

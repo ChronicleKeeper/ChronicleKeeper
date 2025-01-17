@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Library\Presentation\Controller\Image;
 
+use ChronicleKeeper\Image\Application\Command\StoreImage;
 use ChronicleKeeper\Image\Domain\Entity\Image;
-use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemImageRepository;
 use ChronicleKeeper\Library\Presentation\Form\ImageType;
 use ChronicleKeeper\Shared\Presentation\FlashMessages\Alert;
 use ChronicleKeeper\Shared\Presentation\FlashMessages\HandleFlashMessages;
@@ -14,6 +14,7 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Requirement\Requirement;
 use Symfony\Component\Routing\RouterInterface;
@@ -31,8 +32,8 @@ class ImageEdit extends AbstractController
     public function __construct(
         private readonly Environment $environment,
         private readonly FormFactoryInterface $formFactory,
-        private readonly FilesystemImageRepository $imageRepository,
         private readonly RouterInterface $router,
+        private readonly MessageBusInterface $bus,
     ) {
     }
 
@@ -42,7 +43,7 @@ class ImageEdit extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->imageRepository->store($image);
+            $this->bus->dispatch(new StoreImage($image));
 
             $this->addFlashMessage(
                 $request,

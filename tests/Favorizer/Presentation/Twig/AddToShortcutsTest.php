@@ -6,22 +6,16 @@ namespace ChronicleKeeper\Test\Favorizer\Presentation\Twig;
 
 use ChronicleKeeper\Document\Domain\Entity\Document;
 use ChronicleKeeper\Favorizer\Presentation\Twig\AddToShortcuts;
-use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
 use ChronicleKeeper\Test\Document\Domain\Entity\DocumentBuilder;
+use ChronicleKeeper\Test\WebTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Large;
 use PHPUnit\Framework\Attributes\Test;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\UX\LiveComponent\Test\InteractsWithLiveComponents;
-
-use function assert;
-use function json_encode;
-
-use const JSON_THROW_ON_ERROR;
 
 #[CoversClass(AddToShortcuts::class)]
 #[Large]
-class AddToShortcutsTest extends KernelTestCase
+class AddToShortcutsTest extends WebTestCase
 {
     use InteractsWithLiveComponents;
 
@@ -30,13 +24,13 @@ class AddToShortcutsTest extends KernelTestCase
     {
         $document = (new DocumentBuilder())->withId('f3ce2cce-888d-4812-8470-72cdd96faf4c')->build();
 
-        $fileAccess = self::getContainer()->get(FileAccess::class);
-        assert($fileAccess instanceof FileAccess);
-        $fileAccess->write(
-            'library.documents',
-            'f3ce2cce-888d-4812-8470-72cdd96faf4c.json',
-            json_encode($document, JSON_THROW_ON_ERROR),
-        );
+        $this->databasePlatform->insert('documents', [
+            'id' => $document->getId(),
+            'title' => $document->getTitle(),
+            'content' => $document->getContent(),
+            'directory' => $document->getDirectory()->getId(),
+            'last_updated' => $document->getUpdatedAt()->format('Y-m-d H:i:s'),
+        ]);
 
         $component = $this->createLiveComponent(
             name: AddToShortcuts::class,

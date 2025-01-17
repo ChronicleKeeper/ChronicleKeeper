@@ -7,8 +7,10 @@ namespace ChronicleKeeper\Library\Infrastructure\LLMChain\Tool;
 use ChronicleKeeper\Chat\Domain\ValueObject\FunctionDebug;
 use ChronicleKeeper\Chat\Domain\ValueObject\Reference;
 use ChronicleKeeper\Chat\Infrastructure\LLMChain\RuntimeCollector;
-use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemVectorImageRepository;
+use ChronicleKeeper\Image\Application\Query\SearchSimilarImages;
+use ChronicleKeeper\Image\Domain\Entity\Image;
 use ChronicleKeeper\Settings\Application\SettingsHandler;
+use ChronicleKeeper\Shared\Application\Query\QueryService;
 use ChronicleKeeper\Shared\Infrastructure\LLMChain\EmbeddingCalculator;
 use PhpLlm\LlmChain\Chain\ToolBox\Attribute\AsTool;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -31,11 +33,11 @@ class ImageSearch
     private float|null $maxDistance = null;
 
     public function __construct(
-        private readonly FilesystemVectorImageRepository $vectorImageRepository,
         private readonly SettingsHandler $settingsHandler,
         private readonly RouterInterface $router,
         private readonly RuntimeCollector $runtimeCollector,
         private readonly EmbeddingCalculator $embeddingCalculator,
+        private readonly QueryService $queryService,
     ) {
     }
 
@@ -47,12 +49,16 @@ class ImageSearch
     /** @param string $search Contains the user's question or request related to the game world. */
     public function __invoke(string $search): string
     {
-        $maxResults = $this->settingsHandler->get()->getChatbotGeneral()->getMaxImageResponses();
-        $results    = $this->vectorImageRepository->findSimilar(
+        $settings    = $this->settingsHandler->get();
+        $maxResults  = $settings->getChatbotGeneral()->getMaxImageResponses();
+        $maxDistance = $this->maxDistance ?? $settings->getChatbotTuning()->getImagesMaxDistance();
+
+        /** @var list<array{image: Image, content: string, distance: float}> $results */
+        $results = $this->queryService->query(new SearchSimilarImages(
             $this->embeddingCalculator->getSingleEmbedding($search),
-            maxDistance: $this->maxDistance,
-            maxResults: $maxResults,
-        );
+            $maxDistance,
+            $maxResults,
+        ));
 
         if (count($results) === 0) {
             $this->runtimeCollector->addFunctionDebug(
@@ -71,7 +77,7 @@ class ImageSearch
         $result  = 'You will embed the found images to your responses as markdown only if the description of the image fits the question.' . PHP_EOL;
         $result .= 'I have found the following pictures and images that are associated to the question:' . PHP_EOL;
         foreach ($results as $image) {
-            $libraryImage = $image['vector']->image;
+            $libraryImage = $image['image'];
 
             $imageUrl = $this->router->generate(
                 'library_image_download',
@@ -82,7 +88,7 @@ class ImageSearch
             $result .= '# Image Name: ' . $libraryImage->getTitle() . PHP_EOL;
             $result .= 'Direct Link to the image: ' . $imageUrl . PHP_EOL;
             $result .= 'The image is described as the following: ' . PHP_EOL;
-            $result .= $image['vector']->content . PHP_EOL . PHP_EOL;
+            $result .= $image['content'] . PHP_EOL . PHP_EOL;
 
             $this->runtimeCollector->addReference(Reference::forImage($libraryImage));
 
@@ -90,7 +96,7 @@ class ImageSearch
                 'image' => $libraryImage->getDirectory()->flattenHierarchyTitle()
                     . '/' . $libraryImage->getTitle(),
                 'distance' => $image['distance'],
-                'content' => $image['vector']->content,
+                'content' => $image['content'],
             ];
         }
 

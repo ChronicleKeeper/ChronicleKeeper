@@ -7,19 +7,16 @@ namespace ChronicleKeeper\ImageGenerator\Application\Query;
 use ChronicleKeeper\ImageGenerator\Domain\Entity\GeneratorResult;
 use ChronicleKeeper\Shared\Application\Query\Query;
 use ChronicleKeeper\Shared\Application\Query\QueryParameters;
-use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
-use Symfony\Component\Serializer\Encoder\JsonEncoder;
-use Symfony\Component\Serializer\SerializerInterface;
+use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 use function assert;
-
-use const DIRECTORY_SEPARATOR;
 
 final readonly class GetImageOfGeneratorRequestQuery implements Query
 {
     public function __construct(
-        private FileAccess $fileAccess,
-        private SerializerInterface $serializer,
+        private DenormalizerInterface $denormalizer,
+        private DatabasePlatform $platform,
     ) {
     }
 
@@ -27,12 +24,11 @@ final readonly class GetImageOfGeneratorRequestQuery implements Query
     {
         assert($parameters instanceof GetImageOfGeneratorRequest);
 
-        $filename = $parameters->requestId . DIRECTORY_SEPARATOR . $parameters->imageId . '.json';
-
-        return $this->serializer->deserialize(
-            $this->fileAccess->read('generator.images', $filename),
-            GeneratorResult::class,
-            JsonEncoder::FORMAT,
+        $images = $this->platform->fetchSingleRow(
+            'SELECT * FROM generator_results WHERE generatorRequest = :requestId AND id = :imageId',
+            ['requestId' => $parameters->requestId, 'imageId' => $parameters->imageId],
         );
+
+        return $this->denormalizer->denormalize($images, GeneratorResult::class);
     }
 }

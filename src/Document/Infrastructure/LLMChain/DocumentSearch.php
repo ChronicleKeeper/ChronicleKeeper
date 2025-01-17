@@ -8,7 +8,7 @@ use ChronicleKeeper\Chat\Domain\ValueObject\FunctionDebug;
 use ChronicleKeeper\Chat\Domain\ValueObject\Reference;
 use ChronicleKeeper\Chat\Infrastructure\LLMChain\RuntimeCollector;
 use ChronicleKeeper\Document\Application\Query\SearchSimilarVectors;
-use ChronicleKeeper\Document\Domain\Entity\VectorDocument;
+use ChronicleKeeper\Document\Domain\Entity\Document;
 use ChronicleKeeper\Settings\Application\SettingsHandler;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
 use ChronicleKeeper\Shared\Infrastructure\LLMChain\EmbeddingCalculator;
@@ -50,7 +50,7 @@ class DocumentSearch
         $maxResults  = $settings->getChatbotGeneral()->getMaxDocumentResponses();
         $maxDistance = $this->maxDistance ?? $settings->getChatbotTuning()->getDocumentsMaxDistance();
 
-        /** @var list<array{vector: VectorDocument, distance: float}> $documents */
+        /** @var list<array{document: Document, content: string, distance: float}> $documents */
         $documents = $this->queryService->query(new SearchSimilarVectors(
             $this->embeddingCalculator->getSingleEmbedding($search),
             $maxDistance,
@@ -73,19 +73,19 @@ class DocumentSearch
 
         $result = 'I have found the following information that are associated to the question:' . PHP_EOL;
         foreach ($documents as $document) {
-            $libraryDocument        = $document['vector']->document;
+            $libraryDocument        = $document['document'];
             $documentHierarchyTitle = $libraryDocument->getDirectory()->flattenHierarchyTitle();
 
             $result .= '# Title: ' . $libraryDocument->getTitle() . PHP_EOL;
             $result .= 'Storage Directory: ' . $documentHierarchyTitle . PHP_EOL;
-            $result .= $document['vector']->content . PHP_EOL . PHP_EOL;
+            $result .= $document['content'] . PHP_EOL . PHP_EOL;
 
             $this->runtimeCollector->addReference(Reference::forDocument($libraryDocument));
 
             $debugResponse[] = [
                 'document' => $documentHierarchyTitle . '/' . $libraryDocument->getTitle(),
                 'distance' => $document['distance'],
-                'content' => $document['vector']->content,
+                'content' => $document['content'],
             ];
         }
 

@@ -7,13 +7,14 @@ namespace ChronicleKeeper\Test\Document\Application\Command;
 use ChronicleKeeper\Document\Application\Command\StoreDocumentVectors;
 use ChronicleKeeper\Document\Application\Command\StoreDocumentVectorsHandler;
 use ChronicleKeeper\Document\Domain\Entity\VectorDocument;
-use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
 use ChronicleKeeper\Test\Document\Domain\Entity\VectorDocumentBuilder;
+use ChronicleKeeper\Test\Shared\Infrastructure\Database\DatabasePlatformMock;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Serializer\SerializerInterface;
+
+use function implode;
 
 #[CoversClass(StoreDocumentVectors::class)]
 #[CoversClass(StoreDocumentVectorsHandler::class)]
@@ -34,19 +35,15 @@ class StoreDocumentVectorsTest extends TestCase
     {
         $vectorDocument = (new VectorDocumentBuilder())->build();
 
-        $handler        = new StoreDocumentVectorsHandler(
-            $fileAccess = $this->createMock(FileAccess::class),
-            $serializer = self::createStub(SerializerInterface::class),
-        );
-
-        $fileAccess->expects($this->once())
-            ->method('write')
-            ->with(
-                'vector.documents',
-                $vectorDocument->id . '.json',
-                $serializer->serialize($vectorDocument, 'json'),
-            );
-
+        $databasePlatform = new DatabasePlatformMock();
+        $handler          = new StoreDocumentVectorsHandler($databasePlatform);
         $handler(new StoreDocumentVectors($vectorDocument));
+
+        $databasePlatform->assertExecutedInsert('documents_vectors', [
+            'document_id' => $vectorDocument->document->getId(),
+            'embedding' => '[' . implode(',', $vectorDocument->vector) . ']',
+            'content' => $vectorDocument->content,
+            'vectorContentHash' => $vectorDocument->vectorContentHash,
+        ]);
     }
 }

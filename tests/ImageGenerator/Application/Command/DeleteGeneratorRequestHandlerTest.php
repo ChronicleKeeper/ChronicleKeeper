@@ -6,7 +6,7 @@ namespace ChronicleKeeper\Test\ImageGenerator\Application\Command;
 
 use ChronicleKeeper\ImageGenerator\Application\Command\DeleteGeneratorRequest;
 use ChronicleKeeper\ImageGenerator\Application\Command\DeleteGeneratorRequestHandler;
-use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
+use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\Attributes\Test;
@@ -30,26 +30,27 @@ class DeleteGeneratorRequestHandlerTest extends TestCase
     #[Test]
     public function deletionWorksAsExcpected(): void
     {
-        $fileAccess = $this->createMock(FileAccess::class);
-
-        $handler = new DeleteGeneratorRequestHandler($fileAccess);
-        $request = new DeleteGeneratorRequest('30da9c8d-7c80-4404-b8d2-5fa196e9548c');
+        $uuidToDelete     = '30da9c8d-7c80-4404-b8d2-5fa196e9548c';
+        $databasePlatform = $this->createMock(DatabasePlatform::class);
 
         $invoker = $this->exactly(2);
-        $fileAccess->expects($invoker)
-            ->method('delete')
-            ->willReturnCallback(static function (string $path, string $filename) use ($invoker): void {
-                if ($invoker->numberOfInvocations() === 1) {
-                    self::assertSame('generator.images', $path);
-                    self::assertSame('30da9c8d-7c80-4404-b8d2-5fa196e9548c', $filename);
+        $databasePlatform->expects($invoker)
+            ->method('query')
+            ->willReturnCallback(
+                static function (string $query, array $parameters) use ($invoker, $uuidToDelete): void {
+                    if ($invoker->numberOfInvocations() === 1) {
+                        self::assertSame('DELETE FROM generator_results WHERE generatorRequest = :id', $query);
+                        self::assertSame(['id' => $uuidToDelete], $parameters);
 
-                    return;
-                }
+                        return;
+                    }
 
-                self::assertSame('generator.requests', $path);
-                self::assertSame('30da9c8d-7c80-4404-b8d2-5fa196e9548c.json', $filename);
-            });
+                    self::assertSame('DELETE FROM generator_requests WHERE id = :id', $query);
+                    self::assertSame(['id' => $uuidToDelete], $parameters);
+                },
+            );
 
-        $handler($request);
+        $handler = new DeleteGeneratorRequestHandler($databasePlatform);
+        $handler(new DeleteGeneratorRequest($uuidToDelete));
     }
 }

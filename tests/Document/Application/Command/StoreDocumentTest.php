@@ -8,13 +8,12 @@ use ChronicleKeeper\Document\Application\Command\StoreDocument;
 use ChronicleKeeper\Document\Application\Command\StoreDocumentHandler;
 use ChronicleKeeper\Document\Domain\Entity\Document;
 use ChronicleKeeper\Document\Domain\Event\DocumentRenamed;
-use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
 use ChronicleKeeper\Test\Document\Domain\Entity\DocumentBuilder;
+use ChronicleKeeper\Test\Shared\Infrastructure\Database\DatabasePlatformMock;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Serializer\SerializerInterface;
 
 #[CoversClass(StoreDocument::class)]
 #[CoversClass(StoreDocumentHandler::class)]
@@ -33,21 +32,17 @@ class StoreDocumentTest extends TestCase
     #[Test]
     public function documentIsStored(): void
     {
-        $document       = (new DocumentBuilder())->build();
-        $handler        = new StoreDocumentHandler(
-            $fileAccess = $this->createMock(FileAccess::class),
-            $serializer = self::createStub(SerializerInterface::class),
-        );
-
-        $fileAccess->expects($this->once())
-            ->method('write')
-            ->with(
-                'library.documents',
-                $document->getId() . '.json',
-                $serializer->serialize($document, 'json'),
-            );
-
+        $document = (new DocumentBuilder())->build();
+        $handler  = new StoreDocumentHandler($databasePlatform = new DatabasePlatformMock());
         $handler(new StoreDocument($document));
+
+        $databasePlatform->assertExecutedInsert('documents', [
+            'id'          => $document->getId(),
+            'title'       => $document->getTitle(),
+            'content'     => $document->getContent(),
+            'directory'   => $document->getDirectory()->getId(),
+            'last_updated' => $document->getUpdatedAt()->format('Y-m-d H:i:s'),
+        ]);
     }
 
     #[Test]
@@ -56,11 +51,7 @@ class StoreDocumentTest extends TestCase
         $document = (new DocumentBuilder())->build();
         $document->rename('new-name');
 
-        $handler = new StoreDocumentHandler(
-            self::createStub(FileAccess::class),
-            self::createStub(SerializerInterface::class),
-        );
-
+        $handler          = new StoreDocumentHandler(new DatabasePlatformMock());
         $dispatchedEvents = $handler(new StoreDocument($document))->getEvents();
 
         self::assertNotEmpty($dispatchedEvents);

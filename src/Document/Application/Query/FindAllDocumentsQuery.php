@@ -7,25 +7,17 @@ namespace ChronicleKeeper\Document\Application\Query;
 use ChronicleKeeper\Document\Domain\Entity\Document;
 use ChronicleKeeper\Shared\Application\Query\Query;
 use ChronicleKeeper\Shared\Application\Query\QueryParameters;
-use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
-use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\Finder;
-use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\PathRegistry;
-use Psr\Log\LoggerInterface;
-use RuntimeException;
-use Symfony\Component\Serializer\SerializerInterface;
+use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
+use function array_map;
 use function assert;
-use function strcasecmp;
-use function usort;
 
 class FindAllDocumentsQuery implements Query
 {
     public function __construct(
-        private readonly PathRegistry $pathRegistry,
-        private readonly Finder $finder,
-        private readonly FileAccess $fileAccess,
-        private readonly SerializerInterface $serializer,
-        private readonly LoggerInterface $logger,
+        private readonly DenormalizerInterface $denormalizer,
+        private readonly DatabasePlatform $databasePlatform,
     ) {
     }
 
@@ -34,28 +26,11 @@ class FindAllDocumentsQuery implements Query
     {
         assert($parameters instanceof FindAllDocuments);
 
-        $files = $this->finder->findFilesInDirectory($this->pathRegistry->get('library.documents'));
+        $documents = $this->databasePlatform->fetch('SELECT * FROM documents ORDER BY title');
 
-        $documents = [];
-        foreach ($files as $file) {
-            try {
-                $filename = $file->getFilename();
-                assert($filename !== '');
-
-                $content = $this->fileAccess->read('library.documents', $filename);
-                assert($content !== '');
-
-                $documents[] = $this->serializer->deserialize($content, Document::class, 'json');
-            } catch (RuntimeException $e) {
-                $this->logger->error($e, ['file' => $file]);
-            }
-        }
-
-        usort(
+        return array_map(
+            fn (array $document) => $this->denormalizer->denormalize($document, Document::class),
             $documents,
-            static fn (Document $left, Document $right) => strcasecmp($left->getTitle(), $right->getTitle()),
         );
-
-        return $documents;
     }
 }

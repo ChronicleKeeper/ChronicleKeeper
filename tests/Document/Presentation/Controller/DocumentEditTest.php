@@ -11,10 +11,9 @@ use ChronicleKeeper\Library\Domain\RootDirectory;
 use ChronicleKeeper\Library\Presentation\Twig\DirectoryBreadcrumb;
 use ChronicleKeeper\Library\Presentation\Twig\DirectorySelection;
 use ChronicleKeeper\Shared\Infrastructure\LLMChain\LLMChainFactory;
-use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
 use ChronicleKeeper\Test\Document\Domain\Entity\DocumentBuilder;
 use ChronicleKeeper\Test\Shared\Infrastructure\LLMChain\LLMChainFactoryDouble;
-use ChronicleKeeper\Test\Shared\Infrastructure\Persistence\Filesystem\FileAccessDouble;
+use ChronicleKeeper\Test\WebTestCase;
 use Override;
 use PhpLlm\LlmChain\Bridge\OpenAI\Embeddings;
 use PhpLlm\LlmChain\Document\Vector;
@@ -22,17 +21,16 @@ use PhpLlm\LlmChain\Model\Response\ResponseInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Large;
 use PHPUnit\Framework\Attributes\Test;
-use Symfony\Bundle\FrameworkBundle\KernelBrowser;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Uid\Uuid;
 
+use function array_map;
 use function assert;
-use function json_encode;
+use function mt_getrandmax;
+use function mt_rand;
+use function range;
 use function reset;
-
-use const JSON_THROW_ON_ERROR;
 
 #[CoversClass(DocumentEdit::class)]
 #[CoversClass(DocumentType::class)]
@@ -41,24 +39,21 @@ use const JSON_THROW_ON_ERROR;
 #[Large]
 class DocumentEditTest extends WebTestCase
 {
-    private KernelBrowser $client;
-    private FileAccessDouble $fileAccess;
     private Document $fixtureDocument;
 
+    #[Override]
     protected function setUp(): void
     {
+        parent::setUp();
+
         $this->fixtureDocument = (new DocumentBuilder())->build();
-        $this->client          = self::createClient();
-
-        $fileAccess = $this->client->getContainer()->get(FileAccess::class);
-        assert($fileAccess instanceof FileAccessDouble);
-
-        $this->fileAccess = $fileAccess;
-        $this->fileAccess->write(
-            'library.documents',
-            $this->fixtureDocument->getId() . '.json',
-            json_encode($this->fixtureDocument, JSON_THROW_ON_ERROR),
-        );
+        $this->databasePlatform->insert('documents', [
+            'id'    => $this->fixtureDocument->getId(),
+            'title' => $this->fixtureDocument->getTitle(),
+            'content' => $this->fixtureDocument->getContent(),
+            'directory' => $this->fixtureDocument->getDirectory()->getId(),
+            'last_updated' => $this->fixtureDocument->getUpdatedAt()->format('Y-m-d H:i:s'),
+        ]);
     }
 
     #[Override]
@@ -66,7 +61,7 @@ class DocumentEditTest extends WebTestCase
     {
         parent::tearDown();
 
-        unset($this->client, $this->fileAccess, $this->fixtureDocument);
+        unset($this->fixtureDocument);
     }
 
     #[Test]
@@ -109,7 +104,7 @@ class DocumentEditTest extends WebTestCase
                 /** @return Vector[] */
                 public function getContent(): array
                 {
-                    return [new Vector([1.0, 2.0, 3.0])];
+                    return [new Vector(array_map(static fn () => mt_rand() / mt_getrandmax(), range(1, 1536)))];
                 }
             },
         );
@@ -129,11 +124,11 @@ class DocumentEditTest extends WebTestCase
         self::assertResponseRedirects('/library');
 
         // Check the new document is stored
-        $files = $this->fileAccess->allOfType('library.documents');
-        self::assertCount(1, $files);
+        $documents = $this->databasePlatform->fetch('SELECT * FROM documents');
+        self::assertCount(1, $documents);
 
-        $document = reset($files);
-        self::assertStringContainsString('Test Edited Title', $document);
-        self::assertStringContainsString('Test Edited Content', $document);
+        $document = reset($documents);
+        self::assertStringContainsString('Test Edited Title', $document['title']);
+        self::assertStringContainsString('Test Edited Content', $document['content']);
     }
 }

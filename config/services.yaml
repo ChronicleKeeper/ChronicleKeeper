@@ -5,7 +5,6 @@ parameters:
   app.storage.base_dir: '%kernel.project_dir%/var'
   app.data.base_dir: '%kernel.project_dir%/var/data'
   app.tmp.base_dir: '%kernel.project_dir%/var/tmp'
-  app.library.base_dir: '%kernel.project_dir%/var/library'
 
 services:
   _defaults:
@@ -13,6 +12,8 @@ services:
     autoconfigure: true
     bind:
       string $environment: '%env(string:APP_ENV)%'
+      string $databasePath: '%app.data.base_dir%/%env(string:DATABASE_FILENAME)%'
+      string $projectRoot: '%kernel.project_dir%'
 
   ChronicleKeeper\:
     resource: '../src/*'
@@ -24,6 +25,9 @@ services:
   League\CommonMark\Extension\Table\TableExtension:
     tags: [ 'twig.markdown.league_extension' ]
 
+  Symfony\Component\Finder\Finder:
+    shared: false
+
   ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\PathRegistry:
     calls:
       - method: add
@@ -31,22 +35,6 @@ services:
       - method: add
         arguments: [ 'general.project', '%kernel.project_dir%' ]
       - method: add
-        arguments: [ 'library.documents', '%app.storage.base_dir%/documents' ]
-      - method: add
-        arguments: [ 'library.images', '%app.library.base_dir%/images' ]
-      - method: add
-        arguments: [ 'library.directories', '%app.storage.base_dir%/directories' ]
+        arguments: [ 'temp', '%app.tmp.base_dir%' ]
       - method: add
         arguments: [ 'library.directories.cache', '%kernel.cache_dir%/library/directories' ]
-      - method: add
-        arguments: [ 'library.conversations', '%app.library.base_dir%/conversations' ]
-      - method: add
-        arguments: [ 'vector.documents', '%app.data.base_dir%/document' ]
-      - method: add
-        arguments: [ 'vector.images', '%app.data.base_dir%/image' ]
-      - method: add
-        arguments: [ 'generator.requests', '%app.storage.base_dir%/generated_images/requests' ]
-      - method: add
-        arguments: [ 'generator.images', '%app.storage.base_dir%/generated_images/images' ]
-      - method: add
-        arguments: [ 'temp', '%app.tmp.base_dir%' ]

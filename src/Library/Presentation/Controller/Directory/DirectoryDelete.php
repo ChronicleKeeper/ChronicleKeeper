@@ -8,10 +8,13 @@ use ChronicleKeeper\Chat\Application\Command\StoreConversation;
 use ChronicleKeeper\Chat\Application\Query\FindConversationsByDirectoryParameters;
 use ChronicleKeeper\Document\Application\Command\StoreDocument;
 use ChronicleKeeper\Document\Application\Query\FindDocumentsByDirectory;
+use ChronicleKeeper\Image\Application\Command\StoreImage;
+use ChronicleKeeper\Image\Application\Query\FindImagesByDirectory;
+use ChronicleKeeper\Library\Application\Command\DeleteDirectory;
+use ChronicleKeeper\Library\Application\Command\StoreDirectory;
+use ChronicleKeeper\Library\Application\Query\FindDirectoriesByParent;
 use ChronicleKeeper\Library\Domain\Entity\Directory;
 use ChronicleKeeper\Library\Domain\RootDirectory;
-use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemDirectoryRepository;
-use ChronicleKeeper\Library\Infrastructure\Repository\FilesystemImageRepository;
 use ChronicleKeeper\Library\Presentation\Form\DirectoryDeleteOptions;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
 use ChronicleKeeper\Shared\Presentation\FlashMessages\Alert;
@@ -34,8 +37,6 @@ class DirectoryDelete extends AbstractController
     use HandleFlashMessages;
 
     public function __construct(
-        private readonly FilesystemDirectoryRepository $directoryRepository,
-        private readonly FilesystemImageRepository $imageRepository,
         private readonly QueryService $queryService,
         private readonly MessageBusInterface $bus,
     ) {
@@ -61,7 +62,7 @@ class DirectoryDelete extends AbstractController
         $directoryRemovalOptions = $form->getData();
         if ($directoryRemovalOptions['confirmDeleteAll'] === true) {
             // Delte all Content! Must search for all child directories ... all! Really ALL!
-            $this->directoryRepository->remove($directory);
+            $this->bus->dispatch(new DeleteDirectory($directory));
 
             $this->addFlashMessage(
                 $request,
@@ -76,7 +77,7 @@ class DirectoryDelete extends AbstractController
         $targetDirectory = $directoryRemovalOptions['moveContentTo'];
 
         $this->moveDirectoryContentToOtherDirectory($directory, $directoryRemovalOptions['moveContentTo']);
-        $this->directoryRepository->remove($directory);
+        $this->bus->dispatch(new DeleteDirectory($directory));
 
         $this->addFlashMessage(
             $request,
@@ -89,9 +90,9 @@ class DirectoryDelete extends AbstractController
 
     private function moveDirectoryContentToOtherDirectory(Directory $sourceDirectory, Directory $targetDirectory): void
     {
-        foreach ($this->directoryRepository->findByParent($sourceDirectory) as $directory) {
+        foreach ($this->queryService->query(new FindDirectoriesByParent($sourceDirectory->getId())) as $directory) {
             $directory->moveToDirectory($targetDirectory);
-            $this->directoryRepository->store($directory);
+            $this->bus->dispatch(new StoreDirectory($directory));
         }
 
         foreach ($this->queryService->query(new FindDocumentsByDirectory($sourceDirectory->getId())) as $document) {
@@ -99,9 +100,9 @@ class DirectoryDelete extends AbstractController
             $this->bus->dispatch(new StoreDocument($document));
         }
 
-        foreach ($this->imageRepository->findByDirectory($sourceDirectory) as $image) {
+        foreach ($this->queryService->query(new FindImagesByDirectory($sourceDirectory->getId())) as $image) {
             $image->moveToDirectory($targetDirectory);
-            $this->imageRepository->store($image);
+            $this->bus->dispatch(new StoreImage($image));
         }
 
         foreach ($this->queryService->query(new FindConversationsByDirectoryParameters($sourceDirectory)) as $conversation) {

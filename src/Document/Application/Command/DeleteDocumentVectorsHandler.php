@@ -4,19 +4,19 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Document\Application\Command;
 
-use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
+use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler]
 class DeleteDocumentVectorsHandler
 {
     public function __construct(
-        private readonly FileAccess $fileAccess,
+        private readonly DatabasePlatform $platform,
     ) {
     }
 
     public function __invoke(DeleteDocumentVectors $command): void
     {
-        $this->fileAccess->delete('vector.documents', $command->id . '.json');
+        $this->platform->query('DELETE FROM documents_vectors WHERE document_id = :id', ['id' => $command->documentId]);
     }
 }

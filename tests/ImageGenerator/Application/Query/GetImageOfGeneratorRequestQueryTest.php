@@ -7,12 +7,12 @@ namespace ChronicleKeeper\Test\ImageGenerator\Application\Query;
 use ChronicleKeeper\ImageGenerator\Application\Query\GetImageOfGeneratorRequest;
 use ChronicleKeeper\ImageGenerator\Application\Query\GetImageOfGeneratorRequestQuery;
 use ChronicleKeeper\ImageGenerator\Domain\Entity\GeneratorResult;
-use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
+use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Webmozart\Assert\InvalidArgumentException;
 
 #[CoversClass(GetImageOfGeneratorRequestQuery::class)]
@@ -59,29 +59,28 @@ class GetImageOfGeneratorRequestQueryTest extends TestCase
         $requestId = '5b3cde06-bc8b-4389-8407-2493a58d95e7';
         $imageId   = '51b7e687-309a-4ee4-9d11-d6fbd977acde';
 
-        $fileAccess = $this->createMock(FileAccess::class);
-        $fileAccess
-            ->expects($this->once())
-            ->method('read')
-            ->willReturnCallback(static function (string $type, string $filename) use ($requestId, $imageId): string {
-                self::assertSame('generator.images', $type);
-                self::assertSame($requestId . '/' . $imageId . '.json', $filename);
+        $databasePlatform = $this->createMock(DatabasePlatform::class);
+        $databasePlatform->expects($this->once())
+            ->method('fetchSingleRow')
+            ->with(
+                'SELECT * FROM generator_results WHERE generatorRequest = :requestId AND id = :imageId',
+                ['requestId' => $requestId, 'imageId' => $imageId],
+            )
+            ->willReturn(['title' => 'foo']);
 
-                return '{}';
-            });
-
-        $serializer = $this->createMock(SerializerInterface::class);
-        $serializer
+        $denormalizer = $this->createMock(DenormalizerInterface::class);
+        $denormalizer
             ->expects($this->once())
-            ->method('deserialize')
-            ->willReturnCallback(static function (string $fileContent, string $target): GeneratorResult {
-                self::assertSame('{}', $fileContent);
+            ->method('denormalize')
+            ->willReturnCallback(static function (array $data, string $target): GeneratorResult {
                 self::assertSame(GeneratorResult::class, $target);
+
+                self::assertSame('foo', $data['title']);
 
                 return self::createStub(GeneratorResult::class);
             });
 
-        (new GetImageOfGeneratorRequestQuery($fileAccess, $serializer))
+        (new GetImageOfGeneratorRequestQuery($denormalizer, $databasePlatform))
             ->query(new GetImageOfGeneratorRequest($requestId, $imageId));
     }
 }

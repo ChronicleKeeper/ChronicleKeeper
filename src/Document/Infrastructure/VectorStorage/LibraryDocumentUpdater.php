@@ -7,7 +7,6 @@ namespace ChronicleKeeper\Document\Infrastructure\VectorStorage;
 use ChronicleKeeper\Document\Application\Command\DeleteDocumentVectors;
 use ChronicleKeeper\Document\Application\Command\StoreDocumentVectors;
 use ChronicleKeeper\Document\Application\Query\FindAllDocuments;
-use ChronicleKeeper\Document\Application\Query\FindVectorsOfDocument;
 use ChronicleKeeper\Document\Domain\Entity\Document;
 use ChronicleKeeper\Document\Domain\Entity\VectorDocument;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
@@ -16,7 +15,6 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
 
 use function count;
-use function reset;
 use function trim;
 
 class LibraryDocumentUpdater
@@ -42,27 +40,8 @@ class LibraryDocumentUpdater
         Document $document,
         int $contentLength = self::VECTOR_CONTENT_LENGTH,
     ): void {
-        $existingStorage = $this->queryService->query(new FindVectorsOfDocument($document->getId()));
-
-        if ($existingStorage === []) {
-            $this->createVectorDocument($document, $contentLength);
-
-            return;
-        }
-
-        // Check the existing storage content hash and update only if necessary
-        $singleOriginalVectorDocument = reset($existingStorage);
-        if ($singleOriginalVectorDocument->vectorContentHash === $document->getContentHash()) {
-            $this->logger->debug('Vector storage for document is up to date.', ['document' => $document]);
-
-            return;
-        }
-
-        // Clean Vector Storage
-        foreach ($existingStorage as $vectorDocument) {
-            $this->bus->dispatch(new DeleteDocumentVectors($vectorDocument->id));
-        }
-
+        // Clean Vector Storage for the document
+        $this->bus->dispatch(new DeleteDocumentVectors($document->getId()));
         $this->logger->debug('Vector storage for document was cleared.', ['document' => $document]);
 
         // Re-Create the Storage

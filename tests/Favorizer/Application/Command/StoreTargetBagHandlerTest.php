@@ -7,15 +7,13 @@ namespace ChronicleKeeper\Test\Favorizer\Application\Command;
 use ChronicleKeeper\Favorizer\Application\Command\StoreTargetBag;
 use ChronicleKeeper\Favorizer\Application\Command\StoreTargetBagHandler;
 use ChronicleKeeper\Favorizer\Domain\TargetBag;
-use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
+use ChronicleKeeper\Favorizer\Domain\ValueObject\LibraryDocumentTarget;
+use ChronicleKeeper\Favorizer\Domain\ValueObject\LibraryImageTarget;
+use ChronicleKeeper\Test\Shared\Infrastructure\Database\DatabasePlatformMock;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Serializer\SerializerInterface;
-
-use const JSON_PRETTY_PRINT;
-use const JSON_UNESCAPED_UNICODE;
 
 #[CoversClass(StoreTargetBag::class)]
 #[CoversClass(StoreTargetBagHandler::class)]
@@ -25,26 +23,16 @@ class StoreTargetBagHandlerTest extends TestCase
     #[Test]
     public function storeTargetBag(): void
     {
-        $fileAccess = $this->createMock(FileAccess::class);
-        $fileAccess->expects($this->once())
-            ->method('write')
-            ->with(
-                'storage',
-                'favorites.json',
-                '{"targetBag":"targetBag"}',
-            );
+        $targetBag = new TargetBag();
+        $targetBag->append(new LibraryDocumentTarget('4c0ad0b6-772d-4ef2-8fd6-8120c90e6e45', 'Title 1'));
+        $targetBag->append(new LibraryImageTarget('c0773b2c-0479-4a5b-91b9-2b52b10fcde8', 'Title 2'));
 
-        $serializer = $this->createMock(SerializerInterface::class);
-        $serializer->expects($this->once())
-            ->method('serialize')
-            ->with(
-                self::isInstanceOf(TargetBag::class),
-                'json',
-                ['json_encode_options' => JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT],
-            )
-            ->willReturn('{"targetBag":"targetBag"}');
+        $databasePlatform = new DatabasePlatformMock();
 
-        $handler = new StoreTargetBagHandler($fileAccess, $serializer);
-        $handler(new StoreTargetBag(new TargetBag()));
+        $handler = new StoreTargetBagHandler($databasePlatform);
+        $handler(new StoreTargetBag($targetBag));
+
+        $databasePlatform->assertExecutedQuery('DELETE FROM favorites');
+        $databasePlatform->assertExecutedInsertsCount(2);
     }
 }

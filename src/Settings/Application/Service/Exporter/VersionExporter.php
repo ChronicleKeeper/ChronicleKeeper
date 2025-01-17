@@ -14,7 +14,7 @@ final readonly class VersionExporter implements SingleExport
     ) {
     }
 
-    public function export(ZipArchive $archive): void
+    public function export(ZipArchive $archive, ExportSettings $exportSettings): void
     {
         $archive->addFromString('VERSION', $this->version->getCurrentVersion());
     }

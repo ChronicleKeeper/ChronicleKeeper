@@ -13,7 +13,7 @@ use ChronicleKeeper\Settings\Domain\ValueObject\Settings\ChatbotGeneral;
 use ChronicleKeeper\Settings\Domain\ValueObject\Settings\ChatbotTuning;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
 use ChronicleKeeper\Shared\Infrastructure\LLMChain\EmbeddingCalculator;
-use ChronicleKeeper\Test\Document\Domain\Entity\VectorDocumentBuilder;
+use ChronicleKeeper\Test\Document\Domain\Entity\DocumentBuilder;
 use ChronicleKeeper\Test\Settings\Domain\ValueObject\SettingsBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
@@ -42,8 +42,8 @@ class DocumentSearchTest extends TestCase
             ->willReturn([0.1, 0.2, 0.3]);
 
         $foundDocuments = [
-            ['vector' => (new VectorDocumentBuilder())->build(), 'distance' => 0.1],
-            ['vector' => (new VectorDocumentBuilder())->build(), 'distance' => 0.2],
+            ['document' => (new DocumentBuilder())->build(), 'content' => 'First Content', 'distance' => 0.1],
+            ['document' => (new DocumentBuilder())->build(), 'content' => 'Second Content', 'distance' => 0.2],
         ];
 
         $queryService = $this->createMock(QueryService::class);
@@ -71,22 +71,21 @@ class DocumentSearchTest extends TestCase
             $queryService,
             $runtimeCollector,
         );
-        $result         = $documentSearch('I am searching for documents');
 
         self::assertSame(
             <<<'TEXT'
             I have found the following information that are associated to the question:
             # Title: Default Title
             Storage Directory: Hauptverzeichnis
-            Default Content
+            First Content
 
             # Title: Default Title
             Storage Directory: Hauptverzeichnis
-            Default Content
+            Second Content
 
 
             TEXT,
-            $result,
+            $documentSearch('I am searching for documents'),
         );
     }
 
@@ -142,19 +141,17 @@ class DocumentSearchTest extends TestCase
             ->with('I am searching for documents')
             ->willReturn([0.1, 0.2, 0.3]);
 
-        $foundDocuments = [['vector' => (new VectorDocumentBuilder())->build(), 'distance' => 0.1]];
-
         $queryService = $this->createMock(QueryService::class);
         $queryService->expects($this->once())
             ->method('query')
             ->with(self::isInstanceOf(SearchSimilarVectors::class))
-            ->willReturnCallback(static function (SearchSimilarVectors $query) use ($foundDocuments) {
+            ->willReturnCallback(static function (SearchSimilarVectors $query) {
                 self::assertSame([0.1, 0.2, 0.3], $query->searchedVectors);
 
                 self::assertSame(0.15, $query->maxDistance);
                 self::assertSame(20, $query->maxResults);
 
-                return $foundDocuments;
+                return [['document' => (new DocumentBuilder())->build(), 'content' => 'My Content', 'distance' => 0.1]];
             });
 
         $runtimeCollector = $this->createMock(RuntimeCollector::class);
@@ -171,18 +168,16 @@ class DocumentSearchTest extends TestCase
         );
         $documentSearch->setOneTimeMaxDistance(0.15);
 
-        $result = $documentSearch('I am searching for documents');
-
         self::assertSame(
             <<<'TEXT'
             I have found the following information that are associated to the question:
             # Title: Default Title
             Storage Directory: Hauptverzeichnis
-            Default Content
+            My Content
 
 
             TEXT,
-            $result,
+            $documentSearch('I am searching for documents'),
         );
     }
 }

@@ -7,13 +7,11 @@ namespace ChronicleKeeper\Test\Document\Infrastructure\VectorStorage;
 use ChronicleKeeper\Document\Application\Command\DeleteDocumentVectors;
 use ChronicleKeeper\Document\Application\Command\StoreDocumentVectors;
 use ChronicleKeeper\Document\Application\Query\FindAllDocuments;
-use ChronicleKeeper\Document\Application\Query\FindVectorsOfDocument;
 use ChronicleKeeper\Document\Infrastructure\VectorStorage\LibraryDocumentUpdater;
 use ChronicleKeeper\Shared\Application\Query\QueryParameters;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
 use ChronicleKeeper\Shared\Infrastructure\LLMChain\EmbeddingCalculator;
 use ChronicleKeeper\Test\Document\Domain\Entity\DocumentBuilder;
-use ChronicleKeeper\Test\Document\Domain\Entity\VectorDocumentBuilder;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
@@ -51,20 +49,18 @@ class LibraryDocumentUpdaterTest extends TestCase
     #[Test]
     public function itCreatesAVectorStorageIfThereWasNone(): void
     {
+        $document = (new DocumentBuilder())->build();
+
         $queryService = $this->createMock(QueryService::class);
-        $queryService->expects($this->exactly(2))
+        $queryService->expects($this->once())
             ->method('query')
             ->willReturnCallback(
-                static function (QueryParameters $query) {
+                static function (QueryParameters $query) use ($document) {
                     if ($query instanceof FindAllDocuments) {
-                        return [(new DocumentBuilder())->build()];
+                        return [$document];
                     }
 
-                    if ($query instanceof FindVectorsOfDocument) {
-                        return [];
-                    }
-
-                    throw new InvalidArgumentException('Unexpected query');
+                    throw new InvalidArgumentException('Unexpected query ' . $query::class);
                 },
             );
 
@@ -78,49 +74,21 @@ class LibraryDocumentUpdaterTest extends TestCase
             ->willReturn(['foo']);
 
         $bus = $this->createMock(MessageBusInterface::class);
-        $bus->expects($this->once())
+        $bus->expects($this->exactly(2))
             ->method('dispatch')
             ->willReturnCallback(
-                static function (StoreDocumentVectors $command) {
-                    self::assertSame([10.12], $command->vectorDocument->vector);
+                static function (object $command) use ($document) {
+                    if ($command instanceof DeleteDocumentVectors) {
+                        self::assertSame($document->getId(), $command->documentId);
+                    }
+
+                    if ($command instanceof StoreDocumentVectors) {
+                        self::assertSame([10.12], $command->vectorDocument->vector);
+                    }
 
                     return new Envelope($command);
                 },
             );
-
-        $updater = new LibraryDocumentUpdater(new NullLogger(), $embeddingCalculator, $queryService, $bus);
-        $updater->updateAll();
-    }
-
-    #[Test]
-    public function itDoesNothingForExistingStorageOnUnchangedContentHash(): void
-    {
-        $queryService = $this->createMock(QueryService::class);
-        $queryService->expects($this->exactly(2))
-            ->method('query')
-            ->willReturnCallback(
-                static function (QueryParameters $query) {
-                    if ($query instanceof FindAllDocuments) {
-                        return [(new DocumentBuilder())->withContent('foo')->build()];
-                    }
-
-                    if ($query instanceof FindVectorsOfDocument) {
-                        return [
-                            (new VectorDocumentBuilder())
-                                ->withVectorContentHash('0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33')
-                                ->build(),
-                        ];
-                    }
-
-                    throw new InvalidArgumentException('Unexpected query');
-                },
-            );
-
-        $embeddingCalculator = $this->createMock(EmbeddingCalculator::class);
-        $embeddingCalculator->expects($this->never())->method('getSingleEmbedding');
-
-        $bus = $this->createMock(MessageBusInterface::class);
-        $bus->expects($this->never())->method('dispatch');
 
         $updater = new LibraryDocumentUpdater(new NullLogger(), $embeddingCalculator, $queryService, $bus);
         $updater->updateAll();
@@ -132,22 +100,12 @@ class LibraryDocumentUpdaterTest extends TestCase
         $document = (new DocumentBuilder())->withId('8a998dc1-31bc-4903-8e60-6ad3232f819b')->build();
 
         $queryService = $this->createMock(QueryService::class);
-        $queryService->expects($this->exactly(2))
+        $queryService->expects($this->once())
             ->method('query')
             ->willReturnCallback(
                 static function (QueryParameters $query) use ($document) {
                     if ($query instanceof FindAllDocuments) {
                         return [$document];
-                    }
-
-                    if ($query instanceof FindVectorsOfDocument) {
-                        return [
-                            (new VectorDocumentBuilder())
-                                ->withId('3d9de4e8-cff0-4708-877e-03637433fd18')
-                                ->withDocument($document)
-                                ->withVectorContentHash('12345')
-                                ->build(),
-                        ];
                     }
 
                     throw new InvalidArgumentException('Unexpected query');
@@ -167,9 +125,9 @@ class LibraryDocumentUpdaterTest extends TestCase
         $bus->expects($this->exactly(2))
             ->method('dispatch')
             ->willReturnCallback(
-                static function (object $command) {
+                static function (object $command) use ($document) {
                     if ($command instanceof DeleteDocumentVectors) {
-                        self::assertSame('3d9de4e8-cff0-4708-877e-03637433fd18', $command->id);
+                        self::assertSame($document->getId(), $command->documentId);
                     }
 
                     if ($command instanceof StoreDocumentVectors) {
@@ -188,7 +146,7 @@ class LibraryDocumentUpdaterTest extends TestCase
     public function itDoesSplitContentForMultipleVectorDocuments(): void
     {
         $queryService = $this->createMock(QueryService::class);
-        $queryService->expects($this->exactly(2))
+        $queryService->expects($this->once())
             ->method('query')
             ->willReturnCallback(
                 static function (QueryParameters $query) {
@@ -196,11 +154,7 @@ class LibraryDocumentUpdaterTest extends TestCase
                         return [(new DocumentBuilder())->withContent('Foo Bar Baz')->build()];
                     }
 
-                    if ($query instanceof FindVectorsOfDocument) {
-                        return [];
-                    }
-
-                    throw new InvalidArgumentException('Unexpected query');
+                    throw new InvalidArgumentException('Unexpected query ' . $query::class);
                 },
             );
 
@@ -212,24 +166,31 @@ class LibraryDocumentUpdaterTest extends TestCase
             ->method('getMultipleEmbeddings')
             ->willReturn([[10.12], [11.13], [12.14]]);
 
-        $busInvoker = $this->exactly(3);
+        $busInvoker = $this->exactly(4);
 
         $bus = $this->createMock(MessageBusInterface::class);
         $bus->expects($busInvoker)
             ->method('dispatch')
             ->willReturnCallback(
-                static function (StoreDocumentVectors $command) use ($busInvoker) {
+                static function (StoreDocumentVectors|DeleteDocumentVectors $command) use ($busInvoker) {
                     if ($busInvoker->numberOfInvocations() === 1) {
+                        self::assertInstanceOf(DeleteDocumentVectors::class, $command);
+                    }
+
+                    if ($busInvoker->numberOfInvocations() === 2) {
+                        self::assertInstanceOf(StoreDocumentVectors::class, $command);
                         self::assertSame([10.12], $command->vectorDocument->vector);
                         self::assertSame('Foo', $command->vectorDocument->content);
                     }
 
-                    if ($busInvoker->numberOfInvocations() === 2) {
+                    if ($busInvoker->numberOfInvocations() === 3) {
+                        self::assertInstanceOf(StoreDocumentVectors::class, $command);
                         self::assertSame([11.13], $command->vectorDocument->vector);
                         self::assertSame('Bar', $command->vectorDocument->content);
                     }
 
-                    if ($busInvoker->numberOfInvocations() === 3) {
+                    if ($busInvoker->numberOfInvocations() === 4) {
+                        self::assertInstanceOf(StoreDocumentVectors::class, $command);
                         self::assertSame([12.14], $command->vectorDocument->vector);
                         self::assertSame('Baz', $command->vectorDocument->content);
                     }

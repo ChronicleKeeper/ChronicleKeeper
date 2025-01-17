@@ -47,7 +47,7 @@ class GeneratorRequestTest extends TestCase
             'id' => $generatorRequest->id,
             'prompt' => null,
             'title' => 'foo',
-            'userInput' => 'bar',
+            'userInput' => ['prompt' => 'bar', 'systemPrompt' => null],
         ], $generatorRequest->jsonSerialize());
     }
 }

@@ -11,5 +11,5 @@ use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 #[AutoconfigureTag('application_exporer_single_import')]
 interface SingleImport
 {
-    public function import(Filesystem $filesystem, ImportSettings $settings): ImportedFileBag;
+    public function import(Filesystem $filesystem, ImportSettings $settings): void;
 }

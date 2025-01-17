@@ -10,10 +10,12 @@ use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileA
 use ChronicleKeeper\Test\Chat\Domain\Entity\ExtendedMessageBuilder;
 use ChronicleKeeper\Test\Chat\Domain\Entity\LLMChain\UserMessageBuilder;
 use ChronicleKeeper\Test\Shared\Infrastructure\Persistence\Filesystem\FileAccessDouble;
+use ChronicleKeeper\Test\WebTestCase;
+use PhpLlm\LlmChain\Model\Message\Content\Text;
+use PhpLlm\LlmChain\Model\Message\UserMessage;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Large;
 use PHPUnit\Framework\Attributes\Test;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
 
 use function assert;
@@ -28,8 +30,7 @@ class ChatTest extends WebTestCase
     #[Test]
     public function itCanOpenTheChatWithoutAnyStoredConversation(): void
     {
-        $client = static::createClient();
-        $client->request(Request::METHOD_GET, '/');
+        $this->client->request(Request::METHOD_GET, '/');
 
         self::assertResponseIsSuccessful();
         self::assertSelectorTextContains('h2', 'Unbekanntes Gespräch');
@@ -38,10 +39,8 @@ class ChatTest extends WebTestCase
     #[Test]
     public function itCanOpenTheChatWithStoredTemporaryConversation(): void
     {
-        $client = static::createClient();
-
         // Create the default conversation to test for
-        $fileAccess = $client->getContainer()->get(FileAccess::class);
+        $fileAccess = $this->client->getContainer()->get(FileAccess::class);
         assert($fileAccess instanceof FileAccessDouble);
 
         $conversation = Conversation::createEmpty();
@@ -56,47 +55,64 @@ class ChatTest extends WebTestCase
             json_encode($conversation, JSON_THROW_ON_ERROR),
         );
 
-        $client->request(Request::METHOD_GET, '/');
+        $this->client->request(Request::METHOD_GET, '/');
 
         self::assertResponseIsSuccessful();
 
         self::assertSelectorTextContains('h2', 'My Testing Conversation');
-        self::assertStringContainsString('Hello World', (string) $client->getResponse()->getContent());
+        self::assertStringContainsString('Hello World', (string) $this->client->getResponse()->getContent());
     }
 
     #[Test]
     public function itCanOpenAnExistingConversation(): void
     {
-        $client = static::createClient();
-
         // Create the default conversation to test for
-        $fileAccess = $client->getContainer()->get(FileAccess::class);
+        $fileAccess = $this->client->getContainer()->get(FileAccess::class);
         assert($fileAccess instanceof FileAccessDouble);
 
         $conversation = Conversation::createEmpty();
         $conversation->rename('My Testing Conversation');
-        $conversation->getMessages()[] = (new ExtendedMessageBuilder())
+        $conversation->getMessages()[] = $message = (new ExtendedMessageBuilder())
             ->withMessage((new UserMessageBuilder())->withContent('Hello World')->build())
             ->build();
 
-        $fileAccess->write(
-            'library.conversations',
-            $conversation->getId() . '.json',
-            json_encode($conversation, JSON_THROW_ON_ERROR),
-        );
+        $this->databasePlatform->insert('conversations', [
+            'id' => $conversation->getId(),
+            'title' => $conversation->getTitle(),
+            'directory' => $conversation->getDirectory()->getId(),
+        ]);
 
-        $client->request(Request::METHOD_GET, '/chat/' . $conversation->getId());
+        $this->databasePlatform->insert('conversation_settings', [
+            'conversation_id' => $conversation->getId(),
+            'version' => $conversation->getSettings()->version,
+            'temperature' => $conversation->getSettings()->temperature,
+            'images_max_distance' => $conversation->getSettings()->imagesMaxDistance,
+            'documents_max_distance' => $conversation->getSettings()->imagesMaxDistance,
+        ]);
+
+        assert($message->message instanceof UserMessage);
+        assert(isset($message->message->content[0]) && $message->message->content[0] instanceof Text);
+
+        $this->databasePlatform->insert('conversation_messages', [
+            'id' => $message->id,
+            'conversation_id' => $conversation->getId(),
+            'role' => $message->message->getRole()->value,
+            'content' => $message->message->content[0]->text,
+            'context' => '{}',
+            'debug' => '{}',
+        ]);
+
+        $this->client->request(Request::METHOD_GET, '/chat/' . $conversation->getId());
 
         self::assertResponseIsSuccessful();
         self::assertSelectorTextContains('h2', 'My Testing Conversation');
-        self::assertStringContainsString('Hello World', (string) $client->getResponse()->getContent());
+        self::assertStringContainsString('Hello World', (string) $this->client->getResponse()->getContent());
     }
 
     #[Test]
     public function itWillOpenATemporaryConversationWhenCalledIdentifierIsNotAvailable(): void
     {
-        $client = static::createClient();
-        $client->request(Request::METHOD_GET, '/chat/455af8a7-14f6-4516-910e-3bdb460c5418');
+        $this->client->request(Request::METHOD_GET, '/chat/455af8a7-14f6-4516-910e-3bdb460c5418');
 
         self::assertResponseRedirects('/');
     }
