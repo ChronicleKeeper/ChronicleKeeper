@@ -1,0 +1,87 @@
+{% extends 'layout.html.twig' %}
+
+{% block page_title %}{{ item.name }}{% endblock %}
+
+{% block page_title_actions %}
+    <div class="col-auto ms-auto d-print-none">
+        <div class="btn-list">
+            <a href="{{ path('world_item_edit', {'id': item.id}) }}" class="btn btn-icon btn-warning">
+                {{ ux_icon('tabler:database-edit') }}
+            </a>
+            <a href="{{ path('world_item_delete', {'id': item.id}) }}" class="btn btn-icon btn-danger" {{ stimulus_controller('confirm') }}>
+                {{ ux_icon('tabler:database-minus') }}
+            </a>
+        </div>
+    </div>
+{% endblock %}
+
+{% block page_content %}
+    <div class="container-xl">
+        <div class="row row-deck row-cards">
+            <div class="col-sm-4">
+                <div class="card {{ item.shortDescription|length == 0 ? 'card-inactive' }}">
+                    <div class="card-body">
+                        <p>{{ item.shortDescription|nl2br ?: 'Eine Kurzbeschreibung ist nicht vorhanden ...' }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Beziehungen</h3>
+                        <div class="card-actions">
+                            <a href="#" class="btn btn-outline btn-ghost btn-sm">
+                                {{ ux_icon('tabler:plus') }} Hinzufügen
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card-table table-responsive">
+                        <table class="table table-vcenter">
+                            <thead>
+                                <tr>
+                                    <th>Art</th>
+                                    <th>Name</th>
+                                    <th class="w-8">&nbsp;</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                <tr><td colspan="3">Keine Beziehung vorhanden ...</td></tr>
+                            </tbody>
+
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Verknüpfte Medien</h3>
+                        <div class="card-actions">
+                            <a href="#" class="btn btn-outline btn-ghost btn-sm">
+                                {{ ux_icon('tabler:plus') }} Hinzufügen
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card-table table-responsive">
+                        <table class="table table-vcenter">
+                            <thead>
+                            <tr>
+                                <th>Titel</th>
+                                <th class="w-8">&nbsp;</th>
+                            </tr>
+                            </thead>
+
+                            <tbody>
+                            <tr><td colspan="2">Keine Beziehung vorhanden ...</td></tr>
+                            </tbody>
+
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

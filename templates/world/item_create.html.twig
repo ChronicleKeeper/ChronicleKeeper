@@ -1,0 +1,29 @@
+{% extends 'layout.html.twig' %}
+
+{% block page_title %}Datenbank - Eintrag erstellen{% endblock %}
+
+{% block page_content %}
+    <div class="container-xl">
+        <div class="row row-deck row-cards">
+            <div class="col-sm-12">
+                <div class="card">
+                    <form action="{{ path('world_item_create') }}" method="post">
+                        <div class="card-body">
+                            <div class="row g-5">
+                                {{ form_row(form.type) }}
+                                {{ form_row(form.name) }}
+                                {{ form_row(form.shortDescription) }}
+                            </div>
+                        </div>
+                        <div class="card-footer text-end">
+                            <div class="d-flex">
+                                <a href="{{ path('world_item_listing') }}" class="btn btn-link">Abbruch</a>
+                                <button type="submit" class="btn btn-primary ms-auto">Speichern</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
