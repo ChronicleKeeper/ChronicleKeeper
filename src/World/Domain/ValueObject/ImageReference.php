@@ -15,6 +15,11 @@ class ImageReference implements MediaReference
     ) {
     }
 
+    public function getType(): string
+    {
+        return 'image';
+    }
+
     public function getIcon(): string
     {
         return 'tabler:photo';

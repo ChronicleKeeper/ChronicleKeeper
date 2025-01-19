@@ -6,6 +6,8 @@ namespace ChronicleKeeper\World\Domain\ValueObject;
 
 interface MediaReference
 {
+    public function getType(): string;
+
     public function getIcon(): string;
 
     public function getMediaId(): string;

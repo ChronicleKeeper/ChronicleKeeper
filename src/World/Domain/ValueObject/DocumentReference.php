@@ -15,6 +15,11 @@ class DocumentReference implements MediaReference
     ) {
     }
 
+    public function getType(): string
+    {
+        return 'document';
+    }
+
     public function getIcon(): string
     {
         return 'tabler:file';

@@ -15,6 +15,11 @@ class ConversationReference implements MediaReference
     ) {
     }
 
+    public function getType(): string
+    {
+        return 'conversation';
+    }
+
     public function getIcon(): string
     {
         return 'tabler:message';
@@ -32,7 +37,9 @@ class ConversationReference implements MediaReference
 
     public function getMediaDisplayName(): string
     {
-        return $this->conversation->getDirectory()->flattenHierarchyTitle(true) . ' > ' . $this->conversation->getTitle();
+        return $this->conversation->getDirectory()->flattenHierarchyTitle(true)
+            . ' > '
+            . $this->conversation->getTitle();
     }
 
     public function getGenericLinkIdentifier(): string
