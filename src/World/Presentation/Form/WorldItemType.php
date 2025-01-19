@@ -86,6 +86,8 @@ final class WorldItemType extends AbstractType implements DataMapperInterface
                 (string) $forms['name']->getData(),
                 (string) $forms['shortDescription']->getData(),
             );
+
+            return;
         }
 
         $viewData->rename((string) $forms['name']->getData());

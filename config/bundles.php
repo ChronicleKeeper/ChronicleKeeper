@@ -13,6 +13,7 @@ use Symfony\UX\StimulusBundle\StimulusBundle;
 use Symfony\UX\Turbo\TurboBundle;
 use Symfony\UX\TwigComponent\TwigComponentBundle;
 use Twig\Extra\TwigExtraBundle\TwigExtraBundle;
+use Symfony\UX\Autocomplete\AutocompleteBundle;
 
 return [
     // Backend Packages
@@ -27,6 +28,7 @@ return [
     LiveComponentBundle::class => ['all' => true],
     StimulusBundle::class => ['all' => true],
     TurboBundle::class => ['all' => true],
+    AutocompleteBundle::class => ['all' => true],
 
     // Development Packages
     DebugBundle::class => ['dev' => true],

@@ -1,0 +1,50 @@
+{% extends 'layout.html.twig' %}
+
+{% block page_title %}{{ item.name }} - Medien Hinzufügen{% endblock %}
+
+{% block page_content %}
+    <form action="{{ path('world_item_add_relations', {'id': item.id}) }}" method="post">
+
+    <div class="container-xl">
+        <div class="row row-deck row-cards">
+            <div class="col-sm-12">
+
+                <div class="card">
+                    <div class="card-body">
+                        <label for="world_item_shortDescription" class="form-label">Medienauswahl</label>
+                        <select
+                            name="media[]"
+                            multiple="multiple"
+                            {{ stimulus_controller(
+                                'symfony/ux-autocomplete/autocomplete',
+                                {
+                                    url: path('world_item_media_autocomplete'),
+                                    noMoreResultsText: 'Keine weiteren Ergebnisse.',
+                                    noResultsFoundText: 'Keine Ergebnisse gefunden.',
+                                    closeAfterSelect: false,
+                                }
+                            ) }}
+                        >
+                        </select>
+                        <div id="world_item_shortDescription_help" class="form-text mb-0 help-text">
+                            Bitte beginne Namen von Medien einzugeben, die du hinzufügen möchtest.
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <div class="row align-items-center">
+                            <div class="col"><a href="{{ path('world_item_view', {'id': item.id}) }}">Abbrechen</a></div>
+                            <div class="col-auto">
+                                <button type="submit" class="btn btn-primary ms-auto">Speichern</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+
+    </form>
+{% endblock %}
+

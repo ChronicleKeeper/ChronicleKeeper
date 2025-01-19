@@ -46,13 +46,16 @@ class DocumentDenormalizerTest extends TestCase
         $queryService = $this->createMock(QueryService::class);
         $queryService->expects($this->once())
             ->method('query')
-            ->with(self::equalTo(new GetDocument('foo')))
+            ->with(self::equalTo(new GetDocument('24c19e34-39c7-4c67-930f-9a7a969489c5')))
             ->willReturn($document = (new DocumentBuilder())->build());
 
         $denormalizer = new DocumentDenormalizer($queryService);
         $denormalizer->setDenormalizer($denormalizer);
 
-        self::assertSame($document, $denormalizer->denormalize('foo', Document::class));
+        self::assertSame(
+            $document,
+            $denormalizer->denormalize('24c19e34-39c7-4c67-930f-9a7a969489c5', Document::class),
+        );
     }
 
     #[Test]

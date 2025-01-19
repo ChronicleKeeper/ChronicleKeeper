@@ -9,22 +9,28 @@ use ChronicleKeeper\World\Domain\Event\ItemChangedDescription;
 use ChronicleKeeper\World\Domain\Event\ItemCreated;
 use ChronicleKeeper\World\Domain\Event\ItemRenamed;
 use ChronicleKeeper\World\Domain\ValueObject\ItemType;
+use ChronicleKeeper\World\Domain\ValueObject\MediaReference;
 use Symfony\Component\Uid\Uuid;
 use Webmozart\Assert\Assert;
 
 class Item extends AggregateRoot
 {
+    /** @param array<MediaReference> $mediaReferences */
     public function __construct(
         private readonly string $id,
         private readonly ItemType $type,
         private string $name,
         private string $shortDescription,
+        private array $mediaReferences = [],
     ) {
         Assert::uuid($id, 'The identifier ob the item has to be an UUID.');
     }
 
-    public static function create(ItemType $type, string $name, string $shortDescription): Item
-    {
+    public static function create(
+        ItemType $type,
+        string $name,
+        string $shortDescription,
+    ): Item {
         $item = new self(
             Uuid::v4()->toString(),
             $type,
@@ -56,6 +62,12 @@ class Item extends AggregateRoot
         return $this->shortDescription;
     }
 
+    /** @return array<MediaReference> */
+    public function getMediaReferences(): array
+    {
+        return $this->mediaReferences;
+    }
+
     public function rename(string $newName): void
     {
         if ($newName === $this->name) {
@@ -74,5 +86,16 @@ class Item extends AggregateRoot
 
         $this->record(new ItemChangedDescription($this, $this->shortDescription));
         $this->shortDescription = $newShortDescription;
+    }
+
+    /** @param MediaReference[] $references */
+    public function setMediaReferences(array $references): void
+    {
+        $this->mediaReferences = $references;
+    }
+
+    public function addMediaReference(MediaReference $reference): void
+    {
+        $this->mediaReferences[] = $reference;
     }
 }

@@ -12,6 +12,7 @@ use ChronicleKeeper\Shared\Domain\Entity\AggregateRoot;
 use JsonSerializable;
 use Symfony\Component\Uid\Uuid;
 
+use function array_pop;
 use function array_reverse;
 use function implode;
 
@@ -95,7 +96,7 @@ class Directory extends AggregateRoot implements JsonSerializable
         return $this->id === $directory->id;
     }
 
-    public function flattenHierarchyTitle(): string
+    public function flattenHierarchyTitle(bool $withoutRoot = false): string
     {
         if ($this->id === RootDirectory::ID) {
             return $this->title;
@@ -108,6 +109,10 @@ class Directory extends AggregateRoot implements JsonSerializable
             $components[] = $directory->title;
             $directory    = $directory->parent;
         } while ($directory instanceof self);
+
+        if ($withoutRoot === true) {
+            array_pop($components);
+        }
 
         return implode(' > ', array_reverse($components));
     }

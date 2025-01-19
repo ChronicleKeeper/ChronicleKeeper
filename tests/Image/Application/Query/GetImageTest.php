@@ -23,10 +23,10 @@ class GetImageTest extends TestCase
     #[Test]
     public function queryIsCorrect(): void
     {
-        $query = new GetImage('image-id');
+        $query = new GetImage('b22e89e8-54b0-4abd-b8d2-8a4c7f5c3150');
 
         self::assertSame(GetImageQuery::class, $query->getQueryClass());
-        self::assertSame('image-id', $query->id);
+        self::assertSame('b22e89e8-54b0-4abd-b8d2-8a4c7f5c3150', $query->id);
     }
 
     #[Test]
@@ -35,21 +35,21 @@ class GetImageTest extends TestCase
         $databasePlatform = new DatabasePlatformMock();
         $databasePlatform->expectFetch(
             'SELECT * FROM images WHERE id = :id',
-            ['id' => 'image-id'],
-            [['id' => 'image-id']],
+            ['id' => '0db8d4df-3da3-4781-b07f-2e42ac103820'],
+            [['id' => '0db8d4df-3da3-4781-b07f-2e42ac103820']],
         );
 
         $denormalizer = $this->createMock(DenormalizerInterface::class);
         $denormalizer->expects($this->once())
             ->method('denormalize')
-            ->with(['id' => 'image-id'], Image::class)
+            ->with(['id' => '0db8d4df-3da3-4781-b07f-2e42ac103820'], Image::class)
             ->willReturn($image = (new ImageBuilder())->build());
 
         $query = new GetImageQuery($databasePlatform, $denormalizer);
 
         self::assertSame(
             $image,
-            $query->query(new GetImage('image-id')),
+            $query->query(new GetImage('0db8d4df-3da3-4781-b07f-2e42ac103820')),
         );
     }
 }

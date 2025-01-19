@@ -23,10 +23,10 @@ class GetDocumentTest extends TestCase
     #[Test]
     public function queryIsCorrect(): void
     {
-        $query = new GetDocument('document-id');
+        $query = new GetDocument('fef8517b-6ffe-4102-b4e5-5f685764f2be');
 
         self::assertSame(GetDocumentQuery::class, $query->getQueryClass());
-        self::assertSame('document-id', $query->id);
+        self::assertSame('fef8517b-6ffe-4102-b4e5-5f685764f2be', $query->id);
     }
 
     #[Test]

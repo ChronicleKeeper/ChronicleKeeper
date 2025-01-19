@@ -42,7 +42,7 @@
                                     <tr>
                                         <td>{{ item.name }}</td>
                                         <td>{{ item.type.label }}</td>
-                                        <td>
+                                        <td class="text-end">
                                             <a href="{{ path('world_item_view', {'id': item.id}) }}" title="Ansehen">{{ ux_icon('tabler:database-search') }}</a>
                                             <a href="{{ path('world_item_edit', {'id': item.id}) }}" title="Bearbeiten">{{ ux_icon('tabler:database-edit', {'color': 'var(--tblr-warning)'}) }}</a>
                                             <a href="{{ path('world_item_delete', {'id': item.id}) }}" title="Löschen" {{ stimulus_controller('confirm') }}>{{ ux_icon('tabler:database-minus', {'color': 'var(--tblr-danger)'}) }}</a>
