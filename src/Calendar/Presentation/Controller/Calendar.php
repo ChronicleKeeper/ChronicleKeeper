@@ -22,7 +22,7 @@ final class Calendar extends AbstractController
     public function __invoke(): Response
     {
         $calendar    = $this->queryService->query(new LoadCalendar());
-        $currentDate = new CalendarDate($calendar, 1265, 1, 12);
+        $currentDate = new CalendarDate($calendar, 1265, 1, 14);
 
         return $this->render(
             'calendar/calendar.html.twig',

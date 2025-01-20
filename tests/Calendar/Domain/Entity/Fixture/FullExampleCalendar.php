@@ -24,7 +24,10 @@ class FullExampleCalendar
         $thirdMonth = new Month($calendar, 3, 'ThirdMonth', $dayCollection);
 
         $calendar->setMonths(
-            new Month($calendar, 1, 'FirstMonth', new DayCollection(10)),
+            new Month($calendar, 1, 'FirstMonth', new DayCollection(
+                10,
+                new LeapDay(1, 'NewYearsLeapDay'),
+            )),
             $thirdMonth,
             new Month($calendar, 2, 'SecondMonth', new DayCollection(15)),
         );

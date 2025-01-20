@@ -6,6 +6,7 @@ namespace ChronicleKeeper\Test\Calendar\Domain\Entity\Calendar;
 
 use ChronicleKeeper\Calendar\Domain\Entity\Calendar\DayCollection;
 use ChronicleKeeper\Calendar\Domain\Entity\Calendar\LeapDay;
+use ChronicleKeeper\Calendar\Domain\Entity\Calendar\RegularDay;
 use ChronicleKeeper\Calendar\Domain\Exception\InvalidLeapDays;
 use ChronicleKeeper\Test\Calendar\Domain\Entity\Fixture\FullExampleCalendar;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -24,7 +25,7 @@ class DayCollectionTest extends TestCase
         $calendar = FullExampleCalendar::get();
         $month    = $calendar->getMonthOfTheYear(1);
 
-        self::assertCount(10, $month->days);
+        self::assertCount(11, $month->days);
     }
 
     #[Test]
@@ -59,32 +60,6 @@ class DayCollectionTest extends TestCase
     }
 
     #[Test]
-    public function itFailsSettingLeapDaysWhenTheyAreStartingSequenceWithinRegularMonth(): void
-    {
-        $this->expectException(InvalidLeapDays::class);
-        $this->expectExceptionMessage('Leap days are not a sequence from the max days of the month');
-
-        new DayCollection(
-            10,
-            new LeapDay(9, 'EndOfYearFirstLeapDay'),
-            new LeapDay(10, 'EndOfYearFirstLeapDay'),
-        );
-    }
-
-    #[Test]
-    public function itFailsSettingLeapDaysWhenTheyAreNotSequenceFromLastDayOfMonthOn(): void
-    {
-        $this->expectException(InvalidLeapDays::class);
-        $this->expectExceptionMessage('Leap days are not a sequence from the max days of the month');
-
-        new DayCollection(
-            10,
-            new LeapDay(11, 'EndOfYearFirstLeapDay'),
-            new LeapDay(13, 'EndOfYearFirstLeapDay'),
-        );
-    }
-
-    #[Test]
     public function itCanCheckADayIsALeapDay(): void
     {
         $calendar = FullExampleCalendar::get();
@@ -103,23 +78,19 @@ class DayCollectionTest extends TestCase
     }
 
     #[Test]
-    public function itCanGetALeapDay(): void
+    public function itWillCalculateTheDaysInTheMonthCorrectly(): void
     {
         $calendar = FullExampleCalendar::get();
-        $month    = $calendar->getMonthOfTheYear(3);
+        $month    = $calendar->getMonthOfTheYear(1);
 
-        self::assertSame('EndOfYearFirstLeapDay', $month->days->getLeapDay(11)->name);
-    }
+        self::assertCount(11, $month->days);
 
-    #[Test]
-    public function itFailsGettingANonExistentLeapDay(): void
-    {
-        $this->expectException(InvalidLeapDays::class);
-        $this->expectExceptionMessage('The leap day 10 does not exist.');
+        $firstDayShouldBeLeapDay = $month->days->getDay(1);
+        self::assertInstanceOf(LeapDay::class, $firstDayShouldBeLeapDay);
+        self::assertSame('NewYearsLeapDay', $firstDayShouldBeLeapDay->getLabel());
 
-        $calendar = FullExampleCalendar::get();
-        $month    = $calendar->getMonthOfTheYear(3);
-
-        $month->days->getLeapDay(10);
+        $secondDayShouldBeTheFirstRegularDay = $month->days->getDay(2);
+        self::assertInstanceOf(RegularDay::class, $secondDayShouldBeTheFirstRegularDay);
+        self::assertSame('1', $secondDayShouldBeTheFirstRegularDay->getLabel());
     }
 }

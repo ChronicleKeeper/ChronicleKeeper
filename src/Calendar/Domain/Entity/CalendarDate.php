@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Calendar\Domain\Entity;
 
+use ChronicleKeeper\Calendar\Domain\Entity\Calendar\Month;
 use ChronicleKeeper\Calendar\Domain\Entity\Calendar\WeekDay;
 use ChronicleKeeper\Calendar\Domain\Exception\DayNotExistsInMonth;
 use ChronicleKeeper\Calendar\Domain\Exception\MonthNotExists;
@@ -13,6 +14,8 @@ use function sprintf;
 
 class CalendarDate
 {
+    private readonly Month $currentMonth;
+
     public function __construct(
         private readonly Calendar $calendar,
         private readonly int $year,
@@ -20,10 +23,10 @@ class CalendarDate
         private readonly int $day,
     ) {
         // Check if month exists in calendar, method throws exception if not exists
-        $month = $this->calendar->getMonthOfTheYear($this->month);
+        $this->currentMonth = $this->calendar->getMonthOfTheYear($this->month);
 
         // Check if day is valid for the given month
-        $maxDaysInMonth = $month->days->count();
+        $maxDaysInMonth = $this->currentMonth->days->count();
 
         if ($this->day < 1 || $this->day > $maxDaysInMonth) {
             throw new DayNotExistsInMonth($this->day, $this->month);
@@ -40,9 +43,16 @@ class CalendarDate
         return $this->month;
     }
 
-    public function getDay(): int
+    public function getDay(): string
     {
-        return $this->day;
+        return $this->currentMonth->days->getDay($this->day)->getLabel();
+    }
+
+    public function isSame(CalendarDate $calendarDate): bool
+    {
+        return $this->year === $calendarDate->year
+            && $this->month === $calendarDate->month
+            && $this->day === $calendarDate->day;
     }
 
     public function format(): string
@@ -51,14 +61,14 @@ class CalendarDate
         if ($currentMonth->days->isLeapDay($this->day)) {
             return sprintf(
                 '%s %d',
-                $currentMonth->days->getLeapDay($this->day)->name,
+                $currentMonth->days->getDay($this->day)->getLabel(),
                 $this->year,
             );
         }
 
         return sprintf(
             '%d. %s %d',
-            $this->day,
+            $currentMonth->days->getDay($this->day)->getLabel(),
             $this->calendar->getMonthOfTheYear($this->month)->name,
             $this->year,
         );
@@ -165,13 +175,13 @@ class CalendarDate
 
         // Add days from previous months in current year
         for ($i = 1; $i < $this->getMonth(); $i++) {
-            $totalDays += $this->calendar->getMonthOfTheYear($i)->days->count();
+            $totalDays += $this->calendar->getMonthOfTheYear($i)->days->getRegularDaysCount();
             // Substract the leap days of the month when they must not be counted
             // TODO: As we have leap days possible only in specific months this has to be based on the month!
         }
 
         // Add days in current month
-        $totalDays += $this->getDay();
+        $totalDays += $this->day;
 
         return $totalDays;
     }

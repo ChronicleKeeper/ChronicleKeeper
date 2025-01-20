@@ -49,7 +49,7 @@
 
         {% for leapDay in this.leapDaysOfCurrentMonth %}
             <div class="col-4">
-                <div class="card">
+                <div class="card{{ this.isLeapDayActive(leapDay) ? ' bg-primary-lt' }}">
                     <div class="card-header">
                         <h3 class="card-title">{{ leapDay.name }}</h3>
                     </div>

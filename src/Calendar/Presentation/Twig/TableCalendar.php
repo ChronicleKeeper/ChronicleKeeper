@@ -46,6 +46,18 @@ class TableCalendar
         return $currentMonth->days->getLeapDays();
     }
 
+    public function isLeapDayActive(LeapDay $leapDay): bool
+    {
+        $leadDayCalendarDate = new CalendarDate(
+            $this->calendar,
+            $this->currentDate->getYear(),
+            $this->currentDate->getMonth(),
+            $leapDay->dayOfTheMonth,
+        );
+
+        return $this->currentDate->isSame($leadDayCalendarDate);
+    }
+
     public function getPreviousDayOfLeapDay(LeapDay $leapDay): string
     {
         $leadDayCalendarDate = new CalendarDate(

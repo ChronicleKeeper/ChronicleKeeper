@@ -8,24 +8,26 @@ use ChronicleKeeper\Calendar\Domain\Exception\InvalidLeapDays;
 use Countable;
 
 use function array_combine;
-use function array_keys;
 use function array_map;
 use function count;
-use function range;
 use function usort;
 
-readonly class DayCollection implements Countable
+final class DayCollection implements Countable
 {
+    /** @var array<int, Day> */
+    private array $daysInTheMonth = [];
+
     /** @var array<int, LeapDay> */
     private array $leapDays;
 
-    /** @param int<0, max> $maxRegularDays */
+    /** @param int<0, max> $amountOfRegularDays */
     public function __construct(
-        private int $maxRegularDays,
+        private readonly int $amountOfRegularDays,
         LeapDay ...$leapDays,
     ) {
         if ($leapDays === []) {
             $this->leapDays = [];
+            $this->calculateDaysInTheMonth();
 
             return;
         }
@@ -41,6 +43,32 @@ readonly class DayCollection implements Countable
         if (count($this->leapDays) !== count($leapDays)) {
             throw InvalidLeapDays::leapDaysAreNotUnique();
         }
+
+        $this->calculateDaysInTheMonth();
+    }
+
+    private function calculateDaysInTheMonth(): void
+    {
+        $dayOfTheMonthToCheck       = 1;
+        $numericRegularDayToDisplay = 1;
+        do {
+            $leapDay = $this->leapDays[$dayOfTheMonthToCheck] ?? false;
+
+            if ($leapDay instanceof LeapDay) {
+                $this->daysInTheMonth[$dayOfTheMonthToCheck] = $leapDay;
+                ++$dayOfTheMonthToCheck;
+
+                continue;
+            }
+
+            $this->daysInTheMonth[$dayOfTheMonthToCheck] = new RegularDay(
+                $dayOfTheMonthToCheck,
+                $numericRegularDayToDisplay,
+            );
+
+            ++$dayOfTheMonthToCheck;
+            ++$numericRegularDayToDisplay;
+        } while (count($this->daysInTheMonth) < $this->count());
     }
 
     /** @return LeapDay[] */
@@ -49,23 +77,24 @@ readonly class DayCollection implements Countable
         return $this->leapDays;
     }
 
-    public function isLeapDay(int $day): bool
+    public function getDay(int $day): Day
     {
-        return isset($this->leapDays[$day]);
+        return $this->daysInTheMonth[$day];
     }
 
-    public function getLeapDay(int $day): LeapDay
+    public function isLeapDay(int $day): bool
     {
-        if (! $this->isLeapDay($day)) {
-            throw InvalidLeapDays::theLeapDayDoesNotExist($day);
-        }
-
-        return $this->leapDays[$day];
+        return isset($this->daysInTheMonth[$day]) && $this->daysInTheMonth[$day] instanceof LeapDay;
     }
 
     public function count(): int
     {
-        return $this->maxRegularDays + count($this->leapDays);
+        return $this->amountOfRegularDays + count($this->leapDays);
+    }
+
+    public function getRegularDaysCount(): int
+    {
+        return $this->amountOfRegularDays;
     }
 
     public function getLeapDaysCount(): int
