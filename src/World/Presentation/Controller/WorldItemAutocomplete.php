@@ -12,12 +12,15 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
 
+use Symfony\Component\Routing\Requirement\Requirement;
+
 use function array_map;
 
 #[Route(
     '/world/item/{id}/autocomplete',
-    name: 'world_item_autocomplete',
+    name: 'world_item_relation_autocomplete',
     methods: ['GET'],
+    requirements: ['id' => Requirement::UUID],
 )]
 final class WorldItemAutocomplete extends AbstractController
 {
