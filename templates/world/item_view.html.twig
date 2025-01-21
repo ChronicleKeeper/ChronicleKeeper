@@ -26,34 +26,7 @@
                 </div>
             </div>
 
-            <div class="col-sm-8">
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">Beziehungen</h3>
-                        <div class="card-actions">
-                            <a href="#" class="btn btn-outline btn-ghost btn-sm">
-                                {{ ux_icon('tabler:plus') }} Hinzufügen
-                            </a>
-                        </div>
-                    </div>
-                    <div class="card-table table-responsive">
-                        <table class="table table-vcenter">
-                            <thead>
-                                <tr>
-                                    <th>Art</th>
-                                    <th>Name</th>
-                                    <th class="w-8">&nbsp;</th>
-                                </tr>
-                            </thead>
-
-                            <tbody>
-                                <tr><td colspan="3">Keine Beziehung vorhanden ...</td></tr>
-                            </tbody>
-
-                        </table>
-                    </div>
-                </div>
-            </div>
+            {{ component('World:ItemRelations', {'item': item}) }}
 
             <div class="col-sm-12">
                 <div class="card">
@@ -110,4 +83,10 @@
             </div>
         </div>
     </div>
+
+    {% component "Tabler:Modal" with {id: 'add-item-relation'} %}
+        {% block modal_full_content %}
+            {{ component('World:AddRelationToWorld', { 'itemId': item.id, 'itemType': item.type }) }}
+        {% endblock %}
+    {% endcomponent %}
 {% endblock %}

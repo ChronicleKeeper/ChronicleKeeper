@@ -5,18 +5,17 @@ declare(strict_types=1);
 namespace ChronicleKeeper\World\Application\Query;
 
 use ChronicleKeeper\Shared\Application\Query\QueryParameters;
+use ChronicleKeeper\World\Domain\Entity\Item;
 
-final class SearchWorldItems implements QueryParameters
+class FindRelationsOfItem implements QueryParameters
 {
-    /** @param list<string> $exclude */
     public function __construct(
-        public readonly string $search = '',
-        public readonly array $exclude = [],
+        public readonly Item $item,
     ) {
     }
 
     public function getQueryClass(): string
     {
-        return SearchWorldItemsQuery::class;
+        return FindRelationsOfItemQuery::class;
     }
 }

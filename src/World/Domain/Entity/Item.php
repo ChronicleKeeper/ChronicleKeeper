@@ -88,12 +88,6 @@ class Item extends AggregateRoot
         $this->shortDescription = $newShortDescription;
     }
 
-    /** @param MediaReference[] $references */
-    public function setMediaReferences(array $references): void
-    {
-        $this->mediaReferences = $references;
-    }
-
     public function addMediaReference(MediaReference $reference): void
     {
         $this->mediaReferences[] = $reference;

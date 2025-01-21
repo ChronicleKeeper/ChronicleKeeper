@@ -25,6 +25,17 @@ final class WorldItemProvider extends DefaultSchemaProvider
             );
         SQL);
 
+        $platform->query(<<<'SQL'
+            CREATE TABLE world_item_relations (
+                source_world_item_id TEXT NOT NULL,
+                target_world_item_id TEXT NOT NULL,
+                relation_type TEXT NOT NULL,
+                PRIMARY KEY (source_world_item_id, target_world_item_id),
+                FOREIGN KEY (source_world_item_id) REFERENCES world_items(id),
+                FOREIGN KEY (target_world_item_id) REFERENCES world_items(id)
+            );
+        SQL);
+
         // Create junction table for documents
         $platform->query(<<<'SQL'
         CREATE TABLE world_item_documents (
