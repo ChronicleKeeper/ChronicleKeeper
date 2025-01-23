@@ -168,7 +168,7 @@ class CalendarDate
         $totalDays = 0;
 
         // Add days from previous years
-        $totalDays += ($this->getYear() - 1) * $this->calendar->countDaysInYear();
+        $totalDays += ($this->getYear() - 1) * $this->calendar->countDaysInYear($this->year);
 
         // Extract the leap days of the last year
         // TODO: As we have leap days possible only in specific years this has to be based on the year!
@@ -182,6 +182,26 @@ class CalendarDate
 
         // Add days in current month
         $totalDays += $this->day;
+
+        return $totalDays;
+    }
+
+    public function getTotalDaysFromCalendarStart(): int
+    {
+        $totalDays = 0;
+
+        // Add days from complete years
+        for ($year = 1; $year < $this->year; $year++) {
+            $totalDays += $this->calendar->countDaysInYear($year);
+        }
+
+        // Add days from complete months in current year
+        for ($month = 1; $month < $this->month; $month++) {
+            $totalDays += $this->calendar->countDaysInMonth($this->year, $month);
+        }
+
+        // Add remaining days in current month
+        $totalDays += $this->day - 1; // Subtract 1 because day 1 shouldn't add a day
 
         return $totalDays;
     }

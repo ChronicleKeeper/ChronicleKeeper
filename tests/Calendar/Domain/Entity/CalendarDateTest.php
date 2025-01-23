@@ -36,19 +36,25 @@ class CalendarDateTest extends TestCase
         yield 'Add 4 day to the beginning of the year' => [
             new CalendarDate($calendar, 1, 1, 1),
             4,
-            '5. FirstMonth 1',
+            '4. FirstMonth 1', // Still the 4th because the 1st day is a leap day it is "skipped" for name rendering
         ];
 
         yield 'Add 15 days to the beginning of the year' => [
             new CalendarDate($calendar, 1, 1, 1),
             15,
-            '6. SecondMonth 1',
+            '5. SecondMonth 1',
         ];
 
         yield 'Add 40 days to the beginning of the year, year changes' => [
             new CalendarDate($calendar, 1, 1, 1),
             40,
-            '4. FirstMonth 2',
+            '2. FirstMonth 2',
+        ];
+
+        yield 'Add some days to land on a leap day in calculation' => [
+            new CalendarDate($calendar, 1, 3, 7),
+            4,
+            'EndOfYearFirstLeapDay 1', // The 11th day is a leap day, so no numeric naming
         ];
     }
 

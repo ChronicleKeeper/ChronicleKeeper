@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ChronicleKeeper\Calendar\Domain\Entity;
 
 use ChronicleKeeper\Calendar\Domain\Entity\Calendar\Month;
+use ChronicleKeeper\Calendar\Domain\Entity\Calendar\MoonCycle;
 use ChronicleKeeper\Calendar\Domain\Entity\Calendar\WeekConfiguration;
 use ChronicleKeeper\Calendar\Domain\Exception\MonthNotExists;
 use ChronicleKeeper\Calendar\Domain\Exception\YearHasNotASequentialListOfMonths;
@@ -25,6 +26,7 @@ class Calendar
     private array $months = [];
 
     private WeekConfiguration $weekConfiguration;
+    private MoonCycle $moonCycle;
 
     public function setMonths(Month ...$months): void
     {
@@ -65,6 +67,20 @@ class Calendar
         return $this->weekConfiguration;
     }
 
+    public function setMoonCycle(MoonCycle $moonCycle): void
+    {
+        if (isset($this->moonCycle)) {
+            return;
+        }
+
+        $this->moonCycle = $moonCycle;
+    }
+
+    public function getMoonCycle(): MoonCycle
+    {
+        return $this->moonCycle;
+    }
+
     /** @return Month[] */
     public function getMonths(): array
     {
@@ -76,12 +92,17 @@ class Calendar
         return $this->months[$index] ?? throw new MonthNotExists($index);
     }
 
-    public function countDaysInYear(): int
+    public function countDaysInYear(int $year): int
     {
         return array_reduce(
             $this->months,
             static fn (int $carry, Month $month) => $carry + $month->days->count(),
             0,
         );
+    }
+
+    public function countDaysInMonth(int $year, int $month): int
+    {
+        return $this->getMonthOfTheYear($month)->days->count();
     }
 }

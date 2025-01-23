@@ -8,6 +8,7 @@ use ChronicleKeeper\Calendar\Domain\Entity\Calendar;
 use ChronicleKeeper\Calendar\Domain\Entity\Calendar\DayCollection;
 use ChronicleKeeper\Calendar\Domain\Entity\Calendar\LeapDay;
 use ChronicleKeeper\Calendar\Domain\Entity\Calendar\Month;
+use ChronicleKeeper\Calendar\Domain\Entity\Calendar\MoonCycle;
 use ChronicleKeeper\Calendar\Domain\Entity\Calendar\WeekConfiguration;
 use ChronicleKeeper\Calendar\Domain\Entity\Calendar\WeekDay;
 use ChronicleKeeper\Shared\Application\Query\Query;
@@ -44,6 +45,9 @@ final class LoadCalendarQuery implements Query
             new WeekDay(4, 'Vierttag'),
             new WeekDay(5, 'Fünfttag'),
         ));
+
+        // Configure Moon Cycle
+        $calendar->setMoonCycle(new MoonCycle(30));
 
         return $calendar;
     }

@@ -22,19 +22,22 @@
                             <tr>
                                 {%  for day in 1..amountOfDaysPerWeek %}
                                     <td class="{% if handleDay.day == currentDate.day %}bg-primary-subtle{% endif %}">
-                                        {% if handleDay.isLeapDay %}
-                                            <div class="text-muted small">
-                                                {{ handleDay.format }}
-                                            </div>
-                                        {% else %}
-                                            {% if handleDay.month != currentDate.month %}
-                                                <div class="text-muted small">
+                                        <div class="row">
+                                            <div class="col">
+                                                {% if not this.isInCurrentMonth(handleDay) %}
+                                                    <div class="text-muted small">
+                                                        {{ handleDay.day }}
+                                                    </div>
+                                                {% else %}
                                                     {{ handleDay.day }}
+                                                {% endif %}
+                                            </div>
+                                            {% if this.isInCurrentMonth(handleDay) %}
+                                                <div class="col add-column-right right text-small">
+                                                    <span data-bs-toggle="tooltip" data-bs-placement="top" title="{{ calendar.moonCycle.moonStateOfDay(handleDay).label }}">{{ calendar.moonCycle.moonStateOfDay(handleDay).icon }}</span>
                                                 </div>
-                                            {% else %}
-                                                {{ handleDay.day }}
                                             {% endif %}
-                                        {% endif %}
+                                        </div>
                                     </td>
 
                                     {% set handleDay = this.nextRegularDay(handleDay) %}

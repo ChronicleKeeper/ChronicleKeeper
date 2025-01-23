@@ -37,7 +37,7 @@ class CalendarTest extends TestCase
     public function itCanCountTheDaysInAYear(): void
     {
         $calendar = $this->getCalendar();
-        self::assertSame(37, $calendar->countDaysInYear());
+        self::assertSame(38, $calendar->countDaysInYear());
     }
 
     #[Test]

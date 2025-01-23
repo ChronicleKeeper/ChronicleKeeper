@@ -29,6 +29,11 @@ class TableCalendar
         return $date;
     }
 
+    public function isInCurrentMonth(CalendarDate $date): bool
+    {
+        return $date->getMonth() === $this->currentDate->getMonth();
+    }
+
     public function getNextRegularDay(CalendarDate $date): CalendarDate
     {
         do {
