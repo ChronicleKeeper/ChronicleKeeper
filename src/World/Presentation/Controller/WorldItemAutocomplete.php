@@ -19,8 +19,8 @@ use function array_map;
 #[Route(
     '/world/item/{id}/autocomplete',
     name: 'world_item_relation_autocomplete',
-    methods: ['GET'],
     requirements: ['id' => Requirement::UUID],
+    methods: ['GET'],
 )]
 final class WorldItemAutocomplete extends AbstractController
 {

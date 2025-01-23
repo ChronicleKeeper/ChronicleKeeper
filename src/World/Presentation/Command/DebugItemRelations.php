@@ -61,6 +61,11 @@ final class DebugItemRelations extends Command
             }
         }
 
+        $io->info(
+            'Checking the following types: '
+            . implode(', ', array_map(static fn (ItemType $type) => $type->value, $itemTypes)),
+        );
+
         $builtRelationTypesTo  = ItemType::getRelationTypesTo();
         $typesWithoutRelations = [];
         foreach ($itemTypes as $itemType) {

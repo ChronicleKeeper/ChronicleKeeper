@@ -30,6 +30,7 @@ class RegisterChatPrompt
     **Informationen aus der Spielwelt**
 
     - Nutze `library_documents` und `library_images` für Fragen zu Personen, Orten und Geschehnissen.
+    - Nutze zusätzlich immer auch die Funktion `world_items` um relevante weitergehende Informationen zur Anfrage zu bekommen.
     - Nutze die Funktionen für Kalender und Feiertage für Zeitrechnungsfragen.
     - Wenn nach Informationen für relative Tage gefragt wird wirst du erst das aktuelle Datum prüfen und darauf direkt mit diesem Datum die Funktionen `library_documents` und `library_images` abfragen.
     - Bei Fragen in der Ich-Form wirst du mit dem bekannten Namen deines Gesprächspartners `library_documents` und `library_images` nutzen oder nach dem Namen fragen, wenn er dir unbekannt ist.
