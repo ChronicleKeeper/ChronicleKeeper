@@ -167,21 +167,42 @@ class CalendarDate
     {
         $totalDays = 0;
 
-        // Add days from previous years
-        $totalDays += ($this->getYear() - 1) * $this->calendar->countDaysInYear($this->year);
-
-        // Extract the leap days of the last year
-        // TODO: As we have leap days possible only in specific years this has to be based on the year!
+        // Add days from previous complete years
+        for ($year = 1; $year < $this->getYear(); $year++) {
+            $totalDays += $this->calendar->countDaysInYear($year);
+        }
 
         // Add days from previous months in current year
-        for ($i = 1; $i < $this->getMonth(); $i++) {
-            $totalDays += $this->calendar->getMonthOfTheYear($i)->days->getRegularDaysCount();
-            // Substract the leap days of the month when they must not be counted
-            // TODO: As we have leap days possible only in specific months this has to be based on the month!
+        for ($month = 1; $month < $this->getMonth(); $month++) {
+            $monthObj   = $this->calendar->getMonthOfTheYear($month);
+            $totalDays += $monthObj->days->countInYear($this->year);
+
+            // Add leap days if they occur in this month and year
+            foreach ($monthObj->days->getLeapDays() as $leapDay) {
+                if (! $leapDay->occursInYear($this->year)) {
+                    continue;
+                }
+
+                $totalDays++;
+            }
         }
 
         // Add days in current month
         $totalDays += $this->day;
+
+        // If we're past any leap days in current month, add them
+        $currentMonth = $this->calendar->getMonthOfTheYear($this->getMonth());
+        foreach ($currentMonth->days->getLeapDays() as $leapDay) {
+            if (! $leapDay->occursInYear($this->year)) {
+                continue;
+            }
+
+            if ($leapDay->getDayOfTheMonth() >= $this->day) {
+                continue;
+            }
+
+            $totalDays++;
+        }
 
         return $totalDays;
     }

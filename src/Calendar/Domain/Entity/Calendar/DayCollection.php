@@ -8,6 +8,7 @@ use ChronicleKeeper\Calendar\Domain\Exception\InvalidLeapDays;
 use Countable;
 
 use function array_combine;
+use function array_filter;
 use function array_map;
 use function count;
 use function usort;
@@ -77,6 +78,15 @@ final class DayCollection implements Countable
         return $this->leapDays;
     }
 
+    /** @return LeapDay[] */
+    public function getLeapDaysInYear(int $year): array
+    {
+        return array_filter(
+            $this->leapDays,
+            static fn (LeapDay $leapDay) => $leapDay->occursInYear($year),
+        );
+    }
+
     public function getDay(int $day): Day
     {
         return $this->daysInTheMonth[$day];
@@ -85,6 +95,11 @@ final class DayCollection implements Countable
     public function isLeapDay(int $day): bool
     {
         return isset($this->daysInTheMonth[$day]) && $this->daysInTheMonth[$day] instanceof LeapDay;
+    }
+
+    public function countInYear(int $year): int
+    {
+        return $this->amountOfRegularDays + count($this->getLeapDaysInYear($year));
     }
 
     public function count(): int
@@ -100,5 +115,10 @@ final class DayCollection implements Countable
     public function getLeapDaysCount(): int
     {
         return count($this->leapDays);
+    }
+
+    public function countLeapDaysInYear(int $year): int
+    {
+        return count($this->getLeapDaysInYear($year));
     }
 }

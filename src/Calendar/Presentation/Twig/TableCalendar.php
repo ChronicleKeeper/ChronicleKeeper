@@ -48,7 +48,7 @@ class TableCalendar
     {
         $currentMonth = $this->calendar->getMonthOfTheYear($this->currentDate->getMonth());
 
-        return $currentMonth->days->getLeapDays();
+        return $currentMonth->days->getLeapDaysInYear($this->currentDate->getYear());
     }
 
     public function isLeapDayActive(LeapDay $leapDay): bool

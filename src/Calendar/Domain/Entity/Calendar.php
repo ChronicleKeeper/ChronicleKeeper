@@ -96,13 +96,13 @@ class Calendar
     {
         return array_reduce(
             $this->months,
-            static fn (int $carry, Month $month) => $carry + $month->days->count(),
+            static fn (int $carry, Month $month) => $carry + $month->days->countInYear($year),
             0,
         );
     }
 
     public function countDaysInMonth(int $year, int $month): int
     {
-        return $this->getMonthOfTheYear($month)->days->count();
+        return $this->getMonthOfTheYear($month)->days->countInYear($year);
     }
 }

@@ -26,7 +26,7 @@ readonly class Month
     {
         return array_map(
             fn (int $day) => new CalendarDate($this->calendar, $year, $this->indexInYear, $day),
-            range(1, $this->days->count()),
+            range(1, $this->days->countInYear($year)),
         );
     }
 

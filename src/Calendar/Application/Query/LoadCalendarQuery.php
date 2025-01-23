@@ -27,7 +27,7 @@ final class LoadCalendarQuery implements Query
                 new LeapDay(1, 'Katertag'),
                 new LeapDay(14, 'Tag der Mondgöttin'),
                 new LeapDay(31, 'Drei Könige'),
-                new LeapDay(32, 'Vier Könige'),
+                new LeapDay(32, 'Vier Könige', leapYearFrequency: 2, startYear: 1263),
             )),
             new Month($calendar, 2, 'Februar', new DayCollection(
                 30,
