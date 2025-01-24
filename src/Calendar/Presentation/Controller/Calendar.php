@@ -11,6 +11,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
+use function count;
+
 final class Calendar extends AbstractController
 {
     public function __construct(
@@ -18,15 +20,38 @@ final class Calendar extends AbstractController
     ) {
     }
 
-    #[Route('/calendar', name: 'calendar')]
-    public function __invoke(): Response
+    #[Route(
+        '/calendar/{year}/{month}',
+        name: 'calendar',
+        defaults: ['year' => null, 'month' => null],
+    )]
+    public function __invoke(int|null $year = null, int|null $month = null): Response
     {
-        $calendar    = $this->queryService->query(new LoadCalendar());
-        $currentDate = new CalendarDate($calendar, 1265, 1, 14);
+        $calendar = $this->queryService->query(new LoadCalendar());
+        $today    = new CalendarDate($calendar, 2, 1, 14); // Fixed current day
+
+        if ($year === null || $month === null) {
+            $viewDate = clone $today;
+        } else {
+            // Handle month overflow/underflow
+            if ($month < 1) {
+                $year--;
+                $month = count($calendar->getMonths());
+            } elseif ($month > count($calendar->getMonths())) {
+                $year++;
+                $month = 1;
+            }
+
+            $viewDate = new CalendarDate($calendar, $year, $month, 1);
+        }
 
         return $this->render(
             'calendar/calendar.html.twig',
-            ['calendar' => $calendar, 'currentDate' => $currentDate],
+            [
+                'calendar' => $calendar,
+                'viewDate' => $viewDate,
+                'currentDate' => $today,
+            ],
         );
     }
 }

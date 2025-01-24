@@ -1,10 +1,24 @@
 {% extends 'layout.html.twig' %}
 
-{% block page_title %}Heute ist der {{ currentDate.format }}{% endblock %}
+{% block page_subtitle %}Heute ist der {{ currentDate.format }}{% endblock %}
+{% block page_title %}{{ viewDate.format }}{% endblock %}
 
 {% block page_title_actions %}
     <div class="col-auto ms-auto d-print-none">
         <div class="btn-list">
+            {# Add month navigation buttons #}
+            <div class="btn-group me-2">
+                <a href="{{ path('calendar', {'year': viewDate.year, 'month': viewDate.month - 1}) }}" class="btn">
+                    {{ ux_icon('tabler:chevron-left') }}
+                </a>
+                <a href="{{ path('calendar') }}" class="btn">
+                    {{ ux_icon('tabler:calendar-due') }}Heute
+                </a>
+                <a href="{{ path('calendar', {'year': viewDate.year, 'month': viewDate.month + 1}) }}" class="btn">
+                    {{ ux_icon('tabler:chevron-right') }}
+                </a>
+            </div>
+
             <a href="#" class="btn d-none d-sm-inline-block">
                 {{ ux_icon('tabler:file-plus') }} Neue Veranstaltung
             </a>
@@ -19,5 +33,5 @@
 {% endblock %}
 
 {% block page_content %}
-    {{ component('Calendar:Table', {calendar: calendar, currentDate: currentDate}) }}
+    {{ component('Calendar:Table', {calendar: calendar, currentDate: currentDate, viewDate: viewDate}) }}
 {% endblock %}

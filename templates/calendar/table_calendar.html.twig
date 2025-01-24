@@ -1,4 +1,4 @@
-{% set currentMonth = calendar.getMonthOfTheYear(currentDate.month) %}
+{% set currentMonth = calendar.getMonthOfTheYear(viewDate.month) %}
 
 <div class="container-xl">
     <div class="row row-cards">
@@ -14,14 +14,14 @@
                         </tr>
                         </thead>
                         <tbody>
-                        {% set handleDay = this.firstRegularDay(currentDate) %}
+                        {% set handleDay = this.firstRegularDay(viewDate) %}
                         {% set amountOfWeeks = currentMonth.amountOfWeeks %}
                         {% set amountOfDaysPerWeek = calendar.weeks.countDays %}
 
                         {% for week in 1..amountOfWeeks %}
                             <tr>
                                 {%  for day in 1..amountOfDaysPerWeek %}
-                                    <td class="{% if handleDay.day == currentDate.day %}bg-primary-subtle{% endif %}">
+                                    <td class="{% if handleDay.isSame(currentDate) %}bg-primary-subtle{% endif %}">
                                         <div class="row">
                                             <div class="col">
                                                 {% if not this.isInCurrentMonth(handleDay) %}

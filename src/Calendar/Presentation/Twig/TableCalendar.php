@@ -14,6 +14,7 @@ class TableCalendar
 {
     public Calendar $calendar;
     public CalendarDate $currentDate;
+    public CalendarDate $viewDate;
 
     public function getFirstRegularDay(CalendarDate $date): CalendarDate
     {
@@ -31,7 +32,7 @@ class TableCalendar
 
     public function isInCurrentMonth(CalendarDate $date): bool
     {
-        return $date->getMonth() === $this->currentDate->getMonth();
+        return $date->getMonth() === $this->viewDate->getMonth();
     }
 
     public function getNextRegularDay(CalendarDate $date): CalendarDate
@@ -46,29 +47,29 @@ class TableCalendar
     /** @return Calendar\LeapDay[] */
     public function getLeapDaysOfCurrentMonth(): array
     {
-        $currentMonth = $this->calendar->getMonthOfTheYear($this->currentDate->getMonth());
+        $currentMonth = $this->calendar->getMonthOfTheYear($this->viewDate->getMonth());
 
-        return $currentMonth->days->getLeapDaysInYear($this->currentDate->getYear());
+        return $currentMonth->days->getLeapDaysInYear($this->viewDate->getYear());
     }
 
     public function isLeapDayActive(LeapDay $leapDay): bool
     {
         $leadDayCalendarDate = new CalendarDate(
             $this->calendar,
-            $this->currentDate->getYear(),
-            $this->currentDate->getMonth(),
+            $this->viewDate->getYear(),
+            $this->viewDate->getMonth(),
             $leapDay->dayOfTheMonth,
         );
 
-        return $this->currentDate->isSame($leadDayCalendarDate);
+        return $this->viewDate->isSame($leadDayCalendarDate);
     }
 
     public function getPreviousDayOfLeapDay(LeapDay $leapDay): string
     {
         $leadDayCalendarDate = new CalendarDate(
             $this->calendar,
-            $this->currentDate->getYear(),
-            $this->currentDate->getMonth(),
+            $this->viewDate->getYear(),
+            $this->viewDate->getMonth(),
             $leapDay->dayOfTheMonth,
         );
 
@@ -79,8 +80,8 @@ class TableCalendar
     {
         $leadDayCalendarDate = new CalendarDate(
             $this->calendar,
-            $this->currentDate->getYear(),
-            $this->currentDate->getMonth(),
+            $this->viewDate->getYear(),
+            $this->viewDate->getMonth(),
             $leapDay->dayOfTheMonth,
         );
 
