@@ -7,26 +7,23 @@ namespace ChronicleKeeper\World\Application\Query;
 use ChronicleKeeper\Shared\Application\Query\Query;
 use ChronicleKeeper\Shared\Application\Query\QueryParameters;
 use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
-use ChronicleKeeper\World\Domain\Entity\Item;
-use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 use function assert;
+
 use function implode;
 
-final class SearchWorldItemsQuery implements Query
+final class SearchWorldItemsCountQuery implements Query
 {
     public function __construct(
         private readonly DatabasePlatform $platform,
-        private readonly DenormalizerInterface $denormalizer,
     ) {
     }
 
-    /** @return Item[] */
-    public function query(QueryParameters $parameters): array
+    public function query(QueryParameters $parameters): int
     {
-        assert($parameters instanceof SearchWorldItems);
+        assert($parameters instanceof SearchWorldItemsCount);
 
-        $query           = 'SELECT id, type, name, short_description as shortDescription FROM world_items';
+        $query           = 'SELECT COUNT(id) as count FROM world_items';
         $queryParameters = [];
         $addWhere        = [];
 
@@ -49,13 +46,6 @@ final class SearchWorldItemsQuery implements Query
             $query .= ' WHERE ' . implode(' AND ', $addWhere);
         }
 
-        $query                    .= ' ORDER BY name ASC LIMIT :limit OFFSET :offset';
-        $queryParameters['limit']  = $parameters->limit;
-        $queryParameters['offset'] = $parameters->offset;
-
-        return $this->denormalizer->denormalize(
-            $this->platform->fetch($query, $queryParameters),
-            Item::class . '[]',
-        );
+        return $this->platform->fetchSingleRow($query, $queryParameters)['count']; // @phpstan-ignore offsetAccess.notFound
     }
 }

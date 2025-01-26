@@ -1,69 +1,99 @@
 <div {{ attributes }}>
-    <div class="card">
-        <div class="card-body">
-            <div class="row g-3">
-                <div class="col-sm-6">
-                    <input
-                        type="text"
-                        name="search"
-                        class="form-control"
-                        value="{{ search }}"
-                        data-model="debounce(100)|search"
-                        placeholder="Nach Namen suchen...">
-                </div>
-                <div class="col-sm-6">
-                    <select
-                        name="type"
-                        class="form-select"
-                        data-model="type">
-                        <option value="">Alle Typen</option>
-                        {% for type in this.itemTypes %}
-                            <option value="{{ type.value }}" {{ type.value == this.type ? 'selected' : '' }}>
-                                {{ type.label }}
-                            </option>
-                        {% endfor %}
-                    </select>
-                </div>
-            </div>
-        </div>
-    </div>
+	<div class="card">
+		<div class="card-body">
+			<div class="row g-3">
+				<div class="col-sm-6">
+					<input type="text" name="search" class="form-control" value="{{ search }}" data-model="debounce(100)|search" placeholder="Nach Namen suchen...">
+				</div>
+				<div class="col-sm-6">
+					<select name="type" class="form-select" data-model="type">
+						<option value="">Alle Typen</option>
+						{% for type in this.itemTypes %}
+							<option value="{{ type.value }}" {{ type.value == this.type ? 'selected' : '' }}>
+								{{ type.label }}
+							</option>
+						{% endfor %}
+					</select>
+				</div>
+			</div>
+		</div>
+	</div>
 
-    <div class="card mt-3" data-loading="addClass(placeholder-glow)">
-        <div class="card-table table-responsive">
-            <table class="table table-vcenter" data-loading="addClass(disabled)">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Typ</th>
-                        <th class="w-8">&nbsp;</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td colspan="3" class="text-center d-none" data-loading="removeClass(d-none)">
-                            <div class="d-flex">
-                                <div class="spinner-border"></div>
-                                <div class="p-1" style="margin-left: 5px;"><i>Dein Keeper durchwühlt die Karteikarten in einigen staubigen Schränken nach Informationen.</i></div>
-                            </div>
-                        </td>
-                    </tr>
-                    {% for item in this.items %}
-                        <tr data-loading="addClass(d-none)">
-                            <td>{{ item.name }}</td>
-                            <td>{{ item.type.label }}</td>
-                            <td class="text-end">
-                                <a href="{{ path('world_item_view', {'id': item.id}) }}" title="Ansehen">{{ ux_icon('tabler:database-search') }}</a>
-                                <a href="{{ path('world_item_edit', {'id': item.id}) }}" title="Bearbeiten">{{ ux_icon('tabler:database-edit', {'color': 'var(--tblr-warning)'}) }}</a>
-                                <a href="{{ path('world_item_delete', {'id': item.id}) }}" title="Löschen" {{ stimulus_controller('confirm') }}>{{ ux_icon('tabler:database-minus', {'color': 'var(--tblr-danger)'}) }}</a>
-                            </td>
-                        </tr>
-                    {% else %}
-                        <tr data-loading="addClass(d-none)">
-                            <td colspan="3">Keine Einträge gefunden.</td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </div>
+	<div class="card mt-3" data-loading="addClass(placeholder-glow)">
+		<div class="card-table table-responsive">
+			<table class="table table-vcenter" data-loading="addClass(disabled)">
+				<thead>
+					<tr>
+						<th>Name</th>
+						<th>Typ</th>
+						<th class="w-8">&nbsp;</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td colspan="3" class="text-center d-none" data-loading="removeClass(d-none)">
+							<div class="d-flex">
+								<div class="spinner-border"></div>
+								<div class="p-1" style="margin-left: 5px;">
+									<i>Dein Keeper durchwühlt die Karteikarten in einigen staubigen Schränken nach Informationen.</i>
+								</div>
+							</div>
+						</td>
+					</tr>
+					{% for item in this.items %}
+						<tr data-loading="addClass(d-none)">
+							<td>{{ item.name }}</td>
+							<td>{{ item.type.label }}</td>
+							<td class="text-end">
+								<a href="{{ path('world_item_view', {'id': item.id}) }}" title="Ansehen">{{ ux_icon('tabler:database-search') }}</a>
+								<a href="{{ path('world_item_edit', {'id': item.id}) }}" title="Bearbeiten">{{ ux_icon('tabler:database-edit', {'color': 'var(--tblr-warning)'}) }}</a>
+								<a href="{{ path('world_item_delete', {'id': item.id}) }}" title="Löschen" {{ stimulus_controller('confirm') }}>{{ ux_icon('tabler:database-minus', {'color': 'var(--tblr-danger)'}) }}</a>
+							</td>
+						</tr>
+					{% else %}
+						<tr data-loading="addClass(d-none)">
+							<td colspan="3">Keine Einträge gefunden.</td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+        {% set totalItems = this.totalItems %}
+        {% set totalPages = this.totalPages(totalItems) %}
+		{% if totalPages > 1 %}
+            {% set itemsPerPage = this.itemsPerPage %}
+			<div class="card-footer d-flex align-items-center pt-2 pb-2" data-loading="addClass(d-none)">
+				<p class="m-0 text-muted">Zeige
+					<span>{{ ((this.page - 1) * itemsPerPage) + 1 }}</span>
+					bis
+					<span>{{ min(this.page * itemsPerPage, totalItems) }}</span>
+					von
+					<span>{{ totalItems }}</span>
+					Einträgen</p>
+				<ul class="pagination m-0 ms-auto">
+					<li class="page-item {% if this.page == 1 %}disabled{% endif %}">
+						<button type="button" class="page-link" data-action="live#action" data-live-action-param="updatePage" data-live-page-param="{{ this.page - 1 }}">
+							{{ ux_icon('tabler:chevron-left') }}
+						</button>
+					</li>
+					{% for p in this.getPageRange(totalItems) %}
+						{% if p is null %}
+							<li class="page-item disabled">
+								<span class="page-link">...</span>
+							</li>
+						{% else %}
+							<li class="page-item {% if this.page == p %}active{% endif %}">
+								<button type="button" class="page-link" data-action="live#action" data-live-action-param="updatePage" data-live-page-param="{{ p }}">{{ p }}</button>
+							</li>
+						{% endif %}
+					{% endfor %}
+					<li class="page-item {% if this.page == totalPages %}disabled{% endif %}">
+						<button type="button" class="page-link" data-action="live#action" data-live-action-param="updatePage" data-live-page-param="{{ this.page + 1 }}" {% if this.page == this.totalPages %} disabled {% endif %}>
+							{{ ux_icon('tabler:chevron-right') }}
+						</button>
+					</li>
+				</ul>
+			</div>
+		{% endif %}
+	</div>
 </div>
