@@ -8,6 +8,7 @@ use ChronicleKeeper\Shared\Application\Query\QueryParameters;
 
 class SearchWorldItems implements QueryParameters
 {
+    /** @param string[] $exclude */
     public function __construct(
         public readonly string $search = '',
         public readonly string $type = '',
