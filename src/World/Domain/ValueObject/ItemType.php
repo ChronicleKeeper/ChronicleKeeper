@@ -461,6 +461,33 @@ enum ItemType: string
             [self::ORGANIZATION, self::SETTLEMENT, 'political_power', 'hat politischen Einfluss in', 'politisch beeinflusst von'],
             [self::ORGANIZATION, self::REGION, 'dominates', 'dominiert', 'dominiert von'],
             [self::ORGANIZATION, self::ORGANIZATION, 'puppet', 'kontrolliert', 'kontrolliert von'],
+
+            // Trading & Commerce Relations
+            [self::SETTLEMENT, self::SETTLEMENT, 'major_trade', 'wichtiger Handelspartner von', 'wichtiger Handelspartner mit'],
+            [self::SETTLEMENT, self::SETTLEMENT, 'black_market', 'Schwarzmarktroute zu', 'Schwarzmarktroute von'],
+            [self::SETTLEMENT, self::ORGANIZATION, 'market_control', 'Markt kontrolliert von', 'kontrolliert Markt in'],
+            [self::SETTLEMENT, self::ORGANIZATION, 'merchant_guild', 'Handelsgilde ansässig in', 'hat Niederlassung in'],
+
+            [self::ORGANIZATION, self::SETTLEMENT, 'monopoly', 'hat Handelsmonopol in', 'Handel monopolisiert von'],
+            [self::ORGANIZATION, self::REGION, 'trade_rights', 'hat Handelsrechte in', 'Handelsrechte vergeben an'],
+            [self::ORGANIZATION, self::ORGANIZATION, 'trade_cartel', 'Handelskartell mit', 'Handelskartell mit'],
+            [self::ORGANIZATION, self::OBJECT, 'exclusive_trade', 'exklusiver Händler für', 'exklusiv gehandelt von'],
+
+            [self::LOCATION, self::OBJECT, 'speciality', 'bekannt für', 'Spezialität von'],
+            [self::LOCATION, self::ORGANIZATION, 'trade_post', 'Handelsposten von', 'unterhält Handelsposten in'],
+            [self::LOCATION, self::LOCATION, 'trade_stop', 'Handelsstation für', 'nutzt Handelsstation'],
+
+            [self::PERSON, self::ORGANIZATION, 'merchant', 'Händler für', 'beschäftigt als Händler'],
+            [self::PERSON, self::SETTLEMENT, 'market_rights', 'hat Marktrecht in', 'gewährt Marktrecht an'],
+            [self::PERSON, self::OBJECT, 'specialized_trader', 'spezialisiert auf Handel mit', 'speziell gehandelt von'],
+
+            [self::OBJECT, self::SETTLEMENT, 'main_export', 'Hauptexport von', 'exportiert hauptsächlich'],
+            [self::OBJECT, self::SETTLEMENT, 'main_import', 'Hauptimport von', 'importiert hauptsächlich'],
+            [self::OBJECT, self::LOCATION, 'trade_good', 'gehandelt in', 'handelt mit'],
+
+            [self::FACTION, self::SETTLEMENT, 'controls_prices', 'kontrolliert Preise in', 'Preise kontrolliert von'],
+            [self::FACTION, self::ORGANIZATION, 'trade_alliance', 'Handelsallianz mit', 'Handelsallianz mit'],
+            [self::FACTION, self::OBJECT, 'regulates_trade', 'reguliert Handel mit', 'Handel reguliert von'],
         ];
     }
 

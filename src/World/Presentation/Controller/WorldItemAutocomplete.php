@@ -36,17 +36,11 @@ final class WorldItemAutocomplete extends AbstractController
             return new JsonResponse(['results' => []]);
         }
 
-        // Get current existing relations
-        $existingIds = array_map(
-            static fn (Relation $relation) => $relation->toItem->getId(),
-            $this->queryService->query(new FindRelationsOfItem($id)),
-        );
-
         return new JsonResponse([
             'results' => $this->formatResults($this->queryService->query(
                 new SearchWorldItems(
                     search: $search,
-                    exclude: [$id] + $existingIds,
+                    exclude: [$id],
                 ),
             )),
         ]);
