@@ -86,7 +86,7 @@ class DatabaseSearch
             $response .= 'Short Description: ' . $result->getShortDescription() . PHP_EOL;
 
             /** @var Relation[] $relations */
-            $relations = $this->queryService->query(new FindRelationsOfItem($result));
+            $relations = $this->queryService->query(new FindRelationsOfItem($result->getId()));
             if ($relations === []) {
                 continue;
             }

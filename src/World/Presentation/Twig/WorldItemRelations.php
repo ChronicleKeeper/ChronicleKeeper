@@ -22,7 +22,7 @@ class WorldItemRelations
     /** @return Relation[] */
     public function getRelations(): array
     {
-        return $this->queryService->query(new FindRelationsOfItem($this->item));
+        return $this->queryService->query(new FindRelationsOfItem($this->item->getId()));
     }
 
     public function getRelationLabel(Item $toItem, string $relationType): string

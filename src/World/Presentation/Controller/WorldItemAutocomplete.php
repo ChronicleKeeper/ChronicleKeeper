@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace ChronicleKeeper\World\Presentation\Controller;
 
 use ChronicleKeeper\Shared\Application\Query\QueryService;
+use ChronicleKeeper\World\Application\Query\FindRelationsOfItem;
 use ChronicleKeeper\World\Application\Query\SearchWorldItems;
 use ChronicleKeeper\World\Domain\Entity\Item;
+use ChronicleKeeper\World\Domain\ValueObject\Relation;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -34,11 +36,17 @@ final class WorldItemAutocomplete extends AbstractController
             return new JsonResponse(['results' => []]);
         }
 
+        // Get current existing relations
+        $existingIds = array_map(
+            static fn (Relation $relation) => $relation->toItem->getId(),
+            $this->queryService->query(new FindRelationsOfItem($id)),
+        );
+
         return new JsonResponse([
             'results' => $this->formatResults($this->queryService->query(
                 new SearchWorldItems(
                     search: $search,
-                    exclude: [$id],
+                    exclude: [$id] + $existingIds,
                 ),
             )),
         ]);
@@ -54,7 +62,7 @@ final class WorldItemAutocomplete extends AbstractController
         return array_map(
             static fn (Item $item) => [
                 'value' => $item->getId(),
-                'text' => $item->getName(),
+                'text' => $item->getName() . ' (' . $item->getType()->getLabel() . ')',
                 'type' => $item->getType()->value,
             ],
             $items,
