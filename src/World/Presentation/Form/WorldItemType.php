@@ -9,7 +9,7 @@ use ChronicleKeeper\World\Domain\ValueObject\ItemType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\DataMapperInterface;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
-use Symfony\Component\Form\Extension\Core\Type\EnumType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -18,7 +18,11 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Traversable;
 
+use function in_array;
 use function iterator_to_array;
+use function ksort;
+use function strcmp;
+use function usort;
 
 final class WorldItemType extends AbstractType implements DataMapperInterface
 {
@@ -35,10 +39,29 @@ final class WorldItemType extends AbstractType implements DataMapperInterface
     {
         $builder->setDataMapper($this);
 
-        $builder->add('type', EnumType::class, [
+        $groupedTypes = ItemType::getGroupedTypes();
+        ksort($groupedTypes); // Sort the groups alphabetically
+
+        $choices = [];
+        foreach ($groupedTypes as $groupItems) {
+            usort($groupItems, static fn (ItemType $a, ItemType $b) => strcmp($a->getLabel(), $b->getLabel()));
+            $choices = [...$choices, ...$groupItems];
+        }
+
+        $builder->add('type', ChoiceType::class, [
             'label' => 'Typ',
-            'class' => ItemType::class,
+            'choices' => $choices,
+            'choice_value' => static fn (ItemType|null $type) => $type?->value,
             'choice_label' => static fn (ItemType $type) => $type->getLabel(),
+            'group_by' => static function (ItemType $type): string {
+                foreach (ItemType::getGroupedTypes() as $groupName => $types) {
+                    if (in_array($type, $types, true)) {
+                        return $groupName;
+                    }
+                }
+
+                return 'Sonstiges';
+            },
         ]);
 
         $builder->add('name', TextType::class, [
