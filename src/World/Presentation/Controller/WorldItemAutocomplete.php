@@ -5,10 +5,8 @@ declare(strict_types=1);
 namespace ChronicleKeeper\World\Presentation\Controller;
 
 use ChronicleKeeper\Shared\Application\Query\QueryService;
-use ChronicleKeeper\World\Application\Query\FindRelationsOfItem;
 use ChronicleKeeper\World\Application\Query\SearchWorldItems;
 use ChronicleKeeper\World\Domain\Entity\Item;
-use ChronicleKeeper\World\Domain\ValueObject\Relation;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;

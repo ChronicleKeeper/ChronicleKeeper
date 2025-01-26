@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ChronicleKeeper\World\Domain\ValueObject;
 
 use function array_keys;
+use function array_merge;
 
 enum ItemType: string
 {
@@ -35,8 +36,15 @@ enum ItemType: string
     case SPELL    = 'spell';
 
     // Physical Items
-    case OBJECT   = 'object';
-    case ARTIFACT = 'artifact';
+    case OBJECT     = 'object';                  // Base type for all physical items
+    case ARTIFACT   = 'artifact';              // Magical or unique items
+    case WEAPON     = 'weapon';                  // Combat equipment
+    case ARMOR      = 'armor';                    // Protective equipment
+    case TOOL       = 'tool';                      // Utility items
+    case DOCUMENT   = 'document';              // Written materials
+    case CONTAINER  = 'container';            // Storage items
+    case VALUABLE   = 'valuable';              // Precious items
+    case CONSUMABLE = 'consumable';          // Used-up items
 
     // Other
     case OTHER = 'other';
@@ -71,11 +79,34 @@ enum ItemType: string
             self::SPELL => 'Zauber',
 
             // Physical Items
-            self::OBJECT => 'Gegenstand',
+            self::OBJECT => 'Sonstiges Objekt',
             self::ARTIFACT => 'Artefakt',
+            self::WEAPON => 'Waffe',
+            self::ARMOR => 'Rüstung',
+            self::TOOL => 'Werkzeug',
+            self::DOCUMENT => 'Dokument',
+            self::CONTAINER => 'Behälter',
+            self::VALUABLE => 'Wertgegenstand',
+            self::CONSUMABLE => 'Verbrauchsgegenstand',
 
             // Other
             self::OTHER => 'Sonstiges',
+        };
+    }
+
+    public function isObjectType(): bool
+    {
+        return match ($this) {
+            self::OBJECT,
+            self::ARTIFACT,
+            self::WEAPON,
+            self::ARMOR,
+            self::TOOL,
+            self::DOCUMENT,
+            self::CONTAINER,
+            self::VALUABLE,
+            self::CONSUMABLE => true,
+            default => false,
         };
     }
 
@@ -116,6 +147,13 @@ enum ItemType: string
             'Gegenstände' => [
                 self::OBJECT,
                 self::ARTIFACT,
+                self::WEAPON,
+                self::ARMOR,
+                self::TOOL,
+                self::DOCUMENT,
+                self::CONTAINER,
+                self::VALUABLE,
+                self::CONSUMABLE,
             ],
             'Sonstiges' => [
                 self::OTHER,
@@ -145,7 +183,7 @@ enum ItemType: string
      */
     public static function getRelationTypes(): array
     {
-        return [
+        $baseRelations = [
             // Political & Diplomatic Relations
             [self::COUNTRY, self::COUNTRY, 'allied', 'Verbündeter von', 'Verbündeter mit'],
             [self::COUNTRY, self::COUNTRY, 'hostile', 'verfeindet mit', 'verfeindet mit'],
@@ -488,6 +526,66 @@ enum ItemType: string
             [self::FACTION, self::SETTLEMENT, 'controls_prices', 'kontrolliert Preise in', 'Preise kontrolliert von'],
             [self::FACTION, self::ORGANIZATION, 'trade_alliance', 'Handelsallianz mit', 'Handelsallianz mit'],
             [self::FACTION, self::OBJECT, 'regulates_trade', 'reguliert Handel mit', 'Handel reguliert von'],
+
+            // Weapon Relations
+            [self::WEAPON, self::PERSON, 'wielded', 'geführt von', 'führt'],
+            [self::WEAPON, self::ORGANIZATION, 'standard_issue', 'Standardausrüstung von', 'rüstet aus mit'],
+
+            // Armor Relations
+            [self::ARMOR, self::PERSON, 'worn', 'getragen von', 'trägt'],
+            [self::ARMOR, self::ORGANIZATION, 'uniform', 'Uniform von', 'trägt als Uniform'],
+
+            // Tool Relations
+            [self::TOOL, self::PERSON, 'used', 'benutzt von', 'benutzt'],
+            [self::TOOL, self::ORGANIZATION, 'equipment', 'Ausrüstung von', 'verwendet'],
+
+            // Document Relations
+            [self::DOCUMENT, self::PERSON, 'authored', 'verfasst von', 'verfasste'],
+            [self::DOCUMENT, self::ORGANIZATION, 'archived', 'archiviert von', 'archiviert'],
+            [self::DOCUMENT, self::EVENT, 'records', 'dokumentiert', 'dokumentiert in'],
+
+            // Container Relations
+            [self::CONTAINER, self::OBJECT, 'contains', 'enthält', 'gelagert in'],
+            [self::CONTAINER, self::PERSON, 'secured', 'gesichert von', 'sichert'],
+
+            // Valuable Relations
+            [self::VALUABLE, self::PERSON, 'collected', 'gesammelt von', 'sammelt'],
+            [self::VALUABLE, self::ORGANIZATION, 'traded', 'gehandelt von', 'handelt mit'],
+
+            // Consumable Relations
+            [self::CONSUMABLE, self::PERSON, 'uses', 'verwendet von', 'verwendet'],
+            [self::CONSUMABLE, self::ORGANIZATION, 'produces', 'hergestellt von', 'stellt her'],
+        ];
+
+        // Inherit base object relations for all object subtypes
+        /** @var list<array{0: ItemType, 1: ItemType, 2: string, 3: string, 4: string}> $inheritedRelations */
+        $inheritedRelations = [];
+        foreach ($baseRelations as $relation) {
+            if ($relation[0] !== self::OBJECT) {
+                continue;
+            }
+
+            $objectSubtypes = self::getObjectSubTypes();
+            foreach ($objectSubtypes as $subtype) {
+                $inheritedRelations[] = [$subtype, $relation[1], $relation[2], $relation[3], $relation[4]];
+            }
+        }
+
+        return array_merge($baseRelations, $inheritedRelations); // @phpstan-ignore return.type
+    }
+
+    /** @return ItemType[] */
+    public static function getObjectSubTypes(): array
+    {
+        return [
+            self::ARTIFACT,
+            self::WEAPON,
+            self::ARMOR,
+            self::TOOL,
+            self::DOCUMENT,
+            self::CONTAINER,
+            self::VALUABLE,
+            self::CONSUMABLE,
         ];
     }
 
@@ -504,6 +602,15 @@ enum ItemType: string
         foreach ($relations as [$sourceType, $targetType, $relationType, $sourceLabel, $targetLabel]) {
             $relationTypes[$sourceType->value][$targetType->value][$relationType] = $sourceLabel;
             $relationTypes[$targetType->value][$sourceType->value][$relationType] = $targetLabel;
+
+            if ($targetType !== self::OBJECT) {
+                continue;
+            }
+
+            foreach (self::getObjectSubTypes() as $subType) {
+                $relationTypes[$sourceType->value][$subType->value][$relationType] = $sourceLabel;
+                $relationTypes[$subType->value][$sourceType->value][$relationType] = $targetLabel;
+            }
         }
 
         // Additionally every available type within this enum gets a default "related" relation to every other type

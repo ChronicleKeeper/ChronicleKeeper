@@ -14,12 +14,7 @@ final class WorldItemProvider extends DefaultSchemaProvider
         $platform->query(<<<'SQL'
             CREATE TABLE world_items (
                 id TEXT PRIMARY KEY,
-                type TEXT NOT NULL CHECK(type IN (
-                    'country', 'region', 'location',
-                    'organization', 'person', 'race',
-                    'event', 'quest', 'campaign',
-                    'object', 'other'
-                )),
+                type TEXT NOT NULL,
                 name TEXT NOT NULL,
                 short_description TEXT NOT NULL
             );
