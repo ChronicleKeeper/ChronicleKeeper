@@ -6,11 +6,11 @@ namespace ChronicleKeeper\World\Application\Query;
 
 use ChronicleKeeper\Shared\Application\Query\QueryParameters;
 
-final class SearchWorldItems implements QueryParameters
+class SearchWorldItems implements QueryParameters
 {
-    /** @param list<string> $exclude */
     public function __construct(
         public readonly string $search = '',
+        public readonly string $type = '',
         public readonly array $exclude = [],
     ) {
     }

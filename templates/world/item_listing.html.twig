@@ -16,10 +16,34 @@
 
     <div class="container-xl">
         <div class="row row-deck row-cards">
-            <div class="row-sm-12">
-                <div class="card card-borderless">
+            <div class="col-sm-12">
+                <div class="card">
                     <div class="card-body">
-                        Suchen ...
+                        <form method="get" action="{{ path('world_item_listing') }}">
+                            <div class="row g-3">
+                                <div class="col-sm-6">
+                                    <label class="form-label">Name</label>
+                                    <input type="text" name="search" class="form-control" value="{{ app.request.query.get('search') }}" placeholder="Nach Namen suchen...">
+                                </div>
+                                <div class="col-sm-4">
+                                    <label class="form-label">Typ</label>
+                                    <select name="type" class="form-select">
+                                        <option value="">Alle Typen</option>
+                                        {% for type in item_types %}
+                                            <option value="{{ type.value }}" {{ app.request.query.get('type') == type.value ? 'selected' : '' }}>
+                                                {{ type.label }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-sm-2">
+                                    <label class="form-label">&nbsp;</label>
+                                    <button type="submit" class="btn btn-primary w-100">
+                                        {{ ux_icon('tabler:search') }} Suchen
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>

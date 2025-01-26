@@ -28,11 +28,16 @@ final class SearchWorldItemsQuery implements Query
 
         $query           = 'SELECT id, type, name, short_description as shortDescription FROM world_items';
         $queryParameters = [];
+        $addWhere        = [];
 
-        $addWhere = [];
         if ($parameters->search !== '') {
             $addWhere[]                = 'name LIKE :search';
             $queryParameters['search'] = '%' . $parameters->search . '%';
+        }
+
+        if ($parameters->type !== '') {
+            $addWhere[]              = 'type = :type';
+            $queryParameters['type'] = $parameters->type;
         }
 
         if ($parameters->exclude !== []) {
@@ -43,6 +48,8 @@ final class SearchWorldItemsQuery implements Query
         if ($addWhere !== []) {
             $query .= ' WHERE ' . implode(' AND ', $addWhere);
         }
+
+        $query .= ' ORDER BY name ASC';
 
         return $this->denormalizer->denormalize(
             $this->platform->fetch($query, $queryParameters),
