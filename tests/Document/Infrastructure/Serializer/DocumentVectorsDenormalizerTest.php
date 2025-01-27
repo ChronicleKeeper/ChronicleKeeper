@@ -65,7 +65,7 @@ class DocumentVectorsDenormalizerTest extends TestCase
     {
         $array = [
             'id' => 'b0eacee0-3fbe-4083-ac57-a045aee44647',
-            'documentId' => '456',
+            'documentId' => 'bfc59217-6643-4416-bbc2-8c2cbf9c4f08',
             'content' => 'foo',
             'vectorContentHash' => 'bar',
             'vector' => [10.2],
@@ -74,7 +74,7 @@ class DocumentVectorsDenormalizerTest extends TestCase
         $queryService = $this->createMock(QueryService::class);
         $queryService->expects($this->once())
             ->method('query')
-            ->with(self::equalTo(new GetDocument('456')))
+            ->with(self::equalTo(new GetDocument('bfc59217-6643-4416-bbc2-8c2cbf9c4f08')))
             ->willReturn($document = (new DocumentBuilder())->build());
 
         $vectorDocument = (new DocumentVectorsDenormalizer($queryService))
@@ -92,7 +92,7 @@ class DocumentVectorsDenormalizerTest extends TestCase
     {
         $array = [
             'id' => 'b0eacee0-3fbe-4083-ac57-a045aee44647',
-            'documentId' => '456',
+            'documentId' => '632fd263-4700-4b4e-9853-4849da547d11',
             'content' => 'foo',
             'vectorContentHash' => 'bar',
             'vector' => [10.2],
@@ -101,7 +101,7 @@ class DocumentVectorsDenormalizerTest extends TestCase
         $queryService = $this->createMock(QueryService::class);
         $queryService->expects($this->once())
             ->method('query')
-            ->with(self::equalTo(new GetDocument('456')))
+            ->with(self::equalTo(new GetDocument('632fd263-4700-4b4e-9853-4849da547d11')))
             ->willReturn($document = (new DocumentBuilder())->build());
 
         $denormalizer = new DocumentVectorsDenormalizer($queryService);

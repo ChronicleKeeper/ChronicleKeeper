@@ -65,7 +65,7 @@ class VectorImageDenormalizerTest extends TestCase
     {
         $array = [
             'id' => 'b3907fc7-00ec-4223-9d36-13a17080ae5a',
-            'imageId' => '456',
+            'imageId' => 'e7b9b163-aa0e-4dae-8351-0a86cfb00d70',
             'content' => 'foo',
             'vectorContentHash' => 'bar',
             'vector' => [10.2],
@@ -74,7 +74,7 @@ class VectorImageDenormalizerTest extends TestCase
         $queryService = $this->createMock(QueryService::class);
         $queryService->expects($this->once())
             ->method('query')
-            ->with(self::equalTo(new GetImage('456')))
+            ->with(self::equalTo(new GetImage('e7b9b163-aa0e-4dae-8351-0a86cfb00d70')))
             ->willReturn($image = (new ImageBuilder())->build());
 
         $vectorImage = (new VectorImageDenormalizer($queryService))->denormalize($array, VectorImage::class);
@@ -91,7 +91,7 @@ class VectorImageDenormalizerTest extends TestCase
     {
         $array = [
             'id' => 'b3907fc7-00ec-4223-9d36-13a17080ae5a',
-            'imageId' => '456',
+            'imageId' => 'b1d73186-dad8-4dcc-93f8-4b10ba0ab7f4',
             'content' => 'foo',
             'vectorContentHash' => 'bar',
             'vector' => [10.2],
@@ -100,7 +100,7 @@ class VectorImageDenormalizerTest extends TestCase
         $queryService = $this->createMock(QueryService::class);
         $queryService->expects($this->once())
             ->method('query')
-            ->with(self::equalTo(new GetImage('456')))
+            ->with(self::equalTo(new GetImage('b1d73186-dad8-4dcc-93f8-4b10ba0ab7f4')))
             ->willReturn($image = (new ImageBuilder())->build());
 
         $denormalizer      = new VectorImageDenormalizer($queryService);

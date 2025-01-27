@@ -1,0 +1,38 @@
+<div class="col-sm-8">
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Beziehungen</h3>
+            <div class="card-actions">
+                <a href="#" class="btn btn-outline btn-ghost btn-sm" data-bs-toggle="modal" data-bs-target="#add-item-relation">
+                    {{ ux_icon('tabler:plus') }} Hinzufügen
+                </a>
+            </div>
+        </div>
+        <div class="card-table table-responsive">
+            <table class="table table-vcenter">
+                <thead>
+                <tr>
+                    <th>Art</th>
+                    <th>Name</th>
+                    <th style="width: 50px!important;">&nbsp;</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                {% for relation in this.relations %}
+                    <tr>
+                        <td>{{ this.relationLabel(relation.toItem, relation.relationType) }}</td>
+                        <td><a href="{{ path('world_item_view', {'id': relation.toItem.id }) }}">{{ relation.toItem.name }} ({{ relation.toItem.type.label }})</a></td>
+                        <td>
+                            <a href="{{ path('world_item_relation_remove', {'sourceItemId': item.id, 'targetItemId': relation.toItem.id, 'relationType': relation.relationType}) }}" title="Löschen" {{ stimulus_controller('confirm') }}>{{ ux_icon('tabler:link-minus', {'color': 'var(--tblr-danger)'}) }}</a>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr><td colspan="3">Keine Beziehung vorhanden ...</td></tr>
+                {% endfor %}
+                </tbody>
+
+            </table>
+        </div>
+    </div>
+</div>

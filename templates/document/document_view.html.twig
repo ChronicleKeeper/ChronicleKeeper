@@ -6,6 +6,9 @@
     <div class="col-auto ms-auto d-print-none">
         <div class="btn-list">
             <twig:Favorizer:AddToShortcuts id="{{ document.id }}" type="{{ constant('class', document) }}" asButton="true" />
+            <a type="button" class="btn btn-icon" title="Links in die Welt" data-bs-toggle="modal" data-bs-target="#show-world-links">
+                {{ ux_icon('tabler:link') }}
+            </a>
             <a href="{{ path('library_document_edit', {'document': document.id }) }}" class="btn btn-icon btn-warning">
                 {{ ux_icon('tabler:file-pencil') }}
             </a>
@@ -34,4 +37,11 @@
             </div>
         </div>
     </div>
+
+    {% component "Tabler:Modal" with {id: 'show-world-links'} %}
+        {% block modal_header %}Verlinkungen{% endblock %}
+        {% block modal_body %}
+            {{ component('World:ShowWorldLinks', { 'type': 'document', 'mediumId': document.id }) }}
+        {% endblock %}
+    {% endcomponent %}
 {% endblock %}

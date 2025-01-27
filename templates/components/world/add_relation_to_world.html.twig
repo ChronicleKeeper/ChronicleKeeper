@@ -1,0 +1,44 @@
+<form
+    action="{{ path('world_item_relation_add', {'itemId': itemId}) }}"
+    method="post"
+    {{ stimulus_controller('world_relation_selector') }}
+    data-source-type="{{ this.itemType.value }}"
+    data-relations="{{ this.availableRelations|json_encode }}"
+    data-relation-selector-target="item_relation_type"
+>
+    <div class="modal-header">
+        <h5 class="modal-title">Beziehung Hinzufügen</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    </div>
+    <div class="modal-body">
+        <div class="mb-3">
+            <label for="item_relation_world_item" class="form-label required">Eintrag auswählen</label>
+            <select
+                id="item_relation_world_item"
+                name="item_relation[world_item]"
+                {{ stimulus_controller(
+                    'symfony/ux-autocomplete/autocomplete',
+                    {
+                        url: path('world_item_relation_autocomplete', {'id': itemId}),
+                        noMoreResultsText: 'Keine weiteren Ergebnisse.',
+                        noResultsFoundText: 'Keine Ergebnisse gefunden.',
+                        closeAfterSelect: false,
+                    }
+                ) }}
+                data-controller="world_relation_selector"
+            >
+            </select>
+            <div id="world_item_shortDescription_help" class="form-text mb-0 help-text">
+                Beginne den Namen des Eintrages einzugeben nach dem du suchst.
+            </div>
+        </div>
+        <div class="mb-3">
+            <label for="item_relation_type" class="form-label required">Beziehung</label>
+            <select id="item_relation_type" class="form-select" name="item_relation[type]">
+            </select>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary ms-auto" data-bs-dismiss="modal">Speichern</button>
+    </div>
+</form>

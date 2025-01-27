@@ -18,4 +18,5 @@ enum Type: string
     case DOCUMENT_EMBEDDING = 'document_embedding';
     case IMAGE              = 'image';
     case IMAGE_EMBEDDING    = 'image_embedding';
+    case WORLD_ITEM         = 'world_item';
 }

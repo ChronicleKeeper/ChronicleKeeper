@@ -9,6 +9,7 @@ use ChronicleKeeper\Favorizer\Domain\ValueObject\ChatConversationTarget;
 use ChronicleKeeper\Favorizer\Domain\ValueObject\LibraryDocumentTarget;
 use ChronicleKeeper\Favorizer\Domain\ValueObject\LibraryImageTarget;
 use ChronicleKeeper\Favorizer\Domain\ValueObject\Target;
+use ChronicleKeeper\Favorizer\Domain\ValueObject\WorldItemTarget;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
 use Generator;
 use Symfony\Component\Routing\RouterInterface;
@@ -61,6 +62,10 @@ class HeaderShortcuts
             return 'tabler:message-2-share';
         }
 
+        if ($target instanceof WorldItemTarget) {
+            return 'tabler:database-search';
+        }
+
         return 'tabler:file';
     }
 
@@ -76,6 +81,10 @@ class HeaderShortcuts
 
         if ($target instanceof ChatConversationTarget) {
             return $this->router->generate('chat', ['conversation' => $target->getId()]);
+        }
+
+        if ($target instanceof WorldItemTarget) {
+            return $this->router->generate('world_item_view', ['id' => $target->getId()]);
         }
 
         return '#';

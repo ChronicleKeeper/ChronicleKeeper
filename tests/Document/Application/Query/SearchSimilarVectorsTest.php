@@ -65,7 +65,7 @@ class SearchSimilarVectorsTest extends TestCase
             ->method('query')
             ->willReturnCallback(
                 static function (GetDocument $query) use ($responseDocument) {
-                    self::assertSame('1', $query->id);
+                    self::assertSame('deafe2a2-4d71-4bf1-9289-64a611adc1ce', $query->id);
 
                     return $responseDocument;
                 },
@@ -78,7 +78,7 @@ class SearchSimilarVectorsTest extends TestCase
                 'maxDistance' => 0.5,
                 'maxResults' => 10,
             ],
-            [['document_id' => '1', 'distance' => 0.1, 'content' => 'content']],
+            [['document_id' => 'deafe2a2-4d71-4bf1-9289-64a611adc1ce', 'distance' => 0.1, 'content' => 'content']],
         );
 
         $searchSimilarVectorsQuery = new SearchSimilarVectorsQuery($databasePlatform, $queryService);

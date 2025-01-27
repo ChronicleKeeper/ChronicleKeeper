@@ -1,0 +1,21 @@
+{% extends 'layout.html.twig' %}
+
+{% block page_title %}Registratur{% endblock %}
+
+{% block page_title_actions %}
+    <div class="col-auto ms-auto d-print-none">
+        <div class="btn-list">
+            <a href="{{ path('world_item_create') }}" class="btn d-none d-sm-inline-block">
+                {{ ux_icon('tabler:database-plus') }}Eintrag erstellen
+            </a>
+        </div>
+    </div>
+{% endblock %}
+
+{% block page_content %}
+
+    <div class="container-xl">
+        {{ component('World:ItemSearch') }}
+    </div>
+
+{% endblock %}

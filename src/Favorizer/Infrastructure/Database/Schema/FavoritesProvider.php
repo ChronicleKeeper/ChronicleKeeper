@@ -18,7 +18,7 @@ final class FavoritesProvider extends DefaultSchemaProvider
                 id TEXT PRIMARY KEY,
                 title TEXT NOT NULL,
                 type TEXT NOT NULL
-                CHECK(type IN ('ChatConversationTarget', 'LibraryDocumentTarget', 'LibraryImageTarget'))
+                CHECK(type IN ('ChatConversationTarget', 'LibraryDocumentTarget', 'LibraryImageTarget', 'WorldItemTarget'))
             );
             SQL,
         );

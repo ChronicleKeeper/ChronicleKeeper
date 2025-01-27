@@ -1,0 +1,93 @@
+{% extends 'layout.html.twig' %}
+
+{% block page_title %}{{ item.name }}{% endblock %}
+
+{% block page_title_actions %}
+    <div class="col-auto ms-auto d-print-none">
+        <div class="btn-list">
+            <twig:Favorizer:AddToShortcuts id="{{ item.id }}" type="{{ constant('class', item) }}" asButton="true" />
+            <a href="{{ path('world_item_edit', {'id': item.id}) }}" class="btn btn-icon btn-warning">
+                {{ ux_icon('tabler:database-edit') }}
+            </a>
+            <a href="{{ path('world_item_delete', {'id': item.id}) }}" class="btn btn-icon btn-danger" {{ stimulus_controller('confirm') }}>
+                {{ ux_icon('tabler:database-minus') }}
+            </a>
+        </div>
+    </div>
+{% endblock %}
+
+{% block page_content %}
+    <div class="container-xl">
+        <div class="row row-deck row-cards">
+            <div class="col-sm-4">
+                <div class="card {{ item.shortDescription|length == 0 ? 'card-inactive' }}">
+                    <div class="card-body">
+                        <p>{{ item.shortDescription|nl2br ?: 'Eine Kurzbeschreibung ist nicht vorhanden ...' }}</p>
+                    </div>
+                </div>
+            </div>
+
+            {{ component('World:ItemRelations', {'item': item}) }}
+
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Verknüpfte Medien</h3>
+                        <div class="card-actions">
+                            <a href="{{ path('world_item_add_relations', {'id': item.id}) }}" class="btn btn-outline btn-ghost btn-sm">
+                                {{ ux_icon('tabler:link') }} Hinzufügen
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card-table table-responsive">
+                        <table class="table table-vcenter">
+                            <thead>
+                            <tr>
+                                <th>Titel</th>
+                                <th style="width: 100px!important">&nbsp;</th>
+                            </tr>
+                            </thead>
+
+                            <tbody>
+
+                                {% for media in item.mediaReferences %}
+                                    <tr>
+                                        <td>{{ ux_icon(media.icon) }} {{ media.mediaDisplayName }}</td>
+                                        <td class="text-end">
+
+                                            {% if media.type == 'document' %}
+                                                <a href="{{ path('library_document_view', {'document': media.mediaId}) }}" title="Ansehen">{{ ux_icon('tabler:file-search') }}</a>
+                                            {% elseif media.type == 'conversation' %}
+                                                <a href="{{ path('chat', {'conversation': media.mediaId}) }}" title="Gespräch fortführen">{{ ux_icon('tabler:message-2-share') }}</a>
+                                            {% elseif media.type == 'image' %}
+                                                <a href="{{ path('library_image_view', {'image': media.mediaId}) }}" title="Ansehen">{{ ux_icon('tabler:photo-search') }}</a>
+                                            {% endif %}
+
+                                            <a
+                                                href="{{ path('world_item_remove_media', {'id': item.id, 'mediumIdentifier': media.genericLinkIdentifier}) }}"
+                                                {{ stimulus_controller('confirm') }}
+                                            >
+                                                {{ ux_icon('tabler:link-off', {'color': 'var(--tblr-danger)'}) }}
+                                            </a>
+                                        </td>
+                                    </tr>
+
+                                {% else %}
+                                    <tr><td colspan="2">Keine Beziehung vorhanden ...</td></tr>
+                                {% endfor %}
+
+                            </tbody>
+
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% component "Tabler:Modal" with {id: 'add-item-relation'} %}
+        {% block modal_full_content %}
+            {{ component('World:AddRelationToWorld', { 'itemId': item.id, 'itemType': item.type }) }}
+        {% endblock %}
+    {% endcomponent %}
+{% endblock %}

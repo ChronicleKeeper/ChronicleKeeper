@@ -8,6 +8,7 @@ use ChronicleKeeper\Favorizer\Domain\ValueObject\ChatConversationTarget;
 use ChronicleKeeper\Favorizer\Domain\ValueObject\LibraryDocumentTarget;
 use ChronicleKeeper\Favorizer\Domain\ValueObject\LibraryImageTarget;
 use ChronicleKeeper\Favorizer\Domain\ValueObject\Target;
+use ChronicleKeeper\Favorizer\Domain\ValueObject\WorldItemTarget;
 use InvalidArgumentException;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
@@ -34,6 +35,10 @@ final class TargetDenormalizer implements DenormalizerInterface
 
         if ($data['type'] === 'ChatConversationTarget') {
             return new ChatConversationTarget($data['id'], $data['title']);
+        }
+
+        if ($data['type'] === 'WorldItemTarget') {
+            return new WorldItemTarget($data['id'], $data['title']);
         }
 
         throw new InvalidArgumentException('Unknown target type.');

@@ -1,0 +1,30 @@
+<table class="table table-vcenter">
+    <thead>
+    <tr>
+        <th>Name</th>
+        <th>Typ</th>
+        <th style="width: 50px!important">&nbsp;</th>
+    </tr>
+    </thead>
+    <tbody>
+
+    {% for item in this.links %}
+
+        <tr>
+            <td>{{ item.name }}</td>
+            <td>{{ item.type.label }}</td>
+            <td class="text-end">
+                <a href="{{ path('world_item_view', {'id': item.id}) }}" title="Ansehen">{{ ux_icon('tabler:database-search') }}</a>
+            </td>
+        </tr>
+
+    {% else %}
+
+        <tr>
+            <td colspan="3">Die Götter deiner Welt sind noch unentschlossen, hilf ihnen sie zu befüllen.</td>
+        </tr>
+
+    {% endfor %}
+
+    </tbody>
+</table>
