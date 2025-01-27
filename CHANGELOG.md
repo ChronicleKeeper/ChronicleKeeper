@@ -17,6 +17,7 @@
 - Refactored the full data layer to utilize mostly a SQLite database instead of files.
 - Added a vector storage plugin for SQLite to store and search vectors in the database.
   - **Caution:** The SQLite extensions are stopping PHP from running in multi-threaded environments.
+- Move the project back to the MIT License from this version on.
 
 ## [alpha-0.6] - Performance and Stability
 

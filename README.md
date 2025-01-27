@@ -52,7 +52,8 @@ Eine ausführliche Dokumentation findest du unter [https://chroniclekeeper.githu
 
 ## License
 
-**Chronicle Keeper** © 2024+, Denis Zunke. Published within a custom license. See LICENSE.
+**Chronicle Keeper** © 2025+, Denis Zunke. Dieses Projekt ist unter der MIT-Lizenz lizenziert, 
+siehe [LICENSE](LICENSE) für den vollständigen Lizenztext.
 
 > GitHub [@dzunke](https://github.com/DZunke) &nbsp;&middot;&nbsp;
 > Twitter [@DZunke](https://twitter.com/DZunke)
