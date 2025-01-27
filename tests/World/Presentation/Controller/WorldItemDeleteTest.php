@@ -7,6 +7,7 @@ namespace ChronicleKeeper\Test\World\Presentation\Controller;
 use ChronicleKeeper\Test\WebTestCase;
 use ChronicleKeeper\Test\World\Domain\Entity\ItemBuilder;
 use ChronicleKeeper\World\Application\Command\DeleteWorldItem;
+use ChronicleKeeper\World\Application\Command\DeleteWorldItemHandler;
 use ChronicleKeeper\World\Domain\Entity\Item;
 use ChronicleKeeper\World\Presentation\Controller\WorldItemDelete;
 use Override;
@@ -17,6 +18,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 #[CoversClass(WorldItemDelete::class)]
 #[CoversClass(DeleteWorldItem::class)]
+#[CoversClass(DeleteWorldItemHandler::class)]
 #[Large]
 class WorldItemDeleteTest extends WebTestCase
 {

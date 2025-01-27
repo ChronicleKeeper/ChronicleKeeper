@@ -6,6 +6,7 @@ namespace ChronicleKeeper\Test\World\Presentation\Controller;
 
 use ChronicleKeeper\Test\WebTestCase;
 use ChronicleKeeper\World\Application\Command\StoreWorldItem;
+use ChronicleKeeper\World\Application\Command\StoreWorldItemHandler;
 use ChronicleKeeper\World\Presentation\Controller\WorldItemCreate;
 use ChronicleKeeper\World\Presentation\Form\WorldItemType;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -16,6 +17,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 #[CoversClass(WorldItemCreate::class)]
 #[CoversClass(StoreWorldItem::class)]
+#[CoversClass(StoreWorldItemHandler::class)]
 #[CoversClass(WorldItemType::class)]
 #[Large]
 class WorldItemCreateTest extends WebTestCase

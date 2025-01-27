@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Test;
 
+use ChronicleKeeper\Shared\Application\Query\QueryService;
 use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
 use ChronicleKeeper\Shared\Infrastructure\Database\Schema\SchemaManager;
 use Override;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase as SymfonyWebTestCase;
+use Symfony\Component\Messenger\MessageBusInterface;
 
 use function assert;
 
@@ -16,6 +18,8 @@ class WebTestCase extends SymfonyWebTestCase
 {
     protected KernelBrowser $client;
     protected DatabasePlatform $databasePlatform;
+    protected QueryService $queryService;
+    protected MessageBusInterface $bus;
     protected SchemaManager $schemaManager;
 
     protected function setUp(): void
@@ -31,6 +35,16 @@ class WebTestCase extends SymfonyWebTestCase
         assert($schemaManager instanceof SchemaManager);
 
         $this->schemaManager = $schemaManager;
+
+        $queryService = self::getContainer()->get(QueryService::class);
+        assert($queryService instanceof QueryService);
+
+        $this->queryService = $queryService;
+
+        $bus = self::getContainer()->get(MessageBusInterface::class);
+        assert($bus instanceof MessageBusInterface);
+
+        $this->bus = $bus;
 
         if (! self::willSetupSchema()) {
             return;

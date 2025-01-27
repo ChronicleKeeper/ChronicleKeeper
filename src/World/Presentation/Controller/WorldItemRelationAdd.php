@@ -17,8 +17,8 @@ use Symfony\Component\Routing\Requirement\Requirement;
 #[Route(
     '/world/item/{itemId}/relation/add',
     name: 'world_item_relation_add',
-    methods: ['POST'],
     requirements: ['itemId' => Requirement::UUID],
+    methods: ['POST'],
 )]
 final class WorldItemRelationAdd extends AbstractController
 {

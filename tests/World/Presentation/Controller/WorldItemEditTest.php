@@ -7,6 +7,7 @@ namespace ChronicleKeeper\Test\World\Presentation\Controller;
 use ChronicleKeeper\Test\WebTestCase;
 use ChronicleKeeper\Test\World\Domain\Entity\ItemBuilder;
 use ChronicleKeeper\World\Application\Command\StoreWorldItem;
+use ChronicleKeeper\World\Application\Command\StoreWorldItemHandler;
 use ChronicleKeeper\World\Domain\Entity\Item;
 use ChronicleKeeper\World\Domain\ValueObject\ItemType;
 use ChronicleKeeper\World\Presentation\Controller\WorldItemEdit;
@@ -20,6 +21,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 #[CoversClass(WorldItemEdit::class)]
 #[CoversClass(StoreWorldItem::class)]
+#[CoversClass(StoreWorldItemHandler::class)]
 #[CoversClass(WorldItemType::class)]
 #[Large]
 class WorldItemEditTest extends WebTestCase

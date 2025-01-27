@@ -91,7 +91,11 @@ class GetWorldItemQuery implements Query
 
         foreach ($conversationReferences as $conversationReference) {
             try {
-                $conversation = $this->queryService->query(new FindConversationByIdParameters($conversationReference['conversation_id']));
+                $conversation = $this->queryService->query(
+                    new FindConversationByIdParameters(
+                        $conversationReference['conversation_id'],
+                    ),
+                );
                 $item->addMediaReference(new ConversationReference($item, $conversation));
             } catch (Throwable) {
                 // It is aceptable if a reference is defect ...

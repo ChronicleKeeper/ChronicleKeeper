@@ -7,6 +7,7 @@ namespace ChronicleKeeper\Test\World\Presentation\Controller;
 use ChronicleKeeper\Test\WebTestCase;
 use ChronicleKeeper\Test\World\Domain\Entity\ItemBuilder;
 use ChronicleKeeper\World\Application\Query\SearchWorldItems;
+use ChronicleKeeper\World\Application\Query\SearchWorldItemsQuery;
 use ChronicleKeeper\World\Domain\Entity\Item;
 use ChronicleKeeper\World\Domain\ValueObject\ItemType;
 use ChronicleKeeper\World\Presentation\Controller\WorldItemListing;
@@ -19,7 +20,10 @@ use Symfony\Component\HttpFoundation\Request;
 
 #[CoversClass(WorldItemListing::class)]
 #[CoversClass(SearchWorldItems::class)]
+#[CoversClass(SearchWorldItemsQuery::class)]
 #[CoversClass(ItemSearch::class)]
+#[CoversClass(SearchWorldItems::class)]
+#[CoversClass(SearchWorldItemsQuery::class)]
 #[Large]
 class WorldItemListingTest extends WebTestCase
 {
