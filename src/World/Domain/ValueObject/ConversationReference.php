@@ -46,4 +46,13 @@ class ConversationReference implements MediaReference
     {
         return 'conversation_' . $this->conversation->getId();
     }
+
+    /** @return array{type: string, conversation_id: string} */
+    public function jsonSerialize(): array
+    {
+        return [
+            'type' => $this->getType(),
+            'conversation_id' => $this->conversation->getId(),
+        ];
+    }
 }

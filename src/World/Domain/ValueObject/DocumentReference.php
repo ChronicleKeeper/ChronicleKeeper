@@ -44,4 +44,13 @@ class DocumentReference implements MediaReference
     {
         return 'document_' . $this->document->getId();
     }
+
+    /** @return array{type: string, document_id: string} */
+    public function jsonSerialize(): array
+    {
+        return [
+            'type' => $this->getType(),
+            'document_id' => $this->document->getId(),
+        ];
+    }
 }

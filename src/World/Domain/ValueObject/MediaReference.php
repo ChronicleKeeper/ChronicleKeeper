@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\World\Domain\ValueObject;
 
-interface MediaReference
+use JsonSerializable;
+
+interface MediaReference extends JsonSerializable
 {
     public function getType(): string;
 

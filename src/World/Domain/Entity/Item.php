@@ -10,10 +10,11 @@ use ChronicleKeeper\World\Domain\Event\ItemCreated;
 use ChronicleKeeper\World\Domain\Event\ItemRenamed;
 use ChronicleKeeper\World\Domain\ValueObject\ItemType;
 use ChronicleKeeper\World\Domain\ValueObject\MediaReference;
+use JsonSerializable;
 use Symfony\Component\Uid\Uuid;
 use Webmozart\Assert\Assert;
 
-class Item extends AggregateRoot
+class Item extends AggregateRoot implements JsonSerializable
 {
     /** @param array<MediaReference> $mediaReferences */
     public function __construct(
@@ -91,5 +92,24 @@ class Item extends AggregateRoot
     public function addMediaReference(MediaReference $reference): void
     {
         $this->mediaReferences[] = $reference;
+    }
+
+    /** @return array{
+     *     id: string,
+     *     type: string,
+     *     name: string,
+     *     shortDescription: string,
+     *     mediaReferences: array<MediaReference>
+     * }
+     */
+    public function jsonSerialize(): array
+    {
+        return [
+            'id' => $this->id,
+            'type' => $this->type->value,
+            'name' => $this->name,
+            'shortDescription' => $this->shortDescription,
+            'mediaReferences' => $this->mediaReferences,
+        ];
     }
 }

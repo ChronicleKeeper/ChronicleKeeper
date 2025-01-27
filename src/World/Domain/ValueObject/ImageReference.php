@@ -44,4 +44,13 @@ class ImageReference implements MediaReference
     {
         return 'image_' . $this->image->getId();
     }
+
+    /** @return array{type: string, image_id: string} */
+    public function jsonSerialize(): array
+    {
+        return [
+            'type' => $this->getType(),
+            'image_id' => $this->image->getId(),
+        ];
+    }
 }

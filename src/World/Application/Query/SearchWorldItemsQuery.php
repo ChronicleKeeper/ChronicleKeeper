@@ -50,9 +50,13 @@ final class SearchWorldItemsQuery implements Query
             $query .= ' WHERE ' . implode(' AND ', $addWhere);
         }
 
-        $query                    .= ' ORDER BY name ASC LIMIT :limit OFFSET :offset';
-        $queryParameters['limit']  = $parameters->limit;
-        $queryParameters['offset'] = $parameters->offset;
+        $query .= ' ORDER BY name';
+
+        if ($parameters->limit !== -1) {
+            $query                    .= ' ASC LIMIT :limit OFFSET :offset';
+            $queryParameters['limit']  = $parameters->limit;
+            $queryParameters['offset'] = $parameters->offset;
+        }
 
         return $this->denormalizer->denormalize(
             $this->platform->fetch($query, $queryParameters),
