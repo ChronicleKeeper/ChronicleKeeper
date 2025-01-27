@@ -21,7 +21,7 @@
 
 	<div class="card mt-3" data-loading="addClass(placeholder-glow)">
 		<div class="card-table table-responsive">
-			<table class="table table-vcenter" data-loading="addClass(disabled)">
+			<table id="item-list" class="table table-vcenter" data-loading="addClass(disabled)">
 				<thead>
 					<tr>
 						<th>Name</th>
@@ -30,7 +30,7 @@
 					</tr>
 				</thead>
 				<tbody>
-					<tr>
+					<tr class="loader-row">
 						<td colspan="3" class="text-center d-none" data-loading="removeClass(d-none)">
 							<div class="d-flex">
 								<div class="spinner-border"></div>
@@ -41,7 +41,7 @@
 						</td>
 					</tr>
 					{% for item in this.items %}
-						<tr data-loading="addClass(d-none)">
+						<tr class="result-row" data-loading="addClass(d-none)">
 							<td>{{ item.name }}</td>
 							<td>{{ item.type.label }}</td>
 							<td class="text-end">
@@ -51,7 +51,7 @@
 							</td>
 						</tr>
 					{% else %}
-						<tr data-loading="addClass(d-none)">
+						<tr class="no-result-row" data-loading="addClass(d-none)">
 							<td colspan="3">Keine Einträge gefunden.</td>
 						</tr>
 					{% endfor %}

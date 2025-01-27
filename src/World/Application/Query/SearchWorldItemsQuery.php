@@ -26,7 +26,8 @@ final class SearchWorldItemsQuery implements Query
     {
         assert($parameters instanceof SearchWorldItems);
 
-        $query           = 'SELECT id, type, name, short_description as shortDescription FROM world_items';
+        $query = 'SELECT id, type, name, short_description as shortDescription FROM world_items';
+
         $queryParameters = [];
         $addWhere        = [];
 

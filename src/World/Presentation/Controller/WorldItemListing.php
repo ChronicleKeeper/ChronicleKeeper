@@ -8,7 +8,6 @@ use ChronicleKeeper\Shared\Application\Query\QueryService;
 use ChronicleKeeper\World\Application\Query\SearchWorldItems;
 use ChronicleKeeper\World\Domain\ValueObject\ItemType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -19,15 +18,12 @@ final class WorldItemListing extends AbstractController
     {
     }
 
-    public function __invoke(Request $request): Response
+    public function __invoke(): Response
     {
         return $this->render(
             'world/item_listing.html.twig',
             [
-                'items' => $this->queryService->query(new SearchWorldItems(
-                    search: $request->query->get('search', ''),
-                    type: $request->query->get('type', ''),
-                )),
+                'items' => $this->queryService->query(new SearchWorldItems()),
                 'item_types' => ItemType::cases(),
             ],
         );

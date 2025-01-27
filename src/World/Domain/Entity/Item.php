@@ -23,7 +23,7 @@ class Item extends AggregateRoot
         private string $shortDescription,
         private array $mediaReferences = [],
     ) {
-        Assert::uuid($id, 'The identifier ob the item has to be an UUID.');
+        Assert::uuid($id, 'The identifier of the item has to be an UUID.');
     }
 
     public static function create(
