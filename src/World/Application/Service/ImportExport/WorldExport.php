@@ -19,6 +19,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 use ZipArchive;
 
 use function array_map;
+use function assert;
 use function count;
 
 use const JSON_PRETTY_PRINT;
@@ -47,7 +48,9 @@ final readonly class WorldExport implements SingleExport
             $this->logger->debug('Exporting item.', ['id' => $item->getId()]);
 
             $item = $this->queryService->query(new GetWorldItem($item->getId()));
-            $data = $item->toArray();
+            assert($item instanceof Item);
+
+            $data = $item->jsonSerialize();
 
             // Add Relations
             $data['relations'] = array_map(

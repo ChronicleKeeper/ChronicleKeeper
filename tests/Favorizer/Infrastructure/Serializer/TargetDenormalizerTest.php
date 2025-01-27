@@ -8,6 +8,7 @@ use ChronicleKeeper\Favorizer\Domain\ValueObject\ChatConversationTarget;
 use ChronicleKeeper\Favorizer\Domain\ValueObject\LibraryDocumentTarget;
 use ChronicleKeeper\Favorizer\Domain\ValueObject\LibraryImageTarget;
 use ChronicleKeeper\Favorizer\Domain\ValueObject\Target;
+use ChronicleKeeper\Favorizer\Domain\ValueObject\WorldItemTarget;
 use ChronicleKeeper\Favorizer\Infrastructure\Serializer\TargetDenormalizer;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -71,6 +72,24 @@ class TargetDenormalizerTest extends TestCase
         self::assertInstanceOf(LibraryImageTarget::class, $target);
         self::assertSame('f3ce2cce-888d-4812-8470-72cdd96faf4c', $target->getId());
         self::assertSame('Image Title', $target->getTitle());
+    }
+
+    #[Test]
+    public function denormalizeWorldItemTarget(): void
+    {
+        $denormalizer = new TargetDenormalizer();
+        $target       = $denormalizer->denormalize(
+            [
+                'type' => 'WorldItemTarget',
+                'id' => 'f3ce2cce-888d-4812-8470-72cdd96faf4c',
+                'title' => 'Example Item',
+            ],
+            Target::class,
+        );
+
+        self::assertInstanceOf(WorldItemTarget::class, $target);
+        self::assertSame('f3ce2cce-888d-4812-8470-72cdd96faf4c', $target->getId());
+        self::assertSame('Example Item', $target->getTitle());
     }
 
     #[Test]

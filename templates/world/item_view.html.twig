@@ -5,6 +5,7 @@
 {% block page_title_actions %}
     <div class="col-auto ms-auto d-print-none">
         <div class="btn-list">
+            <twig:Favorizer:AddToShortcuts id="{{ item.id }}" type="{{ constant('class', item) }}" asButton="true" />
             <a href="{{ path('world_item_edit', {'id': item.id}) }}" class="btn btn-icon btn-warning">
                 {{ ux_icon('tabler:database-edit') }}
             </a>

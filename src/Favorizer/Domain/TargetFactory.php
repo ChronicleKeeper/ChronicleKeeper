@@ -13,9 +13,12 @@ use ChronicleKeeper\Favorizer\Domain\ValueObject\ChatConversationTarget;
 use ChronicleKeeper\Favorizer\Domain\ValueObject\LibraryDocumentTarget;
 use ChronicleKeeper\Favorizer\Domain\ValueObject\LibraryImageTarget;
 use ChronicleKeeper\Favorizer\Domain\ValueObject\Target;
+use ChronicleKeeper\Favorizer\Domain\ValueObject\WorldItemTarget;
 use ChronicleKeeper\Image\Application\Query\GetImage;
 use ChronicleKeeper\Image\Domain\Entity\Image;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
+use ChronicleKeeper\World\Application\Query\GetWorldItem;
+use ChronicleKeeper\World\Domain\Entity\Item;
 
 use function Symfony\Component\String\u;
 
@@ -40,6 +43,10 @@ class TargetFactory
             return $this->createFromConversation($this->queryService->query(new FindConversationByIdParameters($id)));
         }
 
+        if ($type === Item::class) {
+            return $this->createFromItem($this->queryService->query(new GetWorldItem($id)));
+        }
+
         throw UnknownMedium::forType($type);
     }
 
@@ -58,6 +65,14 @@ class TargetFactory
         return new ChatConversationTarget(
             $conversation->getId(),
             u($conversation->getTitle())->truncate(20, '…')->toString(),
+        );
+    }
+
+    private function createFromItem(Item $item): Target
+    {
+        return new WorldItemTarget(
+            $item->getId(),
+            u($item->getName())->truncate(20, '…')->toString(),
         );
     }
 }
