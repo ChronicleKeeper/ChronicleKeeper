@@ -1,5 +1,23 @@
 # Changelog
 
+## [alpha-0.7] - Moving Forward
+
+**Added**
+- Introduced the "World" module for managing and interacting with items and their relationships.
+    - Handling items with types and short descriptions.
+    - Adding items to shortcuts.
+    - Managing media references, including viewing, adding, and removing media.
+    - Establishing relationships between items.
+    - Accessing bi-directional connections of items.
+    - Integrating the world database with the chatbot.
+    - Extending the system prompt to utilize the world database.
+    - Viewing linked database entries in document and image headers.
+
+**Changed**
+- Refactored the full data layer to utilize mostly a SQLite database instead of files.
+- Added a vector storage plugin for SQLite to store and search vectors in the database.
+  - **Caution:** The SQLite extensions are stopping PHP from running in multi-threaded environments.
+
 ## [alpha-0.6] - Performance and Stability
 
 **Added**
