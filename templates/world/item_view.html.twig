@@ -9,7 +9,12 @@
             <a href="{{ path('world_item_edit', {'id': item.id}) }}" class="btn btn-icon btn-warning">
                 {{ ux_icon('tabler:database-edit') }}
             </a>
-            <a href="{{ path('world_item_delete', {'id': item.id}) }}" class="btn btn-icon btn-danger" {{ stimulus_controller('confirm') }}>
+            <a href="{{ path('world_item_delete', {'id': item.id}) }}"
+               class="btn btn-icon btn-danger"
+               title="Registereintrag löschen"
+               data-confirm
+               data-confirm-message="Möchtest du den Eintrag wirklich löschen?"
+            >
                 {{ ux_icon('tabler:database-minus') }}
             </a>
         </div>
@@ -65,7 +70,9 @@
 
                                             <a
                                                 href="{{ path('world_item_remove_media', {'id': item.id, 'mediumIdentifier': media.genericLinkIdentifier}) }}"
-                                                {{ stimulus_controller('confirm') }}
+                                                title="Medienreferenz löschen"
+                                                data-confirm
+                                                data-confirm-message="Möchtest du die Referenz zu &quot;{{ media.mediaTitle }}&quot; wirklich löschen?"
                                             >
                                                 {{ ux_icon('tabler:link-off', {'color': 'var(--tblr-danger)'}) }}
                                             </a>

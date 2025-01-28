@@ -48,7 +48,11 @@
 								<a href="{{ path('world_item_view', {'id': item.id}) }}" title="Ansehen">{{ ux_icon('tabler:database-search') }}</a>
                                 <twig:Favorizer:AddToShortcuts id="{{ item.id }}" type="{{ 'ChronicleKeeper\\World\\Domain\\Entity\\Item' }}" />
 								<a href="{{ path('world_item_edit', {'id': item.id}) }}" title="Bearbeiten">{{ ux_icon('tabler:database-edit', {'color': 'var(--tblr-warning)'}) }}</a>
-								<a href="{{ path('world_item_delete', {'id': item.id}) }}" title="Löschen" {{ stimulus_controller('confirm') }}>{{ ux_icon('tabler:database-minus', {'color': 'var(--tblr-danger)'}) }}</a>
+								<a href="{{ path('world_item_delete', {'id': item.id}) }}"
+                                   title="Registereintrag löschen"
+                                   data-confirm
+                                   data-confirm-message="Möchtest du den Eintrag &quot;{{ item.name }}&quot; wirklich löschen?"
+                                >{{ ux_icon('tabler:database-minus', {'color': 'var(--tblr-danger)'}) }}</a>
 							</td>
 						</tr>
 					{% else %}

@@ -56,7 +56,11 @@
                                             <a href="{{ path('settings_system_prompts_edit', {'id': prompt.id}) }}" title="Ansehen">{{ ux_icon('tabler:list-search') }}</a>
                                         {% else %}
                                             <a href="{{ path('settings_system_prompts_edit', {'id': prompt.id}) }}" title="Bearbeiten">{{ ux_icon('tabler:list-search', {'color': 'var(--tblr-warning)'}) }}</a>
-                                            <a href="{{ path('settings_system_prompts_delete', {'id': prompt.id}) }}" title="Löschen"{{ stimulus_controller('confirm') }}>{{ ux_icon('tabler:trash', {'color': 'var(--tblr-danger)'}) }}</a>
+                                            <a href="{{ path('settings_system_prompts_delete', {'id': prompt.id}) }}"
+                                               title="Prompt löschen"
+                                               data-confirm
+                                               data-confirm-message="Möchtest du den Prompt &quot;{{ prompt.name }}&quot; wirklich löschen?"
+                                            >{{ ux_icon('tabler:trash', {'color': 'var(--tblr-danger)'}) }}</a>
                                         {% endif %}
                                     </td>
                                 </tr>

@@ -15,7 +15,11 @@
             <a href="{{ path('library_image_view', {'image': image.id}) }}" title="Ansehen">{{ ux_icon('tabler:photo-search') }}</a>
             <twig:Favorizer:AddToShortcuts id="{{ image.id }}" type="{{ 'ChronicleKeeper\\Image\\Domain\\Entity\\Image' }}" />
             <a href="{{ path('library_image_edit', {'image': image.id}) }}" title="Bearbeiten">{{ ux_icon('tabler:photo-edit', {'color': 'var(--tblr-warning)'}) }}</a>
-            <a href="{{ path('library_image_delete', {'image': image.id}) }}" title="Löschen" {{ stimulus_controller('confirm') }}>{{ ux_icon('tabler:photo-minus', {'color': 'var(--tblr-danger)'}) }}</a>
+            <a href="{{ path('library_image_delete', {'image': image.id}) }}"
+               title="Bild löschen"
+               data-confirm
+               data-confirm-message="Möchtest du das Bild &quot;{{ image.title }}&quot; wirklich löschen?"
+            >{{ ux_icon('tabler:photo-minus', {'color': 'var(--tblr-danger)'}) }}</a>
         </td>
     </tr>
 {% endmacro %}
@@ -29,7 +33,11 @@
             <a href="{{ path('library_document_view', {'document': document.id}) }}" title="Ansehen">{{ ux_icon('tabler:file-search') }}</a>
             <twig:Favorizer:AddToShortcuts id="{{ document.id }}" type="{{ 'ChronicleKeeper\\Document\\Domain\\Entity\\Document' }}" />
             <a href="{{ path('library_document_edit', {'document': document.id}) }}" title="Bearbeiten">{{ ux_icon('tabler:file-pencil', {'color': 'var(--tblr-warning)'}) }}</a>
-            <a href="{{ path('library_document_delete', {'document': document.id}) }}" title="Löschen" {{ stimulus_controller('confirm') }}>{{ ux_icon('tabler:file-minus', {'color': 'var(--tblr-danger)'}) }}</a>
+            <a href="{{ path('library_document_delete', {'document': document.id}) }}"
+               title="Dokument löschen"
+               data-confirm
+               data-confirm-message="Möchtest du das Dokument &quot;{{ document.title }}&quot; wirklich löschen?"
+            >{{ ux_icon('tabler:file-minus', {'color': 'var(--tblr-danger)'}) }}</a>
         </td>
     </tr>
 {% endmacro %}
@@ -42,7 +50,11 @@
         <td>
             <a href="{{ path('chat', {'conversation': conversation.id}) }}" title="Gespräch fortführen">{{ ux_icon('tabler:message-2-share') }}</a>
             <twig:Favorizer:AddToShortcuts id="{{ conversation.id }}" type="{{ 'ChronicleKeeper\\Chat\\Domain\\Entity\\Conversation' }}" />
-            <a href="{{ path('chat_delete', {'conversation': conversation.id}) }}" title="Gespräch Löschen" {{ stimulus_controller('confirm') }}>
+            <a href="{{ path('chat_delete', {'conversation': conversation.id}) }}"
+               title="Gespräch löschen"
+               data-confirm
+               data-confirm-message="Möchtest du das Gespräch &quot;{{ conversation.title }}&quot; wirklich löschen?"
+            >
                 {{ ux_icon('tabler:message-2-off', {'color': 'var(--tblr-danger)'}) }}
             </a>
         </td>

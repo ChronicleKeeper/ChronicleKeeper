@@ -21,10 +21,15 @@
                 <tbody>
                 {% for relation in this.relations %}
                     <tr>
-                        <td>{{ this.relationLabel(relation.toItem, relation.relationType) }}</td>
+                        {% set relationLabel = this.relationLabel(relation.toItem, relation.relationType) %}
+                        <td>{{ relationLabel }}</td>
                         <td><a href="{{ path('world_item_view', {'id': relation.toItem.id }) }}">{{ relation.toItem.name }} ({{ relation.toItem.type.label }})</a></td>
                         <td>
-                            <a href="{{ path('world_item_relation_remove', {'sourceItemId': item.id, 'targetItemId': relation.toItem.id, 'relationType': relation.relationType}) }}" title="Löschen" {{ stimulus_controller('confirm') }}>{{ ux_icon('tabler:link-minus', {'color': 'var(--tblr-danger)'}) }}</a>
+                            <a href="{{ path('world_item_relation_remove', {'sourceItemId': item.id, 'targetItemId': relation.toItem.id, 'relationType': relation.relationType}) }}"
+                               title="Beziehung zu {{ relation.toItem.name }} löschen"
+                               data-confirm
+                               data-confirm-message="Möchtest du die Beziehung wirklich löschen?"
+                            >{{ ux_icon('tabler:link-minus', {'color': 'var(--tblr-danger)'}) }}</a>
                         </td>
                     </tr>
                 {% else %}

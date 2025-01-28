@@ -20,7 +20,8 @@
 - Move the project back to the MIT License from this version on.
 - Favorites dropdown changed to an offsite canvas for better overview.
 - Removed the favorites limit of 10 because of better visualization.
-- Favorites are now sorted by their title
+- Favorites are now sorted by their title.
+- Replaced vanilla JS confirm dialog on deletion links with a fully-featured dialog.
 
 ## [alpha-0.6] - Performance and Stability
 
