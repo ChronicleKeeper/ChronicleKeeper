@@ -31,7 +31,7 @@ class GetTargetBagQueryTest extends TestCase
     public function emptyTargetBagIsDelivered(): void
     {
         $databasePlatform = new DatabasePlatformMock();
-        $databasePlatform->expectFetch('SELECT * FROM favorites', [], []);
+        $databasePlatform->expectFetch('SELECT * FROM favorites ORDER BY title', [], []);
 
         $denormalizer = $this->createMock(DenormalizerInterface::class);
         $denormalizer->expects($this->never())->method('denormalize');
@@ -49,7 +49,7 @@ class GetTargetBagQueryTest extends TestCase
 
         $databasePlatform = new DatabasePlatformMock();
         $databasePlatform->expectFetch(
-            'SELECT * FROM favorites',
+            'SELECT * FROM favorites ORDER BY title',
             [],
             [$dbResult],
         );

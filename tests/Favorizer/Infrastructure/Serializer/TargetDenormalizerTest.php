@@ -124,4 +124,22 @@ class TargetDenormalizerTest extends TestCase
             Target::class,
         );
     }
+
+    #[Test]
+    public function supportsDenormalization(): void
+    {
+        $denormalizer = new TargetDenormalizer();
+
+        self::assertTrue($denormalizer->supportsDenormalization([], Target::class));
+        self::assertFalse($denormalizer->supportsDenormalization([], 'UnknownClass'));
+    }
+
+    #[Test]
+    public function itHasTheCorrectSupportedTypes(): void
+    {
+        $denormalizer = new TargetDenormalizer();
+
+        self::assertSame([Target::class => true], $denormalizer->getSupportedTypes(null));
+        self::assertSame([Target::class => true], $denormalizer->getSupportedTypes('json'));
+    }
 }

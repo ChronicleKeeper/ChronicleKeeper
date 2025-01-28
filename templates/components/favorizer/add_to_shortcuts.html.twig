@@ -1,7 +1,7 @@
 <div {{ attributes }} class="d-inline">
     {% set exists = this.exists %}
 
-    <a class="no-loader text-yellow{{ asButton ? ' btn btn-icon' }}{{ this.maxFavoritesReached and exists is same as false ? ' disabled'}}"
+    <a class="no-loader text-yellow{{ asButton ? ' btn btn-icon' }}"
        href="#"
        title="{{ exists ? 'Von Favoriten entfernen' : 'Zu Favoriten hinzufügen' }}"
        data-loading="addClass(d-none)"

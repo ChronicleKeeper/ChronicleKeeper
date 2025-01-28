@@ -68,6 +68,23 @@ class ClearOnLinkedDataRemovalTest extends TestCase
     }
 
     #[Test]
+    public function itDoesDoNothingOnImageRemovalIsNotAFavorite(): void
+    {
+        $image = (new ImageBuilder())->build();
+        $event = new ImageDeleted($image);
+
+        $targetBag = $this->createMock(TargetBag::class);
+        $targetBag->method('exists')->willReturn(false);
+
+        $this->queryService->method('query')->willReturn($targetBag);
+
+        $targetBag->expects($this->never())->method('remove');
+        $this->bus->expects($this->never())->method('dispatch');
+
+        $this->clearOnLinkedDataRemoval->removeOnImageDeleted($event);
+    }
+
+    #[Test]
     public function itRemovesOnDocumentDeleted(): void
     {
         $document = (new DocumentBuilder())->build();
@@ -86,6 +103,23 @@ class ClearOnLinkedDataRemovalTest extends TestCase
             ->method('dispatch')
             ->with(new StoreTargetBag($targetBag))
             ->willReturn(new Envelope(new StoreTargetBag($targetBag)));
+
+        $this->clearOnLinkedDataRemoval->removeOnDocumentDeleted($event);
+    }
+
+    #[Test]
+    public function itDoesDoNothingOnDocumentRemovalIsNotAFavorite(): void
+    {
+        $document = (new DocumentBuilder())->build();
+        $event    = new DocumentDeleted($document);
+
+        $targetBag = $this->createMock(TargetBag::class);
+        $targetBag->method('exists')->willReturn(false);
+
+        $this->queryService->method('query')->willReturn($targetBag);
+
+        $targetBag->expects($this->never())->method('remove');
+        $this->bus->expects($this->never())->method('dispatch');
 
         $this->clearOnLinkedDataRemoval->removeOnDocumentDeleted($event);
     }
@@ -113,6 +147,23 @@ class ClearOnLinkedDataRemovalTest extends TestCase
     }
 
     #[Test]
+    public function itDoesDoNothingOnConversationRemovalIsNotAFavorite(): void
+    {
+        $conversation = (new ConversationBuilder())->build();
+        $event        = new ConversationDeleted($conversation);
+
+        $targetBag = $this->createMock(TargetBag::class);
+        $targetBag->method('exists')->willReturn(false);
+
+        $this->queryService->method('query')->willReturn($targetBag);
+
+        $targetBag->expects($this->never())->method('remove');
+        $this->bus->expects($this->never())->method('dispatch');
+
+        $this->clearOnLinkedDataRemoval->removeOnConversationDeleted($event);
+    }
+
+    #[Test]
     public function itRemovesOnWorldItemDeleted(): void
     {
         $item  = (new ItemBuilder())->build();
@@ -131,6 +182,23 @@ class ClearOnLinkedDataRemovalTest extends TestCase
             ->method('dispatch')
             ->with(new StoreTargetBag($targetBag))
             ->willReturn(new Envelope(new StoreTargetBag($targetBag)));
+
+        $this->clearOnLinkedDataRemoval->removeOnWorldItemDeleted($event);
+    }
+
+    #[Test]
+    public function itDoesDoNothingOnWorldItemRemovalIsNotAFavorite(): void
+    {
+        $item  = (new ItemBuilder())->build();
+        $event = new ItemDeleted($item);
+
+        $targetBag = $this->createMock(TargetBag::class);
+        $targetBag->method('exists')->willReturn(false);
+
+        $this->queryService->method('query')->willReturn($targetBag);
+
+        $targetBag->expects($this->never())->method('remove');
+        $this->bus->expects($this->never())->method('dispatch');
 
         $this->clearOnLinkedDataRemoval->removeOnWorldItemDeleted($event);
     }

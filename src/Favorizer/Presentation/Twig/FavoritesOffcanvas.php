@@ -18,8 +18,11 @@ use Symfony\UX\LiveComponent\Attribute\LiveListener;
 use Symfony\UX\LiveComponent\ComponentToolsTrait;
 use Symfony\UX\LiveComponent\DefaultActionTrait;
 
-#[AsLiveComponent('Favorizer:HeaderShortcuts', 'components/favorizer/header_shortcuts.html.twig')]
-class HeaderShortcuts
+use function ksort;
+use function strtoupper;
+
+#[AsLiveComponent('Favorizer:Offcanvas', 'components/favorizer/favorites_offcanvas.html.twig')]
+class FavoritesOffcanvas
 {
     use DefaultActionTrait;
     use ComponentToolsTrait;
@@ -46,6 +49,31 @@ class HeaderShortcuts
                 'url' => $this->generateShortcutUrl($target),
             ];
         }
+    }
+
+    /** @return array<string, list<array{icon: string, title: string, url: string}>> */
+    public function getAlphabeticallyGrouped(): array
+    {
+        $targets = $this->queryService->query(new GetTargetBag());
+        $grouped = [];
+
+        foreach ($targets as $target) {
+            $firstLetter = strtoupper((string) $target->getTitle()[0]);
+
+            if (! isset($grouped[$firstLetter])) {
+                $grouped[$firstLetter] = [];
+            }
+
+            $grouped[$firstLetter][] = [
+                'icon' => $this->getIconForTarget($target),
+                'title' => $target->getTitle(),
+                'url' => $this->generateShortcutUrl($target),
+            ];
+        }
+
+        ksort($grouped);
+
+        return $grouped;
     }
 
     private function getIconForTarget(Target $target): string
