@@ -22,6 +22,8 @@
 - Removed the favorites limit of 10 because of better visualization.
 - Favorites are now sorted by their title.
 - Replaced vanilla JS confirm dialog on deletion links with a fully-featured dialog.
+- Updated cztomczak/phpdesktop build to lates version 130.
+- Updated to PHP 8.4 and utilized it during builds.
 
 ## [alpha-0.6] - Performance and Stability
 
