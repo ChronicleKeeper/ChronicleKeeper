@@ -12,7 +12,12 @@
             <a href="{{ path('library_document_edit', {'document': document.id }) }}" class="btn btn-icon btn-warning">
                 {{ ux_icon('tabler:file-pencil') }}
             </a>
-            <a href="{{ path('library_document_delete', {'document': document.id }) }}" class="btn btn-icon btn-danger" {{ stimulus_controller('confirm') }}>
+            <a href="{{ path('library_document_delete', {'document': document.id }) }}"
+               class="btn btn-icon btn-danger"
+               title="Dokument löschen"
+               data-confirm
+               data-confirm-message="Möchtest du das Dokument wirklich löschen?"
+            >
                 {{ ux_icon('tabler:file-minus') }}
             </a>
         </div>

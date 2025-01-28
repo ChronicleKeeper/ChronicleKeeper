@@ -8,7 +8,12 @@
             <a href="{{ path('image_generator_overview') }}" class="btn d-none d-sm-inline-block">
                 {{ ux_icon('tabler:photo-ai') }} Übersicht
             </a>
-            <a href="{{ path('image_generator_delete', {'generatorRequestId': request.id }) }}" class="btn btn-icon btn-danger" {{ stimulus_controller('confirm') }}>
+            <a href="{{ path('image_generator_delete', {'generatorRequestId': request.id }) }}"
+               class="btn btn-icon btn-danger"
+               title="Arbeitsauftrag löschen"
+               data-confirm
+               data-confirm-message="Möchtest du den Arbeitsauftrag wirklich löschen?"
+            >
                 {{ ux_icon('tabler:photo-minus') }}
             </a>
         </div>

@@ -1,0 +1,23 @@
+<div class="modal modal-blur fade" id="confirm-dialog" tabindex="-1" aria-modal="true" role="dialog" {{ stimulus_controller('confirm_dialog') }}>
+    <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="modal-status bg-danger"></div>
+            <div class="modal-body text-center py-4">
+                {{ ux_icon('tabler:alert-triangle', {'width': 24, 'height': 24, 'class': 'icon mb-2 text-danger icon-lg'}) }}
+                <h3></h3>
+                <div class="confirmation-message"></div>
+            </div>
+            <div class="modal-footer">
+                <div class="w-100">
+                    <div class="row">
+                        <div class="col">
+                            <a href="#" class="btn btn-3 w-100" data-bs-dismiss="modal">Abbrechen</a></div>
+                        <div class="col">
+                            <a href="#" class="btn btn-danger btn-4 w-100" data-bs-dismiss="modal">Ja</a></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

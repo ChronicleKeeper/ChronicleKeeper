@@ -15,7 +15,12 @@
             <a href="{{ path('library_image_edit', {'image': image.id }) }}" class="btn btn-icon btn-warning">
                 {{ ux_icon('tabler:photo-edit') }}
             </a>
-            <a href="{{ path('library_image_delete', {'image': image.id }) }}" class="btn btn-icon btn-danger" {{ stimulus_controller('confirm') }}>
+            <a href="{{ path('library_image_delete', {'image': image.id }) }}"
+               class="btn btn-icon btn-danger"
+               title="Bild löschen"
+               data-confirm
+               data-confirm-message="Möchtest du das Bild wirklich löschen?"
+            >
                 {{ ux_icon('tabler:photo-minus') }}
             </a>
         </div>
