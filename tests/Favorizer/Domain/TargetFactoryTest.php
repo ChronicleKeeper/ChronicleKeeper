@@ -14,6 +14,8 @@ use ChronicleKeeper\Shared\Application\Query\QueryService;
 use ChronicleKeeper\Test\Chat\Domain\Entity\ConversationBuilder;
 use ChronicleKeeper\Test\Document\Domain\Entity\DocumentBuilder;
 use ChronicleKeeper\Test\Image\Domain\Entity\ImageBuilder;
+use ChronicleKeeper\Test\World\Domain\Entity\ItemBuilder;
+use ChronicleKeeper\World\Application\Query\GetWorldItem;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\Attributes\Test;
@@ -28,7 +30,7 @@ class TargetFactoryTest extends TestCase
     public function createDocumentTarget(): void
     {
         $document = (new DocumentBuilder())
-            ->withTitle('Foo Bar Baz Quoz Quux Corge Grault Garply Waldo Fred Plugh Xyzzy Thud')
+            ->withTitle('Foo Bar Baz')
             ->build();
 
         $queryService = $this->createMock(QueryService::class);
@@ -50,14 +52,14 @@ class TargetFactoryTest extends TestCase
         $target        = $targetFactory->create($document->getId(), $document::class);
 
         self::assertSame($document->getId(), $target->getId());
-        self::assertSame('Foo Bar Baz Quoz Qu…', $target->getTitle());
+        self::assertSame('Foo Bar Baz', $target->getTitle());
     }
 
     #[Test]
     public function createImageTarget(): void
     {
         $image = (new ImageBuilder())
-            ->withTitle('Foo Bar Baz Quoz Quux Corge Grault Garply Waldo Fred Plugh Xyzzy Thud')
+            ->withTitle('Foo Bar Baz')
             ->build();
 
         $queryService = $this->createMock(QueryService::class);
@@ -77,14 +79,14 @@ class TargetFactoryTest extends TestCase
         $target        = $targetFactory->create($image->getId(), $image::class);
 
         self::assertSame($image->getId(), $target->getId());
-        self::assertSame('Foo Bar Baz Quoz Qu…', $target->getTitle());
+        self::assertSame('Foo Bar Baz', $target->getTitle());
     }
 
     #[Test]
     public function createConversationTarget(): void
     {
         $conversation = (new ConversationBuilder())
-            ->withTitle('Foo Bar Baz Quoz Quux Corge Grault Garply Waldo Fred Plugh Xyzzy Thud')
+            ->withTitle('Foo Bar Baz')
             ->build();
 
         $queryService = $this->createMock(QueryService::class);
@@ -104,7 +106,32 @@ class TargetFactoryTest extends TestCase
         $target        = $targetFactory->create($conversation->getId(), $conversation::class);
 
         self::assertSame($conversation->getId(), $target->getId());
-        self::assertSame('Foo Bar Baz Quoz Qu…', $target->getTitle());
+        self::assertSame('Foo Bar Baz', $target->getTitle());
+    }
+
+    #[Test]
+    public function createWorldItemTarget(): void
+    {
+        $item = (new ItemBuilder())->withName('Foo Bar Baz')->build();
+
+        $queryService = $this->createMock(QueryService::class);
+        $queryService->expects($this->once())
+            ->method('query')
+            ->willReturnCallback(
+                static function (QueryParameters $query) use ($item): object {
+                    if ($query instanceof GetWorldItem) {
+                        return $item;
+                    }
+
+                    throw new UnexpectedValueException('Unexpected query.');
+                },
+            );
+
+        $targetFactory = new TargetFactory($queryService);
+        $target        = $targetFactory->create($item->getId(), $item::class);
+
+        self::assertSame($item->getId(), $target->getId());
+        self::assertSame('Foo Bar Baz', $target->getTitle());
     }
 
     #[Test]

@@ -18,6 +18,9 @@
 - Added a vector storage plugin for SQLite to store and search vectors in the database.
   - **Caution:** The SQLite extensions are stopping PHP from running in multi-threaded environments.
 - Move the project back to the MIT License from this version on.
+- Favorites dropdown changed to an offsite canvas for better overview.
+- Removed the favorites limit of 10 because of better visualization.
+- Favorites are now sorted by their title
 
 ## [alpha-0.6] - Performance and Stability
 

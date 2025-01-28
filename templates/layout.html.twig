@@ -50,6 +50,11 @@
                 <twig:Notifications />
             {% endblock %}
             {% block page_content %}{% endblock %}
+
+            {% set isFirstStart = settings_handler.get.application.hasOpenAIApiKey is same as false %}
+            {% if not isFirstStart %}
+                <twig:Favorizer:Offcanvas />
+            {% endif %}
         </div>
     </div>
 

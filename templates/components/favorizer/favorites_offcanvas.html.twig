@@ -1,0 +1,30 @@
+<div class="offcanvas offcanvas-end w-50" tabindex="-1" id="favorites-canvas" aria-labelledby="favorites-canvas" aria-modal="true" role="dialog" {{ attributes }}>
+    <div class="offcanvas-header p-3">
+        <h2 class="offcanvas-title m-1" id="favorites-canvas-label">
+            <span class="text-yellow">{{ ux_icon('tabler:star', {'style': 'vertical-align: text-top'}) }}</span>
+            Favoriten
+        </h2>
+        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body p-0">
+        <div class="list-group list-group-flush overflow-auto" style="max-height: 80vh;">
+
+            {% for letter, shortcuts in this.alphabeticallyGrouped %}
+
+                <div class="list-group-header sticky-top">{{ letter }}</div>
+
+                {% for shortcut in shortcuts %}
+
+                    <a href="{{ shortcut.url }}" class="list-group-item list-group-item-action">
+                        <div class="d-flex align-items-center">
+                            {{ ux_icon(shortcut.icon, {'class': 'icon dropdown-item-icon icon-tabler text-white', 'style': 'opacity: 1;'}) }}
+                            <span class="text-truncate ms-2">{{ shortcut.title }}</span>
+                        </div>
+                    </a>
+
+                {% endfor %}
+
+            {% endfor %}
+        </div>
+    </div>
+</div>
