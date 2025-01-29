@@ -25,6 +25,11 @@ class Calendar
     /** @var array<int, Month> $months */
     private array $months = [];
 
+    /** @var array<int, int> $cachedDaysInYear */
+    private array $cachedDaysInYear = [];
+    /** @var array<int, array<int, int>> */
+    private array $cachedDaysInMonth = [];
+
     private WeekConfiguration $weekConfiguration;
     private MoonCycle $moonCycle;
 
@@ -90,6 +95,34 @@ class Calendar
     public function getMonthOfTheYear(int $index): Month
     {
         return $this->months[$index] ?? throw new MonthNotExists($index);
+    }
+
+    public function getDaysUpToYear(int $year): int
+    {
+        if (! isset($this->cachedDaysInYear[$year])) {
+            $days = 0;
+            for ($y = 1; $y < $year; $y++) {
+                $days += $this->countDaysInYear($y);
+            }
+
+            $this->cachedDaysInYear[$year] = $days;
+        }
+
+        return $this->cachedDaysInYear[$year];
+    }
+
+    public function getDaysUpToMonthInYear(int $year, int $month): int
+    {
+        if (! isset($this->cachedDaysInMonth[$year][$month])) {
+            $days = $this->getDaysUpToYear($year);
+            for ($m = 1; $m < $month; $m++) {
+                $days += $this->countDaysInMonth($year, $m);
+            }
+
+            $this->cachedDaysInMonth[$year][$month] = $days;
+        }
+
+        return $this->cachedDaysInMonth[$year][$month];
     }
 
     public function countDaysInYear(int $year): int

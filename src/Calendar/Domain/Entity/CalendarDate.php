@@ -147,7 +147,7 @@ class CalendarDate
     public function getWeekDay(): WeekDay
     {
         $weekDays  = $this->calendar->getWeeks()->getDays();
-        $totalDays = $this->calculateTotalDaysUntilToday();
+        $totalDays = $this->getTotalDaysFromCalendarStart();
         $index     = ($totalDays - 1) % count($weekDays) + 1;
 
         return $weekDays[$index];
@@ -163,66 +163,18 @@ class CalendarDate
         return new CalendarDate($this->calendar, $this->year, $this->month, 1);
     }
 
-    private function calculateTotalDaysUntilToday(): int
-    {
-        $totalDays = 0;
-
-        // Add days from previous complete years
-        for ($year = 1; $year < $this->getYear(); $year++) {
-            $totalDays += $this->calendar->countDaysInYear($year);
-        }
-
-        // Add days from previous months in current year
-        for ($month = 1; $month < $this->getMonth(); $month++) {
-            $monthObj   = $this->calendar->getMonthOfTheYear($month);
-            $totalDays += $monthObj->days->countInYear($this->year);
-
-            // Add leap days if they occur in this month and year
-            foreach ($monthObj->days->getLeapDays() as $leapDay) {
-                if (! $leapDay->occursInYear($this->year)) {
-                    continue;
-                }
-
-                $totalDays++;
-            }
-        }
-
-        // Add days in current month
-        $totalDays += $this->day;
-
-        // If we're past any leap days in current month, add them
-        $currentMonth = $this->calendar->getMonthOfTheYear($this->getMonth());
-        foreach ($currentMonth->days->getLeapDays() as $leapDay) {
-            if (! $leapDay->occursInYear($this->year)) {
-                continue;
-            }
-
-            if ($leapDay->getDayOfTheMonth() >= $this->day) {
-                continue;
-            }
-
-            $totalDays++;
-        }
-
-        return $totalDays;
-    }
-
     public function getTotalDaysFromCalendarStart(): int
     {
         $totalDays = 0;
 
         // Add days from complete years
-        for ($year = 1; $year < $this->year; $year++) {
-            $totalDays += $this->calendar->countDaysInYear($year);
-        }
+        $totalDays += $this->calendar->getDaysUpToYear($this->year);
 
         // Add days from complete months in current year
-        for ($month = 1; $month < $this->month; $month++) {
-            $totalDays += $this->calendar->countDaysInMonth($this->year, $month);
-        }
+        $totalDays += $this->calendar->getDaysUpToMonthInYear($this->year, $this->month - 1);
 
         // Add remaining days in current month
-        $totalDays += $this->day - 1; // Subtract 1 because day 1 shouldn't add a day
+        $totalDays += $this->day;
 
         return $totalDays;
     }

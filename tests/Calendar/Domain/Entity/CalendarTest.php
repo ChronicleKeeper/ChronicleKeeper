@@ -37,14 +37,14 @@ class CalendarTest extends TestCase
     public function itCanCountTheDaysInAYear(): void
     {
         $calendar = $this->getCalendar();
-        self::assertSame(38, $calendar->countDaysInYear());
+        self::assertSame(38, $calendar->countDaysInYear(1));
     }
 
     #[Test]
     public function itIsWorkingWithAnEmptyListOfMonths(): void
     {
         $calendar = new Calendar();
-        self::assertSame(0, $calendar->countDaysInYear());
+        self::assertSame(0, $calendar->countDaysInYear(1));
     }
 
     #[Test]
@@ -83,7 +83,7 @@ class CalendarTest extends TestCase
         $calendar = $this->getCalendar();
         $calendar->setMonths();
 
-        self::assertNotSame(0, $calendar->countDaysInYear());
+        self::assertNotSame(0, $calendar->countDaysInYear(1));
     }
 
     private function getCalendar(): Calendar
