@@ -36,7 +36,13 @@ final class Calendar extends AbstractController
             // Handle month overflow/underflow
             if ($month < 1) {
                 $year--;
+
+                if ($year < 0) {
+                    return $this->redirectToRoute('calendar', ['year' => 0, 'month' => 1]);
+                }
+
                 $month = count($calendar->getMonths());
+
             } elseif ($month > count($calendar->getMonths())) {
                 $year++;
                 $month = 1;

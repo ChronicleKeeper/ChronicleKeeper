@@ -24,7 +24,8 @@
                                     <td class="{% if handleDay.isSame(currentDate) %}bg-primary-subtle{% endif %}">
                                         <div class="row">
                                             <div class="col">
-                                                {% if not this.isInCurrentMonth(handleDay) %}
+                                                {% if handleDay.year < 0 %}
+                                                {% elseif not this.isInCurrentMonth(handleDay) %}
                                                     <div class="text-muted small">
                                                         {{ handleDay.day }}
                                                     </div>
@@ -60,8 +61,9 @@
                         <div class="row">
                             <div class="col-5">Zwischen</div>
                             <div class="col-7 text-muted">
-                                {{ this.previousDayOfLeapDay(leapDay) }}<br />
-                                {{ this.nextDayOfLeapDay(leapDay) }}
+                                {% set previousDayOfLeapDay = this.previousDayOfLeapDay(leapDay) %}
+                                {{ previousDayOfLeapDay.year >= 0 ? previousDayOfLeapDay.format ~ ' - ' }}
+                                {{ this.nextDayOfLeapDay(leapDay).format }}
                             </div>
                         </div>
                     </div>

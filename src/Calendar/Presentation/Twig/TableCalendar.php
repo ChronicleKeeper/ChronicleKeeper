@@ -16,7 +16,7 @@ class TableCalendar
     public CalendarDate $currentDate;
     public CalendarDate $viewDate;
 
-    public function getFirstRegularDay(CalendarDate $date): CalendarDate
+    public function getFirstRegularDay(CalendarDate $date): CalendarDate|null
     {
         $date = $date->getFirstDayOfMonth()->getFirstDayOfWeek();
         if (! $date->isLeapDay()) {
@@ -64,7 +64,7 @@ class TableCalendar
         return $this->viewDate->isSame($leadDayCalendarDate);
     }
 
-    public function getPreviousDayOfLeapDay(LeapDay $leapDay): string
+    public function getPreviousDayOfLeapDay(LeapDay $leapDay): CalendarDate
     {
         $leadDayCalendarDate = new CalendarDate(
             $this->calendar,
@@ -73,10 +73,10 @@ class TableCalendar
             $leapDay->dayOfTheMonth,
         );
 
-        return $leadDayCalendarDate->subDays(1)->format();
+        return $leadDayCalendarDate->subDays(1);
     }
 
-    public function getNextDayOfLeapDay(LeapDay $leapDay): string
+    public function getNextDayOfLeapDay(LeapDay $leapDay): CalendarDate
     {
         $leadDayCalendarDate = new CalendarDate(
             $this->calendar,
@@ -85,6 +85,6 @@ class TableCalendar
             $leapDay->dayOfTheMonth,
         );
 
-        return $leadDayCalendarDate->addDays(1)->format();
+        return $leadDayCalendarDate->addDays(1);
     }
 }
