@@ -6,6 +6,7 @@ namespace ChronicleKeeper\World\Presentation\Controller;
 
 use ChronicleKeeper\Shared\Presentation\FlashMessages\Alert;
 use ChronicleKeeper\Shared\Presentation\FlashMessages\HandleFlashMessages;
+use ChronicleKeeper\Shared\Presentation\Twig\Form\HandleFooterButtonGroup;
 use ChronicleKeeper\World\Application\Command\StoreWorldItem;
 use ChronicleKeeper\World\Domain\Entity\Item;
 use ChronicleKeeper\World\Presentation\Form\WorldItemType;
@@ -21,6 +22,7 @@ use function assert;
 final class WorldItemCreate extends AbstractController
 {
     use HandleFlashMessages;
+    use HandleFooterButtonGroup;
 
     public function __invoke(Request $request, MessageBusInterface $bus): Response
     {
@@ -39,7 +41,12 @@ final class WorldItemCreate extends AbstractController
                 'Der Eintrag wurde erfolgreich erstellt.',
             );
 
-            return $this->redirectToRoute('world_item_listing');
+            return $this->redirectFromFooter(
+                $request,
+                $this->generateUrl('world_item_listing'),
+                $this->generateUrl('world_item_view', ['id' => $item->getId()]),
+                $this->generateUrl('world_item_create'),
+            );
         }
 
         return $this->render(

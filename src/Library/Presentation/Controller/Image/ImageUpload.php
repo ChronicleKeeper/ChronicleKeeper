@@ -10,16 +10,15 @@ use ChronicleKeeper\Library\Presentation\Form\ImageUploadType;
 use ChronicleKeeper\Settings\Domain\Entity\SystemPrompt;
 use ChronicleKeeper\Shared\Presentation\FlashMessages\Alert;
 use ChronicleKeeper\Shared\Presentation\FlashMessages\HandleFlashMessages;
+use ChronicleKeeper\Shared\Presentation\Twig\Form\HandleFooterButtonGroup;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Requirement\Requirement;
 use Symfony\Component\Routing\RouterInterface;
-use Twig\Environment;
 
 use function assert;
 
@@ -31,9 +30,9 @@ use function assert;
 class ImageUpload extends AbstractController
 {
     use HandleFlashMessages;
+    use HandleFooterButtonGroup;
 
     public function __construct(
-        private readonly Environment $environment,
         private readonly FormFactoryInterface $formFactory,
         private readonly Uploader $uploader,
         private readonly RouterInterface $router,
@@ -60,12 +59,17 @@ class ImageUpload extends AbstractController
                 'Das Bild mit dem Titel "' . $image->getTitle() . '" wurde erfolgreich hochgeladen. Bitte überprüfe die inhaltliche Beschreibung.',
             );
 
-            return new RedirectResponse($this->router->generate('library_image_view', ['image' => $image->getId()]));
+            return $this->redirectFromFooter(
+                $request,
+                $this->router->generate('library', ['directory' => $image->getDirectory()->getId()]),
+                $this->router->generate('library_image_view', ['image' => $image->getId()]),
+                $this->router->generate('library_image_upload', ['directory' => $image->getDirectory()->getId()]),
+            );
         }
 
-        return new Response($this->environment->render(
+        return $this->render(
             'library/image_upload.html.twig',
             ['directory' => $directory, 'form' => $form->createView()],
-        ));
+        );
     }
 }

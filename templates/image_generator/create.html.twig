@@ -30,10 +30,13 @@
                         </div>
                     </div>
                     <div class="card-footer text-end">
-                        <div class="d-flex">
-                            <a href="{{ path('image_generator_overview') }}" class="btn btn-link">Abbruch</a>
-                            <button type="submit" class="btn btn-primary ms-auto">Weiter</button>
-                        </div>
+                        {{ component('Form:FotterButtonGroup',
+                            {
+                                'cancelLink': path('image_generator_overview'),
+                                'showRedirectToCreate': false,
+                                'showRedirectToView': false
+                            }
+                        ) }}
                     </div>
                 </div>
             </div>

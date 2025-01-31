@@ -25,7 +25,6 @@ use function assert;
 use function mt_getrandmax;
 use function mt_rand;
 use function range;
-use function reset;
 
 #[CoversClass(DocumentUpload::class)]
 #[CoversClass(DocumentUploadType::class)]
@@ -85,8 +84,6 @@ class DocumentUploadTest extends WebTestCase
         // Check the new document is stored
         $documents = $this->databasePlatform->fetch('SELECT * FROM documents');
         self::assertCount(1, $documents);
-
-        $document = reset($documents);
-        self::assertResponseRedirects('/library/document/' . $document['id']);
+        self::assertResponseRedirects('/library');
     }
 }
