@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Test\Shared\Infrastructure\Database;
 
+use BadMethodCallException;
 use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
+use ChronicleKeeper\Shared\Infrastructure\Database\QueryBuilder\QueryBuilderFactory;
 use PHPUnit\Framework\Assert;
 use Throwable;
 
@@ -17,6 +19,8 @@ use const JSON_THROW_ON_ERROR;
 
 final class DatabasePlatformMock implements DatabasePlatform
 {
+    /** @var list<array<string, mixed>>|null */
+    private array|null $mockResults = null;
     /** @var array<int, array{sql: string, parameters: array<string, mixed>}> */
     private array $executedQueries = [];
     /** @var array<int, array{table: string, data: array<string, mixed>}> */
@@ -28,6 +32,17 @@ final class DatabasePlatformMock implements DatabasePlatform
     private array $executedFetches = [];
     /** @var array<string, Throwable> */
     private array $throwExceptionOnInsertToTable = [];
+
+    public function createQueryBuilder(): QueryBuilderFactory
+    {
+        throw new BadMethodCallException('Not implemented');
+    }
+
+     /** @param list<array<string, mixed>>|null $results */
+    public function setMockResult(array|null $results): void
+    {
+        $this->mockResults = $results;
+    }
 
     public function beginTransaction(): void
     {
@@ -139,6 +154,13 @@ final class DatabasePlatformMock implements DatabasePlatform
             if ($expectation['sql'] === '*' && $expectation['parameters'] === $parameters) {
                 return $expectation['result'];
             }
+        }
+
+        if ($this->mockResults !== null) {
+            $mockResult        = $this->mockResults;
+            $this->mockResults = null;
+
+            return $mockResult;
         }
 
         Assert::fail(sprintf(

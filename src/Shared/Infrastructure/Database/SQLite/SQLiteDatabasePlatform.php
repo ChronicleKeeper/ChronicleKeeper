@@ -6,6 +6,7 @@ namespace ChronicleKeeper\Shared\Infrastructure\Database\SQLite;
 
 use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
 use ChronicleKeeper\Shared\Infrastructure\Database\Exception\UnexpectedMultipleResults;
+use ChronicleKeeper\Shared\Infrastructure\Database\QueryBuilder\QueryBuilderFactory;
 use Psr\Log\LoggerInterface;
 use SQLite3;
 
@@ -19,12 +20,22 @@ use const SQLITE3_ASSOC;
 
 class SQLiteDatabasePlatform implements DatabasePlatform
 {
-    private SQLite3|null $connection = null;
+    private SQLite3|null $connection                      = null;
+    private QueryBuilderFactory|null $queryBuilderFactory = null;
 
     public function __construct(
         private readonly SQLiteConnectionFactory $connectionFactory,
         private readonly LoggerInterface $databaseLogger,
     ) {
+    }
+
+    public function createQueryBuilder(): QueryBuilderFactory
+    {
+        if (! $this->queryBuilderFactory instanceof QueryBuilderFactory) {
+            $this->queryBuilderFactory = new SQLiteQueryBuilderFactory($this);
+        }
+
+        return $this->queryBuilderFactory;
     }
 
     private function getConnection(): SQLite3

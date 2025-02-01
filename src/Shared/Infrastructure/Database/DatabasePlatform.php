@@ -4,8 +4,12 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Shared\Infrastructure\Database;
 
+use ChronicleKeeper\Shared\Infrastructure\Database\QueryBuilder\QueryBuilderFactory;
+
 interface DatabasePlatform
 {
+    public function createQueryBuilder(): QueryBuilderFactory;
+
     /**
      * @param array<string, mixed> $parameters
      *
