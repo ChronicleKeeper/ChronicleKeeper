@@ -45,8 +45,8 @@ class SQLiteDeleteQueryBuilderTest extends TestCase
 
         // Assert the query was executed with correct SQL and parameters
         $this->databasePlatform->assertExecutedQuery(
-            'DELETE FROM test_table WHERE id = :id',
-            ['id' => '123'],
+            'DELETE FROM test_table WHERE id = :id_1',
+            ['id_1' => '123'],
         );
     }
 
@@ -62,8 +62,8 @@ class SQLiteDeleteQueryBuilderTest extends TestCase
 
         // Assert the query was executed with correct SQL and parameters
         $this->databasePlatform->assertExecutedQuery(
-            'DELETE FROM test_table WHERE id = :id AND status = :status',
-            ['id' => '123', 'status' => 'active'],
+            'DELETE FROM test_table WHERE id = :id_1 AND status = :status_2',
+            ['id_1' => '123', 'status_2' => 'active'],
         );
     }
 }

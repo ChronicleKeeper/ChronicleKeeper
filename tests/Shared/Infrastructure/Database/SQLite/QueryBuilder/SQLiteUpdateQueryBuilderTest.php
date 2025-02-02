@@ -55,12 +55,12 @@ final class SQLiteUpdateQueryBuilderTest extends TestCase
         $this->builder->execute();
 
         $this->databasePlatform->assertExecutedQuery(
-            'UPDATE users SET name = :name, email = :email, active = :active WHERE id = :id_3',
+            'UPDATE users SET name = :name, email = :email, active = :active WHERE id = :id_1',
             [
                 'name' => 'John Doe',
                 'email' => 'john@example.com',
                 'active' => true,
-                'id_3' => 1,
+                'id_1' => 1,
             ],
         );
     }
@@ -79,11 +79,11 @@ final class SQLiteUpdateQueryBuilderTest extends TestCase
         $this->builder->execute();
 
         $this->databasePlatform->assertExecutedQuery(
-            'UPDATE users SET deleted_at = :deleted_at, name = :name WHERE id = :id_2',
+            'UPDATE users SET deleted_at = :deleted_at, name = :name WHERE id = :id_1',
             [
                 'deleted_at' => null,
                 'name' => 'John Doe',
-                'id_2' => 1,
+                'id_1' => 1,
             ],
         );
     }

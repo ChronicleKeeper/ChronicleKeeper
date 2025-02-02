@@ -69,8 +69,8 @@ final class SQLiteSelectQueryBuilderTest extends TestCase
         $this->builder->execute();
 
         $this->databasePlatform->assertFetchExecuted(
-            'SELECT * FROM users WHERE status = :status_0 AND age > :age_1',
-            ['status_0' => 'active', 'age_1' => 18],
+            'SELECT * FROM users WHERE status = :status_1 AND age > :age_2',
+            ['status_1' => 'active', 'age_2' => 18],
         );
     }
 

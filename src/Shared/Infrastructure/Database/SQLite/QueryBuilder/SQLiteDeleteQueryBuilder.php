@@ -6,40 +6,40 @@ namespace ChronicleKeeper\Shared\Infrastructure\Database\SQLite\QueryBuilder;
 
 use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
 use ChronicleKeeper\Shared\Infrastructure\Database\QueryBuilder\DeleteQueryBuilder;
+use ChronicleKeeper\Shared\Infrastructure\Database\SQLite\QueryBuilder\Traits\WhereClauseBuilder;
+use InvalidArgumentException;
 
-use function implode;
 use function sprintf;
+use function trim;
 
-final class SQLiteDeleteQueryBuilder implements DeleteQueryBuilder
+class SQLiteDeleteQueryBuilder implements DeleteQueryBuilder
 {
+    use WhereClauseBuilder;
+
     private string $table = '';
 
-    /** @var list<string> */
-    private array $conditions = [];
-    /** @var array<string, mixed> */
-    private array $parameters = [];
-
-    public function __construct(private readonly DatabasePlatform $platform)
-    {
+    public function __construct(
+        private readonly DatabasePlatform $platform,
+    ) {
     }
 
     public function from(string $table): self
     {
-        $this->table = $table;
+        if (trim($table) === '') {
+            throw new InvalidArgumentException('Table name cannot be empty');
+        }
 
-        return $this;
-    }
-
-    public function where(string $column, string $operator, mixed $value): self
-    {
-        $this->conditions[]        = sprintf('%s %s :%s', $column, $operator, $column);
-        $this->parameters[$column] = $value;
+        $this->table = trim($table);
 
         return $this;
     }
 
     public function execute(): null
     {
+        if ($this->table === '') {
+            throw new InvalidArgumentException('No table specified for delete query');
+        }
+
         $this->platform->query($this->buildQuery(), $this->parameters);
 
         return null;
@@ -49,10 +49,6 @@ final class SQLiteDeleteQueryBuilder implements DeleteQueryBuilder
     {
         $query = sprintf('DELETE FROM %s', $this->table);
 
-        if ($this->conditions !== []) {
-            $query .= ' WHERE ' . implode(' AND ', $this->conditions);
-        }
-
-        return $query;
+        return $query . $this->getWhereClause();
     }
 }

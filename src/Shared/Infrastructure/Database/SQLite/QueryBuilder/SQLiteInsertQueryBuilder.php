@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Shared\Infrastructure\Database\SQLite\QueryBuilder;
 
-use BadMethodCallException;
 use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
 use ChronicleKeeper\Shared\Infrastructure\Database\QueryBuilder\InsertQueryBuilder;
 
@@ -36,11 +35,6 @@ final class SQLiteInsertQueryBuilder implements InsertQueryBuilder
         $this->asReplace = true;
 
         return $this;
-    }
-
-    public function where(string $column, string $operator, mixed $value): InsertQueryBuilder
-    {
-        throw new BadMethodCallException('Method is not available for SQLite Insert Queries.');
     }
 
     /** @inheritDoc */

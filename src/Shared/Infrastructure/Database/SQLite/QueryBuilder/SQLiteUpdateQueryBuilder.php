@@ -6,22 +6,20 @@ namespace ChronicleKeeper\Shared\Infrastructure\Database\SQLite\QueryBuilder;
 
 use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
 use ChronicleKeeper\Shared\Infrastructure\Database\QueryBuilder\UpdateQueryBuilder;
+use ChronicleKeeper\Shared\Infrastructure\Database\SQLite\QueryBuilder\Traits\WhereClauseBuilder;
 
 use function array_keys;
 use function array_map;
-use function count;
 use function implode;
 use function sprintf;
 
 final class SQLiteUpdateQueryBuilder implements UpdateQueryBuilder
 {
+    use WhereClauseBuilder;
+
     private string $table = '';
     /** @var array<string, mixed> */
     private array $values = [];
-    /** @var list<string> */
-    private array $conditions = [];
-    /** @var array<string, mixed> */
-    private array $parameters = [];
 
     public function __construct(private readonly DatabasePlatform $platform)
     {
@@ -41,15 +39,6 @@ final class SQLiteUpdateQueryBuilder implements UpdateQueryBuilder
         foreach ($data as $column => $value) {
             $this->parameters[$column] = $value;
         }
-
-        return $this;
-    }
-
-    public function where(string $column, string $operator, mixed $value): self
-    {
-        $paramName                    = $column . '_' . count($this->parameters);
-        $this->conditions[]           = sprintf('%s %s :%s', $column, $operator, $paramName);
-        $this->parameters[$paramName] = $value;
 
         return $this;
     }
@@ -74,10 +63,6 @@ final class SQLiteUpdateQueryBuilder implements UpdateQueryBuilder
             implode(', ', $sets),
         );
 
-        if ($this->conditions !== []) {
-            $query .= ' WHERE ' . implode(' AND ', $this->conditions);
-        }
-
-        return $query;
+        return $query . $this->getWhereClause();
     }
 }

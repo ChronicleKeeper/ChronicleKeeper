@@ -14,6 +14,12 @@ interface SelectQueryBuilder extends BaseQueryBuilder
 
     /**
      * @param non-empty-string $column
+     * @param non-empty-string $operator
+     */
+    public function where(string $column, string $operator, mixed $value): self;
+
+    /**
+     * @param non-empty-string $column
      * @param 'ASC'|'DESC'     $direction
      */
     public function orderBy(string $column, string $direction = 'ASC'): self;
