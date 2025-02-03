@@ -1,0 +1,14 @@
+.calendar td.day-in-current-month:hover {
+    background-color: var(--tblr-table-hover-bg)!important;
+    cursor: pointer;
+}
+
+.calendar thead th {
+    height: 50px;
+    min-height: 50px;
+}
+
+.calendar tbody td div.day-content {
+    height: 75px;
+    min-height: 75px;
+}

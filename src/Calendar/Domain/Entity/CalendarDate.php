@@ -8,9 +8,12 @@ use ChronicleKeeper\Calendar\Domain\Entity\Calendar\Month;
 use ChronicleKeeper\Calendar\Domain\Entity\Calendar\WeekDay;
 use ChronicleKeeper\Calendar\Domain\Exception\DayNotExistsInMonth;
 use ChronicleKeeper\Calendar\Domain\Exception\MonthNotExists;
+use ChronicleKeeper\Calendar\Domain\Exception\YearIsInvalidInCalendar;
 
+use function abs;
 use function count;
 use function sprintf;
+use function trim;
 
 class CalendarDate
 {
@@ -22,6 +25,10 @@ class CalendarDate
         private readonly int $month,
         private readonly int $day,
     ) {
+        if ($this->year < $this->calendar->getConfiguration()->beginsInYear) {
+            throw YearIsInvalidInCalendar::forTooEarlyYear($this->year);
+        }
+
         // Check if month exists in calendar, method throws exception if not exists
         $this->currentMonth = $this->calendar->getMonthOfTheYear($this->month);
 
@@ -58,25 +65,14 @@ class CalendarDate
     public function format(): string
     {
         $currentMonth = $this->calendar->getMonthOfTheYear($this->month);
-        if ($currentMonth->days->isLeapDay($this->day)) {
-            return sprintf(
-                '%s %d',
-                $currentMonth->days->getDay($this->day)->getLabel(),
-                $this->year,
-            );
-        }
 
-        return sprintf(
-            '%d. %s %d',
+        return trim(sprintf(
+            '%d. %s %d %s',
             $currentMonth->days->getDay($this->day)->getLabel(),
             $this->calendar->getMonthOfTheYear($this->month)->name,
             $this->year,
-        );
-    }
-
-    public function isLeapDay(): bool
-    {
-        return $this->calendar->getMonthOfTheYear($this->month)->days->isLeapDay($this->day);
+            $this->calendar->getEpochCollection()->getEpochForYear($this->year)->name,
+        ));
     }
 
     public function addDays(int $days): CalendarDate
@@ -144,11 +140,20 @@ class CalendarDate
         }
     }
 
+    public function diffInDays(CalendarDate $date): int
+    {
+        $thisTotalDays = $this->getTotalDaysFromCalendarStart();
+        $dateTotalDays = $date->getTotalDaysFromCalendarStart();
+
+        return abs($thisTotalDays - $dateTotalDays);
+    }
+
     public function getWeekDay(): WeekDay
     {
         $weekDays  = $this->calendar->getWeeks()->getDays();
         $totalDays = $this->getTotalDaysFromCalendarStart();
-        $index     = ($totalDays - 1) % count($weekDays) + 1;
+
+        $index = $totalDays % count($weekDays);
 
         return $weekDays[$index];
     }
@@ -161,6 +166,13 @@ class CalendarDate
     public function getFirstDayOfMonth(): CalendarDate
     {
         return new CalendarDate($this->calendar, $this->year, $this->month, 1);
+    }
+
+    public function getLastDayOfMonth(): CalendarDate
+    {
+        $maxDaysInMonth = $this->calendar->getMonthOfTheYear($this->month)->days->count();
+
+        return new CalendarDate($this->calendar, $this->year, $this->month, $maxDaysInMonth);
     }
 
     public function getTotalDaysFromCalendarStart(): int

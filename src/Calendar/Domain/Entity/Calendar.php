@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Calendar\Domain\Entity;
 
+use ChronicleKeeper\Calendar\Domain\Entity\Calendar\Configuration;
+use ChronicleKeeper\Calendar\Domain\Entity\Calendar\EpochCollection;
 use ChronicleKeeper\Calendar\Domain\Entity\Calendar\Month;
 use ChronicleKeeper\Calendar\Domain\Entity\Calendar\MoonCycle;
 use ChronicleKeeper\Calendar\Domain\Entity\Calendar\WeekConfiguration;
@@ -30,8 +32,14 @@ class Calendar
     /** @var array<int, array<int, int>> */
     private array $cachedDaysInMonth = [];
 
+    private EpochCollection $epochCollection;
     private WeekConfiguration $weekConfiguration;
     private MoonCycle $moonCycle;
+
+    public function __construct(
+        private readonly Configuration $configuration,
+    ) {
+    }
 
     public function setMonths(Month ...$months): void
     {
@@ -56,6 +64,20 @@ class Calendar
         if (array_keys($this->months) !== range(1, count($this->months))) {
             throw new YearHasNotASequentialListOfMonths();
         }
+    }
+
+    public function setEpochCollection(EpochCollection $epochCollection): void
+    {
+        if (isset($this->epochCollection)) {
+            return;
+        }
+
+        $this->epochCollection = $epochCollection;
+    }
+
+    public function getEpochCollection(): EpochCollection
+    {
+        return $this->epochCollection;
     }
 
     public function setWeekConfiguration(WeekConfiguration $weekConfiguration): void
@@ -92,6 +114,11 @@ class Calendar
         return $this->months;
     }
 
+    public function getConfiguration(): Configuration
+    {
+        return $this->configuration;
+    }
+
     public function getMonthOfTheYear(int $index): Month
     {
         return $this->months[$index] ?? throw new MonthNotExists($index);
@@ -101,8 +128,8 @@ class Calendar
     {
         if (! isset($this->cachedDaysInYear[$year])) {
             $days = 0;
-            for ($y = 1; $y < $year; $y++) {
-                $days += $this->countDaysInYear($y);
+            for ($i = $this->configuration->beginsInYear; $i < $year; $i++) {
+                $days += $this->countDaysInYear($i);
             }
 
             $this->cachedDaysInYear[$year] = $days;

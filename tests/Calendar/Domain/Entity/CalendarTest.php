@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ChronicleKeeper\Test\Calendar\Domain\Entity;
 
 use ChronicleKeeper\Calendar\Domain\Entity\Calendar;
+use ChronicleKeeper\Calendar\Domain\Entity\Calendar\Configuration;
 use ChronicleKeeper\Calendar\Domain\Entity\Calendar\DayCollection;
 use ChronicleKeeper\Calendar\Domain\Entity\Calendar\Month;
 use ChronicleKeeper\Calendar\Domain\Exception\MonthNotExists;
@@ -37,13 +38,13 @@ class CalendarTest extends TestCase
     public function itCanCountTheDaysInAYear(): void
     {
         $calendar = $this->getCalendar();
-        self::assertSame(38, $calendar->countDaysInYear(1));
+        self::assertSame(35, $calendar->countDaysInYear(1));
     }
 
     #[Test]
     public function itIsWorkingWithAnEmptyListOfMonths(): void
     {
-        $calendar = new Calendar();
+        $calendar = new Calendar(new Configuration());
         self::assertSame(0, $calendar->countDaysInYear(1));
     }
 
@@ -52,7 +53,7 @@ class CalendarTest extends TestCase
     {
         $this->expectException(YearIsNotStartingWithFirstMonth::class);
 
-        $calendar = new Calendar();
+        $calendar = new Calendar(new Configuration());
         $calendar->setMonths(new Month($calendar, 2, 'SecondMonth', new DayCollection(10)));
     }
 
@@ -61,7 +62,7 @@ class CalendarTest extends TestCase
     {
         $this->expectException(YearHasNotASequentialListOfMonths::class);
 
-        $calendar = new Calendar();
+        $calendar = new Calendar(new Configuration());
         $calendar->setMonths(
             new Month($calendar, 1, 'FirstMonth', new DayCollection(10)),
             new Month($calendar, 3, 'ThirdMonth', new DayCollection(10)),

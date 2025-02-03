@@ -28,34 +28,48 @@ final class Calendar extends AbstractController
     public function __invoke(int|null $year = null, int|null $month = null): Response
     {
         $calendar = $this->queryService->query(new LoadCalendar());
-        $today    = new CalendarDate($calendar, 2, 1, 14); // Fixed current day
+        $today    = new CalendarDate($calendar, 1262, 2, 14);
 
         if ($year === null || $month === null) {
-            $viewDate = clone $today;
-        } else {
-            // Handle month overflow/underflow
-            if ($month < 1) {
-                $year--;
+            return $this->render(
+                'calendar/calendar.html.twig',
+                [
+                    'calendar' => $calendar,
+                    'viewDate' => clone $today,
+                    'currentDate' => $today,
+                ],
+            );
+        }
 
-                if ($year < 0) {
-                    return $this->redirectToRoute('calendar', ['year' => 0, 'month' => 1]);
-                }
+        if ($year < $calendar->getConfiguration()->beginsInYear) {
+            return $this->redirectToRoute(
+                'calendar',
+                ['year' => $calendar->getConfiguration()->beginsInYear, 'month' => 1],
+            );
+        }
 
-                $month = count($calendar->getMonths());
+        // Handle month overflow/underflow
+        if ($month < 1) {
+            $year--;
 
-            } elseif ($month > count($calendar->getMonths())) {
-                $year++;
-                $month = 1;
+            if ($year < $calendar->getConfiguration()->beginsInYear) {
+                return $this->redirectToRoute(
+                    'calendar',
+                    ['year' => $calendar->getConfiguration()->beginsInYear, 'month' => 1],
+                );
             }
 
-            $viewDate = new CalendarDate($calendar, $year, $month, 1);
+            $month = count($calendar->getMonths());
+        } elseif ($month > count($calendar->getMonths())) {
+            $year++;
+            $month = 1;
         }
 
         return $this->render(
             'calendar/calendar.html.twig',
             [
                 'calendar' => $calendar,
-                'viewDate' => $viewDate,
+                'viewDate' => (new CalendarDate($calendar, $year, $month, 1))->getFirstDayOfMonth(),
                 'currentDate' => $today,
             ],
         );

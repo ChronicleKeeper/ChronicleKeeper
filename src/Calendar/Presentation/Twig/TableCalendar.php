@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace ChronicleKeeper\Calendar\Presentation\Twig;
 
 use ChronicleKeeper\Calendar\Domain\Entity\Calendar;
-use ChronicleKeeper\Calendar\Domain\Entity\Calendar\LeapDay;
 use ChronicleKeeper\Calendar\Domain\Entity\CalendarDate;
+use Generator;
 use Symfony\UX\TwigComponent\Attribute\AsTwigComponent;
+
+use function ceil;
 
 #[AsTwigComponent(name: 'Calendar:Table', template: 'calendar/table_calendar.html.twig')]
 class TableCalendar
@@ -16,18 +18,32 @@ class TableCalendar
     public CalendarDate $currentDate;
     public CalendarDate $viewDate;
 
-    public function getFirstRegularDay(CalendarDate $date): CalendarDate|null
+    public function createCalendarOfMonth(CalendarDate $date): Generator
     {
-        $date = $date->getFirstDayOfMonth()->getFirstDayOfWeek();
-        if (! $date->isLeapDay()) {
-            return $date;
+        $calendarStartsWith = $this->getFirstRegularDay($date);
+        $lastDayOfTheMonth  = $date->getLastDayOfMonth();
+
+        $totalAmountOfDaysToDisplay = $calendarStartsWith->diffInDays($lastDayOfTheMonth);
+        $weeksToDisplay             = (int) ceil(
+            $totalAmountOfDaysToDisplay / $this->calendar->getWeeks()->countDays(),
+        );
+
+        for ($weekIndex = 0; $weekIndex < $weeksToDisplay; $weekIndex++) {
+            $week       = [];
+            $daysInWeek = $this->calendar->getWeeks()->countDays();
+
+            for ($dayIndex = 0; $dayIndex < $daysInWeek; $dayIndex++) {
+                $week[]             = $calendarStartsWith;
+                $calendarStartsWith = $this->getNextRegularDay($calendarStartsWith);
+            }
+
+            yield $week;
         }
+    }
 
-        do {
-            $date = $date->subDays(1);
-        } while ($date->isLeapDay() === true);
-
-        return $date;
+    public function getFirstRegularDay(CalendarDate $date): CalendarDate
+    {
+        return $date->getFirstDayOfMonth()->getFirstDayOfWeek();
     }
 
     public function isInCurrentMonth(CalendarDate $date): bool
@@ -37,54 +53,6 @@ class TableCalendar
 
     public function getNextRegularDay(CalendarDate $date): CalendarDate
     {
-        do {
-            $date = $date->addDays(1);
-        } while ($date->isLeapDay() === true);
-
-        return $date;
-    }
-
-    /** @return Calendar\LeapDay[] */
-    public function getLeapDaysOfCurrentMonth(): array
-    {
-        $currentMonth = $this->calendar->getMonthOfTheYear($this->viewDate->getMonth());
-
-        return $currentMonth->days->getLeapDaysInYear($this->viewDate->getYear());
-    }
-
-    public function isLeapDayActive(LeapDay $leapDay): bool
-    {
-        $leadDayCalendarDate = new CalendarDate(
-            $this->calendar,
-            $this->viewDate->getYear(),
-            $this->viewDate->getMonth(),
-            $leapDay->dayOfTheMonth,
-        );
-
-        return $this->viewDate->isSame($leadDayCalendarDate);
-    }
-
-    public function getPreviousDayOfLeapDay(LeapDay $leapDay): CalendarDate
-    {
-        $leadDayCalendarDate = new CalendarDate(
-            $this->calendar,
-            $this->viewDate->getYear(),
-            $this->viewDate->getMonth(),
-            $leapDay->dayOfTheMonth,
-        );
-
-        return $leadDayCalendarDate->subDays(1);
-    }
-
-    public function getNextDayOfLeapDay(LeapDay $leapDay): CalendarDate
-    {
-        $leadDayCalendarDate = new CalendarDate(
-            $this->calendar,
-            $this->viewDate->getYear(),
-            $this->viewDate->getMonth(),
-            $leapDay->dayOfTheMonth,
-        );
-
-        return $leadDayCalendarDate->addDays(1);
+        return $date->addDays(1);
     }
 }

@@ -36,25 +36,19 @@ class CalendarDateTest extends TestCase
         yield 'Add 4 day to the beginning of the year' => [
             new CalendarDate($calendar, 1, 1, 1),
             4,
-            '4. FirstMonth 1', // Still the 4th because the 1st day is a leap day it is "skipped" for name rendering
+            '5. FirstMonth 1 after Boom', // Still the 4th because the 1st day is a leap day it is "skipped" for name rendering
         ];
 
         yield 'Add 15 days to the beginning of the year' => [
             new CalendarDate($calendar, 1, 1, 1),
             15,
-            '5. SecondMonth 1',
+            '6. SecondMonth 1 after Boom',
         ];
 
         yield 'Add 40 days to the beginning of the year, year changes' => [
             new CalendarDate($calendar, 1, 1, 1),
             40,
-            '2. FirstMonth 2',
-        ];
-
-        yield 'Add some days to land on a leap day in calculation' => [
-            new CalendarDate($calendar, 1, 3, 7),
-            4,
-            'EndOfYearFirstLeapDay 1', // The 11th day is a leap day, so no numeric naming
+            '6. FirstMonth 2 after Boom',
         ];
     }
 
@@ -77,48 +71,11 @@ class CalendarDateTest extends TestCase
     }
 
     #[Test]
-    public function itCanAddDaysToDateWithLeapDay(): void
-    {
-        $calendar = FullExampleCalendar::get();
-        $date     = new CalendarDate($calendar, 1, 3, 10);
-
-        $result = $date->addDays(2);
-        self::assertSame('EndOfYearSecondLeapDay 1', $result->format());
-    }
-
-    #[Test]
-    public function isChecksToNotBeingALeapDay(): void
-    {
-        $calendar = FullExampleCalendar::get();
-        $date     = new CalendarDate($calendar, 1, 3, 10);
-
-        self::assertFalse($date->isLeapDay());
-    }
-
-    #[Test]
-    public function isChecksToBeingALeapDay(): void
-    {
-        $calendar = FullExampleCalendar::get();
-        $date     = new CalendarDate($calendar, 1, 3, 11);
-
-        self::assertTrue($date->isLeapDay());
-    }
-
-    #[Test]
     public function ifFormatsARegularDate(): void
     {
         $calendar = FullExampleCalendar::get();
         $date     = new CalendarDate($calendar, 1, 3, 10);
 
-        self::assertSame('10. ThirdMonth 1', $date->format());
-    }
-
-    #[Test]
-    public function ifFormatsALeapDay(): void
-    {
-        $calendar = FullExampleCalendar::get();
-        $date     = new CalendarDate($calendar, 1, 3, 11);
-
-        self::assertSame('EndOfYearFirstLeapDay 1', $date->format());
+        self::assertSame('10. ThirdMonth 1 after Boom', $date->format());
     }
 }

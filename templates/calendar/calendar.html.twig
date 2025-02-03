@@ -1,6 +1,5 @@
 {% extends 'layout.html.twig' %}
 
-{% block page_subtitle %}Heute ist der {{ currentDate.format }}{% endblock %}
 {% block page_title %}{{ viewDate.format }}{% endblock %}
 
 {% block page_title_actions %}
@@ -18,16 +17,6 @@
                     {{ ux_icon('tabler:chevron-right') }}
                 </a>
             </div>
-
-            <a href="#" class="btn d-none d-sm-inline-block">
-                {{ ux_icon('tabler:file-plus') }} Neue Veranstaltung
-            </a>
-            <a href="#" class="btn d-none d-sm-inline-block">
-                {{ ux_icon('tabler:file-plus') }} Medium Verknüpfen
-            </a>
-            <a href="#" class="btn d-none d-sm-inline-block">
-                {{ ux_icon('tabler:file-plus') }} Suchen
-            </a>
         </div>
     </div>
 {% endblock %}

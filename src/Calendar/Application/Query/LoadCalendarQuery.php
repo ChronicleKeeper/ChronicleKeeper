@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace ChronicleKeeper\Calendar\Application\Query;
 
 use ChronicleKeeper\Calendar\Domain\Entity\Calendar;
+use ChronicleKeeper\Calendar\Domain\Entity\Calendar\Configuration;
 use ChronicleKeeper\Calendar\Domain\Entity\Calendar\DayCollection;
-use ChronicleKeeper\Calendar\Domain\Entity\Calendar\LeapDay;
+use ChronicleKeeper\Calendar\Domain\Entity\Calendar\Epoch;
+use ChronicleKeeper\Calendar\Domain\Entity\Calendar\EpochCollection;
 use ChronicleKeeper\Calendar\Domain\Entity\Calendar\Month;
 use ChronicleKeeper\Calendar\Domain\Entity\Calendar\MoonCycle;
 use ChronicleKeeper\Calendar\Domain\Entity\Calendar\WeekConfiguration;
@@ -18,24 +20,34 @@ final class LoadCalendarQuery implements Query
 {
     public function query(QueryParameters $parameters): Calendar
     {
-        $calendar = new Calendar();
+        $calendar = new Calendar(new Configuration(1));
 
         // Configure Months
         $calendar->setMonths(
-            new Month($calendar, 1, 'Januar', new DayCollection(
+            new Month($calendar, 1, 'Taranis', new DayCollection(30)),
+            new Month($calendar, 2, 'Imbolc', new DayCollection(30)),
+            new Month($calendar, 3, 'Brigid', new DayCollection(30)),
+            new Month($calendar, 4, 'Lughnasad', new DayCollection(30)),
+            new Month($calendar, 5, 'Beltain', new DayCollection(30)),
+            new Month($calendar, 6, 'Litha', new DayCollection(30)),
+            new Month($calendar, 7, 'Arthan', new DayCollection(
                 30,
-                new LeapDay(1, 'Katertag'),
-                new LeapDay(14, 'Tag der Mondgöttin'),
-                new LeapDay(31, 'Drei Könige'),
-                new LeapDay(32, 'Vier Könige', leapYearFrequency: 2, startYear: 1263),
             )),
-            new Month($calendar, 2, 'Februar', new DayCollection(
+            new Month($calendar, 8, 'Telisias', new DayCollection(30)),
+            new Month($calendar, 9, 'Mabon', new DayCollection(
                 30,
-                new LeapDay(31, 'Heiliger Schalttag'),
             )),
-            new Month($calendar, 3, 'März', new DayCollection(30)),
-            new Month($calendar, 4, 'April', new DayCollection(30)),
+            new Month($calendar, 10, 'Cerun', new DayCollection(30)),
+            new Month($calendar, 11, 'Sawuin', new DayCollection(
+                30,
+            )),
+            new Month($calendar, 12, 'Nox', new DayCollection(30)),
         );
+
+        // Configure Epochs
+        $calendar->setEpochCollection(new EpochCollection(
+            new Epoch('nach der Flut', 0),
+        ));
 
         // Configure Weeks
         $calendar->setWeekConfiguration(new WeekConfiguration(
@@ -44,6 +56,11 @@ final class LoadCalendarQuery implements Query
             new WeekDay(3, 'Drittag'),
             new WeekDay(4, 'Vierttag'),
             new WeekDay(5, 'Fünfttag'),
+            new WeekDay(6, 'Sechsttag'),
+            new WeekDay(7, 'Siebttag'),
+            new WeekDay(8, 'Achsttag'),
+            new WeekDay(9, 'Neunttag'),
+            new WeekDay(10, 'Zehnttag'),
         ));
 
         // Configure Moon Cycle
