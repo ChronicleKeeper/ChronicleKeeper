@@ -179,9 +179,6 @@ class CalendarDate
     {
         $totalDays = 0;
 
-        // Add days from complete years
-        $totalDays += $this->calendar->getDaysUpToYear($this->year);
-
         // Add days from complete months in current year
         $totalDays += $this->calendar->getDaysUpToMonthInYear($this->year, $this->month - 1);
 

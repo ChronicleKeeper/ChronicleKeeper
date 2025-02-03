@@ -49,6 +49,7 @@ readonly class WeekConfiguration
     public function getFirstDayOfWeekByDate(CalendarDate $date): CalendarDate
     {
         $weekDayOfDate = $date->getWeekDay();
+
         if ($weekDayOfDate->index === 1) {
             return $date;
         }

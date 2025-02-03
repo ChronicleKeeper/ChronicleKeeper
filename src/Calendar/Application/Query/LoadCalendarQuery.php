@@ -24,10 +24,10 @@ final class LoadCalendarQuery implements Query
 
         // Configure Months
         $calendar->setMonths(
-            new Month($calendar, 1, 'Taranis', new DayCollection(30)),
+            new Month($calendar, 1, 'Taranis', new DayCollection(25)),
             new Month($calendar, 2, 'Imbolc', new DayCollection(30)),
-            new Month($calendar, 3, 'Brigid', new DayCollection(30)),
-            new Month($calendar, 4, 'Lughnasad', new DayCollection(30)),
+            new Month($calendar, 3, 'Brigid', new DayCollection(25)),
+            new Month($calendar, 4, 'Lughnasad', new DayCollection(25)),
             new Month($calendar, 5, 'Beltain', new DayCollection(30)),
             new Month($calendar, 6, 'Litha', new DayCollection(30)),
             new Month($calendar, 7, 'Arthan', new DayCollection(
@@ -64,7 +64,7 @@ final class LoadCalendarQuery implements Query
         ));
 
         // Configure Moon Cycle
-        $calendar->setMoonCycle(new MoonCycle(30));
+        $calendar->setMoonCycle(new MoonCycle(10));
 
         return $calendar;
     }
