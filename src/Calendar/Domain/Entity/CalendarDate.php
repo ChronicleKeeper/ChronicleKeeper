@@ -9,6 +9,7 @@ use ChronicleKeeper\Calendar\Domain\Entity\Calendar\WeekDay;
 use ChronicleKeeper\Calendar\Domain\Exception\DayNotExistsInMonth;
 use ChronicleKeeper\Calendar\Domain\Exception\MonthNotExists;
 use ChronicleKeeper\Calendar\Domain\Exception\YearIsInvalidInCalendar;
+use ChronicleKeeper\Calendar\Domain\ValueObject\MoonState;
 
 use function abs;
 use function count;
@@ -152,8 +153,7 @@ class CalendarDate
     {
         $weekDays  = $this->calendar->getWeeks()->getDays();
         $totalDays = $this->getTotalDaysFromCalendarStart();
-
-        $index = $totalDays % count($weekDays);
+        $index     = ($totalDays - 1) % count($weekDays) + 1;
 
         return $weekDays[$index];
     }
@@ -161,6 +161,11 @@ class CalendarDate
     public function getFirstDayOfWeek(): CalendarDate
     {
         return $this->calendar->getWeeks()->getFirstDayOfWeekByDate($this);
+    }
+
+    public function getMoonState(): MoonState
+    {
+        return $this->calendar->getMoonCycle()->getMoonStateOfDay($this);
     }
 
     public function getFirstDayOfMonth(): CalendarDate

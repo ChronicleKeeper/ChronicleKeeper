@@ -11,7 +11,7 @@ use ChronicleKeeper\Calendar\Domain\Entity\Calendar\Month;
 use ChronicleKeeper\Calendar\Domain\Exception\MonthNotExists;
 use ChronicleKeeper\Calendar\Domain\Exception\YearHasNotASequentialListOfMonths;
 use ChronicleKeeper\Calendar\Domain\Exception\YearIsNotStartingWithFirstMonth;
-use ChronicleKeeper\Test\Calendar\Domain\Entity\Fixture\FullExampleCalendar;
+use ChronicleKeeper\Test\Calendar\Domain\Entity\Fixture\ExampleCalendars;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\Attributes\Test;
@@ -89,6 +89,6 @@ class CalendarTest extends TestCase
 
     private function getCalendar(): Calendar
     {
-        return FullExampleCalendar::get();
+        return ExampleCalendars::getFullFeatured();
     }
 }

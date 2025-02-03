@@ -6,7 +6,7 @@ namespace ChronicleKeeper\Test\Calendar\Domain\Entity\Calendar;
 
 use ChronicleKeeper\Calendar\Domain\Entity\Calendar\DayCollection;
 use ChronicleKeeper\Calendar\Domain\Entity\Calendar\RegularDay;
-use ChronicleKeeper\Test\Calendar\Domain\Entity\Fixture\FullExampleCalendar;
+use ChronicleKeeper\Test\Calendar\Domain\Entity\Fixture\ExampleCalendars;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\Attributes\Test;
@@ -19,7 +19,7 @@ class DayCollectionTest extends TestCase
     #[Test]
     public function itWillCalculateTheDaysInTheMonthCorrectly(): void
     {
-        $calendar = FullExampleCalendar::get();
+        $calendar = ExampleCalendars::getFullFeatured();
         $month    = $calendar->getMonthOfTheYear(1);
 
         self::assertCount(10, $month->days);

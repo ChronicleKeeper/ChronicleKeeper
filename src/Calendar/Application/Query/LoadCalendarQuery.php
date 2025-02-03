@@ -20,7 +20,7 @@ final class LoadCalendarQuery implements Query
 {
     public function query(QueryParameters $parameters): Calendar
     {
-        $calendar = new Calendar(new Configuration(1));
+        $calendar = new Calendar(new Configuration());
 
         // Configure Months
         $calendar->setMonths(
@@ -64,7 +64,7 @@ final class LoadCalendarQuery implements Query
         ));
 
         // Configure Moon Cycle
-        $calendar->setMoonCycle(new MoonCycle(10));
+        $calendar->setMoonCycle(new MoonCycle(30));
 
         return $calendar;
     }

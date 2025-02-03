@@ -8,9 +8,7 @@ use ChronicleKeeper\Calendar\Domain\Entity\CalendarDate;
 use ChronicleKeeper\Calendar\Domain\ValueObject\MoonState;
 use Webmozart\Assert\Assert;
 
-use function cos;
-
-use const M_PI;
+use function fmod;
 
 class MoonCycle
 {
@@ -23,24 +21,22 @@ class MoonCycle
     public function getMoonStateOfDay(CalendarDate $date): MoonState
     {
         $totalDays  = $date->getTotalDaysFromCalendarStart();
-        $dayInCycle = $totalDays % $this->daysOfACycle;
+        $dayInCycle = fmod($totalDays, $this->daysOfACycle);
 
-        // Calculate percentage (0-100) and convert to radians (0-2π)
-        $angleInRadians = $dayInCycle / $this->daysOfACycle * 2 * M_PI;
+        // Normalize to 0-1 range (complete cycle)
+        $normalizedAge = $dayInCycle / $this->daysOfACycle;
 
-        // Use cosine to get illumination percentage (-1 to 1, converted to 0-100)
-        $illumination = (1 - cos($angleInRadians)) * 50;
-
-        // More precise phase boundaries
+        // Phase boundaries based on normalized age
         return match (true) {
-            $illumination <= 2 => MoonState::NEW_MOON,           // 0-2%
-            $illumination < 48 => MoonState::WAXING_CRESCENT,    // 2-48%
-            $illumination < 52 => MoonState::FIRST_QUARTER,      // 48-52%
-            $illumination < 98 => MoonState::WAXING_GIBBOUS,     // 52-98%
-            $illumination <= 100 => MoonState::FULL_MOON,        // 98-100%
-            $illumination > 98 => MoonState::WANING_GIBBOUS,     // 100-98%
-            $illumination > 48 => MoonState::LAST_QUARTER,       // 98-48%
-            default => MoonState::WANING_CRESCENT                // 48-2%
+            $normalizedAge < 0.067 => MoonState::NEW_MOON,           // 0-6.7%
+            $normalizedAge < 0.217 => MoonState::WAXING_CRESCENT,    // 6.7-21.7%
+            $normalizedAge < 0.283 => MoonState::FIRST_QUARTER,      // 21.7-28.3%
+            $normalizedAge < 0.467 => MoonState::WAXING_GIBBOUS,     // 28.3-46.7%
+            $normalizedAge < 0.533 => MoonState::FULL_MOON,          // 46.7-53.3%
+            $normalizedAge < 0.717 => MoonState::WANING_GIBBOUS,     // 53.3-71.7%
+            $normalizedAge < 0.783 => MoonState::LAST_QUARTER,       // 71.7-78.3%
+            $normalizedAge < 0.933 => MoonState::WANING_CRESCENT,    // 78.3-93.3%
+            default => MoonState::NEW_MOON,                          // 93.3-100%
         };
     }
 }
