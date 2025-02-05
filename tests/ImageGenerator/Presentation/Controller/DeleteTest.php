@@ -40,11 +40,14 @@ class DeleteTest extends WebTestCase
     #[Test]
     public function thatRequestingPageWithExistentDataIsSuccess(): void
     {
-        $this->databasePlatform->insert('generator_requests', [
-            'id'       => 'c6f5d897-175c-4938-abe1-613fb51fdd68',
-            'title'    => 'Foo Bar Baz',
-            'userInput' => '{"foo": "bar"}',
-        ]);
+        $this->databasePlatform->createQueryBuilder()->createInsert()
+            ->insert('generator_requests')
+            ->values([
+                'id'       => 'c6f5d897-175c-4938-abe1-613fb51fdd68',
+                'title'    => 'Foo Bar Baz',
+                'userInput' => '{"foo": "bar"}',
+            ])
+            ->execute();
 
         $this->client->request(
             Request::METHOD_GET,
@@ -53,10 +56,11 @@ class DeleteTest extends WebTestCase
 
         self::assertResponseRedirects('/image_generator');
 
-        $existingEntries = $this->databasePlatform->fetch(
-            'SELECT * FROM generator_requests WHERE id = :id',
-            ['id' => 'c6f5d897-175c-4938-abe1-613fb51fdd68'],
-        );
+        $existingEntries = $this->databasePlatform->createQueryBuilder()->createSelect()
+            ->from('generator_requests')
+            ->where('id', '=', 'c6f5d897-175c-4938-abe1-613fb51fdd68')
+            ->fetchAll();
+
         self::assertEmpty($existingEntries);
     }
 }

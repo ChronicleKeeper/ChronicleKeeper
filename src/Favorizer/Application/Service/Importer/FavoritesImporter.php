@@ -46,14 +46,15 @@ final readonly class FavoritesImporter implements SingleImport
         }
 
         foreach ($content as $row) {
-            $this->databasePlatform->insertOrUpdate(
-                'favorites',
-                [
+            $this->databasePlatform->createQueryBuilder()->createInsert()
+                ->asReplace()
+                ->insert('favorites')
+                ->values([
                     'id' => $row['id'],
                     'type' => $row['type'],
                     'title' => $row['title'],
-                ],
-            );
+                ])
+                ->execute();
         }
     }
 }

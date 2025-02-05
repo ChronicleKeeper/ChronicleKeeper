@@ -23,31 +23,40 @@ class StoreWorldItemHandler
         try {
             $this->platform->beginTransaction();
 
-            $this->platform->insertOrUpdate(
-                'world_items',
-                [
+            $this->platform->createQueryBuilder()->createInsert()
+                ->asReplace()
+                ->insert('world_items')
+                ->values([
                     'id' => $command->item->getId(),
                     'type' => $command->item->getType()->value,
                     'name' => $command->item->getName(),
                     'short_description' => $command->item->getShortDescription(),
-                ],
-            );
+                ])
+                ->execute();
 
             foreach ($command->item->getMediaReferences() as $media) {
                 if ($media instanceof DocumentReference) {
-                    $this->platform->insertOrUpdate(
-                        'world_item_documents',
-                        ['world_item_id' => $command->item->getId(), 'document_id' => $media->document->getId()],
-                    );
+                    $this->platform->createQueryBuilder()->createInsert()
+                        ->asReplace()
+                        ->insert('world_item_documents')
+                        ->values([
+                            'world_item_id' => $command->item->getId(),
+                            'document_id' => $media->document->getId(),
+                        ])
+                        ->execute();
 
                     continue;
                 }
 
                 if ($media instanceof ImageReference) {
-                    $this->platform->insertOrUpdate(
-                        'world_item_images',
-                        ['world_item_id' => $command->item->getId(), 'image_id' => $media->image->getId()],
-                    );
+                    $this->platform->createQueryBuilder()->createInsert()
+                        ->asReplace()
+                        ->insert('world_item_images')
+                        ->values([
+                            'world_item_id' => $command->item->getId(),
+                            'image_id' => $media->image->getId(),
+                        ])
+                        ->execute();
 
                     continue;
                 }
@@ -56,10 +65,14 @@ class StoreWorldItemHandler
                     continue;
                 }
 
-                $this->platform->insertOrUpdate(
-                    'world_item_conversations',
-                    ['world_item_id' => $command->item->getId(), 'conversation_id' => $media->conversation->getId()],
-                );
+                $this->platform->createQueryBuilder()->createInsert()
+                    ->asReplace()
+                    ->insert('world_item_conversations')
+                    ->values([
+                        'world_item_id' => $command->item->getId(),
+                        'conversation_id' => $media->conversation->getId(),
+                    ])
+                    ->execute();
             }
 
             $this->platform->commit();

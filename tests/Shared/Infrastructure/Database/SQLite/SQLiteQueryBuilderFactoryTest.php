@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Test\Shared\Infrastructure\Database\SQLite;
 
+use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
 use ChronicleKeeper\Shared\Infrastructure\Database\SQLite\QueryBuilder\SQLiteDeleteQueryBuilder;
 use ChronicleKeeper\Shared\Infrastructure\Database\SQLite\QueryBuilder\SQLiteInsertQueryBuilder;
 use ChronicleKeeper\Shared\Infrastructure\Database\SQLite\QueryBuilder\SQLiteSelectQueryBuilder;
 use ChronicleKeeper\Shared\Infrastructure\Database\SQLite\QueryBuilder\SQLiteUpdateQueryBuilder;
 use ChronicleKeeper\Shared\Infrastructure\Database\SQLite\SQLiteQueryBuilderFactory;
-use ChronicleKeeper\Test\Shared\Infrastructure\Database\DatabasePlatformMock;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\Attributes\Test;
@@ -23,8 +23,7 @@ final class SQLiteQueryBuilderFactoryTest extends TestCase
 
     protected function setUp(): void
     {
-        $databasePlatform = new DatabasePlatformMock();
-        $this->factory    = new SQLiteQueryBuilderFactory($databasePlatform);
+        $this->factory = new SQLiteQueryBuilderFactory(self::createStub(DatabasePlatform::class));
     }
 
     #[Test]

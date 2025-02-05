@@ -11,7 +11,7 @@ final class GeneratorRequestProvider extends DefaultSchemaProvider
 {
     public function createSchema(DatabasePlatform $platform): void
     {
-        $platform->query(<<<'SQL'
+        $platform->executeRaw(<<<'SQL'
             CREATE TABLE generator_requests (
                 id TEXT PRIMARY KEY,
                 title TEXT NOT NULL,

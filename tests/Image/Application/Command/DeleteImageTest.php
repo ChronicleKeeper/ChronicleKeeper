@@ -6,22 +6,45 @@ namespace ChronicleKeeper\Test\Image\Application\Command;
 
 use ChronicleKeeper\Image\Application\Command\DeleteImage;
 use ChronicleKeeper\Image\Application\Command\DeleteImageHandler;
-use ChronicleKeeper\Image\Application\Command\DeleteImageVectors;
+use ChronicleKeeper\Image\Application\Command\StoreImage;
+use ChronicleKeeper\Image\Application\Command\StoreImageVectors;
 use ChronicleKeeper\Image\Domain\Event\ImageDeleted;
 use ChronicleKeeper\Test\Image\Domain\Entity\ImageBuilder;
-use ChronicleKeeper\Test\Shared\Infrastructure\Database\DatabasePlatformMock;
+use ChronicleKeeper\Test\Image\Domain\Entity\VectorImageBuilder;
+use ChronicleKeeper\Test\Shared\Infrastructure\Database\SQLite\DatabaseTestCase;
+use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\Small;
+use PHPUnit\Framework\Attributes\Large;
 use PHPUnit\Framework\Attributes\Test;
-use PHPUnit\Framework\TestCase;
-use Symfony\Component\Messenger\Envelope;
-use Symfony\Component\Messenger\MessageBusInterface;
+
+use function assert;
 
 #[CoversClass(DeleteImage::class)]
 #[CoversClass(DeleteImageHandler::class)]
-#[Small]
-class DeleteImageTest extends TestCase
+#[Large]
+class DeleteImageTest extends DatabaseTestCase
 {
+    private DeleteImageHandler $handler;
+
+    #[Override]
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $handler = self::getContainer()->get(DeleteImageHandler::class);
+        assert($handler instanceof DeleteImageHandler);
+
+        $this->handler = $handler;
+    }
+
+    #[Override]
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        unset($this->handler);
+    }
+
     #[Test]
     public function itHasACreatableCommand(): void
     {
@@ -34,28 +57,24 @@ class DeleteImageTest extends TestCase
     #[Test]
     public function itWilLDeleteAllImagesWithTheirEmbeddings(): void
     {
-        $image = (new ImageBuilder())->withId('065abf19-0d7d-44a0-9b24-ad2f1ee88320')->build();
+        // ------------------- The test setup -------------------
 
-        $bus = $this->createMock(MessageBusInterface::class);
-        $bus->expects($this->once())
-            ->method('dispatch')
-            ->willReturnCallback(static function (object $message) use ($image): Envelope {
-                self::assertInstanceOf(DeleteImageVectors::class, $message);
-                self::assertSame($image->getId(), $message->imageId);
+        $image = (new ImageBuilder())->build();
+        $this->bus->dispatch(new StoreImage($image));
 
-                return new Envelope($message);
-            });
+        $imageVectors = (new VectorImageBuilder())->withImage($image)->build();
+        $this->bus->dispatch(new StoreImageVectors($imageVectors));
 
-        $databasePlatform = new DatabasePlatformMock();
-        $handler          = new DeleteImageHandler($databasePlatform, $bus);
-        $result           = $handler(new DeleteImage($image));
+        // ------------------- The test execution -------------------
 
-        $databasePlatform->assertExecutedQuery(
-            'DELETE FROM images WHERE id = :id',
-            ['id' => '065abf19-0d7d-44a0-9b24-ad2f1ee88320'],
-        );
+        $result = ($this->handler)(new DeleteImage($image));
+
+        // ------------------- The test assertions -------------------
 
         self::assertCount(1, $result->getEvents());
         self::assertInstanceOf(ImageDeleted::class, $result->getEvents()[0]);
+
+        $this->assertTableIsEmpty('images');
+        $this->assertTableIsEmpty('images_vectors');
     }
 }

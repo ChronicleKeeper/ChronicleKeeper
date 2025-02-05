@@ -29,6 +29,8 @@ trait WhereClauseBuilder
 
         if ($operator === 'IN' && is_array($value)) {
             $this->addInCondition($column, $paramName, $value);
+        } elseif ($operator === 'NOT IN' && is_array($value)) {
+            $this->addInCondition($column, $paramName, $value, true);
         } else {
             $this->addSimpleCondition($column, $operator, $paramName, $value);
         }
@@ -56,7 +58,7 @@ trait WhereClauseBuilder
 
     private function validateOperator(string $operator): void
     {
-        $validOperators = ['=', '!=', '<', '<=', '>', '>=', 'LIKE', 'IN'];
+        $validOperators = ['=', '!=', '<', '<=', '>', '>=', 'LIKE', 'IN', 'NOT IN', 'MATCH'];
         if (! in_array(strtoupper(trim($operator)), $validOperators, true)) {
             throw new InvalidArgumentException('Invalid operator: ' . $operator);
         }
@@ -68,13 +70,19 @@ trait WhereClauseBuilder
     }
 
     /** @param array<int, string> $values */
-    private function addInCondition(string $column, string $paramName, array $values): void
+    private function addInCondition(string $column, string $paramName, array $values, bool $not = false): void
     {
         $placeholders = [];
         foreach ($values as $i => $value) {
             $itemParam                    = sprintf('%s_%d', $paramName, $i);
             $placeholders[]               = ':' . $itemParam;
             $this->parameters[$itemParam] = $value;
+        }
+
+        if ($not === true) {
+            $this->conditions[] = sprintf('%s NOT IN (%s)', $column, implode(',', $placeholders));
+
+            return;
         }
 
         $this->conditions[] = sprintf('%s IN (%s)', $column, implode(',', $placeholders));

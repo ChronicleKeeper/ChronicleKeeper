@@ -16,16 +16,17 @@ class StoreGeneratorResultHandler
 
     public function __invoke(StoreGeneratorResult $request): void
     {
-        $this->platform->insertOrUpdate(
-            'generator_results',
-            [
+        $this->platform->createQueryBuilder()->createInsert()
+            ->asReplace()
+            ->insert('generator_results')
+            ->values([
                 'id'             => $request->generatorResult->id,
                 'generatorRequest' => $request->requestId,
                 'encodedImage'   => $request->generatorResult->encodedImage,
                 'revisedPrompt'  => $request->generatorResult->revisedPrompt,
                 'mimeType'       => $request->generatorResult->mimeType,
-                'image'          => $request->generatorResult->image,
-            ],
-        );
+                'image'          => $request->generatorResult->image?->getId(),
+            ])
+            ->execute();
     }
 }

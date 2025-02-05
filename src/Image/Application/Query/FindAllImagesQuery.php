@@ -21,12 +21,15 @@ class FindAllImagesQuery implements Query
     ) {
     }
 
-    /** @return list<Image> */
+    /** @return array<int, Image> */
     public function query(QueryParameters $parameters): array
     {
         assert($parameters instanceof FindAllImages);
 
-        $images = $this->databasePlatform->fetch('SELECT * FROM images ORDER BY title');
+        $images = $this->databasePlatform->createQueryBuilder()->createSelect()
+            ->from('images')
+            ->orderBy('title')
+            ->fetchAll();
 
         return array_map(
             fn (array $image) => $this->denormalizer->denormalize($image, Image::class),

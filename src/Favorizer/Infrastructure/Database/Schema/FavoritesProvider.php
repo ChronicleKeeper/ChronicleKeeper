@@ -12,13 +12,12 @@ final class FavoritesProvider extends DefaultSchemaProvider
     public function createSchema(DatabasePlatform $platform): void
     {
         // Create table for targets
-        $platform->query(
+        $platform->executeRaw(
             <<<'SQL'
             CREATE TABLE favorites (
                 id TEXT PRIMARY KEY,
                 title TEXT NOT NULL,
                 type TEXT NOT NULL
-                CHECK(type IN ('ChatConversationTarget', 'LibraryDocumentTarget', 'LibraryImageTarget', 'WorldItemTarget'))
             );
             SQL,
         );

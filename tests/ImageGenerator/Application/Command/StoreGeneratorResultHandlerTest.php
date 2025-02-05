@@ -4,21 +4,46 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Test\ImageGenerator\Application\Command;
 
+use ChronicleKeeper\ImageGenerator\Application\Command\StoreGeneratorRequest;
 use ChronicleKeeper\ImageGenerator\Application\Command\StoreGeneratorResult;
 use ChronicleKeeper\ImageGenerator\Application\Command\StoreGeneratorResultHandler;
-use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
+use ChronicleKeeper\Test\ImageGenerator\Domain\Entity\GeneratorRequestBuilder;
 use ChronicleKeeper\Test\ImageGenerator\Domain\Entity\GeneratorResultBuilder;
+use ChronicleKeeper\Test\Shared\Infrastructure\Database\SQLite\DatabaseTestCase;
+use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\Small;
+use PHPUnit\Framework\Attributes\Large;
 use PHPUnit\Framework\Attributes\Test;
-use PHPUnit\Framework\TestCase;
 use Webmozart\Assert\InvalidArgumentException;
+
+use function assert;
 
 #[CoversClass(StoreGeneratorResultHandler::class)]
 #[CoversClass(StoreGeneratorResult::class)]
-#[Small]
-class StoreGeneratorResultHandlerTest extends TestCase
+#[Large]
+class StoreGeneratorResultHandlerTest extends DatabaseTestCase
 {
+    private StoreGeneratorResultHandler $handler;
+
+    #[Override]
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $handler = self::getContainer()->get(StoreGeneratorResultHandler::class);
+        assert($handler instanceof StoreGeneratorResultHandler);
+
+        $this->handler = $handler;
+    }
+
+    #[Override]
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        unset($this->handler);
+    }
+
     #[Test]
     public function testInvalidRequestId(): void
     {
@@ -32,28 +57,19 @@ class StoreGeneratorResultHandlerTest extends TestCase
     #[Test]
     public function testStoreGeneratorResult(): void
     {
-        $databasePlatform = $this->createMock(DatabasePlatform::class);
+        // ------------------- The test setup -------------------
 
-        $handler = new StoreGeneratorResultHandler($databasePlatform);
-        $request = new StoreGeneratorResult(
-            '67e4e2a2-8afa-4788-83aa-53507cf39e00',
-            (new GeneratorResultBuilder())->build(),
-        );
+        $request = (new GeneratorRequestBuilder())->build();
+        $this->bus->dispatch(new StoreGeneratorRequest($request));
 
-        $databasePlatform->expects($this->once())
-            ->method('insertOrUpdate')
-            ->with(
-                'generator_results',
-                [
-                    'id'             => $request->generatorResult->id,
-                    'generatorRequest' => $request->requestId,
-                    'encodedImage'   => $request->generatorResult->encodedImage,
-                    'revisedPrompt'  => $request->generatorResult->revisedPrompt,
-                    'mimeType'       => $request->generatorResult->mimeType,
-                    'image'          => $request->generatorResult->image,
-                ],
-            );
+        $result = (new GeneratorResultBuilder())->build();
 
-        $handler($request);
+        // ------------------- The test setup -------------------
+
+        ($this->handler)(new StoreGeneratorResult($request->id, $result));
+
+        // ------------------- The test assertions -------------------
+
+        $this->assertRowsInTable('generator_results', 1);
     }
 }

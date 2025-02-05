@@ -35,6 +35,8 @@ use function mt_rand;
 use function range;
 use function reset;
 
+use const JSON_THROW_ON_ERROR;
+
 #[CoversClass(DocumentCreation::class)]
 #[CoversClass(DocumentType::class)]
 #[CoversClass(DirectorySelection::class)]
@@ -139,29 +141,39 @@ class DocumentCreationTest extends WebTestCase
         $fileAccess = $this->client->getContainer()->get(FileAccess::class);
         assert($fileAccess instanceof FileAccessDouble);
 
-        $this->databasePlatform->insert('conversations', [
-            'id' => $conversation->getId(),
-            'title' => $conversation->getTitle(),
-            'directory' => $conversation->getDirectory()->getId(),
-        ]);
+        $this->databasePlatform->createQueryBuilder()->createInsert()
+            ->insert('conversations')
+            ->values([
+                'id' => $conversation->getId(),
+                'title' => $conversation->getTitle(),
+                'directory' => $conversation->getDirectory()->getId(),
+            ])
+            ->execute();
 
-        $this->databasePlatform->insert('conversation_settings', [
-            'conversation_id' => $conversation->getId(),
-            'version' => $conversation->getSettings()->version,
-            'temperature' => $conversation->getSettings()->temperature,
-            'images_max_distance' => $conversation->getSettings()->imagesMaxDistance,
-            'documents_max_distance' => $conversation->getSettings()->imagesMaxDistance,
-        ]);
+        $this->databasePlatform->createQueryBuilder()->createInsert()
+            ->insert('conversation_settings')
+            ->values([
+                'conversation_id' => $conversation->getId(),
+                'version' => $conversation->getSettings()->version,
+                'temperature' => $conversation->getSettings()->temperature,
+                'images_max_distance' => $conversation->getSettings()->imagesMaxDistance,
+                'documents_max_distance' => $conversation->getSettings()->imagesMaxDistance,
+            ])
+            ->execute();
 
         assert($message->message instanceof AssistantMessage);
-        $this->databasePlatform->insert('conversation_messages', [
-            'id' => $message->id,
-            'conversation_id' => $conversation->getId(),
-            'role' => $message->message->getRole()->value,
-            'content' => $message->message->content,
-            'context' => '{}',
-            'debug' => '{}',
-        ]);
+
+        $this->databasePlatform->createQueryBuilder()->createInsert()
+            ->insert('conversation_messages')
+            ->values([
+                'id' => $message->id,
+                'conversation_id' => $conversation->getId(),
+                'role' => $message->message->getRole()->value,
+                'content' => $message->message->content,
+                'context' => '{}',
+                'debug' => '{}',
+            ])
+            ->execute();
 
         $this->client->request(
             Request::METHOD_GET,
@@ -202,7 +214,7 @@ class DocumentCreationTest extends WebTestCase
         $fileAccess->write(
             'temp',
             'conversation_temporary.json',
-            (string) json_encode($conversation),
+            json_encode($conversation, JSON_THROW_ON_ERROR),
         );
 
         $this->client->request(

@@ -4,45 +4,67 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Test\Shared\Infrastructure\Database\SQLite\QueryBuilder;
 
+use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
 use ChronicleKeeper\Shared\Infrastructure\Database\SQLite\QueryBuilder\SQLiteUpdateQueryBuilder;
-use ChronicleKeeper\Test\Shared\Infrastructure\Database\DatabasePlatformMock;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(SQLiteUpdateQueryBuilder::class)]
 #[Small]
 final class SQLiteUpdateQueryBuilderTest extends TestCase
 {
-    private DatabasePlatformMock $databasePlatform;
+    private DatabasePlatform&MockObject $databasePlatform;
     private SQLiteUpdateQueryBuilder $builder;
 
     protected function setUp(): void
     {
-        $this->databasePlatform = new DatabasePlatformMock();
+        $this->databasePlatform = $this->createMock(DatabasePlatform::class);
         $this->builder          = new SQLiteUpdateQueryBuilder($this->databasePlatform);
+    }
+
+    protected function tearDown(): void
+    {
+        unset($this->databasePlatform, $this->builder);
     }
 
     #[Test]
     public function itBuildsBasicUpdateQuery(): void
     {
+        $this->databasePlatform
+            ->expects($this->once())
+            ->method('query')
+            ->with(
+                'UPDATE users SET name = :name WHERE id = :id_1',
+                ['name' => 'John Doe', 'id_1' => 1],
+            );
+
         $this->builder
             ->update('users')
             ->set(['name' => 'John Doe'])
             ->where('id', '=', 1);
 
         $this->builder->execute();
-
-        $this->databasePlatform->assertExecutedQuery(
-            'UPDATE users SET name = :name WHERE id = :id_1',
-            ['name' => 'John Doe', 'id_1' => 1],
-        );
     }
 
     #[Test]
     public function itUpdatesMultipleColumns(): void
     {
+        $this->databasePlatform
+            ->expects($this->once())
+            ->method('query')
+            ->with(
+                'UPDATE users SET name = :name, email = :email, active = :active WHERE id = :id_1',
+                [
+                    'name' => 'John Doe',
+                    'email' => 'john@example.com',
+                    'active' => true,
+                    'id_1' => 1,
+                ],
+            );
+
         $this->builder
             ->update('users')
             ->set([
@@ -53,21 +75,23 @@ final class SQLiteUpdateQueryBuilderTest extends TestCase
             ->where('id', '=', 1);
 
         $this->builder->execute();
-
-        $this->databasePlatform->assertExecutedQuery(
-            'UPDATE users SET name = :name, email = :email, active = :active WHERE id = :id_1',
-            [
-                'name' => 'John Doe',
-                'email' => 'john@example.com',
-                'active' => true,
-                'id_1' => 1,
-            ],
-        );
     }
 
     #[Test]
     public function itHandlesNullValues(): void
     {
+        $this->databasePlatform
+            ->expects($this->once())
+            ->method('query')
+            ->with(
+                'UPDATE users SET deleted_at = :deleted_at, name = :name WHERE id = :id_1',
+                [
+                    'deleted_at' => null,
+                    'name' => 'John Doe',
+                    'id_1' => 1,
+                ],
+            );
+
         $this->builder
             ->update('users')
             ->set([
@@ -77,20 +101,23 @@ final class SQLiteUpdateQueryBuilderTest extends TestCase
             ->where('id', '=', 1);
 
         $this->builder->execute();
-
-        $this->databasePlatform->assertExecutedQuery(
-            'UPDATE users SET deleted_at = :deleted_at, name = :name WHERE id = :id_1',
-            [
-                'deleted_at' => null,
-                'name' => 'John Doe',
-                'id_1' => 1,
-            ],
-        );
     }
 
     #[Test]
     public function itHandlesMultipleWhereConditions(): void
     {
+        $this->databasePlatform
+            ->expects($this->once())
+            ->method('query')
+            ->with(
+                'UPDATE users SET status = :status WHERE last_login < :last_login_1 AND active = :active_2',
+                [
+                    'status' => 'inactive',
+                    'last_login_1' => '2024-01-01',
+                    'active_2' => true,
+                ],
+            );
+
         $this->builder
             ->update('users')
             ->set(['status' => 'inactive'])
@@ -98,14 +125,5 @@ final class SQLiteUpdateQueryBuilderTest extends TestCase
             ->where('active', '=', true);
 
         $this->builder->execute();
-
-        $this->databasePlatform->assertExecutedQuery(
-            'UPDATE users SET status = :status WHERE last_login < :last_login_1 AND active = :active_2',
-            [
-                'status' => 'inactive',
-                'last_login_1' => '2024-01-01',
-                'active_2' => true,
-            ],
-        );
     }
 }

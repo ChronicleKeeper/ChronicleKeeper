@@ -4,22 +4,45 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Test\ImageGenerator\Application\Query;
 
+use ChronicleKeeper\ImageGenerator\Application\Command\StoreGeneratorRequest;
 use ChronicleKeeper\ImageGenerator\Application\Query\GetGeneratorRequest;
 use ChronicleKeeper\ImageGenerator\Application\Query\GetGeneratorRequestQuery;
-use ChronicleKeeper\ImageGenerator\Domain\Entity\GeneratorRequest;
-use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
+use ChronicleKeeper\Test\ImageGenerator\Domain\Entity\GeneratorRequestBuilder;
+use ChronicleKeeper\Test\Shared\Infrastructure\Database\SQLite\DatabaseTestCase;
+use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\Small;
+use PHPUnit\Framework\Attributes\Large;
 use PHPUnit\Framework\Attributes\Test;
-use PHPUnit\Framework\TestCase;
-use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Webmozart\Assert\InvalidArgumentException;
+
+use function assert;
 
 #[CoversClass(GetGeneratorRequestQuery::class)]
 #[CoversClass(GetGeneratorRequest::class)]
-#[Small]
-class GetGeneratorRequestQueryTest extends TestCase
+#[Large]
+class GetGeneratorRequestQueryTest extends DatabaseTestCase
 {
+    private GetGeneratorRequestQuery $query;
+
+    #[Override]
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $query = self::getContainer()->get(GetGeneratorRequestQuery::class);
+        assert($query instanceof GetGeneratorRequestQuery);
+
+        $this->query = $query;
+    }
+
+    #[Override]
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        unset($this->query);
+    }
+
     #[Test]
     public function correctQueryClassIsliked(): void
     {
@@ -41,28 +64,18 @@ class GetGeneratorRequestQueryTest extends TestCase
     #[Test]
     public function theGeneratorRequestIsBuild(): void
     {
-        $identifier = '4a1edd39-2787-4833-854b-12db27479efb';
+        // ------------------- The test setup -------------------
 
-        $databasePlatform = $this->createMock(DatabasePlatform::class);
-        $databasePlatform->expects($this->once())
-            ->method('fetchSingleRow')
-            ->with('SELECT * FROM generator_requests WHERE id = :id', ['id' => $identifier])
-            ->willReturn(['title' => 'foo', 'userInput' => '{}']);
+        $generatorRequest = (new GeneratorRequestBuilder())->build();
+        $this->bus->dispatch(new StoreGeneratorRequest($generatorRequest));
 
-        $denormalizer = $this->createMock(DenormalizerInterface::class);
-        $denormalizer
-            ->expects($this->once())
-            ->method('denormalize')
-            ->willReturnCallback(static function (array $data, string $target): GeneratorRequest {
-                self::assertSame(GeneratorRequest::class, $target);
+        // ------------------- Execute tests --------------------
 
-                self::assertSame('foo', $data['title']);
-                self::assertIsArray($data['userInput']);
+        $result = $this->query->query(new GetGeneratorRequest($generatorRequest->id));
 
-                return self::createStub(GeneratorRequest::class);
-            });
+        // ------------------- The test assertions -------------------
 
-        (new GetGeneratorRequestQuery($denormalizer, $databasePlatform))
-            ->query(new GetGeneratorRequest($identifier));
+        self::assertSame($generatorRequest->id, $result->id);
+        self::assertSame($generatorRequest->prompt?->prompt, $result->prompt?->prompt);
     }
 }

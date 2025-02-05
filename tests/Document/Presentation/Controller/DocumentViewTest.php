@@ -30,13 +30,16 @@ class DocumentViewTest extends WebTestCase
         parent::setUp();
 
         $this->fixtureDocument = (new DocumentBuilder())->build();
-        $this->databasePlatform->insert('documents', [
-            'id'    => $this->fixtureDocument->getId(),
-            'title' => $this->fixtureDocument->getTitle(),
-            'content' => $this->fixtureDocument->getContent(),
-            'directory' => $this->fixtureDocument->getDirectory()->getId(),
-            'last_updated' => $this->fixtureDocument->getUpdatedAt()->format('Y-m-d H:i:s'),
-        ]);
+        $this->databasePlatform->createQueryBuilder()->createInsert()
+            ->insert('documents')
+            ->values([
+                'id'          => $this->fixtureDocument->getId(),
+                'title'       => $this->fixtureDocument->getTitle(),
+                'content'     => $this->fixtureDocument->getContent(),
+                'directory'   => $this->fixtureDocument->getDirectory()->getId(),
+                'last_updated' => $this->fixtureDocument->getUpdatedAt()->format('Y-m-d H:i:s'),
+            ])
+            ->execute();
     }
 
     #[Override]

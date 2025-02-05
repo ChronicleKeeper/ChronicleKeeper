@@ -11,7 +11,7 @@ final class ImageVectorProvider extends DefaultSchemaProvider
 {
     public function createSchema(DatabasePlatform $platform): void
     {
-        $platform->query(<<<'SQL'
+        $platform->executeRaw(<<<'SQL'
             create virtual table images_vectors using vec0(
                 image_id text partition key,
                 embedding float[1536] distance_metric=cosine,

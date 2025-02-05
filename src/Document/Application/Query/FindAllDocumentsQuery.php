@@ -21,12 +21,15 @@ class FindAllDocumentsQuery implements Query
     ) {
     }
 
-    /** @return list<Document> */
+    /** @return array<int, Document> */
     public function query(QueryParameters $parameters): array
     {
         assert($parameters instanceof FindAllDocuments);
 
-        $documents = $this->databasePlatform->fetch('SELECT * FROM documents ORDER BY title');
+        $documents = $this->databasePlatform->createQueryBuilder()->createSelect()
+            ->from('documents')
+            ->orderBy('title')
+            ->fetchAll();
 
         return array_map(
             fn (array $document) => $this->denormalizer->denormalize($document, Document::class),

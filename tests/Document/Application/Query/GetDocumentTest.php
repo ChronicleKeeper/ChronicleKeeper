@@ -4,24 +4,46 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Test\Document\Application\Query;
 
+use ChronicleKeeper\Document\Application\Command\StoreDocument;
 use ChronicleKeeper\Document\Application\Query\GetDocument;
 use ChronicleKeeper\Document\Application\Query\GetDocumentQuery;
-use ChronicleKeeper\Document\Domain\Entity\Document;
 use ChronicleKeeper\Test\Document\Domain\Entity\DocumentBuilder;
-use ChronicleKeeper\Test\Shared\Infrastructure\Database\DatabasePlatformMock;
+use ChronicleKeeper\Test\Shared\Infrastructure\Database\SQLite\DatabaseTestCase;
+use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\Small;
+use PHPUnit\Framework\Attributes\Large;
 use PHPUnit\Framework\Attributes\Test;
-use PHPUnit\Framework\TestCase;
-use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
+
+use function assert;
 
 #[CoversClass(GetDocument::class)]
 #[CoversClass(GetDocumentQuery::class)]
-#[Small]
-class GetDocumentTest extends TestCase
+#[Large]
+class GetDocumentTest extends DatabaseTestCase
 {
+    private GetDocumentQuery $query;
+
+    #[Override]
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $query = self::getContainer()->get(GetDocumentQuery::class);
+        assert($query instanceof GetDocumentQuery);
+
+        $this->query = $query;
+    }
+
+    #[Override]
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        unset($this->query);
+    }
+
     #[Test]
-    public function queryIsCorrect(): void
+    public function itHasTheCorrectQueryClass(): void
     {
         $query = new GetDocument('fef8517b-6ffe-4102-b4e5-5f685764f2be');
 
@@ -30,26 +52,24 @@ class GetDocumentTest extends TestCase
     }
 
     #[Test]
-    public function theQueryIsExectuted(): void
+    public function itIsAbleToQueryTheDocument(): void
     {
-        $denormalizer = $this->createMock(DenormalizerInterface::class);
-        $denormalizer->expects($this->once())
-            ->method('denormalize')
-            ->with(['title' => 'foo'], Document::class)
-            ->willReturn($document = (new DocumentBuilder())->build());
+        // ------------------- The test setup -------------------
 
-        $databasePlatform = new DatabasePlatformMock();
-        $databasePlatform->expectFetch(
-            'SELECT * FROM documents WHERE id = :id',
-            ['id' => $document->getId()],
-            [['title' => 'foo']],
-        );
+        $document = (new DocumentBuilder())
+            ->withId('23d99bcc-9c4f-43b8-872f-55bfed0db605')
+            ->withTitle('Foo Bar Baz')
+            ->build();
 
-        $query = new GetDocumentQuery($denormalizer, $databasePlatform);
+        $this->bus->dispatch(new StoreDocument($document));
 
-        self::assertSame(
-            $document,
-            $query->query(new GetDocument($document->getId())),
-        );
+        // ------------------- The test execution -------------------
+
+        $document = $this->query->query(new GetDocument($document->getId()));
+
+        // ------------------- The test assertions -------------------
+
+        self::assertSame('23d99bcc-9c4f-43b8-872f-55bfed0db605', $document->getId());
+        self::assertSame('Foo Bar Baz', $document->getTitle());
     }
 }

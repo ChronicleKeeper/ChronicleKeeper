@@ -18,15 +18,19 @@ class StoreImageHandler
 
     public function __invoke(StoreImage $command): MessageEventResult
     {
-        $this->databasePlatform->insertOrUpdate('images', [
-            'id' => $command->image->getId(),
-            'title' => $command->image->getTitle(),
-            'mime_type' => $command->image->getMimeType(),
-            'encoded_image' => $command->image->getEncodedImage(),
-            'description' => $command->image->getDescription(),
-            'directory' => $command->image->getDirectory()->getId(),
-            'last_updated' => $command->image->getUpdatedAt()->format('Y-m-d H:i:s'),
-        ]);
+        $this->databasePlatform->createQueryBuilder()->createInsert()
+            ->asReplace()
+            ->insert('images')
+            ->values([
+                'id' => $command->image->getId(),
+                'title' => $command->image->getTitle(),
+                'mime_type' => $command->image->getMimeType(),
+                'encoded_image' => $command->image->getEncodedImage(),
+                'description' => $command->image->getDescription(),
+                'directory' => $command->image->getDirectory()->getId(),
+                'last_updated' => $command->image->getUpdatedAt()->format('Y-m-d H:i:s'),
+            ])
+            ->execute();
 
         return new MessageEventResult($command->image->flushEvents());
     }

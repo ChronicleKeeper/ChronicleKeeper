@@ -40,7 +40,10 @@ class SchemaManager
             $this->platform->beginTransaction();
 
             $providers = iterator_to_array($this->schemaProviders);
-            usort($providers, static fn (SchemaProvider $a, SchemaProvider $b) => $a->getPriority() <=> $b->getPriority());
+            usort($providers, static fn (
+                SchemaProvider $a,
+                SchemaProvider $b,
+            ) => $a->getPriority() <=> $b->getPriority());
 
             foreach ($providers as $schemaProvider) {
                 $this->logger->debug('Creating schema with provider ' . $schemaProvider::class);
@@ -84,7 +87,7 @@ class SchemaManager
 
             $tables = $this->getTables();
             foreach ($tables as $table) {
-                $this->platform->query('DROP TABLE IF EXISTS ' . $table);
+                $this->platform->executeRaw('DROP TABLE IF EXISTS ' . $table);
             }
 
             $this->platform->commit();

@@ -6,55 +6,101 @@ namespace ChronicleKeeper\Test\Document\Application\Command;
 
 use ChronicleKeeper\Document\Application\Command\StoreDocument;
 use ChronicleKeeper\Document\Application\Command\StoreDocumentHandler;
-use ChronicleKeeper\Document\Domain\Entity\Document;
 use ChronicleKeeper\Document\Domain\Event\DocumentRenamed;
 use ChronicleKeeper\Test\Document\Domain\Entity\DocumentBuilder;
-use ChronicleKeeper\Test\Shared\Infrastructure\Database\DatabasePlatformMock;
+use ChronicleKeeper\Test\Shared\Infrastructure\Database\SQLite\DatabaseTestCase;
+use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\Small;
+use PHPUnit\Framework\Attributes\Large;
 use PHPUnit\Framework\Attributes\Test;
-use PHPUnit\Framework\TestCase;
+
+use function assert;
 
 #[CoversClass(StoreDocument::class)]
 #[CoversClass(StoreDocumentHandler::class)]
-#[Small]
-class StoreDocumentTest extends TestCase
+#[Large]
+class StoreDocumentTest extends DatabaseTestCase
 {
-    #[Test]
-    public function commandIsInstantiatable(): void
+    private StoreDocumentHandler $handler;
+
+    #[Override]
+    protected function setUp(): void
     {
-        $document = self::createStub(Document::class);
-        $command  = new StoreDocument($document);
+        parent::setUp();
+
+        $handler = self::getContainer()->get(StoreDocumentHandler::class);
+        assert($handler instanceof StoreDocumentHandler);
+
+        $this->handler = $handler;
+    }
+
+    #[Override]
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        unset($this->handler);
+    }
+
+    #[Test]
+    public function itHasAConstructableCommand(): void
+    {
+        $command = new StoreDocument($document = (new DocumentBuilder())->build());
 
         self::assertSame($document, $command->document);
     }
 
     #[Test]
-    public function documentIsStored(): void
+    public function itEnsuresANonExistentDocumentIsStored(): void
     {
-        $document = (new DocumentBuilder())->build();
-        $handler  = new StoreDocumentHandler($databasePlatform = new DatabasePlatformMock());
-        $handler(new StoreDocument($document));
+        // ------------------- The test setup -------------------
 
-        $databasePlatform->assertExecutedInsert('documents', [
-            'id'          => $document->getId(),
-            'title'       => $document->getTitle(),
-            'content'     => $document->getContent(),
-            'directory'   => $document->getDirectory()->getId(),
-            'last_updated' => $document->getUpdatedAt()->format('Y-m-d H:i:s'),
-        ]);
+        $document = (new DocumentBuilder())
+            ->withId('a89161c0-685c-44de-8bba-09ec863eadf1')
+            ->build();
+
+        // ------------------- The test execution -------------------
+
+        $result = ($this->handler)(new StoreDocument($document));
+
+        // ------------------- The test assertions -------------------
+
+        $events = $result->getEvents();
+        self::assertCount(0, $events); // No events as created with builder
+
+        $this->assertRowsInTable('documents', 1);
     }
 
     #[Test]
-    public function eventsAreReturned(): void
+    public function itEnsuresThatAChangedDocumentCanBeStored(): void
     {
-        $document = (new DocumentBuilder())->build();
+        // ------------------- The test setup -------------------
+
+        $document = (new DocumentBuilder())
+            ->withId('a89161c0-685c-44de-8bba-09ec863eadf1')
+            ->build();
+
+        $this->bus->dispatch(new StoreDocument($document));
+
+        // ------------------- The test execution -------------------
+
         $document->rename('new-name');
 
-        $handler          = new StoreDocumentHandler(new DatabasePlatformMock());
-        $dispatchedEvents = $handler(new StoreDocument($document))->getEvents();
+        $result = ($this->handler)(new StoreDocument($document));
 
-        self::assertNotEmpty($dispatchedEvents);
-        self::assertInstanceOf(DocumentRenamed::class, $dispatchedEvents[0]);
+        // ------------------- The test assertions -------------------
+
+        $events = $result->getEvents();
+        self::assertCount(1, $events);
+        self::assertInstanceOf(DocumentRenamed::class, $events[0]);
+
+        $rawDocument = $this->getRowFromTable(
+            'documents',
+            'id',
+            'a89161c0-685c-44de-8bba-09ec863eadf1',
+        );
+
+        self::assertNotNull($rawDocument);
+        self::assertSame('new-name', $rawDocument['title']);
     }
 }

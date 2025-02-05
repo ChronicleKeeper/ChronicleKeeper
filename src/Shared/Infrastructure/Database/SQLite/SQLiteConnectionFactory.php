@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Shared\Infrastructure\Database\SQLite;
 
+use ChronicleKeeper\Shared\Infrastructure\Database\ConnectionFactory;
 use RuntimeException;
 use SQLite3;
 
@@ -13,7 +14,7 @@ use function substr;
 use const DIRECTORY_SEPARATOR;
 use const PHP_OS_FAMILY;
 
-final class SQLiteConnectionFactory
+final class SQLiteConnectionFactory implements ConnectionFactory
 {
     public function __construct(
         private readonly string $databasePath,

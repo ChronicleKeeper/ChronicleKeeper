@@ -7,17 +7,40 @@ namespace ChronicleKeeper\Test\Image\Application\Command;
 use ChronicleKeeper\Image\Application\Command\StoreImage;
 use ChronicleKeeper\Image\Application\Command\StoreImageHandler;
 use ChronicleKeeper\Test\Image\Domain\Entity\ImageBuilder;
-use ChronicleKeeper\Test\Shared\Infrastructure\Database\DatabasePlatformMock;
+use ChronicleKeeper\Test\Shared\Infrastructure\Database\SQLite\DatabaseTestCase;
+use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\Small;
+use PHPUnit\Framework\Attributes\Large;
 use PHPUnit\Framework\Attributes\Test;
-use PHPUnit\Framework\TestCase;
+
+use function assert;
 
 #[CoversClass(StoreImage::class)]
 #[CoversClass(StoreImageHandler::class)]
-#[Small]
-class StoreImageTest extends TestCase
+#[Large]
+class StoreImageTest extends DatabaseTestCase
 {
+    private StoreImageHandler $handler;
+
+    #[Override]
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $handler = self::getContainer()->get(StoreImageHandler::class);
+        assert($handler instanceof StoreImageHandler);
+
+        $this->handler = $handler;
+    }
+
+    #[Override]
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        unset($this->handler);
+    }
+
     #[Test]
     public function itHasACreatableCommand(): void
     {
@@ -30,22 +53,17 @@ class StoreImageTest extends TestCase
     #[Test]
     public function itWillStoreAnImage(): void
     {
-        $databasePlatform = new DatabasePlatformMock();
+        // ------------------- The test scenario -------------------
 
-        $handler = new StoreImageHandler($databasePlatform);
-        $handler(new StoreImage($image = (new ImageBuilder())->build()));
+        ($this->handler)(new StoreImage($image = (new ImageBuilder())->build()));
 
-        $databasePlatform->assertExecutedInsert(
-            'images',
-            [
-                'id' => $image->getId(),
-                'title' => $image->getTitle(),
-                'mime_type' => $image->getMimeType(),
-                'encoded_image' => $image->getEncodedImage(),
-                'description' => $image->getDescription(),
-                'directory' => $image->getDirectory()->getId(),
-                'last_updated' => $image->getUpdatedAt()->format('Y-m-d H:i:s'),
-            ],
-        );
+        // ------------------- The test assertions -------------------
+
+        $this->assertRowsInTable('images', 1);
+
+        $rawImage = $this->getRowFromTable('images', 'id', $image->getId());
+        self::assertNotNull($rawImage);
+        self::assertSame($rawImage['id'], $image->getId());
+        self::assertSame($rawImage['title'], $image->getTitle());
     }
 }

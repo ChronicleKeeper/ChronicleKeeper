@@ -18,16 +18,17 @@ class StoreDocumentHandler
 
     public function __invoke(StoreDocument $command): MessageEventResult
     {
-        $this->databasePlatform->insertOrUpdate(
-            'documents',
-            [
+        $this->databasePlatform->createQueryBuilder()->createInsert()
+            ->asReplace()
+            ->insert('documents')
+            ->values([
                 'id' => $command->document->getId(),
                 'title' => $command->document->getTitle(),
                 'content' => $command->document->getContent(),
                 'directory' => $command->document->getDirectory()->getId(),
                 'last_updated' => $command->document->getUpdatedAt()->format('Y-m-d H:i:s'),
-            ],
-        );
+            ])
+            ->execute();
 
         return new MessageEventResult($command->document->flushEvents());
     }

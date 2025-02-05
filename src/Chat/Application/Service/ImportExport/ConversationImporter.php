@@ -45,10 +45,7 @@ final readonly class ConversationImporter implements SingleImport
                 $content = $content['data'];
             }
 
-            if (
-                $settings->overwriteLibrary === false
-                && $this->databasePlatform->hasRows('conversations', ['id' => $content['id']])
-            ) {
+            if ($settings->overwriteLibrary === false && $this->hasConversation($content['id'])) {
                 $this->logger->debug(
                     'Conversation already exists in the database, skipping import',
                     ['id' => $content['id']],
@@ -60,5 +57,14 @@ final readonly class ConversationImporter implements SingleImport
             $conversation = $this->denormalizer->denormalize($content, Conversation::class);
             $this->bus->dispatch(new StoreConversation($conversation));
         }
+    }
+
+    private function hasConversation(string $id): bool
+    {
+        return $this->databasePlatform->createQueryBuilder()->createSelect()
+            ->select('id')
+            ->from('conversations')
+            ->where('id', '=', $id)
+            ->fetchOneOrNull() !== null;
     }
 }

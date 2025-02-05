@@ -26,14 +26,14 @@ class SearchSimilarVectorsQuery implements Query
     {
         assert($parameters instanceof SearchSimilarVectors);
 
-        $foundVectors = $this->databasePlatform->fetch(
-            'SELECT document_id, distance, content FROM documents_vectors WHERE embedding match :embedding AND k = :maxResults AND distance < :maxDistance ORDER BY distance',
-            [
-                'embedding' => '[' . implode(',', $parameters->searchedVectors) . ']',
-                'maxDistance' => $parameters->maxDistance,
-                'maxResults' => $parameters->maxResults,
-            ],
-        );
+        $foundVectors = $this->databasePlatform->createQueryBuilder()->createSelect()
+            ->select('document_id', 'distance', 'content')
+            ->from('documents_vectors')
+            ->where('embedding', 'match', '[' . implode(',', $parameters->searchedVectors) . ']')
+            ->where('k', '=', $parameters->maxResults)
+            ->where('distance', '<', $parameters->maxDistance)
+            ->orderBy('distance')
+            ->fetchAll();
 
         $results = [];
         foreach ($foundVectors as $vector) {

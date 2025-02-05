@@ -11,7 +11,7 @@ final class WorldItemProvider extends DefaultSchemaProvider
 {
     public function createSchema(DatabasePlatform $platform): void
     {
-        $platform->query(<<<'SQL'
+        $platform->executeRaw(<<<'SQL'
             CREATE TABLE world_items (
                 id TEXT PRIMARY KEY,
                 type TEXT NOT NULL,
@@ -20,7 +20,7 @@ final class WorldItemProvider extends DefaultSchemaProvider
             );
         SQL);
 
-        $platform->query(<<<'SQL'
+        $platform->executeRaw(<<<'SQL'
             CREATE TABLE world_item_relations (
                 source_world_item_id TEXT NOT NULL,
                 target_world_item_id TEXT NOT NULL,
@@ -32,7 +32,7 @@ final class WorldItemProvider extends DefaultSchemaProvider
         SQL);
 
         // Create junction table for documents
-        $platform->query(<<<'SQL'
+        $platform->executeRaw(<<<'SQL'
         CREATE TABLE world_item_documents (
             world_item_id TEXT NOT NULL,
             document_id TEXT NOT NULL,
@@ -43,7 +43,7 @@ final class WorldItemProvider extends DefaultSchemaProvider
         SQL);
 
         // Create junction table for images
-        $platform->query(<<<'SQL'
+        $platform->executeRaw(<<<'SQL'
             CREATE TABLE world_item_images (
                 world_item_id TEXT NOT NULL,
                 image_id TEXT NOT NULL,
@@ -54,7 +54,7 @@ final class WorldItemProvider extends DefaultSchemaProvider
         SQL);
 
         // Create junction table for conversations
-        $platform->query(<<<'SQL'
+        $platform->executeRaw(<<<'SQL'
             CREATE TABLE world_item_conversations (
                 world_item_id TEXT NOT NULL,
                 conversation_id TEXT NOT NULL,

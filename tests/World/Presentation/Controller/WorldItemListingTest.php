@@ -39,12 +39,15 @@ class WorldItemListingTest extends WebTestCase
             ->withType(ItemType::COUNTRY)
             ->build();
 
-        $this->databasePlatform->insert('world_items', [
-            'id' => $this->item->getId(),
-            'name' => $this->item->getName(),
-            'type' => $this->item->getType()->value,
-            'short_description' => $this->item->getShortDescription(),
-        ]);
+        $this->databasePlatform->createQueryBuilder()->createInsert()
+            ->insert('world_items')
+            ->values([
+                'id' => $this->item->getId(),
+                'name' => $this->item->getName(),
+                'type' => $this->item->getType()->value,
+                'short_description' => $this->item->getShortDescription(),
+            ])
+            ->execute();
     }
 
     #[Override]

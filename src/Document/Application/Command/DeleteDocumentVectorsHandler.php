@@ -17,6 +17,9 @@ class DeleteDocumentVectorsHandler
 
     public function __invoke(DeleteDocumentVectors $command): void
     {
-        $this->platform->query('DELETE FROM documents_vectors WHERE document_id = :id', ['id' => $command->documentId]);
+        $this->platform->createQueryBuilder()->createDelete()
+            ->from('documents_vectors')
+            ->where('document_id', '=', $command->documentId)
+            ->execute();
     }
 }

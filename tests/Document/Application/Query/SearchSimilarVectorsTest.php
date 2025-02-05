@@ -4,24 +4,49 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Test\Document\Application\Query;
 
-use ChronicleKeeper\Document\Application\Query\GetDocument;
+use ChronicleKeeper\Document\Application\Command\StoreDocument;
+use ChronicleKeeper\Document\Application\Command\StoreDocumentVectors;
 use ChronicleKeeper\Document\Application\Query\SearchSimilarVectors;
 use ChronicleKeeper\Document\Application\Query\SearchSimilarVectorsQuery;
-use ChronicleKeeper\Shared\Application\Query\QueryService;
 use ChronicleKeeper\Test\Document\Domain\Entity\DocumentBuilder;
-use ChronicleKeeper\Test\Shared\Infrastructure\Database\DatabasePlatformMock;
+use ChronicleKeeper\Test\Document\Domain\Entity\VectorDocumentBuilder;
+use ChronicleKeeper\Test\Shared\Infrastructure\Database\SQLite\DatabaseTestCase;
+use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\Small;
+use PHPUnit\Framework\Attributes\Large;
 use PHPUnit\Framework\Attributes\Test;
-use PHPUnit\Framework\TestCase;
+
+use function array_fill;
+use function assert;
 
 #[CoversClass(SearchSimilarVectors::class)]
 #[CoversClass(SearchSimilarVectorsQuery::class)]
-#[Small]
-class SearchSimilarVectorsTest extends TestCase
+#[Large]
+class SearchSimilarVectorsTest extends DatabaseTestCase
 {
+    private SearchSimilarVectorsQuery $query;
+
+    #[Override]
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $query = self::getContainer()->get(SearchSimilarVectorsQuery::class);
+        assert($query instanceof SearchSimilarVectorsQuery);
+
+        $this->query = $query;
+    }
+
+    #[Override]
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        unset($this->query);
+    }
+
     #[Test]
-    public function parametersAreInitializable(): void
+    public function itHasConstructableQueryParameters(): void
     {
         $parameters = new SearchSimilarVectors([12.0], 0.5, 10);
 
@@ -33,25 +58,13 @@ class SearchSimilarVectorsTest extends TestCase
     }
 
     #[Test]
-    public function itWillResultInAnEmptyArrayWhenNotResultsFound(): void
+    public function itWillResultInAnEmptyResultWhenThereAreNone(): void
     {
-        $query = new SearchSimilarVectors([12.0], 0.5, 10);
-
-        $queryService = $this->createMock(QueryService::class);
-        $queryService->expects($this->never())->method('query')->willReturn([]);
-
-        $databasePlatform = new DatabasePlatformMock();
-        $databasePlatform->expectAnyFetchWithJustParameters(
-            [
-                'embedding' => '[12]',
-                'maxDistance' => 0.5,
-                'maxResults' => 10,
-            ],
-            [],
-        );
-
-        $searchSimilarVectorsQuery = new SearchSimilarVectorsQuery($databasePlatform, $queryService);
-        $results                   = $searchSimilarVectorsQuery->query($query);
+        $results = $this->query->query(new SearchSimilarVectors(
+            array_fill(0, 1536, 0.0),
+            0.5,
+            10,
+        ));
 
         self::assertEmpty($results);
     }
@@ -59,31 +72,32 @@ class SearchSimilarVectorsTest extends TestCase
     #[Test]
     public function itWillReturnResultsWhenFound(): void
     {
-        $responseDocument = (new DocumentBuilder())->build();
-        $queryService     = $this->createMock(QueryService::class);
-        $queryService->expects($this->once())
-            ->method('query')
-            ->willReturnCallback(
-                static function (GetDocument $query) use ($responseDocument) {
-                    self::assertSame('deafe2a2-4d71-4bf1-9289-64a611adc1ce', $query->id);
+        // ------------------- The test setup -------------------
 
-                    return $responseDocument;
-                },
-            );
+        $document = (new DocumentBuilder())
+            ->withId('4202ef81-3285-4203-9efb-8217f4e93554')
+            ->build();
 
-        $databasePlatform = new DatabasePlatformMock();
-        $databasePlatform->expectAnyFetchWithJustParameters(
-            [
-                'embedding' => '[12]',
-                'maxDistance' => 0.5,
-                'maxResults' => 10,
-            ],
-            [['document_id' => 'deafe2a2-4d71-4bf1-9289-64a611adc1ce', 'distance' => 0.1, 'content' => 'content']],
-        );
+        $vectorDocument = (new VectorDocumentBuilder())
+            ->withDocument($document)
+            ->hasFooVector()
+            ->build();
 
-        $searchSimilarVectorsQuery = new SearchSimilarVectorsQuery($databasePlatform, $queryService);
-        $results                   = $searchSimilarVectorsQuery->query(new SearchSimilarVectors([12.0], 0.5, 10));
+        $this->bus->dispatch(new StoreDocument($document));
+        $this->bus->dispatch(new StoreDocumentVectors($vectorDocument));
 
-        self::assertSame([['document' => $responseDocument, 'content' => 'content', 'distance' => 0.1]], $results);
+        // ------------------- The test execution -------------------
+
+        $results = $this->query->query(new SearchSimilarVectors(
+            $vectorDocument->vector, // Utilize the vector of the document to search the document
+            0.5,
+            10,
+        ));
+
+        // ------------------- The test assertions -------------------
+
+        self::assertCount(1, $results);
+        self::assertSame('4202ef81-3285-4203-9efb-8217f4e93554', $results[0]['document']->getId());
+        self::assertSame(0.0, $results[0]['distance']); // It is totally equal!
     }
 }

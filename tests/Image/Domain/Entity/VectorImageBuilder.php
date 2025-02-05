@@ -8,6 +8,8 @@ use ChronicleKeeper\Image\Domain\Entity\Image;
 use ChronicleKeeper\Library\Infrastructure\VectorStorage\VectorImage;
 use Symfony\Component\Uid\Uuid;
 
+use function array_fill;
+
 class VectorImageBuilder
 {
     private string $id;
@@ -23,7 +25,7 @@ class VectorImageBuilder
         $this->image             = (new ImageBuilder())->build();
         $this->content           = 'Default Content';
         $this->vectorContentHash = 'Default Vector Content Hash';
-        $this->vector            = [1.0, 2.0, 3.0];
+        $this->vector            = array_fill(0, 1536, 0.0);
     }
 
     public function withId(string $id): self

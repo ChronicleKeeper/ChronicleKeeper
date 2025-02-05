@@ -6,18 +6,43 @@ namespace ChronicleKeeper\Test\ImageGenerator\Application\Command;
 
 use ChronicleKeeper\ImageGenerator\Application\Command\DeleteGeneratorRequest;
 use ChronicleKeeper\ImageGenerator\Application\Command\DeleteGeneratorRequestHandler;
-use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
+use ChronicleKeeper\ImageGenerator\Application\Command\StoreGeneratorRequest;
+use ChronicleKeeper\Test\ImageGenerator\Domain\Entity\GeneratorRequestBuilder;
+use ChronicleKeeper\Test\Shared\Infrastructure\Database\SQLite\DatabaseTestCase;
+use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\Small;
+use PHPUnit\Framework\Attributes\Large;
 use PHPUnit\Framework\Attributes\Test;
-use PHPUnit\Framework\TestCase;
 use Webmozart\Assert\InvalidArgumentException;
+
+use function assert;
 
 #[CoversClass(DeleteGeneratorRequestHandler::class)]
 #[CoversClass(DeleteGeneratorRequest::class)]
-#[Small]
-class DeleteGeneratorRequestHandlerTest extends TestCase
+#[Large]
+class DeleteGeneratorRequestHandlerTest extends DatabaseTestCase
 {
+    private DeleteGeneratorRequestHandler $handler;
+
+    #[Override]
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $handler = self::getContainer()->get(DeleteGeneratorRequestHandler::class);
+        assert($handler instanceof DeleteGeneratorRequestHandler);
+
+        $this->handler = $handler;
+    }
+
+    #[Override]
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        unset($this->handler);
+    }
+
     #[Test]
     public function instantiationOfCommandFailsWithNonUuid(): void
     {
@@ -30,27 +55,17 @@ class DeleteGeneratorRequestHandlerTest extends TestCase
     #[Test]
     public function deletionWorksAsExcpected(): void
     {
-        $uuidToDelete     = '30da9c8d-7c80-4404-b8d2-5fa196e9548c';
-        $databasePlatform = $this->createMock(DatabasePlatform::class);
+        // ------------------- The test setup -------------------
 
-        $invoker = $this->exactly(2);
-        $databasePlatform->expects($invoker)
-            ->method('query')
-            ->willReturnCallback(
-                static function (string $query, array $parameters) use ($invoker, $uuidToDelete): void {
-                    if ($invoker->numberOfInvocations() === 1) {
-                        self::assertSame('DELETE FROM generator_results WHERE generatorRequest = :id', $query);
-                        self::assertSame(['id' => $uuidToDelete], $parameters);
+        $request = (new GeneratorRequestBuilder())->build();
+        $this->bus->dispatch(new StoreGeneratorRequest($request));
 
-                        return;
-                    }
+        // ------------------- The test scenario -------------------
 
-                    self::assertSame('DELETE FROM generator_requests WHERE id = :id', $query);
-                    self::assertSame(['id' => $uuidToDelete], $parameters);
-                },
-            );
+        ($this->handler)(new DeleteGeneratorRequest($request->id));
 
-        $handler = new DeleteGeneratorRequestHandler($databasePlatform);
-        $handler(new DeleteGeneratorRequest($uuidToDelete));
+        // ------------------- The test assertions -------------------
+
+        $this->assertTableIsEmpty('generator_requests');
     }
 }

@@ -41,24 +41,22 @@ final readonly class WorldImport implements SingleImport
         $content = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
         $content = $content['data'];
 
-        if (
-            $settings->overwriteLibrary === false
-            && $this->databasePlatform->hasRows('world_items', ['id' => $content['id']])
-        ) {
+        if ($settings->overwriteLibrary === false && $this->hasWorldItem($content['id'])) {
             $this->logger->debug('World item already exists, skipping.', ['item_id' => $content['id']]);
 
             return;
         }
 
-        $this->databasePlatform->insertOrUpdate(
-            'world_items',
-            [
+        $this->databasePlatform->createQueryBuilder()->createInsert()
+            ->asReplace()
+            ->insert('world_items')
+            ->values([
                 'id' => $content['id'],
                 'type' => $content['type'],
                 'name' => $content['name'],
                 'short_description' => $content['shortDescription'],
-            ],
-        );
+            ])
+            ->execute();
 
         foreach ($content['mediaReferences'] as $mediaReference) {
             assert(array_key_exists('type', $mediaReference));
@@ -71,34 +69,39 @@ final readonly class WorldImport implements SingleImport
                 continue;
             }
 
-            $this->databasePlatform->insertOrUpdate(
-                'world_item_relations',
-                [
+            $this->databasePlatform->createQueryBuilder()->createInsert()
+                ->asReplace()
+                ->insert('world_item_relations')
+                ->values([
                     'source_world_item_id' => $content['id'],
                     'target_world_item_id' => $relation['toItem'],
                     'relation_type' => $relation['relationType'],
-                ],
-            );
+                ])
+                ->execute();
         }
     }
 
     private function relationExists(string $fromItem, string $toItem, string $relationType): bool
     {
-        if (
-            $this->databasePlatform->hasRows('world_item_relations', [
-                'source_world_item_id' => $fromItem,
-                'target_world_item_id' => $toItem,
-                'relation_type' => $relationType,
-            ])
-        ) {
+        $fromItemToItem = $this->databasePlatform->createQueryBuilder()->createSelect()
+            ->select('COUNT(*) as count')
+            ->from('world_item_relations')
+            ->where('source_world_item_id', '=', $fromItem)
+            ->where('target_world_item_id', '=', $toItem)
+            ->where('relation_type', '=', $relationType)
+            ->fetchOne()['count'] > 0;
+
+        if ($fromItemToItem) {
             return true;
         }
 
-        return $this->databasePlatform->hasRows('world_item_relations', [
-            'source_world_item_id' => $toItem,
-            'target_world_item_id' => $fromItem,
-            'relation_type' => $relationType,
-        ]);
+        return $this->databasePlatform->createQueryBuilder()->createSelect()
+            ->select('COUNT(*) as count')
+            ->from('world_item_relations')
+            ->where('source_world_item_id', '=', $toItem)
+            ->where('target_world_item_id', '=', $fromItem)
+            ->where('relation_type', '=', $relationType)
+            ->fetchOne()['count'] > 0;
     }
 
     /** @param array<string, mixed> $mediaReference */
@@ -107,10 +110,13 @@ final readonly class WorldImport implements SingleImport
         assert(array_key_exists('type', $mediaReference) && is_string($mediaReference['type']));
 
         if ($mediaReference['type'] === 'document') {
-            $this->databasePlatform->insertOrUpdate(
-                'world_item_documents',
-                $params = ['world_item_id' => $itemId, 'document_id' => $mediaReference['document_id']],
-            );
+            $params = ['world_item_id' => $itemId, 'document_id' => $mediaReference['document_id']];
+
+            $this->databasePlatform->createQueryBuilder()->createInsert()
+                ->asReplace()
+                ->insert('world_item_documents')
+                ->values($params)
+                ->execute();
 
             $this->logger->debug('Imported document media reference.', ['item_id' => $itemId] + $params);
 
@@ -118,10 +124,13 @@ final readonly class WorldImport implements SingleImport
         }
 
         if ($mediaReference['type'] === 'image') {
-            $this->databasePlatform->insertOrUpdate(
-                'world_item_images',
-                $params = ['world_item_id' => $itemId, 'image_id' => $mediaReference['image_id']],
-            );
+            $params = ['world_item_id' => $itemId, 'image_id' => $mediaReference['image_id']];
+
+            $this->databasePlatform->createQueryBuilder()->createInsert()
+                ->asReplace()
+                ->insert('world_item_images')
+                ->values($params)
+                ->execute();
 
             $this->logger->debug('Imported image media reference.', ['world_item_id' => $itemId] + $params);
 
@@ -132,11 +141,22 @@ final readonly class WorldImport implements SingleImport
             return;
         }
 
-        $this->databasePlatform->insertOrUpdate(
-            'world_item_conversations',
-            $params = ['world_item_id' => $itemId, 'conversation_id' => $mediaReference['conversation_id']],
-        );
+        $params = ['world_item_id' => $itemId, 'conversation_id' => $mediaReference['conversation_id']];
+
+        $this->databasePlatform->createQueryBuilder()->createInsert()
+            ->asReplace()
+            ->insert('world_item_conversations')
+            ->values($params)
+            ->execute();
 
         $this->logger->debug('Imported conversation media reference.', ['world_item_id' => $itemId] + $params);
+    }
+
+    private function hasWorldItem(string $id): bool
+    {
+        return $this->databasePlatform->createQueryBuilder()->createSelect()
+            ->from('world_items')
+            ->where('id', '=', $id)
+            ->fetchOneOrNull() !== null;
     }
 }

@@ -33,10 +33,11 @@ class GetWorldItemQuery implements Query
     {
         assert($parameters instanceof GetWorldItem);
 
-        $document = $this->databasePlatform->fetchSingleRow(
-            'SELECT id, type, name, short_description as shortDescription FROM world_items WHERE id = :id',
-            ['id' => $parameters->id],
-        );
+        $document = $this->databasePlatform->createQueryBuilder()->createSelect()
+            ->select('id', 'type', 'name', 'short_description as shortDescription')
+            ->from('world_items')
+            ->where('id', '=', $parameters->id)
+            ->fetchOne();
 
         $item = $this->denormalizer->denormalize($document, Item::class);
         $this->addDocumentReferences($item);
@@ -48,10 +49,11 @@ class GetWorldItemQuery implements Query
 
     private function addDocumentReferences(Item $item): void
     {
-        $documentReferences = $this->databasePlatform->fetch(
-            'SELECT document_id FROM world_item_documents WHERE world_item_id = :id',
-            ['id' => $item->getId()],
-        );
+        $documentReferences = $this->databasePlatform->createQueryBuilder()->createSelect()
+            ->select('document_id')
+            ->from('world_item_documents')
+            ->where('world_item_id', '=', $item->getId())
+            ->fetchAll();
 
         foreach ($documentReferences as $documentReference) {
             try {
@@ -66,10 +68,11 @@ class GetWorldItemQuery implements Query
 
     private function addImageReferences(Item $item): void
     {
-        $imageReferences = $this->databasePlatform->fetch(
-            'SELECT image_id FROM world_item_images WHERE world_item_id = :id',
-            ['id' => $item->getId()],
-        );
+        $imageReferences = $this->databasePlatform->createQueryBuilder()->createSelect()
+            ->select('image_id')
+            ->from('world_item_images')
+            ->where('world_item_id', '=', $item->getId())
+            ->fetchAll();
 
         foreach ($imageReferences as $imageReference) {
             try {
@@ -84,10 +87,11 @@ class GetWorldItemQuery implements Query
 
     private function addConversationReferences(Item $item): void
     {
-        $conversationReferences = $this->databasePlatform->fetch(
-            'SELECT conversation_id FROM world_item_conversations WHERE world_item_id = :id',
-            ['id' => $item->getId()],
-        );
+        $conversationReferences = $this->databasePlatform->createQueryBuilder()->createSelect()
+            ->select('conversation_id')
+            ->from('world_item_conversations')
+            ->where('world_item_id', '=', $item->getId())
+            ->fetchAll();
 
         foreach ($conversationReferences as $conversationReference) {
             try {

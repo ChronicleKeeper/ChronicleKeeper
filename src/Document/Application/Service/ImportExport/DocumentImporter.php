@@ -51,24 +51,31 @@ final readonly class DocumentImporter implements SingleImport
             $content = $content['data'];
         }
 
-        if (
-            $settings->overwriteLibrary === false
-            && $this->databasePlatform->hasRows('documents', ['id' => $content['id']])
-        ) {
+        if ($settings->overwriteLibrary === false && $this->hasDocument($content['id'])) {
             $this->logger->debug('Document already exists, skipping.', ['document_id' => $content['id']]);
 
             return;
         }
 
-        $this->databasePlatform->insertOrUpdate(
-            'documents',
-            [
+        $this->databasePlatform->createQueryBuilder()->createInsert()
+            ->asReplace()
+            ->insert('documents')
+            ->values([
                 'id' => $content['id'],
                 'title' => $content['title'],
                 'content' => $content['content'],
                 'directory' => $content['directory'],
                 'last_updated' => $content['last_updated'],
-            ],
-        );
+            ])
+            ->execute();
+    }
+
+    private function hasDocument(string $id): bool
+    {
+        return $this->databasePlatform->createQueryBuilder()->createSelect()
+            ->select('id')
+            ->from('documents')
+            ->where('id', '=', $id)
+            ->fetchOneOrNull() !== null;
     }
 }

@@ -16,13 +16,14 @@ class StoreItemRelationHandler
 
     public function __invoke(StoreItemRelation $itemRelation): void
     {
-        $this->platform->insertOrUpdate(
-            'world_item_relations',
-            [
+        $this->platform->createQueryBuilder()->createInsert()
+            ->asReplace()
+            ->insert('world_item_relations')
+            ->values([
                 'source_world_item_id' => $itemRelation->sourceItemId,
                 'target_world_item_id' => $itemRelation->targetItemId,
                 'relation_type' => $itemRelation->relationType,
-            ],
-        );
+            ])
+            ->execute();
     }
 }

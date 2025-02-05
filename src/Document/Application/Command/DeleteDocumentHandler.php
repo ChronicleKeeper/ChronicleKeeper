@@ -23,10 +23,10 @@ class DeleteDocumentHandler
     {
         $this->bus->dispatch(new DeleteDocumentVectors($command->document->getId()));
 
-        $this->databasePlatform->query(
-            'DELETE FROM documents WHERE id = :id',
-            ['id' => $command->document->getId()],
-        );
+        $this->databasePlatform->createQueryBuilder()->createDelete()
+            ->from('documents')
+            ->where('id', '=', $command->document->getId())
+            ->execute();
 
         return new MessageEventResult([new DocumentDeleted($command->document)]);
     }

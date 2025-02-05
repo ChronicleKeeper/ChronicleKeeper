@@ -27,9 +27,12 @@ interface SelectQueryBuilder extends BaseQueryBuilder
     /** @param int<1, max> $limit */
     public function limit(int $limit): self;
 
-    /** @return list<array<string, mixed>> */
+    /** @return array<int, array<string, mixed>> */
     public function fetchAll(): array;
 
     /** @return array<string, mixed>|null */
-    public function fetchOne(): array|null;
+    public function fetchOneOrNull(): array|null;
+
+    /** @return array<string, mixed> */
+    public function fetchOne(): array;
 }

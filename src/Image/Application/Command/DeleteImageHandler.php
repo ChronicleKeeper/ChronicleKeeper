@@ -23,10 +23,10 @@ class DeleteImageHandler
     {
         $this->bus->dispatch(new DeleteImageVectors($command->image->getId()));
 
-        $this->databasePlatform->query(
-            'DELETE FROM images WHERE id = :id',
-            ['id' => $command->image->getId()],
-        );
+        $this->databasePlatform->createQueryBuilder()->createDelete()
+            ->from('images')
+            ->where('id', '=', $command->image->getId())
+            ->execute();
 
         return new MessageEventResult([new ImageDeleted($command->image)]);
     }

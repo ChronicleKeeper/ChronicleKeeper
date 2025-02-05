@@ -35,12 +35,15 @@ class WorldItemAutocompleteTest extends WebTestCase
             ->withType(ItemType::COUNTRY)
             ->build();
 
-        $this->databasePlatform->insertOrUpdate('world_items', [
-            'id' => $this->searchableItem->getId(),
-            'name' => $this->searchableItem->getName(),
-            'type' => $this->searchableItem->getType()->value,
-            'short_description' => $this->searchableItem->getShortDescription(),
-        ]);
+        $this->databasePlatform->createQueryBuilder()->createInsert()
+            ->insert('world_items')
+            ->values([
+                'id' => $this->searchableItem->getId(),
+                'name' => $this->searchableItem->getName(),
+                'type' => $this->searchableItem->getType()->value,
+                'short_description' => $this->searchableItem->getShortDescription(),
+            ])
+            ->execute();
     }
 
     #[Override]

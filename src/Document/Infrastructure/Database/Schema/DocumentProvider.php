@@ -11,7 +11,7 @@ final class DocumentProvider extends DefaultSchemaProvider
 {
     public function createSchema(DatabasePlatform $platform): void
     {
-        $platform->query(<<<'SQL'
+        $platform->executeRaw(<<<'SQL'
             CREATE TABLE documents (
                 id TEXT PRIMARY KEY,
                 title TEXT NOT NULL,
@@ -22,12 +22,12 @@ final class DocumentProvider extends DefaultSchemaProvider
             );
         SQL);
 
-        $platform->query(<<<'SQL'
+        $platform->executeRaw(<<<'SQL'
             CREATE INDEX idx_documents_directory
             ON documents (directory);
         SQL);
 
-        $platform->query(<<<'SQL'
+        $platform->executeRaw(<<<'SQL'
             CREATE INDEX idx_documents_last_updated
             ON documents (last_updated);
         SQL);

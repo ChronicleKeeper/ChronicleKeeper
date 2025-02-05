@@ -62,7 +62,7 @@ final class SQLiteSelectQueryBuilder implements SelectQueryBuilder
         return $this;
     }
 
-    /** @return list<array<string, mixed>> */
+    /** @return array<int, array<string, mixed>> */
     public function execute(): array
     {
         return $this->platform->fetch($this->buildQuery(), $this->parameters);
@@ -71,15 +71,20 @@ final class SQLiteSelectQueryBuilder implements SelectQueryBuilder
     /** @inheritDoc */
     public function fetchAll(): array
     {
-        return $this->execute();
+        return $this->platform->fetch($this->buildQuery(), $this->parameters);
     }
 
-    public function fetchOne(): array|null
+    public function fetchOneOrNull(): array|null
     {
-        $this->limit(1);
-        $result = $this->execute();
+        $this->limit = 1;
 
-        return $result[0] ?? null;
+        return $this->platform->fetchOneOrNull($this->buildQuery(), $this->parameters);
+    }
+
+    /** @inheritDoc */
+    public function fetchOne(): array
+    {
+        return $this->platform->fetchOne($this->buildQuery(), $this->parameters);
     }
 
     private function buildQuery(): string

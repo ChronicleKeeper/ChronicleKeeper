@@ -19,14 +19,15 @@ class StoreImageVectorsHandler
 
     public function __invoke(StoreImageVectors $command): void
     {
-        $this->platform->insertOrUpdate(
-            'images_vectors',
-            [
+        $this->platform->createQueryBuilder()->createInsert()
+            ->asReplace()
+            ->insert('images_vectors')
+            ->values([
                 'image_id' => $command->vectorImage->image->getId(),
                 'embedding' => '[' . implode(',', $command->vectorImage->vector) . ']',
                 'content' => $command->vectorImage->content,
                 'vectorContentHash' => $command->vectorImage->vectorContentHash,
-            ],
-        );
+            ])
+            ->execute();
     }
 }

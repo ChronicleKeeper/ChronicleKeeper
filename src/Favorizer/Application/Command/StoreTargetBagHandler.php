@@ -19,18 +19,18 @@ class StoreTargetBagHandler
     public function __invoke(StoreTargetBag $command): void
     {
         // Clear all existing favorites
-        $this->databasePlatform->query('DELETE FROM favorites');
+        $this->databasePlatform->createQueryBuilder()->createDelete()->from('favorites')->execute();
 
         // Store the delivered favorites for next fetching
         foreach ($command->targetBag as $target) {
-            $this->databasePlatform->insert(
-                'favorites',
-                [
+            $this->databasePlatform->createQueryBuilder()->createInsert()
+                ->insert('favorites')
+                ->values([
                     'id' => $target->getId(),
                     'title' => $target->getTitle(),
                     'type' => (new ReflectionClass($target))->getShortName(),
-                ],
-            );
+                ])
+                ->execute();
         }
     }
 }

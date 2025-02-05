@@ -40,11 +40,15 @@ class FavoritesOffcanvasTest extends WebTestCase
         $this->document = (new DocumentBuilder())->withTitle('Foo Bar Baz')->build();
         $this->bus->dispatch(new StoreDocument($this->document));
 
-        $this->databasePlatform->insertOrUpdate('favorites', [
-            'id' => $this->document->getId(),
-            'title' => $this->document->getTitle(),
-            'type' => 'LibraryDocumentTarget',
-        ]);
+        $this->databasePlatform->createQueryBuilder()->createInsert()
+            ->asReplace()
+            ->insert('favorites')
+            ->values([
+                'id' => $this->document->getId(),
+                'title' => $this->document->getTitle(),
+                'type' => 'LibraryDocumentTarget',
+            ])
+            ->execute();
     }
 
     #[Override]

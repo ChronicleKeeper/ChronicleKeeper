@@ -4,93 +4,83 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Test\Document\Application\Query;
 
+use ChronicleKeeper\Document\Application\Command\StoreDocument;
 use ChronicleKeeper\Document\Application\Query\FindAllDocuments;
 use ChronicleKeeper\Document\Application\Query\FindAllDocumentsQuery;
-use ChronicleKeeper\Document\Domain\Entity\Document;
 use ChronicleKeeper\Test\Document\Domain\Entity\DocumentBuilder;
-use ChronicleKeeper\Test\Library\Domain\Entity\DirectoryBuilder;
-use ChronicleKeeper\Test\Shared\Infrastructure\Database\DatabasePlatformMock;
+use ChronicleKeeper\Test\Shared\Infrastructure\Database\SQLite\DatabaseTestCase;
+use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\Small;
+use PHPUnit\Framework\Attributes\Large;
 use PHPUnit\Framework\Attributes\Test;
-use PHPUnit\Framework\TestCase;
-use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
-use UnexpectedValueException;
+
+use function assert;
 
 #[CoversClass(FindAllDocuments::class)]
 #[CoversClass(FindAllDocumentsQuery::class)]
-#[Small]
-class FindAllDocumentsTest extends TestCase
+#[Large]
+class FindAllDocumentsTest extends DatabaseTestCase
 {
-    #[Test]
-    public function parametersAreInitializable(): void
-    {
-        $parameters = new FindAllDocuments();
+    private FindAllDocumentsQuery $query;
 
-        self::assertSame(FindAllDocumentsQuery::class, $parameters->getQueryClass());
+    #[Override]
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $query = self::getContainer()->get(FindAllDocumentsQuery::class);
+        assert($query instanceof FindAllDocumentsQuery);
+
+        $this->query = $query;
+    }
+
+    #[Override]
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        unset($this->query);
     }
 
     #[Test]
-    public function queryWorkingWithoutResults(): void
+    public function itIsSupportingTheCorrectQueryClass(): void
     {
-        $denormalizer = $this->createMock(DenormalizerInterface::class);
-        $denormalizer->expects($this->never())->method('denormalize');
+        self::assertSame(FindAllDocumentsQuery::class, (new FindAllDocuments())->getQueryClass());
+    }
 
-        $databasePlatform = new DatabasePlatformMock();
-        $databasePlatform->expectFetch('SELECT * FROM documents ORDER BY title', [], []);
+    #[Test]
+    public function itIsNotFailingIfDatabaseIsEmpty(): void
+    {
+        $documents = $this->query->query(new FindAllDocuments());
 
-        $query     = new FindAllDocumentsQuery($denormalizer, $databasePlatform);
-        $documents = $query->query(new FindAllDocuments());
-
-        $databasePlatform->assertFetchCount(1);
         self::assertSame([], $documents);
+        $this->assertTableIsEmpty('documents');
     }
 
     #[Test]
-    public function queryWithSortedResults(): void
+    public function isIsReturningSortedResults(): void
     {
-        $databasePlatform = new DatabasePlatformMock();
-        $databasePlatform->expectFetch(
-            'SELECT * FROM documents ORDER BY title',
-            [],
-            [
-                ['title' => 'bar'],
-                ['title' => 'foo'],
-            ],
-        );
+        // ------------------- The test setup -------------------
 
-        $denormalizer = $this->createMock(DenormalizerInterface::class);
-        $denormalizer->expects($this->exactly(2))
-            ->method('denormalize')
-            ->willReturnCallback(
-                static function (array $data, string $class): object {
-                    self::assertSame(Document::class, $class);
+        $aDocument = (new DocumentBuilder())
+            ->withTitle('foo')
+            ->withContent('foo')
+            ->build();
 
-                    $directory = (new DirectoryBuilder())->build();
+        $this->bus->dispatch(new StoreDocument($aDocument));
 
-                    if ($data === ['title' => 'foo']) {
-                        return (new DocumentBuilder())
-                            ->withTitle('foo')
-                            ->withDirectory($directory)
-                            ->withContent('foo')
-                            ->build();
-                    }
+        $bDocument = (new DocumentBuilder())
+            ->withTitle('bar')
+            ->withContent('bar')
+            ->build();
 
-                    if ($data === ['title' => 'bar']) {
-                        return (new DocumentBuilder())
-                            ->withTitle('bar')
-                            ->withDirectory($directory)
-                            ->withContent('bar')
-                            ->build();
-                    }
+        $this->bus->dispatch(new StoreDocument($bDocument));
 
-                    throw new UnexpectedValueException('Unexpected content');
-                },
-            );
+        // ------------------- The test execution -------------------
 
-        $query = new FindAllDocumentsQuery($denormalizer, $databasePlatform);
+        $documents = $this->query->query(new FindAllDocuments());
 
-        $documents = $query->query(new FindAllDocuments());
+        // ------------------- The test assertions -------------------
 
         self::assertCount(2, $documents);
         self::assertSame('bar', $documents[0]->getTitle());

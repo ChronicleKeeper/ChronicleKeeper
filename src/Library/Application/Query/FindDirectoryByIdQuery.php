@@ -29,10 +29,10 @@ final class FindDirectoryByIdQuery implements Query
             return RootDirectory::get();
         }
 
-        $directory = $this->databasePlatform->fetchSingleRow(
-            'SELECT * FROM directories WHERE id = :id',
-            ['id' => $parameters->id],
-        );
+        $directory = $this->databasePlatform->createQueryBuilder()->createSelect()
+            ->from('directories')
+            ->where('id', '=', $parameters->id)
+            ->fetchOne();
 
         return $this->denormalizer->denormalize($directory, Directory::class);
     }
