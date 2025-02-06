@@ -8,7 +8,6 @@ use ChronicleKeeper\ImageGenerator\Domain\Entity\GeneratorResult;
 use ChronicleKeeper\Shared\Application\Query\Query;
 use ChronicleKeeper\Shared\Application\Query\QueryParameters;
 use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 use function assert;
@@ -33,15 +32,7 @@ final readonly class FindAllImagesOfRequestQuery implements Query
 
         $images = [];
         foreach ($files as $file) {
-            try {
-                $images[] = $this->denormalizer->denormalize($file, GeneratorResult::class);
-            } catch (NotFoundHttpException) {
-                // The File could not be converted, maybe the connected image is not existing anymore delete it
-                $this->platform->createQueryBuilder()->createDelete()
-                    ->from('generator_results')
-                    ->where('id', '=', $file['id'])
-                    ->execute();
-            }
+            $images[] = $this->denormalizer->denormalize($file, GeneratorResult::class);
         }
 
         return $images;

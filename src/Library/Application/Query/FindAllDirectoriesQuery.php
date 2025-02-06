@@ -29,7 +29,9 @@ final class FindAllDirectoriesQuery implements Query
     {
         assert($parameters instanceof FindAllDirectories);
 
-        $directories = $this->databasePlatform->fetch('SELECT * FROM directories');
+        $directories = $this->databasePlatform->createQueryBuilder()->createSelect()
+            ->from('directories')
+            ->fetchAll();
 
         $directories = array_map(
             fn (array $directory) => $this->denormalizer->denormalize($directory, Directory::class),

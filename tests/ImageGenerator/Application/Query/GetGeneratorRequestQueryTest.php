@@ -78,4 +78,15 @@ class GetGeneratorRequestQueryTest extends DatabaseTestCase
         self::assertSame($generatorRequest->id, $result->id);
         self::assertSame($generatorRequest->prompt?->prompt, $result->prompt?->prompt);
     }
+
+    #[Test]
+    public function theQueryThrowsAnExceptionIfTheDatabaseHasNoResult(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Generator request with id "49568010-45ea-44fd-ad26-071760660477" not found.');
+
+        // ------------------- Execute tests --------------------
+
+        $this->query->query(new GetGeneratorRequest('49568010-45ea-44fd-ad26-071760660477'));
+    }
 }
