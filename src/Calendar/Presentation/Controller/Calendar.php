@@ -60,9 +60,21 @@ final class Calendar extends AbstractController
             }
 
             $month = count($calendar->getMonths());
-        } elseif ($month > count($calendar->getMonths())) {
+
+            return $this->redirectToRoute(
+                'calendar',
+                ['year' => $year, 'month' => $month],
+            );
+        }
+
+        if ($month > count($calendar->getMonths())) {
             $year++;
             $month = 1;
+
+            return $this->redirectToRoute(
+                'calendar',
+                ['year' => $year, 'month' => $month],
+            );
         }
 
         return $this->render(
