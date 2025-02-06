@@ -7,6 +7,8 @@ namespace ChronicleKeeper\Test\Calendar\Domain\Entity;
 use ChronicleKeeper\Calendar\Domain\Entity\CalendarDate;
 use ChronicleKeeper\Calendar\Domain\Exception\DayNotExistsInMonth;
 use ChronicleKeeper\Calendar\Domain\Exception\MonthNotExists;
+use ChronicleKeeper\Calendar\Domain\Exception\YearIsInvalidInCalendar;
+use ChronicleKeeper\Calendar\Domain\ValueObject\MoonState;
 use ChronicleKeeper\Test\Calendar\Domain\Entity\Fixture\ExampleCalendars;
 use Generator;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -18,9 +20,21 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(CalendarDate::class)]
 #[CoversClass(DayNotExistsInMonth::class)]
 #[CoversClass(MonthNotExists::class)]
+#[CoversClass(YearIsInvalidInCalendar::class)]
 #[Small]
 class CalendarDateTest extends TestCase
 {
+    #[Test]
+    public function itIsAbleToCreateADateInRegularCalendar(): void
+    {
+        $calendar = ExampleCalendars::getOnlyRegularDays();
+        $date     = new CalendarDate($calendar, 1, 3, 10);
+
+        self::assertSame(1, $date->getYear());
+        self::assertSame(3, $date->getMonth());
+        self::assertSame('10', $date->getDay());
+    }
+
     #[Test]
     #[DataProvider('provideDayCalculationCases')]
     public function itCanAddDaysToDate(CalendarDate $sourceDate, int $daysToAdd, string $expectedResult): void
@@ -141,5 +155,295 @@ class CalendarDateTest extends TestCase
         yield 'Last day of the eleventh month of year 1' => [new CalendarDate($calendar, 1, 11, 30), 6];
         yield 'First day of the twelfth month of year 1' => [new CalendarDate($calendar, 1, 12, 1), 7];
         yield 'Last day of the twelfth month of year 1' => [new CalendarDate($calendar, 1, 12, 31), 2];
+    }
+
+    #[Test]
+    #[DataProvider('provideLastDayCases')]
+    public function itIsGivingTheCorrectLastDayOfAMonth(CalendarDate $date, string $expectedDay): void
+    {
+        self::assertSame($expectedDay, $date->getLastDayOfMonth()->format());
+    }
+
+    public static function provideLastDayCases(): Generator
+    {
+        $calendar = ExampleCalendars::getOnlyRegularDays();
+
+        yield 'Last day of january 0 AD in regular day calendar' => [
+            new CalendarDate($calendar, 0, 1, 12),
+            '31. January 0 AD',
+        ];
+
+        yield 'Last day of february 0 AD in regular day calendar' => [
+            new CalendarDate($calendar, 0, 2, 12),
+            '28. February 0 AD',
+        ];
+    }
+
+    #[Test]
+    #[DataProvider('provideFirstDayCases')]
+    public function itIsGivingTheCorrectFirstDayOfAMonth(CalendarDate $date, string $expectedDay): void
+    {
+        self::assertSame($expectedDay, $date->getFirstDayOfMonth()->format());
+    }
+
+    public static function provideFirstDayCases(): Generator
+    {
+        $calendar = ExampleCalendars::getOnlyRegularDays();
+
+        yield 'Last day of january 0 AD in regular day calendar' => [
+            new CalendarDate($calendar, 0, 1, 12),
+            '1. January 0 AD',
+        ];
+
+        yield 'Last day of february 0 AD in regular day calendar' => [
+            new CalendarDate($calendar, 0, 2, 12),
+            '1. February 0 AD',
+        ];
+    }
+
+    #[Test]
+    #[DataProvider('provideDiffInDaysCases')]
+    public function itCalculatesTheDifferenceInDaysBetweenTwoDates(
+        CalendarDate $date,
+        CalendarDate $otherDate,
+        int $expectedDiff,
+    ): void {
+        self::assertSame($expectedDiff, $date->diffInDays($otherDate));
+    }
+
+    public static function provideDiffInDaysCases(): Generator
+    {
+        $calendar = ExampleCalendars::getOnlyRegularDays();
+
+        yield 'Difference between two dates in the same month in regular calendar' => [
+            new CalendarDate($calendar, 0, 1, 1),
+            new CalendarDate($calendar, 0, 1, 5),
+            4,
+        ];
+
+        yield 'Difference between two dates in different months in regular calendar' => [
+            new CalendarDate($calendar, 0, 1, 1),
+            new CalendarDate($calendar, 0, 2, 5),
+            35,
+        ];
+
+        yield 'Difference between two dates in different years in regular calendar' => [
+            new CalendarDate($calendar, 0, 1, 1),
+            new CalendarDate($calendar, 1, 1, 1),
+            365,
+        ];
+    }
+
+    #[Test]
+    #[DataProvider('provideMoonStateCasesWithNonLinearCalendar')]
+    public function itCanCalculateTheCurrentMoonState(CalendarDate $date, MoonState $expectedMoonState): void
+    {
+        self::assertSame($expectedMoonState, $date->getMoonState());
+    }
+
+    public static function provideMoonStateCasesWithNonLinearCalendar(): Generator
+    {
+        $calendar = ExampleCalendars::getOnlyRegularDays();
+
+        yield 'Day 1: New Moon in regular calendar' => [
+            new CalendarDate($calendar, 0, 1, 1),
+            MoonState::NEW_MOON,
+        ];
+
+        yield 'Day 5: Waxing Crescent in regular calendar' => [
+            new CalendarDate($calendar, 0, 1, 5),
+            MoonState::WAXING_CRESCENT,
+        ];
+
+        yield 'Day 7: First Quarter in regular calendar' => [
+            new CalendarDate($calendar, 0, 1, 7),
+            MoonState::FIRST_QUARTER,
+        ];
+
+        yield 'Day 8: First Quarter in regular calendar' => [
+            new CalendarDate($calendar, 0, 1, 8),
+            MoonState::FIRST_QUARTER,
+        ];
+
+        yield 'Day 11: Waxing Gibbous in regular calendar' => [
+            new CalendarDate($calendar, 0, 1, 11),
+            MoonState::WAXING_GIBBOUS,
+        ];
+
+        yield 'Day 15: Full Moon in regular calendar' => [
+            new CalendarDate($calendar, 0, 1, 15),
+            MoonState::FULL_MOON,
+        ];
+
+        yield 'Day 18: Waning Gibbous in regular calendar' => [
+            new CalendarDate($calendar, 0, 1, 18),
+            MoonState::WANING_GIBBOUS,
+        ];
+
+        yield 'Day 22: Last Quarter in regular calendar' => [
+            new CalendarDate($calendar, 0, 1, 22),
+            MoonState::LAST_QUARTER,
+        ];
+
+        yield 'Day 26: Waning Crescent in regular calendar' => [
+            new CalendarDate($calendar, 0, 1, 26),
+            MoonState::WANING_CRESCENT,
+        ];
+
+        yield 'Day 29: New Moon in regular calendar' => [
+            new CalendarDate($calendar, 0, 1, 29),
+            MoonState::NEW_MOON,
+        ];
+    }
+
+    #[Test]
+    #[DataProvider('provideTotalDaysCountCases')]
+    public function itCalculatesTheTotalDaysFromTheStartOfTheCalendar(CalendarDate $date, int $expectedDays): void
+    {
+        self::assertSame($expectedDays, $date->getTotalDaysFromCalendarStart());
+    }
+
+    public static function provideTotalDaysCountCases(): Generator
+    {
+        $calendar = ExampleCalendars::getOnlyRegularDays();
+
+        yield 'First day of the first month of year 0 in regular calendar' => [
+            new CalendarDate($calendar, 0, 1, 1),
+            1,
+        ];
+
+        yield 'Last day of the first month of year 0 in regular calendar' => [
+            new CalendarDate($calendar, 0, 1, 31),
+            31,
+        ];
+
+        yield 'First day of the second month of year 0 in regular calendar' => [
+            new CalendarDate($calendar, 0, 2, 1),
+            32,
+        ];
+
+        yield 'Last day of the second month of year 0 in regular calendar' => [
+            new CalendarDate($calendar, 0, 2, 28),
+            59,
+        ];
+
+        yield 'First day of the third month of year 0 in regular calendar' => [
+            new CalendarDate($calendar, 0, 3, 1),
+            60,
+        ];
+
+        yield 'Last day of the third month of year 0 in regular calendar' => [
+            new CalendarDate($calendar, 0, 3, 31),
+            90,
+        ];
+    }
+
+    #[Test]
+    #[DataProvider('provideSubDaysCases')]
+    public function itCanSubtractDaysFromDate(
+        CalendarDate $sourceDate,
+        int $daysToSubtract,
+        string $expectedResult,
+    ): void {
+        $result = $sourceDate->subDays($daysToSubtract);
+        self::assertSame($expectedResult, $result->format());
+    }
+
+    public static function provideSubDaysCases(): Generator
+    {
+        $calendar = ExampleCalendars::getOnlyRegularDays();
+
+        yield 'Subtract 4 days from the beginning of the year in regular calendar' => [
+            new CalendarDate($calendar, 1, 1, 1),
+            4,
+            '28. December 0 AD',
+        ];
+
+        yield 'Subtract 15 days from the beginning of the year in regular calendar' => [
+            new CalendarDate($calendar, 1, 1, 1),
+            15,
+            '17. December 0 AD',
+        ];
+
+        yield 'Subtract 40 days from the beginning of the year, year changes in regular calendar' => [
+            new CalendarDate($calendar, 1, 1, 1),
+            40,
+            '22. November 0 AD',
+        ];
+
+        yield 'Subtract 365 days from the beginning of the year, year changes in regular calendar' => [
+            new CalendarDate($calendar, 1, 1, 1),
+            365,
+            '1. January 0 AD',
+        ];
+    }
+
+    #[Test]
+    public function itIsNotAbleToSubDaysBeforeCalendarStart(): void
+    {
+        $this->expectException(YearIsInvalidInCalendar::class);
+
+        $calendar = ExampleCalendars::getOnlyRegularDays();
+        $date     = new CalendarDate($calendar, 0, 1, 1);
+        $date->subDays(1);
+    }
+
+    #[Test]
+    public function itIsAbleToCompareToSameDate(): void
+    {
+        $calendar    = ExampleCalendars::getOnlyRegularDays();
+        $date        = new CalendarDate($calendar, 0, 1, 1);
+        $compareDate = new CalendarDate($calendar, 0, 1, 1);
+
+        self::assertNotSame($date, $compareDate);
+        self::assertTrue($date->isSame($compareDate));
+    }
+
+    #[Test]
+    public function itIsAbleToCompareToDifferentDate(): void
+    {
+        $calendar    = ExampleCalendars::getOnlyRegularDays();
+        $date        = new CalendarDate($calendar, 0, 1, 1);
+        $compareDate = new CalendarDate($calendar, 0, 1, 2);
+
+        self::assertNotSame($date, $compareDate);
+        self::assertFalse($date->isSame($compareDate));
+    }
+
+    #[Test]
+    #[DataProvider('provideFirstWeekDayCases')]
+    public function itCanGetTheCorrectFirstDayOfTheWeek(
+        CalendarDate $date,
+        string $expectedDate,
+    ): void {
+        $firstWeekDay = $date->getFirstDayOfWeek();
+
+        self::assertSame(1, $firstWeekDay->getWeekDay()->index);
+        self::assertSame($expectedDate, $firstWeekDay->format());
+    }
+
+    public static function provideFirstWeekDayCases(): Generator
+    {
+        $calendar = ExampleCalendars::getOnlyRegularDays();
+
+        yield 'First day of the regular calendar is also the first weekday' => [
+            new CalendarDate($calendar, 0, 1, 1),
+            '1. January 0 AD',
+        ];
+
+        yield 'Some day in the first week of the regular calendar will return to first day' => [
+            new CalendarDate($calendar, 0, 1, 2),
+            '1. January 0 AD',
+        ];
+
+        yield 'Some random day in the regular calendar year 0 has correct weekday' => [
+            new CalendarDate($calendar, 0, 7, 15),
+            '9. July 0 AD',
+        ];
+
+        yield 'A random day in the regular calendar year 15 has correct weekday' => [
+            new CalendarDate($calendar, 12, 7, 15),
+            '11. July 12 AD',
+        ];
     }
 }

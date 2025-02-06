@@ -12,7 +12,9 @@ use ChronicleKeeper\Calendar\Domain\Exception\MonthNotExists;
 use ChronicleKeeper\Calendar\Domain\Exception\YearHasNotASequentialListOfMonths;
 use ChronicleKeeper\Calendar\Domain\Exception\YearIsNotStartingWithFirstMonth;
 use ChronicleKeeper\Test\Calendar\Domain\Entity\Fixture\ExampleCalendars;
+use Generator;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
@@ -90,5 +92,74 @@ class CalendarTest extends TestCase
     private function getCalendar(): Calendar
     {
         return ExampleCalendars::getFullFeatured();
+    }
+
+    #[Test]
+    #[DataProvider('provideDaysUpToYearCountCases')]
+    public function itCountsDaysUpToYear(Calendar $calendar, int $year, int $expected): void
+    {
+        self::assertSame($expected, $calendar->getDaysUpToYear($year));
+    }
+
+    public static function provideDaysUpToYearCountCases(): Generator
+    {
+        $calendar = ExampleCalendars::getOnlyRegularDays();
+
+        yield 'Year 1 in the regular days calendar' => [$calendar, 1, 365];
+        yield 'Year 2 in the regular days calendar' => [$calendar, 2, 730];
+        yield 'Year 3 in the regular days calendar' => [$calendar, 3, 1095];
+        yield 'Year 4 in the regular days calendar' => [$calendar, 4, 1460];
+    }
+
+    #[Test]
+    #[DataProvider('provideDaysUpToMonthInYearCountCases')]
+    public function itCountsDaysUpToMonthInYear(Calendar $calendar, int $year, int $month, int $expected): void
+    {
+        self::assertSame($expected, $calendar->getDaysUpToMonthInYear($year, $month));
+    }
+
+    public static function provideDaysUpToMonthInYearCountCases(): Generator
+    {
+        $calendar = ExampleCalendars::getOnlyRegularDays();
+
+        yield 'Year 0, Month 1 in the regular days calendar' => [$calendar, 0, 1, 0];
+        yield 'Year 0, Month 2 in the regular days calendar' => [$calendar, 0, 2, 31];
+        yield 'Year 0, Month 3 in the regular days calendar' => [$calendar, 0, 3, 59];
+        yield 'Year 0, Month 7 in the regular days calendar' => [$calendar, 0, 7, 181];
+        yield 'Year 0, Month 8 in the regular days calendar' => [$calendar, 0, 8, 212];
+        yield 'Year 0, Month 10 in the regular days calendar' => [$calendar, 0, 10, 273];
+        yield 'Year 0, Month 12 in the regular days calendar' => [$calendar, 0, 12, 334];
+        yield 'Year 1, Month 1 in the regular days calendar' => [$calendar, 1, 1, 365];
+        yield 'Year 1, Month 5 in the regular days calendar' => [$calendar, 1, 5, 485];
+        yield 'Year 2, Month 1 in the regular days calendar' => [$calendar, 2, 1, 730];
+        yield 'Year 2, Month 4 in the regular days calendar' => [$calendar, 2, 4, 820];
+        yield 'Year 6, Month 1 in the regular days calendar' => [$calendar, 6, 1, 2190];
+        yield 'Year 12, Month 4 in the regular days calendar' => [$calendar, 12, 4, 4470];
+    }
+
+    #[Test]
+    #[DataProvider('provideCountDaysInMonthInYearCases')]
+    public function itCountsDaysInMonthInYear(Calendar $calendar, int $year, int $month, int $expected): void
+    {
+        self::assertSame($expected, $calendar->countDaysInMonth($year, $month));
+    }
+
+    public static function provideCountDaysInMonthInYearCases(): Generator
+    {
+        $calendar = ExampleCalendars::getOnlyRegularDays();
+
+        yield 'Year 0, Month 1 in the regular days calendar' => [$calendar, 0, 1, 31];
+        yield 'Year 0, Month 2 in the regular days calendar' => [$calendar, 0, 2, 28];
+        yield 'Year 0, Month 3 in the regular days calendar' => [$calendar, 0, 3, 31];
+        yield 'Year 0, Month 7 in the regular days calendar' => [$calendar, 0, 7, 31];
+        yield 'Year 0, Month 8 in the regular days calendar' => [$calendar, 0, 8, 31];
+        yield 'Year 0, Month 10 in the regular days calendar' => [$calendar, 0, 10, 31];
+        yield 'Year 0, Month 12 in the regular days calendar' => [$calendar, 0, 12, 31];
+        yield 'Year 1, Month 1 in the regular days calendar' => [$calendar, 1, 1, 31];
+        yield 'Year 1, Month 5 in the regular days calendar' => [$calendar, 1, 5, 31];
+        yield 'Year 2, Month 1 in the regular days calendar' => [$calendar, 2, 1, 31];
+        yield 'Year 2, Month 4 in the regular days calendar' => [$calendar, 2, 4, 30];
+        yield 'Year 6, Month 1 in the regular days calendar' => [$calendar, 6, 1, 31];
+        yield 'Year 12, Month 4 in the regular days calendar' => [$calendar, 12, 4, 30];
     }
 }

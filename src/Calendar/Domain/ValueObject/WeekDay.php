@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ChronicleKeeper\Calendar\Domain\Entity\Calendar;
+namespace ChronicleKeeper\Calendar\Domain\ValueObject;
 
 readonly class WeekDay
 {

@@ -16,6 +16,7 @@ use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(MoonCycle::class)]
+#[CoversClass(MoonState::class)]
 #[Small]
 final class MoonCycleTest extends TestCase
 {

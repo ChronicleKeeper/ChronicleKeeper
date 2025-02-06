@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Calendar\Domain\Entity\Calendar;
 
+use ChronicleKeeper\Calendar\Domain\ValueObject\Epoch;
 use InvalidArgumentException;
 
 use function count;

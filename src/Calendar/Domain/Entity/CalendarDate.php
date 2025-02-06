@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace ChronicleKeeper\Calendar\Domain\Entity;
 
 use ChronicleKeeper\Calendar\Domain\Entity\Calendar\Month;
-use ChronicleKeeper\Calendar\Domain\Entity\Calendar\WeekDay;
 use ChronicleKeeper\Calendar\Domain\Exception\DayNotExistsInMonth;
 use ChronicleKeeper\Calendar\Domain\Exception\MonthNotExists;
 use ChronicleKeeper\Calendar\Domain\Exception\YearIsInvalidInCalendar;
 use ChronicleKeeper\Calendar\Domain\ValueObject\MoonState;
+use ChronicleKeeper\Calendar\Domain\ValueObject\WeekDay;
 
 use function abs;
 use function count;
@@ -54,6 +54,11 @@ class CalendarDate
     public function getDay(): string
     {
         return $this->currentMonth->days->getDay($this->day)->getLabel();
+    }
+
+    public function getCalendar(): Calendar
+    {
+        return $this->calendar;
     }
 
     public function isSame(CalendarDate $calendarDate): bool
@@ -185,7 +190,7 @@ class CalendarDate
         $totalDays = 0;
 
         // Add days from complete months in current year
-        $totalDays += $this->calendar->getDaysUpToMonthInYear($this->year, $this->month - 1);
+        $totalDays += $this->calendar->getDaysUpToMonthInYear($this->year, $this->month);
 
         // Add remaining days in current month
         $totalDays += $this->day;

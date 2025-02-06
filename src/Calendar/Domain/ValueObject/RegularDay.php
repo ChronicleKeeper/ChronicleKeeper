@@ -2,13 +2,15 @@
 
 declare(strict_types=1);
 
-namespace ChronicleKeeper\Calendar\Domain\Entity\Calendar;
+namespace ChronicleKeeper\Calendar\Domain\ValueObject;
 
-class RegularDay implements Day
+use ChronicleKeeper\Calendar\Domain\Entity\Calendar\Day;
+
+final readonly class RegularDay implements Day
 {
     public function __construct(
-        public readonly int $dayOfTheMonth,
-        public readonly int $dayToDisplay,
+        public int $dayOfTheMonth,
+        public int $dayToDisplay,
     ) {
     }
 

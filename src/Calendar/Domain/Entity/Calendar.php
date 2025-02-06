@@ -142,7 +142,7 @@ class Calendar
     {
         if (! isset($this->cachedDaysInMonth[$year][$month])) {
             $days = $this->getDaysUpToYear($year);
-            for ($m = 1; $m <= $month; $m++) {
+            for ($m = 1; $m < $month; $m++) {
                 $days += $this->countDaysInMonth($year, $m);
             }
 

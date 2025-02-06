@@ -7,12 +7,12 @@ namespace ChronicleKeeper\Calendar\Application\Query;
 use ChronicleKeeper\Calendar\Domain\Entity\Calendar;
 use ChronicleKeeper\Calendar\Domain\Entity\Calendar\Configuration;
 use ChronicleKeeper\Calendar\Domain\Entity\Calendar\DayCollection;
-use ChronicleKeeper\Calendar\Domain\Entity\Calendar\Epoch;
 use ChronicleKeeper\Calendar\Domain\Entity\Calendar\EpochCollection;
 use ChronicleKeeper\Calendar\Domain\Entity\Calendar\Month;
 use ChronicleKeeper\Calendar\Domain\Entity\Calendar\MoonCycle;
 use ChronicleKeeper\Calendar\Domain\Entity\Calendar\WeekConfiguration;
-use ChronicleKeeper\Calendar\Domain\Entity\Calendar\WeekDay;
+use ChronicleKeeper\Calendar\Domain\ValueObject\Epoch;
+use ChronicleKeeper\Calendar\Domain\ValueObject\WeekDay;
 use ChronicleKeeper\Shared\Application\Query\Query;
 use ChronicleKeeper\Shared\Application\Query\QueryParameters;
 

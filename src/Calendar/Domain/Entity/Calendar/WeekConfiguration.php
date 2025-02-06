@@ -6,6 +6,7 @@ namespace ChronicleKeeper\Calendar\Domain\Entity\Calendar;
 
 use ChronicleKeeper\Calendar\Domain\Entity\CalendarDate;
 use ChronicleKeeper\Calendar\Domain\Exception\InvalidWeekConfiguration;
+use ChronicleKeeper\Calendar\Domain\ValueObject\WeekDay;
 
 use function abs;
 use function array_combine;
