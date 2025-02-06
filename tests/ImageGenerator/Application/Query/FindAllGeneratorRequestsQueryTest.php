@@ -4,22 +4,44 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Test\ImageGenerator\Application\Query;
 
+use ChronicleKeeper\ImageGenerator\Application\Command\StoreGeneratorRequest;
 use ChronicleKeeper\ImageGenerator\Application\Query\FindAllGeneratorRequests;
 use ChronicleKeeper\ImageGenerator\Application\Query\FindAllGeneratorRequestsQuery;
-use ChronicleKeeper\ImageGenerator\Domain\Entity\GeneratorRequest;
-use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
 use ChronicleKeeper\Test\ImageGenerator\Domain\Entity\GeneratorRequestBuilder;
+use ChronicleKeeper\Test\Shared\Infrastructure\Database\SQLite\DatabaseTestCase;
+use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\Small;
+use PHPUnit\Framework\Attributes\Large;
 use PHPUnit\Framework\Attributes\Test;
-use PHPUnit\Framework\TestCase;
-use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
+
+use function assert;
 
 #[CoversClass(FindAllGeneratorRequestsQuery::class)]
 #[CoversClass(FindAllGeneratorRequests::class)]
-#[Small]
-class FindAllGeneratorRequestsQueryTest extends TestCase
+#[Large]
+class FindAllGeneratorRequestsQueryTest extends DatabaseTestCase
 {
+    private FindAllGeneratorRequestsQuery $query;
+
+    #[Override]
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $query = self::getContainer()->get(FindAllGeneratorRequestsQuery::class);
+        assert($query instanceof FindAllGeneratorRequestsQuery);
+
+        $this->query = $query;
+    }
+
+    #[Override]
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        unset($this->query);
+    }
+
     #[Test]
     public function correctQueryClassIsliked(): void
     {
@@ -32,41 +54,21 @@ class FindAllGeneratorRequestsQueryTest extends TestCase
     #[Test]
     public function isDeliveringFoundGeneratorRequests(): void
     {
-        $databasePlatform = $this->createMock(DatabasePlatform::class);
-        $databasePlatform->expects($this->once())
-            ->method('fetch')
-            ->with('SELECT * FROM generator_requests ORDER BY title')
-            ->willReturn([
-                ['title' => 'foo', 'userInput' => '{"foo": true}'],
-                ['title' => 'bar', 'userInput' => '{"bar": true}'],
-            ]);
+        // ------------------- The test setup -------------------
 
-        $denormalizer        = $this->createMock(DenormalizerInterface::class);
-        $denormalizerInvoker = $this->exactly(2);
-        $denormalizer
-            ->expects($denormalizerInvoker)
-            ->method('denormalize')
-            ->willReturnCallback(
-                static function (array $data, string $target) use ($denormalizerInvoker): GeneratorRequest {
-                    self::assertSame(GeneratorRequest::class, $target);
+        $generatorRequest = (new GeneratorRequestBuilder())->withTitle('foo')->build();
+        $this->bus->dispatch(new StoreGeneratorRequest($generatorRequest));
+        $generatorRequest = (new GeneratorRequestBuilder())->withTitle('bar')->build();
+        $this->bus->dispatch(new StoreGeneratorRequest($generatorRequest));
 
-                    if ($denormalizerInvoker->numberOfInvocations() === 1) {
-                        self::assertSame('foo', $data['title']);
-                        self::assertSame(['foo' => true], $data['userInput']);
+        // ------------------- The actual test -------------------
 
-                        return (new GeneratorRequestBuilder())->withTitle('foo')->build();
-                    }
+        $results = $this->query->query(new FindAllGeneratorRequests());
 
-                    self::assertSame('bar', $data['title']);
-                    self::assertSame(['bar' => true], $data['userInput']);
+        // ------------------- Test Assertions -------------------
 
-                    return (new GeneratorRequestBuilder())->withTitle('bar')->build();
-                },
-            );
-
-        $response = (new FindAllGeneratorRequestsQuery($denormalizer, $databasePlatform))
-            ->query(new FindAllGeneratorRequests());
-
-        self::assertCount(2, $response);
+        self::assertCount(2, $results);
+        self::assertSame('bar', $results[0]->title);
+        self::assertSame('foo', $results[1]->title);
     }
 }

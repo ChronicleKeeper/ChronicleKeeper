@@ -26,14 +26,14 @@ class SearchSimilarImagesQuery implements Query
     {
         assert($parameters instanceof SearchSimilarImages);
 
-        $foundVectors = $this->databasePlatform->fetch(
-            'SELECT image_id, distance, content FROM images_vectors WHERE embedding match :embedding AND k = :maxResults AND distance < :maxDistance ORDER BY distance',
-            [
-                'embedding' => '[' . implode(',', $parameters->searchedVectors) . ']',
-                'maxDistance' => $parameters->maxDistance,
-                'maxResults' => $parameters->maxResults,
-            ],
-        );
+        $foundVectors = $this->databasePlatform->createQueryBuilder()->createSelect()
+            ->select('image_id', 'distance', 'content')
+            ->from('images_vectors')
+            ->where('embedding', 'MATCH', '[' . implode(',', $parameters->searchedVectors) . ']')
+            ->where('k', '=', $parameters->maxResults)
+            ->where('distance', '<', $parameters->maxDistance)
+            ->orderBy('distance')
+            ->fetchAll();
 
         $results = [];
         foreach ($foundVectors as $vector) {

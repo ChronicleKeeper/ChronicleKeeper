@@ -11,7 +11,6 @@ use ChronicleKeeper\World\Domain\Entity\Item;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 use function assert;
-use function implode;
 
 final class SearchWorldItemsQuery implements Query
 {
@@ -26,40 +25,30 @@ final class SearchWorldItemsQuery implements Query
     {
         assert($parameters instanceof SearchWorldItems);
 
-        $query = 'SELECT id, type, name, short_description as shortDescription FROM world_items';
-
-        $queryParameters = [];
-        $addWhere        = [];
+        $queryBuilder = $this->platform->createQueryBuilder()->createSelect()
+            ->select('id', 'type', 'name', 'short_description as shortDescription')
+            ->from('world_items')
+            ->orderBy('name');
 
         if ($parameters->search !== '') {
-            $addWhere[]                = 'name LIKE :search';
-            $queryParameters['search'] = '%' . $parameters->search . '%';
+            $queryBuilder->where('name', 'LIKE', '%' . $parameters->search . '%');
         }
 
         if ($parameters->type !== '') {
-            $addWhere[]              = 'type = :type';
-            $queryParameters['type'] = $parameters->type;
+            $queryBuilder->where('type', '=', $parameters->type);
         }
 
         if ($parameters->exclude !== []) {
-            $addWhere[]                 = 'id NOT IN (:exclude)';
-            $queryParameters['exclude'] = implode(',', $parameters->exclude);
+            $queryBuilder->where('id', 'NOT IN', $parameters->exclude);
         }
-
-        if ($addWhere !== []) {
-            $query .= ' WHERE ' . implode(' AND ', $addWhere);
-        }
-
-        $query .= ' ORDER BY name';
 
         if ($parameters->limit !== -1) {
-            $query                    .= ' ASC LIMIT :limit OFFSET :offset';
-            $queryParameters['limit']  = $parameters->limit;
-            $queryParameters['offset'] = $parameters->offset;
+            $queryBuilder->limit($parameters->limit);
+            $queryBuilder->offset($parameters->offset);
         }
 
         return $this->denormalizer->denormalize(
-            $this->platform->fetch($query, $queryParameters),
+            $queryBuilder->fetchAll(),
             Item::class . '[]',
         );
     }

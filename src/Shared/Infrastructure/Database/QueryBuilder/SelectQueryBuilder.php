@@ -18,14 +18,18 @@ interface SelectQueryBuilder extends BaseQueryBuilder
      */
     public function where(string $column, string $operator, mixed $value): self;
 
+    /** @param list<array{0: string, 1: string, 2: string}> $conditions */
+    public function orWhere(array $conditions): self;
+
     /**
      * @param non-empty-string $column
      * @param 'ASC'|'DESC'     $direction
      */
     public function orderBy(string $column, string $direction = 'ASC'): self;
 
-    /** @param int<1, max> $limit */
     public function limit(int $limit): self;
+
+    public function offset(int $offset): self;
 
     /** @return array<int, array<string, mixed>> */
     public function fetchAll(): array;

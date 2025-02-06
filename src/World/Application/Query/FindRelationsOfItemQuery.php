@@ -26,11 +26,17 @@ class FindRelationsOfItemQuery implements Query
     {
         assert($parameters instanceof FindRelationsOfItem);
 
-        $fromItem     = $parameters->itemid;
-        $rawRelations = $this->platform->fetch(
-            'SELECT source_world_item_id as fromItem, target_world_item_id as toItem, relation_type as relationType FROM world_item_relations WHERE source_world_item_id = :itemId OR target_world_item_id = :itemId',
-            ['itemId' => $fromItem],
-        );
+        $fromItem = $parameters->itemid;
+
+        $rawRelations = $this->platform->createQueryBuilder()->createSelect()
+            ->select(
+                'source_world_item_id as fromItem',
+                'target_world_item_id as toItem',
+                'relation_type as relationType',
+            )
+            ->from('world_item_relations')
+            ->orWhere([['source_world_item_id', '=', $fromItem], ['target_world_item_id', '=', $fromItem]])
+            ->fetchAll();
 
         $relations = [];
         foreach ($rawRelations as $relation) {
