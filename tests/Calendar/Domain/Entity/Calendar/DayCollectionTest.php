@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ChronicleKeeper\Test\Calendar\Domain\Entity\Calendar;
 
 use ChronicleKeeper\Calendar\Domain\Entity\Calendar\DayCollection;
+use ChronicleKeeper\Calendar\Domain\ValueObject\LeapDay;
 use ChronicleKeeper\Calendar\Domain\ValueObject\RegularDay;
 use ChronicleKeeper\Test\Calendar\Domain\Entity\Fixture\ExampleCalendars;
 use Generator;
@@ -14,8 +15,11 @@ use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
+use function sprintf;
+
 #[CoversClass(DayCollection::class)]
 #[CoversClass(RegularDay::class)]
+#[CoversClass(LeapDay::class)]
 #[Small]
 class DayCollectionTest extends TestCase
 {
@@ -33,6 +37,50 @@ class DayCollectionTest extends TestCase
     }
 
     #[Test]
+    public function itWillCalculateTheDaysOnCreationWithMixedDays(): void
+    {
+        $dayCollection = new DayCollection(
+            31,
+            new LeapDay(1, 'First Day'),
+            new LeapDay(15, 'Second Day'),
+        );
+
+        self::assertCount(33, $dayCollection);
+
+        $aRegularDayToTest = $dayCollection->getDay(12);
+        self::assertInstanceOf(RegularDay::class, $aRegularDayToTest);
+        self::assertSame(12, $aRegularDayToTest->getDayOfTheMonth());
+        self::assertSame('11', $aRegularDayToTest->getLabel());
+
+        $aRegularDayToTest = $dayCollection->getDay(33);
+        self::assertInstanceOf(RegularDay::class, $aRegularDayToTest);
+        self::assertSame(33, $aRegularDayToTest->getDayOfTheMonth());
+        self::assertSame('31', $aRegularDayToTest->getLabel());
+
+        $aLeapDayToTest = $dayCollection->getDay(1);
+        self::assertInstanceOf(LeapDay::class, $aLeapDayToTest);
+        self::assertSame(1, $aLeapDayToTest->getDayOfTheMonth());
+        self::assertSame('First Day', $aLeapDayToTest->getLabel());
+
+        $aLeapDayToTest = $dayCollection->getDay(15);
+        self::assertInstanceOf(LeapDay::class, $aLeapDayToTest);
+        self::assertSame(15, $aLeapDayToTest->getDayOfTheMonth());
+        self::assertSame('Second Day', $aLeapDayToTest->getLabel());
+    }
+
+    #[Test]
+    public function itIsAbleToFetchASpecificDayOnADateIgnoringALeapDayFromInterval(): void
+    {
+        $dayCollection = new DayCollection(
+            15,
+            new LeapDay(3, 'First Day', 2),
+        );
+
+        self::assertInstanceOf(RegularDay::class, $dayCollection->getDayInYear(3, 1));
+        self::assertInstanceOf(LeapDay::class, $dayCollection->getDayInYear(3, 2));
+    }
+
+    #[Test]
     #[DataProvider('provideDayCalculationCases')]
     public function itWillGetTheCorrectDayLabelForDayInMonth(
         DayCollection $dayCollection,
@@ -47,15 +95,35 @@ class DayCollectionTest extends TestCase
         $calendar = ExampleCalendars::getOnlyRegularDays();
 
         yield 'Get a regular day in a regular month' => [
-            $calendar->getMonthOfTheYear(1)->days,
+            $calendar->getMonth(1)->days,
             1,
             '1',
         ];
 
         yield 'Get another regular day in a regular month' => [
-            $calendar->getMonthOfTheYear(4)->days,
+            $calendar->getMonth(4)->days,
             5,
             '5',
+        ];
+
+        $calendar = ExampleCalendars::getLinearWithLeapDays();
+
+        yield 'Get a leap day in a month with leap days' => [
+            $calendar->getMonth(1)->days,
+            3,
+            'Mithwinter',
+        ];
+
+        yield 'Get a regular day in a month with leap days' => [
+            $calendar->getMonth(1)->days,
+            4,
+            '3',
+        ];
+
+        yield 'Get another regular day in a month with leap days' => [
+            $calendar->getMonth(7)->days,
+            15,
+            '14',
         ];
     }
 
@@ -68,9 +136,21 @@ class DayCollectionTest extends TestCase
         int $expectedCountInYear,
         int $expectedCountOfRegularDays,
     ): void {
-        self::assertCount($expectedGeneralCount, $dayCollection);
-        self::assertSame($expectedCountInYear, $dayCollection->countInYear($inYear));
-        self::assertSame($expectedCountOfRegularDays, $dayCollection->getRegularDaysCount());
+        self::assertCount(
+            $expectedGeneralCount,
+            $dayCollection,
+            'Total count, utilizing count interface, of days is incorrect',
+        );
+        self::assertSame(
+            $expectedCountInYear,
+            $dayCollection->countInYear($inYear),
+            sprintf('Count of days in year %d is incorrect', $inYear),
+        );
+        self::assertSame(
+            $expectedCountOfRegularDays,
+            $dayCollection->countRegularDays(),
+            'Count of regular days is incorrect',
+        );
     }
 
     public static function provideDayCountCases(): Generator
@@ -78,7 +158,7 @@ class DayCollectionTest extends TestCase
         $calendar = ExampleCalendars::getOnlyRegularDays();
 
         yield 'Get a regular day in a regular month' => [
-            $calendar->getMonthOfTheYear(1)->days,
+            $calendar->getMonth(1)->days,
             1,
             31,
             31,
@@ -86,10 +166,36 @@ class DayCollectionTest extends TestCase
         ];
 
         yield 'Get another regular day in a regular month' => [
-            $calendar->getMonthOfTheYear(4)->days,
+            $calendar->getMonth(4)->days,
             5,
             30,
             30,
+            30,
+        ];
+
+        $calendar = ExampleCalendars::getLinearWithLeapDays();
+
+        yield 'Get a leap day in a month with leap days' => [
+            $calendar->getMonth(1)->days,
+            1,
+            31,
+            31,
+            30,
+        ];
+
+        yield 'Get a leap day in a month with multiple leap days' => [
+            $calendar->getMonth(7)->days,
+            1,
+            32,
+            31,
+            30,
+        ];
+
+        yield 'Get a leap day in a month with multiple leap days in day where leap day is ignored' => [
+            $calendar->getMonth(7)->days,
+            4,
+            32,
+            32,
             30,
         ];
     }

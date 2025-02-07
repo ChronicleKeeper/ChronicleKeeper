@@ -12,6 +12,7 @@ use ChronicleKeeper\Calendar\Domain\Entity\Calendar\Month;
 use ChronicleKeeper\Calendar\Domain\Entity\Calendar\MoonCycle;
 use ChronicleKeeper\Calendar\Domain\Entity\Calendar\WeekConfiguration;
 use ChronicleKeeper\Calendar\Domain\ValueObject\Epoch;
+use ChronicleKeeper\Calendar\Domain\ValueObject\LeapDay;
 use ChronicleKeeper\Calendar\Domain\ValueObject\WeekDay;
 
 class ExampleCalendars
@@ -63,6 +64,58 @@ class ExampleCalendars
             new Month($calendar, 10, 'October', new DayCollection(31)),
             new Month($calendar, 11, 'November', new DayCollection(30)),
             new Month($calendar, 12, 'December', new DayCollection(31)),
+        );
+
+        return $calendar;
+    }
+
+    public static function getLinearWithLeapDays(): Calendar
+    {
+        $calendar = new Calendar(new Configuration(beginsInYear: 0));
+        $calendar->setEpochCollection(new EpochCollection(new Epoch('after the Flood', 0)));
+        $calendar->setMoonCycle(new MoonCycle(30));
+        $calendar->setWeekConfiguration(new WeekConfiguration(
+            new WeekDay(1, 'Firstday'),
+            new WeekDay(2, 'Secondday'),
+            new WeekDay(3, 'Thirdday'),
+            new WeekDay(4, 'Fourthday'),
+            new WeekDay(5, 'Fithday'),
+            new WeekDay(6, 'Sixthday'),
+            new WeekDay(7, 'Seventhday'),
+            new WeekDay(8, 'Eigthday'),
+            new WeekDay(9, 'Ninthday'),
+            new WeekDay(10, 'Tenthday'),
+        ));
+
+        $calendar->setMonths(
+            new Month($calendar, 1, 'Taranis', new DayCollection(
+                30,
+                new LeapDay(3, 'Mithwinter'),
+            )),
+            new Month($calendar, 2, 'Imbolc', new DayCollection(30)),
+            new Month($calendar, 3, 'Brigid', new DayCollection(30)),
+            new Month($calendar, 4, 'Lughnasad', new DayCollection(
+                30,
+                new LeapDay(18, 'Firstseed'),
+            )),
+            new Month($calendar, 5, 'Beltain', new DayCollection(30)),
+            new Month($calendar, 6, 'Litha', new DayCollection(30)),
+            new Month($calendar, 7, 'Arthan', new DayCollection(
+                30,
+                new LeapDay(2, 'Shieldday', yearInterval: 4),
+                new LeapDay(21, 'Midsummer'),
+            )),
+            new Month($calendar, 8, 'Telisias', new DayCollection(30)),
+            new Month($calendar, 9, 'Mabon', new DayCollection(
+                30,
+                new LeapDay(27, 'Highharvest'),
+            )),
+            new Month($calendar, 10, 'Cerun', new DayCollection(30)),
+            new Month($calendar, 11, 'Sawuin', new DayCollection(
+                30,
+                new LeapDay(15, 'Moonfeast'),
+            )),
+            new Month($calendar, 12, 'Nox', new DayCollection(30)),
         );
 
         return $calendar;

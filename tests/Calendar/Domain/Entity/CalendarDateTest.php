@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Test\Calendar\Domain\Entity;
 
+use ChronicleKeeper\Calendar\Domain\Entity\Calendar;
 use ChronicleKeeper\Calendar\Domain\Entity\CalendarDate;
 use ChronicleKeeper\Calendar\Domain\Exception\DayNotExistsInMonth;
 use ChronicleKeeper\Calendar\Domain\Exception\MonthNotExists;
@@ -25,14 +26,66 @@ use PHPUnit\Framework\TestCase;
 class CalendarDateTest extends TestCase
 {
     #[Test]
-    public function itIsAbleToCreateADateInRegularCalendar(): void
+    #[DataProvider('provideDateCreationCases')]
+    public function itIsAbleToCreateADateInRegularCalendar(
+        Calendar $calendar,
+        int $year,
+        int $month,
+        int $day,
+        string $expectedDayLabel,
+    ): void {
+        $date = new CalendarDate($calendar, $year, $month, $day);
+
+        self::assertSame($year, $date->getYear());
+        self::assertSame($month, $date->getMonth());
+        self::assertSame($expectedDayLabel, $date->getDay());
+    }
+
+    public static function provideDateCreationCases(): Generator
     {
         $calendar = ExampleCalendars::getOnlyRegularDays();
-        $date     = new CalendarDate($calendar, 1, 3, 10);
 
-        self::assertSame(1, $date->getYear());
-        self::assertSame(3, $date->getMonth());
-        self::assertSame('10', $date->getDay());
+        yield 'Regular calendar date - some day' => [
+            $calendar,
+            1,
+            3,
+            10,
+            '10',
+        ];
+
+        yield 'Regular calendar date - another some day' => [
+            $calendar,
+            1,
+            2,
+            28,
+            '28',
+        ];
+
+        $calendar = ExampleCalendars::getLinearWithLeapDays();
+
+        yield 'Linear calendar date with leap day' => [
+            $calendar,
+            1,
+            2,
+            29,
+            '29',
+        ];
+
+        yield 'Linear calendar date with leap day - create leap day' => [
+            $calendar,
+            1,
+            1,
+            3,
+            'Mithwinter',
+        ];
+
+        yield 'Linear calendar date with leap day - leap day in non interval year' => [
+            $calendar,
+            2,
+            7,
+            2,
+            '2',
+        ];
     }
 
     #[Test]
@@ -40,29 +93,68 @@ class CalendarDateTest extends TestCase
     public function itCanAddDaysToDate(CalendarDate $sourceDate, int $daysToAdd, string $expectedResult): void
     {
         $result = $sourceDate->addDays($daysToAdd);
+
         self::assertSame($expectedResult, $result->format());
     }
 
     public static function provideDayCalculationCases(): Generator
     {
-        $calendar = ExampleCalendars::getFullFeatured();
+        $calendar = ExampleCalendars::getOnlyRegularDays();
 
-        yield 'Add 4 day to the beginning of the year' => [
+        yield 'Regular Calendar - Add 4 day to the beginning of the year' => [
             new CalendarDate($calendar, 1, 1, 1),
             4,
-            '5. FirstMonth 1 after Boom',
+            '5. January 1 AD',
         ];
 
-        yield 'Add 15 days to the beginning of the year' => [
+        yield 'Regular Calendar - Add 98 days to the beginning of the year' => [
             new CalendarDate($calendar, 1, 1, 1),
-            15,
-            '6. SecondMonth 1 after Boom',
+            98,
+            '9. April 1 AD',
         ];
 
-        yield 'Add 40 days to the beginning of the year, year changes' => [
+        yield 'Regular Calendar - Add 370 days to the beginning of the year, year changes' => [
             new CalendarDate($calendar, 1, 1, 1),
-            40,
-            '6. FirstMonth 2 after Boom',
+            370,
+            '6. January 2 AD',
+        ];
+
+        $calendar = ExampleCalendars::getLinearWithLeapDays();
+
+        yield 'Linear Calendar - Add 4 day to the beginning of the year' => [
+            new CalendarDate($calendar, 1, 1, 1),
+            4,
+            '4. Taranis 1 after the Flood',
+        ];
+
+        yield 'Linear Calendar - Add 2 day to the beginning of the year' => [
+            new CalendarDate($calendar, 1, 1, 1),
+            2,
+            'Mithwinter 1 after the Flood',
+        ];
+
+        yield 'Linear Calendar - Add days to a date and finish on interval inactive leap day' => [
+            new CalendarDate($calendar, 1, 6, 24),
+            8,
+            '2. Arthan 1 after the Flood',
+        ];
+
+        yield 'Linear Calendar - Add days to a date and finish on interval active leap day' => [
+            new CalendarDate($calendar, 4, 6, 24),
+            8,
+            'Shieldday 4 after the Flood',
+        ];
+
+        yield 'Linear Calendar - Add a single day to a interval active leap day' => [
+            new CalendarDate($calendar, 4, 7, 2),
+            1,
+            '2. Arthan 4 after the Flood',
+        ];
+
+        yield 'Linear Calendar - Add two days to a interval active leap day' => [
+            new CalendarDate($calendar, 4, 7, 2),
+            2,
+            '3. Arthan 4 after the Flood',
         ];
     }
 
@@ -73,6 +165,15 @@ class CalendarDateTest extends TestCase
 
         $calendar = ExampleCalendars::getFullFeatured();
         new CalendarDate($calendar, 1, 1, 32);
+    }
+
+    #[Test]
+    public function itFailsCreatingADateAtALeapDayInactiveIntervalYear(): void
+    {
+        $this->expectException(DayNotExistsInMonth::class);
+
+        $calendar = ExampleCalendars::getLinearWithLeapDays();
+        new CalendarDate($calendar, 2, 7, 32);
     }
 
     #[Test]
@@ -91,6 +192,15 @@ class CalendarDateTest extends TestCase
         $date     = new CalendarDate($calendar, 1, 3, 10);
 
         self::assertSame('10. ThirdMonth 1 after Boom', $date->format());
+    }
+
+    #[Test]
+    public function itFormatsALeapDay(): void
+    {
+        $calendar = ExampleCalendars::getLinearWithLeapDays();
+        $date     = new CalendarDate($calendar, 1, 1, 3);
+
+        self::assertSame('Mithwinter 1 after the Flood', $date->format());
     }
 
     #[Test]

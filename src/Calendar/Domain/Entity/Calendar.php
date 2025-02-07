@@ -119,7 +119,7 @@ class Calendar
         return $this->configuration;
     }
 
-    public function getMonthOfTheYear(int $index): Month
+    public function getMonth(int $index): Month
     {
         return $this->months[$index] ?? throw new MonthNotExists($index);
     }
@@ -163,6 +163,6 @@ class Calendar
 
     public function countDaysInMonth(int $year, int $month): int
     {
-        return $this->getMonthOfTheYear($month)->days->countInYear($year);
+        return $this->getMonth($month)->days->countInYear($year);
     }
 }

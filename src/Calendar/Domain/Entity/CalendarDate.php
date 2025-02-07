@@ -8,6 +8,7 @@ use ChronicleKeeper\Calendar\Domain\Entity\Calendar\Month;
 use ChronicleKeeper\Calendar\Domain\Exception\DayNotExistsInMonth;
 use ChronicleKeeper\Calendar\Domain\Exception\MonthNotExists;
 use ChronicleKeeper\Calendar\Domain\Exception\YearIsInvalidInCalendar;
+use ChronicleKeeper\Calendar\Domain\ValueObject\LeapDay;
 use ChronicleKeeper\Calendar\Domain\ValueObject\MoonState;
 use ChronicleKeeper\Calendar\Domain\ValueObject\WeekDay;
 
@@ -31,13 +32,13 @@ class CalendarDate
         }
 
         // Check if month exists in calendar, method throws exception if not exists
-        $this->currentMonth = $this->calendar->getMonthOfTheYear($this->month);
+        $this->currentMonth = $this->calendar->getMonth($this->month);
 
         // Check if day is valid for the given month
-        $maxDaysInMonth = $this->currentMonth->days->count();
+        $maxDaysInMonthOfATheYear = $this->currentMonth->days->countInYear($this->year);
 
-        if ($this->day < 1 || $this->day > $maxDaysInMonth) {
-            throw new DayNotExistsInMonth($this->day, $this->month);
+        if ($this->day < 1 || $this->day > $maxDaysInMonthOfATheYear) {
+            throw new DayNotExistsInMonth($this->year, $this->day, $this->month);
         }
     }
 
@@ -53,7 +54,7 @@ class CalendarDate
 
     public function getDay(): string
     {
-        return $this->currentMonth->days->getDay($this->day)->getLabel();
+        return $this->currentMonth->days->getDayInYear($this->day, $this->year)->getLabel();
     }
 
     public function getCalendar(): Calendar
@@ -70,12 +71,22 @@ class CalendarDate
 
     public function format(): string
     {
-        $currentMonth = $this->calendar->getMonthOfTheYear($this->month);
+        $currentMonth = $this->calendar->getMonth($this->month);
+        $dayToDisplay = $currentMonth->days->getDayInYear($this->day, $this->year);
+
+        if ($dayToDisplay instanceof LeapDay) {
+            return trim(sprintf(
+                '%s %d %s',
+                $dayToDisplay->getLabel(),
+                $this->year,
+                $this->calendar->getEpochCollection()->getEpochForYear($this->year)->name,
+            ));
+        }
 
         return trim(sprintf(
             '%d. %s %d %s',
-            $currentMonth->days->getDay($this->day)->getLabel(),
-            $this->calendar->getMonthOfTheYear($this->month)->name,
+            $dayToDisplay->getLabel(),
+            $this->calendar->getMonth($this->month)->name,
             $this->year,
             $this->calendar->getEpochCollection()->getEpochForYear($this->year)->name,
         ));
@@ -83,7 +94,7 @@ class CalendarDate
 
     public function addDays(int $days): CalendarDate
     {
-        $maxDaysInMonth = $this->calendar->getMonthOfTheYear($this->month)->days->count();
+        $maxDaysInMonth = $this->calendar->getMonth($this->month)->days->count();
 
         // We stay in same month, so all fine
         if ($this->day + $days <= $maxDaysInMonth) {
@@ -92,7 +103,7 @@ class CalendarDate
 
         // We need to move to next month
         try {
-            $nextMonth                = $this->calendar->getMonthOfTheYear($this->month + 1);
+            $nextMonth                = $this->calendar->getMonth($this->month + 1);
             $daysLeftAfterMonthChange = $days - ($maxDaysInMonth - $this->day) - 1;
 
             $monthChangeDate = new CalendarDate($this->calendar, $this->year, $nextMonth->indexInYear, 1);
@@ -101,7 +112,7 @@ class CalendarDate
         } catch (MonthNotExists) {
             // There is no next month, so we have to progress a year and start with the first month
             $nextYear                 = $this->year + 1;
-            $nextMonth                = $this->calendar->getMonthOfTheYear(1);
+            $nextMonth                = $this->calendar->getMonth(1);
             $daysLeftAfterMonthChange = $days - ($maxDaysInMonth - $this->day) - 1;
 
             $yearStartDate = new CalendarDate($this->calendar, $nextYear, $nextMonth->indexInYear, 1);
@@ -118,7 +129,7 @@ class CalendarDate
 
         // We need to move to previous month
         try {
-            $previousMonth            = $this->calendar->getMonthOfTheYear($this->month - 1);
+            $previousMonth            = $this->calendar->getMonth($this->month - 1);
             $daysLeftAfterMonthChange = $days - $this->day;
 
             $monthChangeDate = new CalendarDate(
@@ -132,7 +143,7 @@ class CalendarDate
         } catch (MonthNotExists) {
             // There is no previous month, so we have to go back a year and start with the last month
             $previousYear             = $this->year - 1;
-            $previousMonth            = $this->calendar->getMonthOfTheYear(count($this->calendar->getMonths()));
+            $previousMonth            = $this->calendar->getMonth(count($this->calendar->getMonths()));
             $daysLeftAfterMonthChange = $days - $this->day;
 
             $yearStartDate = new CalendarDate(
@@ -180,7 +191,7 @@ class CalendarDate
 
     public function getLastDayOfMonth(): CalendarDate
     {
-        $maxDaysInMonth = $this->calendar->getMonthOfTheYear($this->month)->days->count();
+        $maxDaysInMonth = $this->calendar->getMonth($this->month)->days->count();
 
         return new CalendarDate($this->calendar, $this->year, $this->month, $maxDaysInMonth);
     }
