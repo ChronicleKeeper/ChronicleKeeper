@@ -23,6 +23,8 @@ final class SQLiteSelectQueryBuilder implements SelectQueryBuilder
     /** @var string[] */
     private array $orderBy = [];
 
+    private bool $isVectorSearch = false;
+
     public function __construct(private readonly DatabasePlatform $platform)
     {
     }
@@ -87,16 +89,44 @@ final class SQLiteSelectQueryBuilder implements SelectQueryBuilder
         return $this->platform->fetchOne($this->buildQuery(), $this->parameters);
     }
 
+    /** @inheritDoc */
+    public function withVectorSearch(
+        string $embeddingColumn,
+        array $vectors,
+        string $distanceColumn,
+        float $maxDistance,
+    ): self {
+        if ($vectors === []) {
+            return $this;
+        }
+
+        $vectorsToString = '[' . implode(',', $vectors) . ']';
+
+        $this->columns[] = sprintf('distance AS %s', $distanceColumn);
+
+        $this->where($embeddingColumn, 'MATCH', $vectorsToString);
+        $this->where($distanceColumn, '<', $maxDistance);
+
+        $this->isVectorSearch = true;
+
+        return $this;
+    }
+
     private function buildQuery(): string
     {
-        $query  = sprintf('SELECT %s FROM %s', implode(', ', $this->columns), $this->table);
+        $query = sprintf('SELECT %s FROM %s', implode(', ', $this->columns), $this->table);
+
+        if ($this->isVectorSearch) {
+            $this->where('k', '=', $this->limit ?? 10);
+        }
+
         $query .= $this->getWhereClause();
 
         if ($this->orderBy !== []) {
             $query .= ' ORDER BY ' . implode(', ', $this->orderBy);
         }
 
-        if ($this->limit !== null) {
+        if ($this->isVectorSearch === false && $this->limit !== null) {
             $query .= sprintf(' LIMIT %d', $this->limit);
         }
 

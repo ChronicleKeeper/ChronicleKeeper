@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Shared;
 
+use ChronicleKeeper\Shared\Infrastructure\DependencyInjection\DatabasePlatformCompilerPass;
 use Override;
 use PhpLlm\LlmChain\Chain\ToolBox\Attribute\AsTool;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
@@ -24,6 +25,11 @@ class Kernel extends BaseKernel
             __DIR__,
             2,
         );
+    }
+
+    protected function build(ContainerBuilder $container): void
+    {
+        $container->addCompilerPass(new DatabasePlatformCompilerPass());
     }
 
     #[Override]

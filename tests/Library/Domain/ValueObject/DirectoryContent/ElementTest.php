@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace ChronicleKeeper\Test\Library\Domain\ValueObject\DirectoryCache;
+namespace ChronicleKeeper\Test\Library\Domain\ValueObject\DirectoryContent;
 
-use ChronicleKeeper\Library\Domain\ValueObject\DirectoryCache\Element;
+use ChronicleKeeper\Library\Domain\ValueObject\DirectoryContent\Element;
 use ChronicleKeeper\Test\Chat\Domain\Entity\ConversationBuilder;
 use ChronicleKeeper\Test\Chat\Domain\Entity\ExtendedMessageBagBuilder;
 use ChronicleKeeper\Test\Document\Domain\Entity\DocumentBuilder;

@@ -11,7 +11,6 @@ use ChronicleKeeper\Shared\Application\Query\QueryService;
 use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
 
 use function assert;
-use function implode;
 
 class SearchSimilarImagesQuery implements Query
 {
@@ -27,11 +26,15 @@ class SearchSimilarImagesQuery implements Query
         assert($parameters instanceof SearchSimilarImages);
 
         $foundVectors = $this->databasePlatform->createQueryBuilder()->createSelect()
-            ->select('image_id', 'distance', 'content')
+            ->select('image_id', 'content')
             ->from('images_vectors')
-            ->where('embedding', 'MATCH', '[' . implode(',', $parameters->searchedVectors) . ']')
-            ->where('k', '=', $parameters->maxResults)
-            ->where('distance', '<', $parameters->maxDistance)
+            ->withVectorSearch(
+                'embedding',
+                $parameters->searchedVectors,
+                'distance',
+                $parameters->maxDistance,
+            )
+            ->limit($parameters->maxResults)
             ->orderBy('distance')
             ->fetchAll();
 

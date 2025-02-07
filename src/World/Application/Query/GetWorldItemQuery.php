@@ -34,7 +34,7 @@ class GetWorldItemQuery implements Query
         assert($parameters instanceof GetWorldItem);
 
         $document = $this->databasePlatform->createQueryBuilder()->createSelect()
-            ->select('id', 'type', 'name', 'short_description as shortDescription')
+            ->select('id', 'type', 'name', 'short_description as "shortDescription"')
             ->from('world_items')
             ->where('id', '=', $parameters->id)
             ->fetchOne();

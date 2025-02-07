@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ChronicleKeeper\Library\Domain\ValueObject\DirectoryCache;
+namespace ChronicleKeeper\Library\Domain\ValueObject\DirectoryContent;
 
 use ChronicleKeeper\Library\Domain\Entity\Directory as DirectoryEntity;
 

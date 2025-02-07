@@ -26,7 +26,7 @@ final class SearchWorldItemsQuery implements Query
         assert($parameters instanceof SearchWorldItems);
 
         $queryBuilder = $this->platform->createQueryBuilder()->createSelect()
-            ->select('id', 'type', 'name', 'short_description as shortDescription')
+            ->select('id', 'type', 'name', 'short_description as "shortDescription"')
             ->from('world_items')
             ->orderBy('name');
 

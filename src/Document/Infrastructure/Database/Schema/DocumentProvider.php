@@ -17,8 +17,7 @@ final class DocumentProvider extends DefaultSchemaProvider
                 title TEXT NOT NULL,
                 content TEXT NOT NULL,
                 directory TEXT NOT NULL,
-                last_updated TEXT NOT NULL,
-                FOREIGN KEY(directory) REFERENCES directories(id)
+                last_updated TEXT NOT NULL
             );
         SQL);
 

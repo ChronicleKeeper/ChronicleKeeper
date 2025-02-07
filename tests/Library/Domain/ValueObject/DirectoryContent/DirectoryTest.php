@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace ChronicleKeeper\Test\Library\Domain\ValueObject\DirectoryCache;
+namespace ChronicleKeeper\Test\Library\Domain\ValueObject\DirectoryContent;
 
 use ChronicleKeeper\Library\Domain\Entity\Directory as DirectoryEntity;
-use ChronicleKeeper\Library\Domain\ValueObject\DirectoryCache\Directory;
+use ChronicleKeeper\Library\Domain\ValueObject\DirectoryContent\Directory;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\Attributes\Test;

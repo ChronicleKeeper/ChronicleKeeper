@@ -39,4 +39,16 @@ interface SelectQueryBuilder extends BaseQueryBuilder
 
     /** @return array<string, mixed> */
     public function fetchOne(): array;
+
+    /**
+     * @param non-empty-string $embeddingColumn
+     * @param list<float>      $vectors
+     * @param non-empty-string $distanceColumn
+     */
+    public function withVectorSearch(
+        string $embeddingColumn,
+        array $vectors,
+        string $distanceColumn,
+        float $maxDistance,
+    ): self;
 }
