@@ -8,11 +8,9 @@ use ChronicleKeeper\ImageGenerator\Application\Command\StoreGeneratorRequest;
 use ChronicleKeeper\ImageGenerator\Application\Command\StoreGeneratorResult;
 use ChronicleKeeper\ImageGenerator\Application\Command\StoreImageToLibrary;
 use ChronicleKeeper\ImageGenerator\Application\Command\StoreImageToLibraryHandler;
-use ChronicleKeeper\Shared\Infrastructure\LLMChain\LLMChainFactory;
 use ChronicleKeeper\Test\ImageGenerator\Domain\Entity\GeneratorRequestBuilder;
 use ChronicleKeeper\Test\ImageGenerator\Domain\Entity\GeneratorResultBuilder;
-use ChronicleKeeper\Test\Shared\Infrastructure\Database\SQLite\DatabaseTestCase;
-use ChronicleKeeper\Test\Shared\Infrastructure\LLMChain\LLMChainFactoryDouble;
+use ChronicleKeeper\Test\Shared\Infrastructure\Database\DatabaseTestCase;
 use Override;
 use PhpLlm\LlmChain\Bridge\OpenAI\Embeddings;
 use PhpLlm\LlmChain\Document\Vector;
@@ -24,11 +22,9 @@ use Webmozart\Assert\InvalidArgumentException;
 
 use function array_map;
 use function assert;
-use function getenv;
 use function mt_getrandmax;
 use function mt_rand;
 use function range;
-use function Symfony\Component\DependencyInjection\Loader\Configurator\env;
 
 #[CoversClass(StoreImageToLibraryHandler::class)]
 #[CoversClass(StoreImageToLibrary::class)]

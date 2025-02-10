@@ -10,6 +10,7 @@ use ChronicleKeeper\Image\Infrastructure\Database\Schema\ImageProvider;
 use ChronicleKeeper\Library\Infrastructure\Database\Schema\DirectoryProvider;
 use ChronicleKeeper\Test\Shared\Infrastructure\Database\Schema\SchemaProviderTestCase;
 use ChronicleKeeper\World\Infrastructure\Database\Schema\WorldItemProvider;
+use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Large;
 use PHPUnit\Framework\Attributes\Test;
@@ -19,6 +20,7 @@ use PHPUnit\Framework\Attributes\Test;
 final class WorldItemProviderTest extends SchemaProviderTestCase
 {
     /** @inheritDoc */
+    #[Override]
     protected static function getRequiredSchemaProviders(): array
     {
         return [

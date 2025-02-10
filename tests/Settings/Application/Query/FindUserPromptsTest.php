@@ -6,7 +6,7 @@ namespace ChronicleKeeper\Test\Settings\Application\Query;
 
 use ChronicleKeeper\Settings\Application\Query\FindUserPrompts;
 use ChronicleKeeper\Settings\Application\Query\FindUserPromptsQuery;
-use ChronicleKeeper\Test\Shared\Infrastructure\Database\SQLite\DatabaseTestCase;
+use ChronicleKeeper\Test\Shared\Infrastructure\Database\DatabaseTestCase;
 use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Large;

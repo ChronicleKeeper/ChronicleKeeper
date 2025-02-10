@@ -10,7 +10,7 @@ use ChronicleKeeper\Image\Application\Query\FindImagesByDirectoryQuery;
 use ChronicleKeeper\Library\Application\Command\StoreDirectory;
 use ChronicleKeeper\Test\Image\Domain\Entity\ImageBuilder;
 use ChronicleKeeper\Test\Library\Domain\Entity\DirectoryBuilder;
-use ChronicleKeeper\Test\Shared\Infrastructure\Database\SQLite\DatabaseTestCase;
+use ChronicleKeeper\Test\Shared\Infrastructure\Database\DatabaseTestCase;
 use InvalidArgumentException;
 use Override;
 use PHPUnit\Framework\Attributes\CoversClass;

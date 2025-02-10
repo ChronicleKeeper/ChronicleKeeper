@@ -15,7 +15,7 @@ use ChronicleKeeper\Test\Chat\Domain\Entity\ExtendedMessageBuilder;
 use ChronicleKeeper\Test\Chat\Domain\Entity\LLMChain\AssistantMessageBuilder;
 use ChronicleKeeper\Test\Chat\Domain\Entity\LLMChain\SystemMessageBuilder;
 use ChronicleKeeper\Test\Chat\Domain\Entity\LLMChain\UserMessageBuilder;
-use ChronicleKeeper\Test\Shared\Infrastructure\Database\SQLite\DatabaseTestCase;
+use ChronicleKeeper\Test\Shared\Infrastructure\Database\DatabaseTestCase;
 use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Large;

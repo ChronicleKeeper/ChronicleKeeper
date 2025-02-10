@@ -11,7 +11,7 @@ use ChronicleKeeper\Image\Application\Command\StoreImageVectors;
 use ChronicleKeeper\Image\Domain\Event\ImageDeleted;
 use ChronicleKeeper\Test\Image\Domain\Entity\ImageBuilder;
 use ChronicleKeeper\Test\Image\Domain\Entity\VectorImageBuilder;
-use ChronicleKeeper\Test\Shared\Infrastructure\Database\SQLite\DatabaseTestCase;
+use ChronicleKeeper\Test\Shared\Infrastructure\Database\DatabaseTestCase;
 use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Large;

@@ -7,7 +7,7 @@ namespace ChronicleKeeper\Test\Image\Application\Command;
 use ChronicleKeeper\Image\Application\Command\StoreImageVectors;
 use ChronicleKeeper\Image\Application\Command\StoreImageVectorsHandler;
 use ChronicleKeeper\Test\Image\Domain\Entity\VectorImageBuilder;
-use ChronicleKeeper\Test\Shared\Infrastructure\Database\SQLite\DatabaseTestCase;
+use ChronicleKeeper\Test\Shared\Infrastructure\Database\DatabaseTestCase;
 use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Large;

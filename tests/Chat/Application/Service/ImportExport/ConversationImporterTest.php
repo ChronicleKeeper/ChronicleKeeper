@@ -8,7 +8,7 @@ use ChronicleKeeper\Chat\Application\Command\StoreConversation;
 use ChronicleKeeper\Chat\Application\Service\ImportExport\ConversationImporter;
 use ChronicleKeeper\Settings\Application\Service\ImportSettings;
 use ChronicleKeeper\Test\Chat\Domain\Entity\ConversationBuilder;
-use ChronicleKeeper\Test\Shared\Infrastructure\Database\SQLite\DatabaseTestCase;
+use ChronicleKeeper\Test\Shared\Infrastructure\Database\DatabaseTestCase;
 use League\Flysystem\DirectoryListing;
 use League\Flysystem\FileAttributes;
 use League\Flysystem\Filesystem;

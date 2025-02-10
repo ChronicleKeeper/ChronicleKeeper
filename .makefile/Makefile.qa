@@ -1,0 +1,22 @@
+SHELL := /bin/bash
+.PHONY: *
+
+check-cs: ## Check coding standards
+	$(PHP) vendor/bin/phpcs -n
+
+fix-cs: ## Fix coding standards
+	$(PHP) vendor/bin/phpcbf -n
+
+static-analysis: ## Run static analysis
+	$(PHP) vendor/bin/phpstan analyse -c phpstan.neon --memory-limit=-1
+
+lint-php: ## Lint PHP files
+	if find src -name "*.php" -exec php -l {} \; | grep -v "No syntax errors detected"; then exit 1; fi
+	if find tests -name "*.php" -exec php -l {} \; | grep -v "No syntax errors detected"; then exit 1; fi
+
+rector: ## Execute all rector rules
+	$(PHP) vendor/bin/rector
+
+fix-all: ## Fix all code issues
+	make rector
+	make fix-cs

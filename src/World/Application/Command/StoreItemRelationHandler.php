@@ -29,7 +29,6 @@ class StoreItemRelationHandler
             AND relation_type = :relation_type
         SQL;
 
-
         try {
             // Check if the relation exists
             $this->platform->fetchOne($query, [

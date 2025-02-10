@@ -7,12 +7,14 @@ namespace ChronicleKeeper\Test\Shared\Infrastructure\Database\SQLite\QueryBuilde
 use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
 use ChronicleKeeper\Shared\Infrastructure\Database\SQLite\QueryBuilder\SQLiteInsertQueryBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(SQLiteInsertQueryBuilder::class)]
+#[Group('sqlite')]
 #[Small]
 final class SQLiteInsertQueryBuilderTest extends TestCase
 {

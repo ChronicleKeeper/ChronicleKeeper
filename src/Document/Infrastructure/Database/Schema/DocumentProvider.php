@@ -6,9 +6,11 @@ namespace ChronicleKeeper\Document\Infrastructure\Database\Schema;
 
 use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
 use ChronicleKeeper\Shared\Infrastructure\Database\Schema\DefaultSchemaProvider;
+use Override;
 
 final class DocumentProvider extends DefaultSchemaProvider
 {
+    #[Override]
     public function getPriority(): int
     {
         return 10;

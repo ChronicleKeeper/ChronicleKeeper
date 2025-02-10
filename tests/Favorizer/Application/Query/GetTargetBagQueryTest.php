@@ -11,7 +11,7 @@ use ChronicleKeeper\Favorizer\Domain\TargetBag;
 use ChronicleKeeper\Favorizer\Domain\ValueObject\LibraryDocumentTarget;
 use ChronicleKeeper\Favorizer\Domain\ValueObject\LibraryImageTarget;
 use ChronicleKeeper\Favorizer\Domain\ValueObject\Target;
-use ChronicleKeeper\Test\Shared\Infrastructure\Database\SQLite\DatabaseTestCase;
+use ChronicleKeeper\Test\Shared\Infrastructure\Database\DatabaseTestCase;
 use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Large;

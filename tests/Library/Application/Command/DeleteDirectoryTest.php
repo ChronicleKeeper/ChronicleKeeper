@@ -15,7 +15,7 @@ use ChronicleKeeper\Test\Chat\Domain\Entity\ConversationBuilder;
 use ChronicleKeeper\Test\Document\Domain\Entity\DocumentBuilder;
 use ChronicleKeeper\Test\Image\Domain\Entity\ImageBuilder;
 use ChronicleKeeper\Test\Library\Domain\Entity\DirectoryBuilder;
-use ChronicleKeeper\Test\Shared\Infrastructure\Database\SQLite\DatabaseTestCase;
+use ChronicleKeeper\Test\Shared\Infrastructure\Database\DatabaseTestCase;
 use InvalidArgumentException;
 use Override;
 use PHPUnit\Framework\Attributes\CoversClass;

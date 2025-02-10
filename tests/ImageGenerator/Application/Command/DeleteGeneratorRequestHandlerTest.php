@@ -8,23 +8,16 @@ use ChronicleKeeper\ImageGenerator\Application\Command\DeleteGeneratorRequest;
 use ChronicleKeeper\ImageGenerator\Application\Command\DeleteGeneratorRequestHandler;
 use ChronicleKeeper\ImageGenerator\Application\Command\StoreGeneratorRequest;
 use ChronicleKeeper\Test\ImageGenerator\Domain\Entity\GeneratorRequestBuilder;
-use ChronicleKeeper\Test\Shared\Infrastructure\Database\SQLite\DatabaseTestCase;
+use ChronicleKeeper\Test\Shared\Infrastructure\Database\DatabaseTestCase;
 use Override;
-use PhpLlm\LlmChain\Bridge\OpenAI\Embeddings;
 use PhpLlm\LlmChain\Bridge\OpenAI\GPT;
-use PhpLlm\LlmChain\Document\Vector;
-use PhpLlm\LlmChain\Model\Response\ResponseInterface;
 use PhpLlm\LlmChain\Model\Response\TextResponse;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Large;
 use PHPUnit\Framework\Attributes\Test;
 use Webmozart\Assert\InvalidArgumentException;
 
-use function array_map;
 use function assert;
-use function mt_getrandmax;
-use function mt_rand;
-use function range;
 
 #[CoversClass(DeleteGeneratorRequestHandler::class)]
 #[CoversClass(DeleteGeneratorRequest::class)]

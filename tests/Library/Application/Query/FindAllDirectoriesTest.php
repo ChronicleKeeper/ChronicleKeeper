@@ -8,7 +8,7 @@ use ChronicleKeeper\Library\Application\Command\StoreDirectory;
 use ChronicleKeeper\Library\Application\Query\FindAllDirectories;
 use ChronicleKeeper\Library\Application\Query\FindAllDirectoriesQuery;
 use ChronicleKeeper\Test\Library\Domain\Entity\DirectoryBuilder;
-use ChronicleKeeper\Test\Shared\Infrastructure\Database\SQLite\DatabaseTestCase;
+use ChronicleKeeper\Test\Shared\Infrastructure\Database\DatabaseTestCase;
 use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Large;

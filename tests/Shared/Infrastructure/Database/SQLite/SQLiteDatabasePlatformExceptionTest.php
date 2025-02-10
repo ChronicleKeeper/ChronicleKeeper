@@ -9,6 +9,7 @@ use ChronicleKeeper\Shared\Infrastructure\Database\Exception\QueryExecutionFaile
 use ChronicleKeeper\Shared\Infrastructure\Database\Exception\StatementPreparationFailed;
 use ChronicleKeeper\Shared\Infrastructure\Database\SQLite\SQLiteDatabasePlatform;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -18,6 +19,7 @@ use SQLite3;
 use SQLite3Stmt;
 
 #[CoversClass(SQLiteDatabasePlatform::class)]
+#[Group('sqlite')]
 #[Small]
 final class SQLiteDatabasePlatformExceptionTest extends TestCase
 {

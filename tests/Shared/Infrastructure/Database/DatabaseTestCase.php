@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ChronicleKeeper\Test\Shared\Infrastructure\Database\SQLite;
+namespace ChronicleKeeper\Test\Shared\Infrastructure\Database;
 
 use ChronicleKeeper\Test\WebTestCase;
 

@@ -10,7 +10,7 @@ use ChronicleKeeper\Library\Domain\Entity\Directory;
 use ChronicleKeeper\Library\Domain\Event\DirectoryCreated;
 use ChronicleKeeper\Library\Domain\Event\DirectoryRenamed;
 use ChronicleKeeper\Library\Domain\RootDirectory;
-use ChronicleKeeper\Test\Shared\Infrastructure\Database\SQLite\DatabaseTestCase;
+use ChronicleKeeper\Test\Shared\Infrastructure\Database\DatabaseTestCase;
 use InvalidArgumentException;
 use Override;
 use PHPUnit\Framework\Attributes\CoversClass;

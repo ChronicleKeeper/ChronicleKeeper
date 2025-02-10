@@ -6,7 +6,7 @@ namespace ChronicleKeeper\Test\World\Application\Event;
 
 use ChronicleKeeper\Settings\Application\Service\ImportSettings;
 use ChronicleKeeper\Settings\Domain\Event\ExecuteImportPruning;
-use ChronicleKeeper\Test\Shared\Infrastructure\Database\SQLite\DatabaseTestCase;
+use ChronicleKeeper\Test\Shared\Infrastructure\Database\DatabaseTestCase;
 use ChronicleKeeper\Test\World\Domain\Entity\ItemBuilder;
 use ChronicleKeeper\World\Application\Command\StoreWorldItem;
 use ChronicleKeeper\World\Application\Event\ImportPruner;

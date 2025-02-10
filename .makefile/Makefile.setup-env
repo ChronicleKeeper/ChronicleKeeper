@@ -1,0 +1,18 @@
+SHELL := /bin/bash
+.PHONY: *
+
+# Environment handling
+setup-env = @if [ ! -f .env.$(1).$(DB) ]; then \
+		echo "Error: .env.$(1).$(DB) not found"; \
+		exit 1; \
+	fi; \
+	cp .env.$(1).$(DB) .env;
+
+setup-dev-env: ## Setup development environment
+	$(call setup-env,dev)
+
+setup-test-env: ## Setup test environment
+	$(call setup-env,test)
+
+setup-database: ## setup the database
+	$(PHP) bin/console app:db:init --force -vvv

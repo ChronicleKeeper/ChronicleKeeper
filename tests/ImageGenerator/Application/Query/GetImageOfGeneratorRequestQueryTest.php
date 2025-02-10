@@ -13,7 +13,7 @@ use ChronicleKeeper\ImageGenerator\Application\Query\GetImageOfGeneratorRequestQ
 use ChronicleKeeper\Test\Image\Domain\Entity\ImageBuilder;
 use ChronicleKeeper\Test\ImageGenerator\Domain\Entity\GeneratorRequestBuilder;
 use ChronicleKeeper\Test\ImageGenerator\Domain\Entity\GeneratorResultBuilder;
-use ChronicleKeeper\Test\Shared\Infrastructure\Database\SQLite\DatabaseTestCase;
+use ChronicleKeeper\Test\Shared\Infrastructure\Database\DatabaseTestCase;
 use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Large;

@@ -9,7 +9,7 @@ use ChronicleKeeper\ImageGenerator\Application\Command\StoreGeneratorRequestHand
 use ChronicleKeeper\ImageGenerator\Application\Service\PromptOptimizer;
 use ChronicleKeeper\ImageGenerator\Domain\ValueObject\OptimizedPrompt;
 use ChronicleKeeper\Test\ImageGenerator\Domain\Entity\GeneratorRequestBuilder;
-use ChronicleKeeper\Test\Shared\Infrastructure\Database\SQLite\DatabaseTestCase;
+use ChronicleKeeper\Test\Shared\Infrastructure\Database\DatabaseTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Large;
 use PHPUnit\Framework\Attributes\Test;

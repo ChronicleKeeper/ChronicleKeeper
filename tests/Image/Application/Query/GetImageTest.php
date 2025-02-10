@@ -8,7 +8,7 @@ use ChronicleKeeper\Image\Application\Command\StoreImage;
 use ChronicleKeeper\Image\Application\Query\GetImage;
 use ChronicleKeeper\Image\Application\Query\GetImageQuery;
 use ChronicleKeeper\Test\Image\Domain\Entity\ImageBuilder;
-use ChronicleKeeper\Test\Shared\Infrastructure\Database\SQLite\DatabaseTestCase;
+use ChronicleKeeper\Test\Shared\Infrastructure\Database\DatabaseTestCase;
 use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Large;

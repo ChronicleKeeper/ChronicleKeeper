@@ -11,11 +11,13 @@ use ChronicleKeeper\Shared\Infrastructure\Database\SQLite\QueryBuilder\SQLiteSel
 use ChronicleKeeper\Shared\Infrastructure\Database\SQLite\QueryBuilder\SQLiteUpdateQueryBuilder;
 use ChronicleKeeper\Shared\Infrastructure\Database\SQLite\SQLiteQueryBuilderFactory;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(SQLiteQueryBuilderFactory::class)]
+#[Group('sqlite')]
 #[Small]
 final class SQLiteQueryBuilderFactoryTest extends TestCase
 {

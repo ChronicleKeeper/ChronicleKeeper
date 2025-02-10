@@ -14,6 +14,7 @@ use ChronicleKeeper\Shared\Infrastructure\Database\QueryBuilder\QueryBuilderFact
 use Psr\Log\LoggerInterface;
 use SQLite3;
 use SQLite3Result;
+use Throwable;
 
 use function assert;
 use function count;
@@ -130,10 +131,14 @@ class SQLiteDatabasePlatform implements DatabasePlatform
 
     public function executeRaw(string $sql): void
     {
-        if (! $this->getConnection()->exec($sql)) {
-            $this->databaseLogger->error('Failed to execute statement', ['sql' => $sql]);
+        try {
+            if (! $this->getConnection()->exec($sql)) {
+                $this->databaseLogger->error('Failed to execute statement', ['sql' => $sql]);
 
-            throw QueryExecutionFailed::forQuery($sql);
+                throw QueryExecutionFailed::forQuery($sql);
+            }
+        } catch (Throwable $e) {
+            throw QueryExecutionFailed::forQuery($sql, $e);
         }
     }
 
