@@ -27,7 +27,7 @@ class StoreGeneratorRequestHandlerTest extends DatabaseTestCase
         $promptOptimizer = $this->createMock(PromptOptimizer::class);
 
         $handler = new StoreGeneratorRequestHandler($serializer, $promptOptimizer, $this->databasePlatform);
-        $request = new StoreGeneratorRequest((new GeneratorRequestBuilder())->build());
+        $request = new StoreGeneratorRequest((new GeneratorRequestBuilder())->withOptimizedPrompt(null)->build());
 
         $promptOptimizer->expects($this->once())
             ->method('optimize')

@@ -9,6 +9,11 @@ use ChronicleKeeper\Shared\Infrastructure\Database\Schema\DefaultSchemaProvider;
 
 final class DocumentProvider extends DefaultSchemaProvider
 {
+    public function getPriority(): int
+    {
+        return 10;
+    }
+
     public function createSchema(DatabasePlatform $platform): void
     {
         $platform->executeRaw(<<<'SQL'

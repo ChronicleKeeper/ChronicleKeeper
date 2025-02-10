@@ -6,6 +6,7 @@ namespace ChronicleKeeper\Image\Application\Command;
 
 use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
+use Symfony\Component\Messenger\MessageBusInterface;
 
 use function implode;
 
@@ -14,13 +15,17 @@ class StoreImageVectorsHandler
 {
     public function __construct(
         private readonly DatabasePlatform $platform,
+        private readonly MessageBusInterface $bus,
     ) {
     }
 
     public function __invoke(StoreImageVectors $command): void
     {
+        // First remove everything
+        $this->bus->dispatch(new DeleteImageVectors($command->vectorImage->image->getId()));
+
+        // Then store it again
         $this->platform->createQueryBuilder()->createInsert()
-            ->asReplace()
             ->insert('images_vectors')
             ->values([
                 'image_id' => $command->vectorImage->image->getId(),

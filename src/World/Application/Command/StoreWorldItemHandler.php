@@ -39,6 +39,7 @@ class StoreWorldItemHandler
                     $this->platform->createQueryBuilder()->createInsert()
                         ->asReplace()
                         ->insert('world_item_documents')
+                        ->onConflict(['world_item_id', 'document_id'])
                         ->values([
                             'world_item_id' => $command->item->getId(),
                             'document_id' => $media->document->getId(),
@@ -52,6 +53,7 @@ class StoreWorldItemHandler
                     $this->platform->createQueryBuilder()->createInsert()
                         ->asReplace()
                         ->insert('world_item_images')
+                        ->onConflict(['world_item_id', 'image_id'])
                         ->values([
                             'world_item_id' => $command->item->getId(),
                             'image_id' => $media->image->getId(),
@@ -68,6 +70,7 @@ class StoreWorldItemHandler
                 $this->platform->createQueryBuilder()->createInsert()
                     ->asReplace()
                     ->insert('world_item_conversations')
+                    ->onConflict(['world_item_id', 'conversation_id'])
                     ->values([
                         'world_item_id' => $command->item->getId(),
                         'conversation_id' => $media->conversation->getId(),

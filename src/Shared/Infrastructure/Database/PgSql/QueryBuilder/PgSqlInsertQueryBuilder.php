@@ -96,7 +96,7 @@ final class PgSqlInsertQueryBuilder implements InsertQueryBuilder
                 implode(
                     ', ',
                     array_map(
-                        static fn (string $col) => sprintf('%s = EXCLUDED.%s', $col, $col),
+                        static fn (string $col) => sprintf('"%s" = EXCLUDED."%s"', $col, $col),
                         $columns,
                     ),
                 ),

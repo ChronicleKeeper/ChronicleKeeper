@@ -45,6 +45,12 @@ final class SQLiteInsertQueryBuilder implements InsertQueryBuilder
         return $this;
     }
 
+    /** @inheritDoc */
+    public function onConflict(array $columns): self
+    {
+        return $this;
+    }
+
     public function execute(): null
     {
         $this->platform->query($this->buildQuery(), $this->values);

@@ -5,9 +5,12 @@ declare(strict_types=1);
 namespace ChronicleKeeper\Shared\Infrastructure\Database\PgSql;
 
 use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
+use ChronicleKeeper\Shared\Infrastructure\Database\Exception\MissingResults;
+use ChronicleKeeper\Shared\Infrastructure\Database\Exception\UnambiguousResult;
 use ChronicleKeeper\Shared\Infrastructure\Database\QueryBuilder\QueryBuilderFactory;
 use PDO;
-use RuntimeException;
+
+use function count;
 
 final class PgSqlDatabasePlatform implements DatabasePlatform
 {
@@ -46,7 +49,7 @@ final class PgSqlDatabasePlatform implements DatabasePlatform
     {
         $result = $this->fetchOneOrNull($sql, $parameters);
         if ($result === null) {
-            throw new RuntimeException('No result found');
+            throw MissingResults::forQuery($sql);
         }
 
         return $result;
@@ -55,11 +58,18 @@ final class PgSqlDatabasePlatform implements DatabasePlatform
     /** @inheritDoc */
     public function fetchOneOrNull(string $sql, array $parameters = []): array|null
     {
-        $stmt = $this->getConnection()->prepare($sql);
-        $stmt->execute($parameters);
-        $result = $stmt->fetch();
+        $result      = $this->fetch($sql, $parameters);
+        $resultCount = count($result);
 
-        return $result === false ? null : $result;
+        if ($resultCount === 0) {
+            return null;
+        }
+
+        if ($resultCount > 1) {
+            throw UnambiguousResult::forQuery($sql);
+        }
+
+        return $result[0];
     }
 
     /** @inheritDoc */

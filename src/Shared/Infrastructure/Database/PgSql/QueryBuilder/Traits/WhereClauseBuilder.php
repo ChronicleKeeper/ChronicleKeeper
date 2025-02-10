@@ -45,7 +45,7 @@ trait WhereClauseBuilder
         foreach ($conditions as [$column, $operator, $value]) {
             $this->validateOperator($operator);
             $paramName                    = $this->generateParamName($column);
-            $orParts[]                    = sprintf('%s %s :%s', $column, $operator, $paramName);
+            $orParts[]                    = sprintf('"%s" %s :%s', $column, $operator, $paramName);
             $this->parameters[$paramName] = $value;
         }
 
@@ -80,12 +80,12 @@ trait WhereClauseBuilder
         }
 
         $operator           = $not ? 'NOT IN' : 'IN';
-        $this->conditions[] = sprintf('%s %s (%s)', $column, $operator, implode(', ', $placeholders));
+        $this->conditions[] = sprintf('"%s" %s (%s)', $column, $operator, implode(', ', $placeholders));
     }
 
     private function addSimpleCondition(string $column, string $operator, string $paramName, mixed $value): void
     {
-        $this->conditions[]           = sprintf('%s %s :%s', $column, $operator, $paramName);
+        $this->conditions[]           = sprintf('"%s" %s :%s', $column, $operator, $paramName);
         $this->parameters[$paramName] = $value;
     }
 

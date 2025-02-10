@@ -46,6 +46,11 @@ phpunit: ## run phpunit
 	APP_ENV=test $(PHP) bin/console cache:clear
 	$(PHP) vendor/bin/phpunit --colors
 
+phpunit-pgsql: ## run phpunit with postgresql
+	APP_ENV=test DATABASE_TYPE=PgSql DATABASE_CONNECTION="pgsql:host=database;port=5432;dbname=chronicle-keeper;user=app;password=app" docker compose exec -e APP_ENV -e DATABASE_TYPE -e DATABASE_CONNECTION php bin/console cache:clear
+	APP_ENV=test DATABASE_TYPE=PgSql DATABASE_CONNECTION="pgsql:host=database;port=5432;dbname=chronicle-keeper;user=app;password=app" docker compose exec -e APP_ENV -e DATABASE_TYPE -e DATABASE_CONNECTION php bin/console app:db:drop --force -vvv
+	APP_ENV=test DATABASE_TYPE=PgSql DATABASE_CONNECTION="pgsql:host=database;port=5432;dbname=chronicle-keeper;user=app;password=app" docker compose exec -e APP_ENV -e DATABASE_TYPE -e DATABASE_CONNECTION php vendor/bin/phpunit --colors
+
 coverage: ## run phpunit with generating coverage report
 	XDEBUG_MODE=coverage $(PHP) vendor/bin/phpunit --coverage-html=coverage --coverage-clover=coverage.xml
 

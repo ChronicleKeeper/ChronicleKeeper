@@ -15,6 +15,7 @@ use Throwable;
 use function array_column;
 use function array_filter;
 use function array_values;
+use function in_array;
 use function iterator_to_array;
 use function usort;
 
@@ -35,7 +36,8 @@ class SchemaManager
     ) {
     }
 
-    public function createSchema(): void
+    /** @param list<class-string<SchemaProvider>> $onlySchemaProviders */
+    public function createSchema(array $onlySchemaProviders = []): void
     {
         try {
             $this->platform->beginTransaction();
@@ -47,6 +49,10 @@ class SchemaManager
             ) => $a->getPriority() <=> $b->getPriority());
 
             foreach ($providers as $schemaProvider) {
+                if ($onlySchemaProviders !== [] && ! in_array($schemaProvider::class, $onlySchemaProviders, true)) {
+                    continue;
+                }
+
                 $this->logger->debug('Creating schema with provider ' . $schemaProvider::class);
                 $schemaProvider->createSchema($this->platform);
             }

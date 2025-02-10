@@ -9,6 +9,11 @@ use ChronicleKeeper\Shared\Infrastructure\Database\Schema\DefaultSchemaProvider;
 
 final class FavoritesProvider extends DefaultSchemaProvider
 {
+    public function getPriority(): int
+    {
+        return 0;
+    }
+
     public function createSchema(DatabasePlatform $platform): void
     {
         // Create table for targets

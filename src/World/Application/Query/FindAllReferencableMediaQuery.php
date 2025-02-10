@@ -9,6 +9,7 @@ use ChronicleKeeper\Shared\Application\Query\QueryParameters;
 use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
 
 use function assert;
+use function strtolower;
 use function trim;
 
 class FindAllReferencableMediaQuery implements Query
@@ -56,14 +57,14 @@ class FindAllReferencableMediaQuery implements Query
     private function getFindAllBySearchTermQuery(string $search): array
     {
         $query = <<<'SQL'
-            SELECT 'document' as type, id, title FROM documents WHERE title LIKE :search
+            SELECT 'document' as type, id, title FROM documents WHERE LOWER(title) LIKE :search
             UNION
-            SELECT 'image' as type, id, title FROM images WHERE title LIKE :search
+            SELECT 'image' as type, id, title FROM images WHERE LOWER(title) LIKE :search
             UNION
-            SELECT 'conversation' as type, id, title FROM conversations WHERE title LIKE :search
+            SELECT 'conversation' as type, id, title FROM conversations WHERE LOWER(title) LIKE :search
             ORDER BY title
         SQL;
 
-        return $this->databasePlatform->fetch($query, ['search' => '%' . $search . '%']);
+        return $this->databasePlatform->fetch($query, ['search' => '%' . strtolower($search) . '%']);
     }
 }

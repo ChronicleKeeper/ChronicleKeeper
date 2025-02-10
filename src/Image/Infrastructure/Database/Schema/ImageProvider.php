@@ -9,6 +9,11 @@ use ChronicleKeeper\Shared\Infrastructure\Database\Schema\DefaultSchemaProvider;
 
 final class ImageProvider extends DefaultSchemaProvider
 {
+    public function getPriority(): int
+    {
+        return 10;
+    }
+
     public function createSchema(DatabasePlatform $platform): void
     {
         $platform->executeRaw(<<<'SQL'
@@ -19,8 +24,7 @@ final class ImageProvider extends DefaultSchemaProvider
                 encoded_image TEXT NOT NULL,
                 description TEXT NOT NULL,
                 directory TEXT NOT NULL,
-                last_updated TEXT NOT NULL,
-                FOREIGN KEY(directory) REFERENCES directories(id)
+                last_updated TEXT NOT NULL
             );
         SQL);
 

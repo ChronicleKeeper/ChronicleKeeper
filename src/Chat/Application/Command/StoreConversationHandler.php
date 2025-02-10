@@ -44,6 +44,7 @@ class StoreConversationHandler
             $qb = $this->databasePlatform->createQueryBuilder()->createInsert();
             $qb->insert('conversation_settings')
                 ->asReplace()
+                ->onConflict(['conversation_id'])
                 ->values([
                     'conversation_id' => $message->conversation->getId(),
                     'version' => $message->conversation->getSettings()->version,

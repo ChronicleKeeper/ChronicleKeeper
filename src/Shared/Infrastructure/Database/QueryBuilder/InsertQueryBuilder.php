@@ -17,4 +17,7 @@ interface InsertQueryBuilder extends BaseQueryBuilder
 
     /** @param array<string, mixed> $data */
     public function values(array $data): self;
+
+    /** @param string[] $columns */
+    public function onConflict(array $columns): self;
 }

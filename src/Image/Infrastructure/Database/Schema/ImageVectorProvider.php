@@ -18,7 +18,7 @@ final class ImageVectorProvider extends DefaultSchemaProvider
                     image_id uuid PRIMARY KEY,
                     embedding vector(1536) NOT NULL,
                     content text NOT NULL,
-                    vector_content_hash text NOT NULL
+                    "vectorContentHash" text NOT NULL
                  );
             SQL);
 

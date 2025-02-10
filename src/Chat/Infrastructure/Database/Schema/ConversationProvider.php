@@ -16,8 +16,7 @@ final class ConversationProvider extends DefaultSchemaProvider
             CREATE TABLE conversations (
                 id TEXT PRIMARY KEY,
                 title TEXT NOT NULL,
-                directory TEXT NOT NULL,
-                FOREIGN KEY(directory) REFERENCES directories(id)
+                directory TEXT NOT NULL
             );
         SQL);
 
@@ -31,8 +30,8 @@ final class ConversationProvider extends DefaultSchemaProvider
                 conversation_id TEXT PRIMARY KEY,
                 version TEXT NOT NULL,
                 temperature REAL NOT NULL,
-                images_max_distance INTEGER NOT NULL,
-                documents_max_distance INTEGER NOT NULL,
+                images_max_distance FLOAT NOT NULL,
+                documents_max_distance FLOAT NOT NULL,
                 FOREIGN KEY(conversation_id) REFERENCES conversations(id)
             );
         SQL);

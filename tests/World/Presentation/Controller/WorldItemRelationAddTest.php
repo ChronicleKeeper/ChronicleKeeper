@@ -45,7 +45,7 @@ class WorldItemRelationAddTest extends WebTestCase
     {
         parent::tearDown();
 
-        unset($this->fromItem);
+        unset($this->fromItem, $this->toItem);
     }
 
     #[Test]

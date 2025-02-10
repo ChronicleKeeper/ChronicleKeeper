@@ -10,7 +10,7 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 final class PgSqlConnectionFactory
 {
     public function __construct(
-        #[Autowire('%env(string:DATABASE_CONNTECTION)%')]
+        #[Autowire('%env(string:DATABASE_CONNECTION)%')]
         private readonly string $dsn,
     ) {
     }

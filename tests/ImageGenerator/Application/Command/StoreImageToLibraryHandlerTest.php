@@ -24,9 +24,11 @@ use Webmozart\Assert\InvalidArgumentException;
 
 use function array_map;
 use function assert;
+use function getenv;
 use function mt_getrandmax;
 use function mt_rand;
 use function range;
+use function Symfony\Component\DependencyInjection\Loader\Configurator\env;
 
 #[CoversClass(StoreImageToLibraryHandler::class)]
 #[CoversClass(StoreImageToLibrary::class)]
@@ -89,10 +91,7 @@ class StoreImageToLibraryHandlerTest extends DatabaseTestCase
         $result = (new GeneratorResultBuilder())->build();
         $this->bus->dispatch(new StoreGeneratorResult($request->id, $result));
 
-        $llmChainFactory = $this->client->getContainer()->get(LLMChainFactory::class);
-        assert($llmChainFactory instanceof LLMChainFactoryDouble);
-
-        $llmChainFactory->addPlatformResponse(
+        $this->llmChainFactory->addPlatformResponse(
             Embeddings::class,
             new class implements ResponseInterface {
                 /** @return Vector[] */
