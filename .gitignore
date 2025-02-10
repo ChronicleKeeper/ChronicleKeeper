@@ -3,9 +3,10 @@
 /vendor/
 /public/assets/
 
-/.env.local
-/.env.local.php
-/.env.*.local
+.env
+.env.local
+.env.*.local
+!.env.dist
 
 /.phpcs-cache
 /.phpunit.cache/
@@ -14,3 +15,4 @@
 /coverage
 
 /.phpbench/
+
