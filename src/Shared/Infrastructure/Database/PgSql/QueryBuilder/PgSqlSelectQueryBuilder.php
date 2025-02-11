@@ -8,6 +8,7 @@ use ChronicleKeeper\Shared\Infrastructure\Database\PgSql\PgSqlDatabasePlatform;
 use ChronicleKeeper\Shared\Infrastructure\Database\PgSql\QueryBuilder\Traits\WhereClauseBuilder;
 use ChronicleKeeper\Shared\Infrastructure\Database\QueryBuilder\SelectQueryBuilder;
 
+use function array_map;
 use function array_values;
 use function implode;
 use function sprintf;
@@ -34,7 +35,10 @@ final class PgSqlSelectQueryBuilder implements SelectQueryBuilder
 
     public function select(string ...$columns): self
     {
-        $this->columns = array_values($columns);
+        $this->columns = array_values(array_map(
+            static fn (string $column): string => str_contains($column, ' as ') ? $column : '"' . $column . '"',
+            $columns,
+        ));
 
         return $this;
     }
@@ -116,6 +120,13 @@ final class PgSqlSelectQueryBuilder implements SelectQueryBuilder
             $vectorsToString,
             $maxDistance,
         );
+
+        return $this;
+    }
+
+    public function vectorToJson(string $embeddingColumn, string $outputAlias): self
+    {
+        $this->columns[] = sprintf('%s as %s', $embeddingColumn, $outputAlias);
 
         return $this;
     }

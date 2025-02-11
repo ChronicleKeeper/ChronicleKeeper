@@ -112,6 +112,13 @@ final class SQLiteSelectQueryBuilder implements SelectQueryBuilder
         return $this;
     }
 
+    public function vectorToJson(string $embeddingColumn, string $outputAlias): self
+    {
+        $this->columns[] = sprintf('vec_to_json(%s) as %s', $embeddingColumn, $outputAlias);
+
+        return $this;
+    }
+
     private function buildQuery(): string
     {
         $query = sprintf('SELECT %s FROM %s', implode(', ', $this->columns), $this->table);

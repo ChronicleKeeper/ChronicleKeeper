@@ -15,7 +15,7 @@ final class ImageVectorProvider extends DefaultSchemaProvider
         if ($platform instanceof PgSqlDatabasePlatform) {
             $platform->executeRaw(<<<'SQL'
                  CREATE TABLE images_vectors (
-                    image_id uuid PRIMARY KEY,
+                    image_id uuid NOT NULL,
                     embedding vector(1536) NOT NULL,
                     content text NOT NULL,
                     "vectorContentHash" text NOT NULL

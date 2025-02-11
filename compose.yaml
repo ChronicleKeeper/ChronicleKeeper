@@ -1,7 +1,9 @@
 services:
   php:
     image: dunglas/frankenphp
-    build: .docker/frankenphp/
+    build:
+      context: .
+      dockerfile: .docker/frankenphp/Dockerfile
     restart: always
     ports:
       - "80:80" # HTTP
@@ -16,7 +18,9 @@ services:
   database:
     profiles: ["dev", "all"]
     image: postgres:15-alpine
-    build: .docker/postgres/
+    build:
+        context: .
+        dockerfile: .docker/postgres/Dockerfile
     restart: always
     environment:
       POSTGRES_USER: app
@@ -31,7 +35,9 @@ services:
   database_test:
     profiles: ["test", "all"]
     image: postgres:15-alpine
-    build: .docker/postgres/
+    build:
+      context: .
+      dockerfile: .docker/postgres/Dockerfile
     restart: always
     environment:
       POSTGRES_USER: app_test

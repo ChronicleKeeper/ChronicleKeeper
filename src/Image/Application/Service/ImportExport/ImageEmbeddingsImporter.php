@@ -64,7 +64,7 @@ final readonly class ImageEmbeddingsImporter implements SingleImport
                     ->insert('images_vectors')
                     ->values([
                         'image_id' => $row['image_id'],
-                        'embedding' => '[' . implode(',', $row['vector']) . ']',
+                        'embedding' => $row['embedding'],
                         'content' => $row['content'],
                         'vectorContentHash' => $row['vectorContentHash'],
                     ])
@@ -90,7 +90,6 @@ final readonly class ImageEmbeddingsImporter implements SingleImport
                 ->execute();
 
             $this->databasePlatform->createQueryBuilder()->createInsert()
-                ->asReplace()
                 ->insert('images_vectors')
                 ->values([
                     'image_id' => $content['imageId'],

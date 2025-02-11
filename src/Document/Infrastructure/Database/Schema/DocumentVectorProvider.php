@@ -15,7 +15,7 @@ final class DocumentVectorProvider extends DefaultSchemaProvider
         if ($platform instanceof PgSqlDatabasePlatform) {
             $platform->executeRaw(<<<'SQL'
                 CREATE TABLE documents_vectors (
-                    document_id uuid PRIMARY KEY,
+                    document_id uuid NOT NULL,
                     embedding vector(1536) NOT NULL,
                     content text NOT NULL,
                     "vectorContentHash" text NOT NULL

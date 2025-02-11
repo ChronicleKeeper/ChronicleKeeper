@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Library\Application\Service\ImportExport;
 
+use ChronicleKeeper\Library\Domain\RootDirectory;
 use ChronicleKeeper\Settings\Application\Service\Importer\SingleImport;
 use ChronicleKeeper\Settings\Application\Service\ImportSettings;
 use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
@@ -36,6 +37,11 @@ final readonly class LibraryDirectoryImporter implements SingleImport
         $content = $filesystem->read('library/directories.json');
         $content = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
         foreach ($content['data'] as $directoryArray) {
+            if ($directoryArray['id'] === RootDirectory::ID) {
+                // The root directoy should not be part of the import, but when it is there we ignore it
+                continue;
+            }
+
             if ($settings->overwriteLibrary === false && $this->hasDirectory($directoryArray['id'])) {
                 $this->logger->debug(
                     'Directory already exists in the database, skipping import',

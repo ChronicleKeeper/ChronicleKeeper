@@ -41,20 +41,14 @@ final readonly class VectorStorageDocumentsExporter implements SingleExport
             return;
         }
 
-        $query = <<<'SQL'
-            SELECT
-                document_id,
-                content,
-                vectorContentHash,
-                vec_to_json(embedding) as embedding
-            FROM
-                documents_vectors
-            WHERE
-                document_id = :id
-        SQL;
-
         foreach ($documents as $document) {
-            $embeddingsOfDocument = $this->databasePlatform->fetch($query, ['id' => $document->getId()]);
+            $embeddingsOfDocument = $this->databasePlatform->createQueryBuilder()
+                ->createSelect()
+                ->select('document_id', 'content', 'vectorContentHash')
+                ->vectorToJson('embedding', 'embedding')
+                ->from('documents_vectors')
+                ->where('document_id', '=', $document->getId())
+                ->fetchAll();
 
             if (count($embeddingsOfDocument) === 0) {
                 $this->logger->debug(

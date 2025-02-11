@@ -51,4 +51,10 @@ interface SelectQueryBuilder extends BaseQueryBuilder
         string $distanceColumn,
         float $maxDistance,
     ): self;
+
+    /**
+     * @param non-empty-string $embeddingColumn
+     * @param non-empty-string $outputAlias
+     */
+    public function vectorToJson(string $embeddingColumn, string $outputAlias): self;
 }

@@ -97,11 +97,10 @@ final readonly class DocumentEmbeddingsImporter implements SingleImport
                 ->execute();
 
             $this->databasePlatform->createQueryBuilder()->createInsert()
-                ->asReplace()
                 ->insert('documents_vectors')
                 ->values([
                     'document_id' => $content['documentId'],
-                    'embedding' => '[' . implode(',', $content['vector']) . ']',
+                    'embedding' => $content['embedding'],
                     'content' => $content['content'],
                     'vectorContentHash' => $content['vectorContentHash'],
                 ])

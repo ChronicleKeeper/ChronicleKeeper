@@ -15,4 +15,8 @@ setup-test-env: ## Setup test environment
 	$(call setup-env,test)
 
 setup-database: ## setup the database
-	$(PHP) bin/console app:db:init --force -vvv
+ifeq ($(DB),sqlite)
+	$(SQLITE_PHP) bin/console app:db:init --force -vvv
+else
+	 $(PGSQL_PHP) bin/console app:db:init --force -vvv
+endif
