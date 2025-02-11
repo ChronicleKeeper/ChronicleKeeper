@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Shared\Infrastructure\Database\PgSql;
 
+use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
 use ChronicleKeeper\Shared\Infrastructure\Database\PgSql\QueryBuilder\PgSqlDeleteQueryBuilder;
 use ChronicleKeeper\Shared\Infrastructure\Database\PgSql\QueryBuilder\PgSqlInsertQueryBuilder;
 use ChronicleKeeper\Shared\Infrastructure\Database\PgSql\QueryBuilder\PgSqlSelectQueryBuilder;
@@ -17,7 +18,7 @@ use ChronicleKeeper\Shared\Infrastructure\Database\QueryBuilder\UpdateQueryBuild
 final class PgSqlQueryBuilderFactory implements QueryBuilderFactory
 {
     public function __construct(
-        private readonly PgSqlDatabasePlatform $platform,
+        private readonly DatabasePlatform $platform,
     ) {
     }
 

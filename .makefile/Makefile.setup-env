@@ -8,11 +8,17 @@ setup-env = @if [ ! -f .env.$(1).$(DB) ]; then \
 	fi; \
 	cp .env.$(1).$(DB) .env;
 
+setup-test-env = @if [ ! -f .env.$(1).$(DB) ]; then \
+		echo "Error: .env.$(1).$(DB) not found"; \
+		exit 1; \
+	fi; \
+	cp .env.$(1).$(DB) .env.test;
+
 setup-dev-env: ## Setup development environment
 	$(call setup-env,dev)
 
 setup-test-env: ## Setup test environment
-	$(call setup-env,test)
+	$(call setup-test-env,test)
 
 setup-database: ## setup the database
 ifeq ($(DB),sqlite)

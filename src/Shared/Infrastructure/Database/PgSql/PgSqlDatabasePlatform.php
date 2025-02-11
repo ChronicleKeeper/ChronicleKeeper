@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Shared\Infrastructure\Database\PgSql;
 
+use ChronicleKeeper\Shared\Infrastructure\Database\ConnectionFactory;
 use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
 use ChronicleKeeper\Shared\Infrastructure\Database\Exception\MissingResults;
 use ChronicleKeeper\Shared\Infrastructure\Database\Exception\UnambiguousResult;
 use ChronicleKeeper\Shared\Infrastructure\Database\QueryBuilder\QueryBuilderFactory;
 use PDO;
 
+use function assert;
 use function count;
 
 final class PgSqlDatabasePlatform implements DatabasePlatform
@@ -17,7 +19,7 @@ final class PgSqlDatabasePlatform implements DatabasePlatform
     private PDO|null $connection = null;
 
     public function __construct(
-        private readonly PgSqlConnectionFactory $connectionFactory,
+        private readonly ConnectionFactory $connectionFactory,
     ) {
     }
 
@@ -26,6 +28,8 @@ final class PgSqlDatabasePlatform implements DatabasePlatform
         if (! $this->connection instanceof PDO) {
             $this->connection = $this->connectionFactory->create();
         }
+
+        assert($this->connection instanceof PDO);
 
         return $this->connection;
     }

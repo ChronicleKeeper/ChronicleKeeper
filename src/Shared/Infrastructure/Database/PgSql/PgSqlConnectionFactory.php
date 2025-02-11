@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Shared\Infrastructure\Database\PgSql;
 
+use ChronicleKeeper\Shared\Infrastructure\Database\ConnectionFactory;
 use PDO;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
-final class PgSqlConnectionFactory
+final class PgSqlConnectionFactory implements ConnectionFactory
 {
     public function __construct(
         #[Autowire('%env(string:DATABASE_CONNECTION)%')]
