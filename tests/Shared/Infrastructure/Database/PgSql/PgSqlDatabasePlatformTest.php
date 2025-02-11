@@ -17,6 +17,8 @@ use PHPUnit\Framework\Attributes\Test;
 
 #[CoversClass(PgSqlConnectionFactory::class)]
 #[CoversClass(PgSqlDatabasePlatform::class)]
+#[CoversClass(MissingResults::class)]
+#[CoversClass(UnambiguousResult::class)]
 #[Group('pgsql')]
 final class PgSqlDatabasePlatformTest extends DatabaseTestCase
 {

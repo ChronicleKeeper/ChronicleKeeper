@@ -17,6 +17,8 @@ use Psr\Log\NullLogger;
 use SQLite3;
 
 #[CoversClass(SQLiteDatabasePlatform::class)]
+#[CoversClass(MissingResults::class)]
+#[CoversClass(UnambiguousResult::class)]
 #[Group('sqlite')]
 final class SQLiteDatabasePlatformTest extends TestCase
 {
