@@ -106,9 +106,9 @@ final readonly class ImageEmbeddingsImporter implements SingleImport
     private function hasImageVectors(string $id): bool
     {
         return $this->databasePlatform->createQueryBuilder()->createSelect()
-            ->select('id')
+            ->select('image_id')
             ->from('images_vectors')
-            ->where('id', '=', $id)
+            ->where('image_id', '=', $id)
             ->fetchOneOrNull() !== null;
     }
 }

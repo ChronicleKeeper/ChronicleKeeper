@@ -13,7 +13,6 @@ use Psr\Log\LoggerInterface;
 
 use function assert;
 use function count;
-use function implode;
 use function json_decode;
 use function reset;
 
@@ -113,7 +112,7 @@ final readonly class DocumentEmbeddingsImporter implements SingleImport
     private function hasDocumentVectors(string $id): bool
     {
         return $this->databasePlatform->createQueryBuilder()->createSelect()
-                ->select('id')
+                ->select('document_id')
                 ->from('documents_vectors')
                 ->where('document_id', '=', $id)
                 ->fetchOneOrNull() !== null;

@@ -85,6 +85,8 @@ final class PgSqlSelectQueryBuilder implements SelectQueryBuilder
 
     public function fetchOneOrNull(): array|null
     {
+        $this->limit = 1;
+
         return $this->platform->fetchOneOrNull($this->getSQL(), $this->parameters);
     }
 
