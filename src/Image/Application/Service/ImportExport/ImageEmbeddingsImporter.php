@@ -13,7 +13,6 @@ use Psr\Log\LoggerInterface;
 
 use function assert;
 use function count;
-use function implode;
 use function json_decode;
 use function reset;
 
@@ -29,12 +28,6 @@ final readonly class ImageEmbeddingsImporter implements SingleImport
 
     public function import(Filesystem $filesystem, ImportSettings $settings): void
     {
-        if (count($filesystem->listContents('vector/image/')->toArray()) > 0) {
-            $this->classicImport($filesystem);
-
-            return;
-        }
-
         foreach ($filesystem->listContents('library/image_embeddings/') as $file) {
             assert($file instanceof FileAttributes);
 
@@ -70,36 +63,6 @@ final readonly class ImageEmbeddingsImporter implements SingleImport
                     ])
                     ->execute();
             }
-        }
-    }
-
-    private function classicImport(Filesystem $filesystem): void
-    {
-        $libraryDirectoryPath = 'vector/image/';
-        foreach ($filesystem->listContents($libraryDirectoryPath) as $zippedFile) {
-            assert($zippedFile instanceof FileAttributes);
-
-            $fileContent = $filesystem->read($zippedFile->path());
-
-            /** @var array{id: string, imageId: string, content: string, vectorContentHash: string, vector: list<float>} $content */
-            $content = json_decode($fileContent, true, 512, JSON_THROW_ON_ERROR);
-
-            $this->databasePlatform->createQueryBuilder()->createDelete()
-                ->from('images_vectors')
-                ->where('image_id', '=', $content['imageId'])
-                ->execute();
-
-            $this->databasePlatform->createQueryBuilder()->createInsert()
-                ->insert('images_vectors')
-                ->values([
-                    'image_id' => $content['imageId'],
-                    'embedding' => '[' . implode(',', $content['vector']) . ']',
-                    'content' => $content['content'],
-                    'vectorContentHash' => $content['vectorContentHash'],
-                ])
-                ->execute();
-
-            $this->logger->debug('Image vector storage imported.', ['vector_id' => $content['id']]);
         }
     }
 

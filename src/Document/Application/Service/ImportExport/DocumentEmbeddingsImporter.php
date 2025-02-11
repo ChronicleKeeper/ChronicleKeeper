@@ -28,13 +28,6 @@ final readonly class DocumentEmbeddingsImporter implements SingleImport
 
     public function import(Filesystem $filesystem, ImportSettings $settings): void
     {
-        if (count($filesystem->listContents('vector/document/')->toArray()) > 0) {
-            $this->logger->debug('Starting the classic import of the vector storage documents.');
-            $this->classicImport($filesystem);
-
-            return;
-        }
-
         $this->logger->debug('Utilizing the modern import of the vector storage documents.');
 
         foreach ($filesystem->listContents('library/document_embeddings/') as $file) {
@@ -76,36 +69,6 @@ final readonly class DocumentEmbeddingsImporter implements SingleImport
             }
 
             $this->logger->debug('Document vector storage imported.', ['document_id' => $documentId]);
-        }
-    }
-
-    private function classicImport(Filesystem $filesystem): void
-    {
-        $libraryDirectoryPath = 'vector/document/';
-        foreach ($filesystem->listContents($libraryDirectoryPath) as $zippedFile) {
-            assert($zippedFile instanceof FileAttributes);
-
-            $fileContent = $filesystem->read($zippedFile->path());
-
-            /** @var array{id: string, documentId: string, content: string, vectorContentHash: string, vector: list<float>} $content */
-            $content = json_decode($fileContent, true, 512, JSON_THROW_ON_ERROR);
-
-            $this->databasePlatform->createQueryBuilder()->createDelete()
-                ->from('documents_vectors')
-                ->where('document_id', '=', $content['documentId'])
-                ->execute();
-
-            $this->databasePlatform->createQueryBuilder()->createInsert()
-                ->insert('documents_vectors')
-                ->values([
-                    'document_id' => $content['documentId'],
-                    'embedding' => $content['embedding'],
-                    'content' => $content['content'],
-                    'vectorContentHash' => $content['vectorContentHash'],
-                ])
-                ->execute();
-
-            $this->logger->debug('Document vector storage imported.', ['vector_id' => $content['id']]);
         }
     }
 
