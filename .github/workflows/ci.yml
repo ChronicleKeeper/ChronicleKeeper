@@ -38,6 +38,10 @@ jobs:
       fail-fast: false
       matrix:
         php: [ '8.3', '8.4' ]
+        coverage: [false]
+        include:
+          - php: '8.3'
+            coverage: true
     name: Unit Tests PHP ${{ matrix.php }}
     steps:
         - name: Checkout
@@ -56,9 +60,11 @@ jobs:
           run: php vendor/bin/phpunit --group small --group medium
 
         - name: PHPUnit with Coverage
+          if: matrix.coverage
           run: XDEBUG_MODE=coverage php vendor/bin/phpunit --group small --group medium --coverage-clover=coverage-unit.xml
 
         - name: Upload Coverage
+          if: matrix.coverage
           uses: codecov/codecov-action@v5
           with:
             token: ${{ secrets.CODECOV_TOKEN }}
@@ -72,6 +78,10 @@ jobs:
       fail-fast: false
       matrix:
         php: [ '8.3', '8.4' ]
+        coverage: [false]
+        include:
+          - php: '8.3'
+            coverage: true
     name: SQLite Tests PHP ${{ matrix.php }}
     steps:
       - name: Checkout
@@ -90,9 +100,11 @@ jobs:
         run: PHP_INI_SCAN_DIR=:config/sqlite/ php vendor/bin/phpunit --group large --group sqlite
 
       - name: PHPUnit with Coverage
+        if: matrix.coverage
         run: PHP_INI_SCAN_DIR=:config/sqlite/ XDEBUG_MODE=coverage php vendor/bin/phpunit --group large --group sqlite --coverage-clover=coverage-sqlite.xml
 
       - name: Upload Coverage
+        if: matrix.coverage
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
@@ -106,6 +118,10 @@ jobs:
       fail-fast: false
       matrix:
         php: [ '8.3', '8.4' ]
+        coverage: [false]
+        include:
+          - php: '8.3'
+            coverage: true
     name: PGSql Tests PHP ${{ matrix.php }}
 
     services:
@@ -143,9 +159,11 @@ jobs:
         run: php vendor/bin/phpunit --group large --group pgsql
 
       - name: PHPUnit with Coverage
+        if: matrix.coverage
         run: XDEBUG_MODE=coverage php vendor/bin/phpunit --group large --group pgsql --coverage-clover=coverage-pgsql.xml
 
       - name: Upload Coverage
+        if: matrix.coverage
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
