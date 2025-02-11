@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace ChronicleKeeper\Test\Shared\Infrastructure\Database\SQLite\QueryBuilder;
+namespace ChronicleKeeper\Test\Shared\Infrastructure\Database\PgSql\QueryBuilder;
 
 use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
-use ChronicleKeeper\Shared\Infrastructure\Database\SQLite\QueryBuilder\SQLiteDeleteQueryBuilder;
+use ChronicleKeeper\Shared\Infrastructure\Database\PgSql\QueryBuilder\PgSqlDeleteQueryBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Small;
@@ -13,18 +13,18 @@ use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(SQLiteDeleteQueryBuilder::class)]
-#[Group('sqlite')]
+#[CoversClass(PgSqlDeleteQueryBuilder::class)]
+#[Group('pgsql')]
 #[Small]
-class SQLiteDeleteQueryBuilderTest extends TestCase
+class PgSqlDeleteQueryBuilderTest extends TestCase
 {
     private DatabasePlatform&MockObject $databasePlatform;
-    private SQLiteDeleteQueryBuilder $builder;
+    private PgSqlDeleteQueryBuilder $builder;
 
     protected function setUp(): void
     {
         $this->databasePlatform = $this->createMock(DatabasePlatform::class);
-        $this->builder          = new SQLiteDeleteQueryBuilder($this->databasePlatform);
+        $this->builder          = new PgSqlDeleteQueryBuilder($this->databasePlatform);
     }
 
     protected function tearDown(): void
@@ -50,7 +50,7 @@ class SQLiteDeleteQueryBuilderTest extends TestCase
         $this->databasePlatform
             ->expects($this->once())
             ->method('query')
-            ->with('DELETE FROM test_table WHERE id = :id_1', ['id_1' => '123']);
+            ->with('DELETE FROM test_table WHERE "id" = :id_1', ['id_1' => '123']);
 
         $this->builder
             ->from('test_table')
@@ -66,7 +66,7 @@ class SQLiteDeleteQueryBuilderTest extends TestCase
             ->expects($this->once())
             ->method('query')
             ->with(
-                'DELETE FROM test_table WHERE id = :id_1 AND status = :status_2',
+                'DELETE FROM test_table WHERE "id" = :id_1 AND "status" = :status_2',
                 ['id_1' => '123', 'status_2' => 'active'],
             );
 

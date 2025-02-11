@@ -11,7 +11,6 @@ use ChronicleKeeper\Shared\Infrastructure\Database\Exception\UnambiguousResult;
 use ChronicleKeeper\Shared\Infrastructure\Database\SQLite\SQLiteDatabasePlatform;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\Large;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
@@ -19,7 +18,6 @@ use SQLite3;
 
 #[CoversClass(SQLiteDatabasePlatform::class)]
 #[Group('sqlite')]
-#[Large]
 final class SQLiteDatabasePlatformTest extends TestCase
 {
     private SQLiteDatabasePlatform $platform;

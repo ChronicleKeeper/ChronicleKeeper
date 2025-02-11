@@ -15,6 +15,6 @@ interface DeleteQueryBuilder extends BaseQueryBuilder
      */
     public function where(string $column, string $operator, mixed $value): self;
 
-    /** @param list<array{0: string, 1: string, 2: string}> $conditions */
+    /** @param list<array{0: string, 1: string, 2: mixed}> $conditions */
     public function orWhere(array $conditions): self;
 }

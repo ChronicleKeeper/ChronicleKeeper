@@ -9,6 +9,7 @@ use ChronicleKeeper\Chat\Application\Query\FindConversationByIdParameters;
 use ChronicleKeeper\Chat\Application\Query\FindConversationByIdQuery;
 use ChronicleKeeper\Chat\Domain\Entity\Conversation;
 use ChronicleKeeper\Chat\Infrastructure\Database\Converter\ConversationRowConverter;
+use ChronicleKeeper\Shared\Infrastructure\Database\Converter\DatabaseRowConverter;
 use ChronicleKeeper\Test\Chat\Domain\Entity\ConversationBuilder;
 use ChronicleKeeper\Test\Chat\Domain\Entity\ExtendedMessageBagBuilder;
 use ChronicleKeeper\Test\Chat\Domain\Entity\ExtendedMessageBuilder;
@@ -26,6 +27,7 @@ use function assert;
 #[CoversClass(FindConversationByIdQuery::class)]
 #[CoversClass(FindConversationByIdParameters::class)]
 #[CoversClass(ConversationRowConverter::class)]
+#[CoversClass(DatabaseRowConverter::class)]
 #[Large]
 class FindConversationByIdQueryTest extends DatabaseTestCase
 {

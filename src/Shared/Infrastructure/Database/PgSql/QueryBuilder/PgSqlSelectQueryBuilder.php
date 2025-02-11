@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Shared\Infrastructure\Database\PgSql\QueryBuilder;
 
-use ChronicleKeeper\Shared\Infrastructure\Database\PgSql\PgSqlDatabasePlatform;
+use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
 use ChronicleKeeper\Shared\Infrastructure\Database\PgSql\QueryBuilder\Traits\WhereClauseBuilder;
 use ChronicleKeeper\Shared\Infrastructure\Database\QueryBuilder\SelectQueryBuilder;
 
@@ -29,7 +29,7 @@ final class PgSqlSelectQueryBuilder implements SelectQueryBuilder
     private string $vectorWhere = '';
 
     public function __construct(
-        private readonly PgSqlDatabasePlatform $platform,
+        private readonly DatabasePlatform $platform,
     ) {
     }
 

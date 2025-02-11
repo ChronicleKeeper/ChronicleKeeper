@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Shared\Infrastructure\Database\PgSql\QueryBuilder;
 
-use ChronicleKeeper\Shared\Infrastructure\Database\PgSql\PgSqlDatabasePlatform;
+use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
 use ChronicleKeeper\Shared\Infrastructure\Database\PgSql\QueryBuilder\Traits\WhereClauseBuilder;
 use ChronicleKeeper\Shared\Infrastructure\Database\QueryBuilder\DeleteQueryBuilder;
+use InvalidArgumentException;
 
 use function sprintf;
+use function trim;
 
 final class PgSqlDeleteQueryBuilder implements DeleteQueryBuilder
 {
@@ -17,12 +19,18 @@ final class PgSqlDeleteQueryBuilder implements DeleteQueryBuilder
     private string $table = '';
 
     public function __construct(
-        private readonly PgSqlDatabasePlatform $platform,
+        private readonly DatabasePlatform $platform,
     ) {
     }
 
     public function from(string $table): self
     {
+        $table = trim($table);
+
+        if ($table === '') {
+            throw new InvalidArgumentException('Table name cannot be empty');
+        }
+
         $this->table = $table;
 
         return $this;
@@ -30,6 +38,10 @@ final class PgSqlDeleteQueryBuilder implements DeleteQueryBuilder
 
     public function execute(): null
     {
+        if ($this->table === '') {
+            throw new InvalidArgumentException('No table specified for delete query');
+        }
+
         $this->platform->query($this->getSQL(), $this->parameters);
 
         return null;

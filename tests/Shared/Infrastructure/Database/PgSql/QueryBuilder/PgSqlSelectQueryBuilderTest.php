@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace ChronicleKeeper\Test\Shared\Infrastructure\Database\SQLite\QueryBuilder;
+namespace ChronicleKeeper\Test\Shared\Infrastructure\Database\PgSql\QueryBuilder;
 
 use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
-use ChronicleKeeper\Shared\Infrastructure\Database\SQLite\QueryBuilder\SQLiteSelectQueryBuilder;
+use ChronicleKeeper\Shared\Infrastructure\Database\PgSql\QueryBuilder\PgSqlSelectQueryBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Small;
@@ -13,18 +13,18 @@ use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(SQLiteSelectQueryBuilder::class)]
-#[Group('sqlite')]
+#[CoversClass(PgSqlSelectQueryBuilder::class)]
+#[Group('pgsql')]
 #[Small]
-final class SQLiteSelectQueryBuilderTest extends TestCase
+final class PgSqlSelectQueryBuilderTest extends TestCase
 {
     private DatabasePlatform&MockObject $databasePlatform;
-    private SQLiteSelectQueryBuilder $builder;
+    private PgSqlSelectQueryBuilder $builder;
 
     protected function setUp(): void
     {
         $this->databasePlatform = $this->createMock(DatabasePlatform::class);
-        $this->builder          = new SQLiteSelectQueryBuilder($this->databasePlatform);
+        $this->builder          = new PgSqlSelectQueryBuilder($this->databasePlatform);
     }
 
     protected function tearDown(): void
@@ -53,7 +53,7 @@ final class SQLiteSelectQueryBuilderTest extends TestCase
         $this->databasePlatform
             ->expects($this->once())
             ->method('fetch')
-            ->with('SELECT id, name FROM users');
+            ->with('SELECT "id", "name" FROM users');
 
         $this->builder
             ->select('id', 'name')
@@ -69,7 +69,7 @@ final class SQLiteSelectQueryBuilderTest extends TestCase
             ->expects($this->once())
             ->method('fetch')
             ->with(
-                'SELECT * FROM users WHERE status = :status_1 AND age > :age_2',
+                'SELECT * FROM users WHERE "status" = :status_1 AND "age" > :age_2',
                 ['status_1' => 'active', 'age_2' => 18],
             );
 
@@ -252,8 +252,8 @@ final class SQLiteSelectQueryBuilderTest extends TestCase
             ->expects($this->once())
             ->method('fetch')
             ->with(
-                'SELECT *, distance AS distance FROM users WHERE embedding MATCH :embedding_1 AND distance < :distance_2 AND k = :k_3',
-                ['embedding_1' => '[1,2]', 'distance_2' => 0.5, 'k_3' => 10],
+                'SELECT *, (embedding <=> \'[1,2]\') AS distance FROM users WHERE (embedding <=> \'[1,2]\') < 0.5',
+                [],
             );
 
         $this->builder
@@ -271,14 +271,14 @@ final class SQLiteSelectQueryBuilderTest extends TestCase
             ->expects($this->once())
             ->method('fetch')
             ->with(
-                'SELECT *, vec_to_json(embedding) as myEmbedding FROM users',
+                'SELECT *, embedding as my_embedding FROM users',
                 [],
             );
 
         $this->builder
             ->select('*')
             ->from('users')
-            ->vectorToJson('embedding', 'myEmbedding');
+            ->vectorToJson('embedding', 'my_embedding');
 
         $this->builder->execute();
     }

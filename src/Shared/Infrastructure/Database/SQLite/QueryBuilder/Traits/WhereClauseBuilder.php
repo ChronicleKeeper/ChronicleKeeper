@@ -38,7 +38,7 @@ trait WhereClauseBuilder
         return $this;
     }
 
-    /** @param list<array{0: string, 1: string, 2: string}> $conditions */
+    /** @param list<array{0: string, 1: string, 2: mixed}> $conditions */
     public function orWhere(array $conditions): self
     {
         $orParts = [];
