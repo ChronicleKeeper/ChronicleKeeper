@@ -15,14 +15,16 @@ check-test-containers:
 
 test: setup-dev-env ## Run tests with configured database
 ifeq ($(DB),sqlite)
+	cp .env.test.sqlite .env.test
 	APP_ENV=test $(SQLITE_PHP) bin/console cache:clear
 	APP_ENV=test $(SQLITE_PHP) bin/console app:db:drop -f
 	$(SQLITE_PHP) vendor/bin/phpunit --colors --exclude-group=pgsql
 else
+	cp .env.test.pgsql .env.test
 	$(MAKE) check-test-containers
-	APP_ENV=test DATABASE_TYPE=PgSql DATABASE_CONNECTION=$(PGSQL_TEST_DSN) $(PGSQL_PHP) bin/console cache:clear
-	APP_ENV=test $(SQLITE_PHP) bin/console app:db:drop -f
-	APP_ENV=test DATABASE_TYPE=PgSql DATABASE_CONNECTION=$(PGSQL_TEST_DSN) $(PGSQL_PHP) vendor/bin/phpunit --colors --exclude-group=sqlite
+	$(PGSQL_PHP) bin/console cache:clear --env=test
+	$(PGSQL_PHP) bin/console app:db:drop -f --env=test
+	$(PGSQL_PHP) vendor/bin/phpunit --colors --exclude-group=sqlite
 endif
 
 coverage: setup-dev-env ## Generate test coverage report
