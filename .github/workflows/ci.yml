@@ -17,6 +17,9 @@ jobs:
         with:
           php-version: '8.3'
 
+      - name: Setup Temporary Config
+        run: cp .env.test.sqlite .env
+
       - uses: "ramsey/composer-install@v3"
 
       - name: Linting PHP
@@ -28,7 +31,75 @@ jobs:
       - name: PHPStan Static Analyses
         run: make static-analysis
 
-  tests:
+  tests-unit:
+    needs: lint
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php: [ '8.3', '8.4' ]
+    name: Unit Tests PHP ${{ matrix.php }}
+    steps:
+        - name: Checkout
+          uses: actions/checkout@v4
+
+        - uses: shivammathur/setup-php@v2
+          with:
+            php-version: ${{ matrix.php }}
+
+        - name: Setup Temporary Config
+          run: cp .env.test.sqlite .env
+
+        - uses: "ramsey/composer-install@v3"
+
+        - name: PHPUnit
+          run: php vendor/bin/phpunit --group small --group medium
+
+        - name: PHPUnit with Coverage
+          run: XDEBUG_MODE=coverage php vendor/bin/phpunit --group small --group medium --coverage-clover=coverage-unit.xml
+
+        - name: Upload Coverage
+          uses: codecov/codecov-action@v5
+          with:
+            token: ${{ secrets.CODECOV_TOKEN }}
+            files: coverage-unit.xml
+            flags: unit-tests
+
+  tests-sqlite:
+    needs: lint
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php: [ '8.3', '8.4' ]
+    name: SQLite Tests PHP ${{ matrix.php }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+
+      - name: Setup Database Config
+        run: cp .env.test.sqlite .env
+
+      - uses: "ramsey/composer-install@v3"
+
+      - name: PHPUnit
+        run: PHP_INI_SCAN_DIR=:config/sqlite/ php vendor/bin/phpunit --group large --group sqlite
+
+      - name: PHPUnit with Coverage
+        run: PHP_INI_SCAN_DIR=:config/sqlite/ XDEBUG_MODE=coverage php vendor/bin/phpunit --group large --group sqlite --coverage-clover=coverage-sqlite.xml
+
+      - name: Upload Coverage
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: coverage-sqlite.xml
+          flags: sqlite-tests
+
+  tests-pgsql:
     needs: lint
     runs-on: ubuntu-latest
     strategy:
@@ -36,7 +107,6 @@ jobs:
       matrix:
         php: [ '8.3', '8.4' ]
         test-group: [ 'small', 'large', 'medium', 'ungrouped' ]
-        database: [ 'sqlite', 'pgsql' ]
     name: Tests PHP ${{ matrix.php }} - ${{ matrix.test-group }} - ${{ matrix.database }}
 
     services:
@@ -66,41 +136,19 @@ jobs:
 
       - name: Setup Database Config
         run: |
-            if [ "${{ matrix.database }}" == "pgsql" ]; then
-                echo "DATABASE_TYPE=PgSql" >> .env.test
-                echo "DATABASE_CONNECTION=pgsql:host=localhost;port=5432;dbname=chronicle-keeper;user=app;password=app" >> .env.test
-            else
-                echo "DATABASE_TYPE=sqlite" >> .env.test
-                echo "DATABASE_CONNECTION=database_test.sqlite" >> .env.test
-            fi
+          cp .env.test.pgsql .env
+          echo "DATABASE_TYPE=PgSql" >> .env.test
+          echo "DATABASE_CONNECTION=pgsql:host=localhost;port=5432;dbname=chronicle-keeper;user=app;password=app" >> .env.test
 
       - name: PHPUnit
-        run: |
-          if [ "${{ matrix.test-group }}" == "ungrouped" ]; then
-              PHP_INI_SCAN_DIR=:config/sqlite/ php vendor/bin/phpunit --exclude-group small --exclude-group large --exclude-group medium
-          else
-              PHP_INI_SCAN_DIR=:config/sqlite/ php vendor/bin/phpunit --group ${{ matrix.test-group }}
-          fi
+        run: php vendor/bin/phpunit --group large --group pgsql
 
-  coverage:
-    needs: tests
-    runs-on: ubuntu-latest
-    name: Coverage Report
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - name: PHPUnit with Coverage
+        run: XDEBUG_MODE=coverage php vendor/bin/phpunit --group large --group pgsql --coverage-clover=coverage-pgsql.xml
 
-      - uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.3'
-
-      - uses: "ramsey/composer-install@v3"
-
-      - name: Generate Coverage Report
-        run: make coverage
-
-      - name: Upload Coverage Report
+      - name: Upload Coverage
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          files: coverage.xml
+          files: coverage-pgsql.xml
+          flags: pgsql-tests
