@@ -29,7 +29,7 @@ final class ConversationProvider extends DefaultSchemaProvider
             CREATE TABLE conversation_settings (
                 conversation_id TEXT PRIMARY KEY,
                 version TEXT NOT NULL,
-                temperature REAL NOT NULL,
+                temperature FLOAT NOT NULL,
                 images_max_distance FLOAT NOT NULL,
                 documents_max_distance FLOAT NOT NULL,
                 FOREIGN KEY(conversation_id) REFERENCES conversations(id)

@@ -36,7 +36,13 @@ final class PgSqlSelectQueryBuilder implements SelectQueryBuilder
     public function select(string ...$columns): self
     {
         $this->columns = array_values(array_map(
-            static fn (string $column): string => str_contains($column, ' as ') ? $column : '"' . $column . '"',
+            static function (string $column): string {
+                if ($column === '*' || str_contains($column, ' as ')) {
+                    return $column;
+                }
+
+                return '"' . $column . '"';
+            },
             $columns,
         ));
 
