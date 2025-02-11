@@ -106,8 +106,7 @@ jobs:
       fail-fast: false
       matrix:
         php: [ '8.3', '8.4' ]
-        test-group: [ 'small', 'large', 'medium', 'ungrouped' ]
-    name: Tests PHP ${{ matrix.php }} - ${{ matrix.test-group }} - ${{ matrix.database }}
+    name: PGSql Tests PHP ${{ matrix.php }}
 
     services:
       postgres:
@@ -132,13 +131,13 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
 
-      - uses: "ramsey/composer-install@v3"
-
       - name: Setup Database Config
         run: |
           cp .env.test.pgsql .env
           echo "DATABASE_TYPE=PgSql" >> .env.test
           echo "DATABASE_CONNECTION=pgsql:host=localhost;port=5432;dbname=chronicle-keeper;user=app;password=app" >> .env.test
+
+      - uses: "ramsey/composer-install@v3"
 
       - name: PHPUnit
         run: php vendor/bin/phpunit --group large --group pgsql
