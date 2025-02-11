@@ -45,7 +45,7 @@ class SearchSimilarVectorsQuery implements Query
             $results[] = [
                 'document' => $document,
                 'content' => $vector['content'],
-                'distance' => $vector['distance'],
+                'distance' => (float) $vector['distance'],
             ];
         }
 

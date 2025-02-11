@@ -43,9 +43,9 @@ class ConversationRowConverter implements RowConverter
             'directory' => $data['directory'],
             'settings' => [
                 'version' => $settings['version'],
-                'temperature' => $settings['temperature'],
-                'imagesMaxDistance' => $settings['images_max_distance'],
-                'documentsMaxDistance' => $settings['documents_max_distance'],
+                'temperature' => (float) $settings['temperature'],
+                'imagesMaxDistance' => (float) $settings['images_max_distance'],
+                'documentsMaxDistance' => (float) $settings['documents_max_distance'],
             ],
             'messages' => [],
         ];

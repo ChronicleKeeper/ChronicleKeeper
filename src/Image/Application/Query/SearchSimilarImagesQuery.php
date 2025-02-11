@@ -45,7 +45,7 @@ class SearchSimilarImagesQuery implements Query
             $results[] = [
                 'image' => $image,
                 'content' => $vector['content'],
-                'distance' => $vector['distance'],
+                'distance' => (float) $vector['distance'],
             ];
         }
 
