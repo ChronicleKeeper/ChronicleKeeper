@@ -38,6 +38,7 @@ class DirectoryCreationTest extends WebTestCase
             Request::METHOD_POST,
             '/library/directory/' . RootDirectory::ID . '/create_directory',
             [
+                'saveAndRedirect' => '1', // Redirect to view the created directory
                 'directory' => [
                     'title' => 'New Directory',
                     'parent' => RootDirectory::ID,
