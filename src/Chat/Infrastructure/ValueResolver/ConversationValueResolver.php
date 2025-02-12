@@ -7,7 +7,7 @@ namespace ChronicleKeeper\Chat\Infrastructure\ValueResolver;
 use ChronicleKeeper\Chat\Application\Query\FindConversationByIdParameters;
 use ChronicleKeeper\Chat\Domain\Entity\Conversation;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
-use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Exception\UnableToReadFile;
+use ChronicleKeeper\Shared\Infrastructure\Database\Exception\MissingResults;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
@@ -41,7 +41,7 @@ class ConversationValueResolver implements ValueResolverInterface
 
         try {
             $conversation = $this->queryService->query(new FindConversationByIdParameters($identifier)) ?? throw new NotFoundHttpException();
-        } catch (UnableToReadFile) {
+        } catch (MissingResults) {
             throw new NotFoundHttpException('Conversation "' . $identifier . '" not found.');
         }
 
