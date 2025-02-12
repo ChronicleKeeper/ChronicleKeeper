@@ -1,5 +1,21 @@
 # Changelog
 
+## [alpha-0.8] - First Steps to the Cloud
+
+**Added**
+- Added PostgreSQL support to the database layer.
+
+**Changed**
+- Some forms now contain an improved footer with more button submit choiced
+    - The default is moving back to the list
+    - You can move to the view mode of the created item
+    - You can create an additional item after the current one
+- The Makefile environment has widely changed to be more open for the different database environments.
+- There is a docker setup again for the PostgreSQL environment.
+- The CI is now testing SQLite and PostgreSQL environments during development of features.
+- The directory cache in the library is gone again, it is not needed anymore after SQLite and PostgreSQL implementation.
+- Update Dependencies to the latest versions.
+
 ## [alpha-0.7] - Moving Forward
 
 **Added**

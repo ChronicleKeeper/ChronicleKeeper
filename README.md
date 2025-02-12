@@ -50,6 +50,10 @@ aus einer vorherigen Version wechseln oder direkt in die Konfiguration weitergel
 
 Eine ausführliche Dokumentation findest du unter [https://chroniclekeeper.github.io/docs/](https://chroniclekeeper.github.io/docs/).
 
+## Contributions
+
+Siehe [CONTRIBUTING.md](CONTRIBUTING.md) für weitere Informationen zur Mitwirkung und ein wenig Entwicklerdokumentation.
+
 ## License
 
 **Chronicle Keeper** © 2025+, Denis Zunke. Dieses Projekt ist unter der MIT-Lizenz lizenziert, 
