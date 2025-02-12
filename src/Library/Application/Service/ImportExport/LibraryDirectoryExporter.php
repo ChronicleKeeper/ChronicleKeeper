@@ -6,6 +6,7 @@ namespace ChronicleKeeper\Library\Application\Service\ImportExport;
 
 use ChronicleKeeper\Library\Application\Query\FindAllDirectories;
 use ChronicleKeeper\Library\Domain\Entity\Directory;
+use ChronicleKeeper\Library\Domain\RootDirectory;
 use ChronicleKeeper\Settings\Application\Service\Exporter\ExportData;
 use ChronicleKeeper\Settings\Application\Service\Exporter\ExportSettings;
 use ChronicleKeeper\Settings\Application\Service\Exporter\SingleExport;
@@ -41,6 +42,11 @@ final readonly class LibraryDirectoryExporter implements SingleExport
 
         $directoriesAsArray = [];
         foreach ($directories as $directory) {
+            if ($directory->getId() === RootDirectory::ID) {
+                // The root directory must not be exported as it is always there and not part of any export
+                continue;
+            }
+
             $directoriesAsArray[] = $directory->toArray();
         }
 

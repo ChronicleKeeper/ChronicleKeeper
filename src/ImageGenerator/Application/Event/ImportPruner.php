@@ -6,6 +6,7 @@ namespace ChronicleKeeper\ImageGenerator\Application\Event;
 
 use ChronicleKeeper\Settings\Domain\Event\ExecuteImportPruning;
 use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
+use ChronicleKeeper\Shared\Infrastructure\Database\Exception\DatabaseQueryException;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
@@ -25,7 +26,21 @@ class ImportPruner
             ['pruner' => self::class, 'tables' => ['generator_requests', 'generator_results']],
         );
 
-        $this->databasePlatform->truncateTable('generator_results');
-        $this->databasePlatform->truncateTable('generator_requests');
+        try {
+            $this->databasePlatform->beginTransaction();
+
+            $this->databasePlatform->createQueryBuilder()->createDelete()->from('generator_results')->execute();
+            $this->databasePlatform->createQueryBuilder()->createDelete()->from('generator_requests')->execute();
+
+            $this->databasePlatform->commit();
+        } catch (DatabaseQueryException $e) {
+            $this->databasePlatform->rollback();
+            $this->logger->error(
+                'Import - Pruning failed.',
+                ['pruner' => self::class, 'error' => $e->getMessage()],
+            );
+
+            throw $e;
+        }
     }
 }

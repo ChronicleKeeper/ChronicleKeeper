@@ -4,22 +4,50 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Test\ImageGenerator\Application\Query;
 
+use ChronicleKeeper\Image\Application\Command\StoreImage;
+use ChronicleKeeper\Image\Domain\Entity\Image;
+use ChronicleKeeper\ImageGenerator\Application\Command\StoreGeneratorRequest;
+use ChronicleKeeper\ImageGenerator\Application\Command\StoreGeneratorResult;
 use ChronicleKeeper\ImageGenerator\Application\Query\GetImageOfGeneratorRequest;
 use ChronicleKeeper\ImageGenerator\Application\Query\GetImageOfGeneratorRequestQuery;
-use ChronicleKeeper\ImageGenerator\Domain\Entity\GeneratorResult;
-use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
+use ChronicleKeeper\Test\Image\Domain\Entity\ImageBuilder;
+use ChronicleKeeper\Test\ImageGenerator\Domain\Entity\GeneratorRequestBuilder;
+use ChronicleKeeper\Test\ImageGenerator\Domain\Entity\GeneratorResultBuilder;
+use ChronicleKeeper\Test\Shared\Infrastructure\Database\DatabaseTestCase;
+use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\Small;
+use PHPUnit\Framework\Attributes\Large;
 use PHPUnit\Framework\Attributes\Test;
-use PHPUnit\Framework\TestCase;
-use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Webmozart\Assert\InvalidArgumentException;
+
+use function assert;
 
 #[CoversClass(GetImageOfGeneratorRequestQuery::class)]
 #[CoversClass(GetImageOfGeneratorRequest::class)]
-#[Small]
-class GetImageOfGeneratorRequestQueryTest extends TestCase
+#[Large]
+class GetImageOfGeneratorRequestQueryTest extends DatabaseTestCase
 {
+    private GetImageOfGeneratorRequestQuery $query;
+
+    #[Override]
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $query = self::getContainer()->get(GetImageOfGeneratorRequestQuery::class);
+        assert($query instanceof GetImageOfGeneratorRequestQuery);
+
+        $this->query = $query;
+    }
+
+    #[Override]
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        unset($this->query);
+    }
+
     #[Test]
     public function correctQueryClassIsliked(): void
     {
@@ -56,31 +84,32 @@ class GetImageOfGeneratorRequestQueryTest extends TestCase
     #[Test]
     public function theGeneratorResultIsBuild(): void
     {
-        $requestId = '5b3cde06-bc8b-4389-8407-2493a58d95e7';
-        $imageId   = '51b7e687-309a-4ee4-9d11-d6fbd977acde';
+        // ------------------- The test setup -------------------
 
-        $databasePlatform = $this->createMock(DatabasePlatform::class);
-        $databasePlatform->expects($this->once())
-            ->method('fetchSingleRow')
-            ->with(
-                'SELECT * FROM generator_results WHERE generatorRequest = :requestId AND id = :imageId',
-                ['requestId' => $requestId, 'imageId' => $imageId],
-            )
-            ->willReturn(['title' => 'foo']);
+        $request = (new GeneratorRequestBuilder())->build();
+        $this->bus->dispatch(new StoreGeneratorRequest($request));
 
-        $denormalizer = $this->createMock(DenormalizerInterface::class);
-        $denormalizer
-            ->expects($this->once())
-            ->method('denormalize')
-            ->willReturnCallback(static function (array $data, string $target): GeneratorResult {
-                self::assertSame(GeneratorResult::class, $target);
+        $image = (new ImageBuilder())->build();
+        $this->bus->dispatch(new StoreImage($image));
 
-                self::assertSame('foo', $data['title']);
+        $result = (new GeneratorResultBuilder())->withImage($image)->build();
+        $this->bus->dispatch(new StoreGeneratorResult($request->id, $result));
 
-                return self::createStub(GeneratorResult::class);
-            });
+        assert($result->image instanceof Image);
 
-        (new GetImageOfGeneratorRequestQuery($denormalizer, $databasePlatform))
-            ->query(new GetImageOfGeneratorRequest($requestId, $imageId));
+        // ------------------- The test execution -------------------
+
+        $searchResult = $this->query->query(new GetImageOfGeneratorRequest(
+            $request->id,
+            $result->id,
+        ));
+
+        // ------------------- The test assertions -------------------
+
+        self::assertSame($result->id, $searchResult->id);
+        self::assertSame(
+            $result->image->getId(),
+            $searchResult->image?->getId(),
+        );
     }
 }

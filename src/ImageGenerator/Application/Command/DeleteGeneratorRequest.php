@@ -8,7 +8,6 @@ use Webmozart\Assert\Assert;
 
 class DeleteGeneratorRequest
 {
-    /** @param non-empty-string $requestId */
     public function __construct(
         public readonly string $requestId,
     ) {

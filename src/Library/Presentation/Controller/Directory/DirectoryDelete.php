@@ -61,7 +61,6 @@ class DirectoryDelete extends AbstractController
         /** @var array{confirmDeleteAll: bool, moveContentTo: Directory} $directoryRemovalOptions */
         $directoryRemovalOptions = $form->getData();
         if ($directoryRemovalOptions['confirmDeleteAll'] === true) {
-            // Delte all Content! Must search for all child directories ... all! Really ALL!
             $this->bus->dispatch(new DeleteDirectory($directory));
 
             $this->addFlashMessage(

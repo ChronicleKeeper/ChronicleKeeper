@@ -27,10 +27,11 @@ class FindConversationsByDirectoryQuery implements Query
     {
         assert($parameters instanceof FindConversationsByDirectoryParameters);
 
-        $data = $this->databasePlatform->fetch(
-            'SELECT * FROM conversations WHERE directory = :directory ORDER BY title',
-            ['directory' => $parameters->directory->getId()],
-        );
+        $data = $this->databasePlatform->createQueryBuilder()->createSelect()
+            ->from('conversations')
+            ->where('directory', '=', $parameters->directory->getId())
+            ->orderBy('title')
+            ->fetchAll();
 
         $conversations = [];
         foreach ($data as $conversation) {

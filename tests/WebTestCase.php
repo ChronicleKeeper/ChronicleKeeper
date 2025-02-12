@@ -7,6 +7,8 @@ namespace ChronicleKeeper\Test;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
 use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
 use ChronicleKeeper\Shared\Infrastructure\Database\Schema\SchemaManager;
+use ChronicleKeeper\Shared\Infrastructure\LLMChain\LLMChainFactory;
+use ChronicleKeeper\Test\Shared\Infrastructure\LLMChain\LLMChainFactoryDouble;
 use Override;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase as SymfonyWebTestCase;
@@ -21,6 +23,7 @@ class WebTestCase extends SymfonyWebTestCase
     protected QueryService $queryService;
     protected MessageBusInterface $bus;
     protected SchemaManager $schemaManager;
+    protected LLMChainFactoryDouble $llmChainFactory;
 
     protected function setUp(): void
     {
@@ -45,6 +48,11 @@ class WebTestCase extends SymfonyWebTestCase
         assert($bus instanceof MessageBusInterface);
 
         $this->bus = $bus;
+
+        $llmChainFactory = $this->client->getContainer()->get(LLMChainFactory::class);
+        assert($llmChainFactory instanceof LLMChainFactoryDouble);
+
+        $this->llmChainFactory = $llmChainFactory;
 
         if (! self::willSetupSchema()) {
             return;

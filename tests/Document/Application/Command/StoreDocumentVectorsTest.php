@@ -6,44 +6,74 @@ namespace ChronicleKeeper\Test\Document\Application\Command;
 
 use ChronicleKeeper\Document\Application\Command\StoreDocumentVectors;
 use ChronicleKeeper\Document\Application\Command\StoreDocumentVectorsHandler;
-use ChronicleKeeper\Document\Domain\Entity\VectorDocument;
 use ChronicleKeeper\Test\Document\Domain\Entity\VectorDocumentBuilder;
-use ChronicleKeeper\Test\Shared\Infrastructure\Database\DatabasePlatformMock;
+use ChronicleKeeper\Test\Shared\Infrastructure\Database\DatabaseTestCase;
+use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\Small;
+use PHPUnit\Framework\Attributes\Large;
 use PHPUnit\Framework\Attributes\Test;
-use PHPUnit\Framework\TestCase;
 
-use function implode;
+use function assert;
 
 #[CoversClass(StoreDocumentVectors::class)]
 #[CoversClass(StoreDocumentVectorsHandler::class)]
-#[Small]
-class StoreDocumentVectorsTest extends TestCase
+#[Large]
+class StoreDocumentVectorsTest extends DatabaseTestCase
 {
-    #[Test]
-    public function commandIsInstantiatable(): void
+    private StoreDocumentVectorsHandler $handler;
+
+    #[Override]
+    protected function setUp(): void
     {
-        $vectorDocument = self::createStub(VectorDocument::class);
-        $command        = new StoreDocumentVectors($vectorDocument);
+        parent::setUp();
+
+        $handler = self::getContainer()->get(StoreDocumentVectorsHandler::class);
+        assert($handler instanceof StoreDocumentVectorsHandler);
+
+        $this->handler = $handler;
+    }
+
+    #[Override]
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        unset($this->handler);
+    }
+
+    #[Test]
+    public function itHasACommandThatIsConstructable(): void
+    {
+        $command = new StoreDocumentVectors($vectorDocument = (new VectorDocumentBuilder())->build());
 
         self::assertSame($vectorDocument, $command->vectorDocument);
     }
 
     #[Test]
-    public function documentIsStored(): void
+    public function itCanStoreTheVectorDocument(): void
     {
-        $vectorDocument = (new VectorDocumentBuilder())->build();
+        // ------------------- The test setup -------------------
 
-        $databasePlatform = new DatabasePlatformMock();
-        $handler          = new StoreDocumentVectorsHandler($databasePlatform);
-        $handler(new StoreDocumentVectors($vectorDocument));
+        $vectorDocument = (new VectorDocumentBuilder())
+            ->withId('15a20288-5e93-4895-897c-b158db2393e4')
+            ->build();
 
-        $databasePlatform->assertExecutedInsert('documents_vectors', [
-            'document_id' => $vectorDocument->document->getId(),
-            'embedding' => '[' . implode(',', $vectorDocument->vector) . ']',
-            'content' => $vectorDocument->content,
-            'vectorContentHash' => $vectorDocument->vectorContentHash,
-        ]);
+        // ------------------- The test execution -------------------
+
+        ($this->handler)(new StoreDocumentVectors($vectorDocument));
+
+        // ------------------- The test assertions -------------------
+
+        $this->assertRowsInTable('documents_vectors', 1);
+
+        $vectors = $this->getRowFromTable(
+            'documents_vectors',
+            'document_id',
+            $vectorDocument->document->getId(),
+        );
+
+        self::assertNotNull($vectors);
+        self::assertSame($vectorDocument->document->getId(), $vectors['document_id']);
+        self::assertSame($vectorDocument->content, $vectors['content']);
     }
 }

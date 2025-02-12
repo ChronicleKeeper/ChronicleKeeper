@@ -4,98 +4,100 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Test\Document\Application\Query;
 
+use ChronicleKeeper\Document\Application\Command\StoreDocument;
 use ChronicleKeeper\Document\Application\Query\FindDocumentsByDirectory;
 use ChronicleKeeper\Document\Application\Query\FindDocumentsByDirectoryQuery;
-use ChronicleKeeper\Document\Domain\Entity\Document;
+use ChronicleKeeper\Library\Application\Command\StoreDirectory;
 use ChronicleKeeper\Test\Document\Domain\Entity\DocumentBuilder;
 use ChronicleKeeper\Test\Library\Domain\Entity\DirectoryBuilder;
-use ChronicleKeeper\Test\Shared\Infrastructure\Database\DatabasePlatformMock;
+use ChronicleKeeper\Test\Shared\Infrastructure\Database\DatabaseTestCase;
+use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\Small;
+use PHPUnit\Framework\Attributes\Large;
 use PHPUnit\Framework\Attributes\Test;
-use PHPUnit\Framework\TestCase;
-use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
-use UnexpectedValueException;
+
+use function assert;
 
 #[CoversClass(FindDocumentsByDirectory::class)]
 #[CoversClass(FindDocumentsByDirectoryQuery::class)]
-#[Small]
-class FindDocumentsByDirectoryTest extends TestCase
+#[Large]
+class FindDocumentsByDirectoryTest extends DatabaseTestCase
 {
-    #[Test]
-    public function parametersAreInitializable(): void
-    {
-        $parameters = new FindDocumentsByDirectory('foo');
+    private FindDocumentsByDirectoryQuery $query;
 
-        self::assertSame('foo', $parameters->id);
+    #[Override]
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $query = self::getContainer()->get(FindDocumentsByDirectoryQuery::class);
+        assert($query instanceof FindDocumentsByDirectoryQuery);
+
+        $this->query = $query;
+    }
+
+    #[Override]
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        unset($this->query);
+    }
+
+    #[Test]
+    public function itHasAConstructableQueryParametersClass(): void
+    {
+        $parameters = new FindDocumentsByDirectory('ffa8cf2d-e0ff-4777-a106-9353917d67c3');
+
+        self::assertSame('ffa8cf2d-e0ff-4777-a106-9353917d67c3', $parameters->id);
         self::assertSame(FindDocumentsByDirectoryQuery::class, $parameters->getQueryClass());
     }
 
     #[Test]
-    public function queryWorkingWithoutResults(): void
+    public function itIsWorkingWhenThereAreNoResults(): void
     {
-        $denormalizer = $this->createMock(DenormalizerInterface::class);
-        $denormalizer->expects($this->never())->method('denormalize');
+        // ------------------- The test setup -------------------
 
-        $databasePlatform = new DatabasePlatformMock();
-        $databasePlatform->expectFetch(
-            'SELECT * FROM documents WHERE directory = :directory ORDER BY title',
-            ['directory' => 'foo'],
-            [],
-        );
+        $directory = (new DirectoryBuilder())->build();
+        $this->bus->dispatch(new StoreDirectory($directory));
 
-        $query     = new FindDocumentsByDirectoryQuery($denormalizer, $databasePlatform);
-        $documents = $query->query(new FindDocumentsByDirectory('foo'));
+        // ------------------- The test execution -------------------
+
+        $documents = $this->query->query(new FindDocumentsByDirectory($directory->getId()));
 
         self::assertSame([], $documents);
     }
 
     #[Test]
-    public function queryWithResults(): void
+    public function itWillFindAllDocumentsThatAreWithingADirectory(): void
     {
-        $searchDirectory = (new DirectoryBuilder())->build();
+        // ------------------- The test setup -------------------
 
-        $platform = new DatabasePlatformMock();
-        $platform->expectFetch(
-            'SELECT * FROM documents WHERE directory = :directory ORDER BY title',
-            ['directory' => $searchDirectory->getId()],
-            [
-                ['title' => 'foo'],
-                ['title' => 'bar'],
-            ],
-        );
+        $directory = (new DirectoryBuilder())->build();
+        $this->bus->dispatch(new StoreDirectory($directory));
 
-        $denormalizer = $this->createMock(DenormalizerInterface::class);
-        $denormalizer->expects($this->exactly(2))
-            ->method('denormalize')
-            ->willReturnCallback(
-                static function (array $data, string $class) use ($searchDirectory): object {
-                    self::assertSame(Document::class, $class);
+        $findableDocument = (new DocumentBuilder())
+            ->withDirectory($directory)
+            ->withTitle('foo')
+            ->withContent('foo')
+            ->build();
 
-                    if ($data === ['title' => 'foo']) {
-                        return (new DocumentBuilder())
-                            ->withTitle('foo')
-                            ->withDirectory($searchDirectory)
-                            ->withContent('foo')
-                            ->build();
-                    }
+        $this->bus->dispatch(new StoreDocument($findableDocument));
 
-                    if ($data === ['title' => 'bar']) {
-                        return (new DocumentBuilder())
-                            ->withTitle('bar')
-                            ->withDirectory($searchDirectory)
-                            ->withContent('bar')
-                            ->build();
-                    }
+        $unfindableDocument = (new DocumentBuilder())
+            ->withTitle('bar')
+            ->withContent('bar')
+            ->build();
 
-                    throw new UnexpectedValueException('Unexpected content');
-                },
-            );
+        $this->bus->dispatch(new StoreDocument($unfindableDocument));
 
-        $query     = new FindDocumentsByDirectoryQuery($denormalizer, $platform);
-        $documents = $query->query(new FindDocumentsByDirectory($searchDirectory->getId()));
+        // ------------------- The test execution -------------------
 
-        self::assertCount(2, $documents);
-        self::assertSame('foo', $documents[0]->getTitle());
+        $documents = $this->query->query(new FindDocumentsByDirectory($directory->getId()));
+
+        // ------------------- The test assertions -------------------
+
+        self::assertCount(1, $documents);
+        self::assertSame($findableDocument->getId(), $documents[0]->getId());
     }
 }

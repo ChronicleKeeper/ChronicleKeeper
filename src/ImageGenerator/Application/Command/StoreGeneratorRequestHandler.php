@@ -28,14 +28,15 @@ class StoreGeneratorRequestHandler
             $request->request->prompt = new OptimizedPrompt($optimizedPrompt);
         }
 
-        $this->platform->insertOrUpdate(
-            'generator_requests',
-            [
+        $this->platform->createQueryBuilder()->createInsert()
+            ->asReplace()
+            ->insert('generator_requests')
+            ->values([
                 'id'       => $request->request->id,
                 'title'    => $request->request->title,
                 'userInput' => $this->serializer->serialize($request->request->userInput, JsonEncoder::FORMAT),
                 'prompt'   => $request->request->prompt->prompt,
-            ],
-        );
+            ])
+            ->execute();
     }
 }

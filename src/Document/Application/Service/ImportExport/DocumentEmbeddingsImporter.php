@@ -13,7 +13,6 @@ use Psr\Log\LoggerInterface;
 
 use function assert;
 use function count;
-use function implode;
 use function json_decode;
 use function reset;
 
@@ -29,13 +28,6 @@ final readonly class DocumentEmbeddingsImporter implements SingleImport
 
     public function import(Filesystem $filesystem, ImportSettings $settings): void
     {
-        if (count($filesystem->listContents('vector/document/')->toArray()) > 0) {
-            $this->logger->debug('Starting the classic import of the vector storage documents.');
-            $this->classicImport($filesystem);
-
-            return;
-        }
-
         $this->logger->debug('Utilizing the modern import of the vector storage documents.');
 
         foreach ($filesystem->listContents('library/document_embeddings/') as $file) {
@@ -50,10 +42,7 @@ final readonly class DocumentEmbeddingsImporter implements SingleImport
             }
 
             $documentId = reset($content['data'])['document_id'];
-            if (
-                $settings->overwriteLibrary === false
-                && $this->databasePlatform->hasRows('documents_vectors', ['document_id' => $documentId])
-            ) {
+            if ($settings->overwriteLibrary === false && $this->hasDocumentVectors($documentId)) {
                 // The document already has a vector storage, no need to overwrite
                 $this->logger->debug(
                     'Document already has a vector storage, skipping.',
@@ -62,54 +51,33 @@ final readonly class DocumentEmbeddingsImporter implements SingleImport
                 continue;
             }
 
-            $this->databasePlatform->query(
-                'DELETE FROM documents_vectors WHERE document_id = :documentId',
-                ['documentId' => $documentId],
-            );
+            $this->databasePlatform->createQueryBuilder()->createDelete()
+                ->from('documents_vectors')
+                ->where('document_id', '=', $documentId)
+                ->execute();
 
             foreach ($content['data'] as $row) {
-                $this->databasePlatform->insert(
-                    'documents_vectors',
-                    [
+                $this->databasePlatform->createQueryBuilder()->createInsert()
+                    ->insert('documents_vectors')
+                    ->values([
                         'document_id' => $row['document_id'],
                         'embedding' => $row['embedding'],
                         'content' => $row['content'],
                         'vectorContentHash' => $row['vectorContentHash'],
-                    ],
-                );
+                    ])
+                    ->execute();
             }
 
             $this->logger->debug('Document vector storage imported.', ['document_id' => $documentId]);
         }
     }
 
-    private function classicImport(Filesystem $filesystem): void
+    private function hasDocumentVectors(string $id): bool
     {
-        $libraryDirectoryPath = 'vector/document/';
-        foreach ($filesystem->listContents($libraryDirectoryPath) as $zippedFile) {
-            assert($zippedFile instanceof FileAttributes);
-
-            $fileContent = $filesystem->read($zippedFile->path());
-
-            /** @var array{id: string, documentId: string, content: string, vectorContentHash: string, vector: list<float>} $content */
-            $content = json_decode($fileContent, true, 512, JSON_THROW_ON_ERROR);
-
-            $this->databasePlatform->query(
-                'DELETE FROM documents_vectors WHERE document_id = :documentId',
-                ['documentId' => $content['documentId']],
-            );
-
-            $this->databasePlatform->insertOrUpdate(
-                'documents_vectors',
-                [
-                    'document_id' => $content['documentId'],
-                    'embedding' => '[' . implode(',', $content['vector']) . ']',
-                    'content' => $content['content'],
-                    'vectorContentHash' => $content['vectorContentHash'],
-                ],
-            );
-
-            $this->logger->debug('Document vector storage imported.', ['vector_id' => $content['id']]);
-        }
+        return $this->databasePlatform->createQueryBuilder()->createSelect()
+                ->select('document_id')
+                ->from('documents_vectors')
+                ->where('document_id', '=', $id)
+                ->fetchOneOrNull() !== null;
     }
 }

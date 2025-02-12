@@ -4,26 +4,54 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Test\Chat\Application\Query;
 
+use ChronicleKeeper\Chat\Application\Command\StoreConversation;
 use ChronicleKeeper\Chat\Application\Query\FindConversationByIdParameters;
 use ChronicleKeeper\Chat\Application\Query\FindConversationByIdQuery;
 use ChronicleKeeper\Chat\Domain\Entity\Conversation;
-use ChronicleKeeper\Chat\Domain\Entity\ExtendedMessageBag;
-use ChronicleKeeper\Chat\Domain\ValueObject\Settings;
-use ChronicleKeeper\Library\Domain\RootDirectory;
-use ChronicleKeeper\Settings\Application\SettingsHandler;
+use ChronicleKeeper\Chat\Infrastructure\Database\Converter\ConversationRowConverter;
 use ChronicleKeeper\Shared\Infrastructure\Database\Converter\DatabaseRowConverter;
-use ChronicleKeeper\Test\Shared\Infrastructure\Database\DatabasePlatformMock;
+use ChronicleKeeper\Test\Chat\Domain\Entity\ConversationBuilder;
+use ChronicleKeeper\Test\Chat\Domain\Entity\ExtendedMessageBagBuilder;
+use ChronicleKeeper\Test\Chat\Domain\Entity\ExtendedMessageBuilder;
+use ChronicleKeeper\Test\Chat\Domain\Entity\LLMChain\AssistantMessageBuilder;
+use ChronicleKeeper\Test\Chat\Domain\Entity\LLMChain\SystemMessageBuilder;
+use ChronicleKeeper\Test\Chat\Domain\Entity\LLMChain\UserMessageBuilder;
+use ChronicleKeeper\Test\Shared\Infrastructure\Database\DatabaseTestCase;
+use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\Small;
+use PHPUnit\Framework\Attributes\Large;
 use PHPUnit\Framework\Attributes\Test;
-use PHPUnit\Framework\TestCase;
-use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
+
+use function assert;
 
 #[CoversClass(FindConversationByIdQuery::class)]
 #[CoversClass(FindConversationByIdParameters::class)]
-#[Small]
-class FindConversationByIdQueryTest extends TestCase
+#[CoversClass(ConversationRowConverter::class)]
+#[CoversClass(DatabaseRowConverter::class)]
+#[Large]
+class FindConversationByIdQueryTest extends DatabaseTestCase
 {
+    private FindConversationByIdQuery $query;
+
+    #[Override]
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $query = self::getContainer()->get(FindConversationByIdQuery::class);
+        assert($query instanceof FindConversationByIdQuery);
+
+        $this->query = $query;
+    }
+
+    #[Override]
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        unset($this->query);
+    }
+
     #[Test]
     public function itEnsuresTheParametersHasTheCorrectQueryClass(): void
     {
@@ -34,74 +62,45 @@ class FindConversationByIdQueryTest extends TestCase
     }
 
     #[Test]
-    public function queryReturnsConversation(): void
+    public function itCanFetchASpecificConversation(): void
     {
-        $conversation = new Conversation(
-            '123e4567-e89b-12d3-a456-426614174000',
-            'Test conversation',
-            RootDirectory::get(),
-            new Settings(),
-            new ExtendedMessageBag(),
-        );
+        // ------------------- The test setup -------------------
+        $messages = (new ExtendedMessageBagBuilder())
+            ->withMessages(
+                (new ExtendedMessageBuilder())->withMessage((new SystemMessageBuilder())->build())->build(),
+                (new ExtendedMessageBuilder())->withMessage((new UserMessageBuilder())->build())->build(),
+                (new ExtendedMessageBuilder())->withMessage((new AssistantMessageBuilder())->build())->build(),
+            )
+            ->build();
 
-        $databasePlatform = new DatabasePlatformMock();
-        $databasePlatform->expectFetch(
-            'SELECT * FROM conversations WHERE id = :id',
-            ['id' => $conversation->getId()],
-            [
-                [
-                    'id' => $conversation->getId(),
-                    'title' => 'Test conversation',
-                    'directory' => $conversation->getDirectory()->getId(),
-                ],
-            ],
-        );
+        $conversation = (new ConversationBuilder())
+            ->withId('123e4567-e89b-12d3-a456-426614174000')
+            ->withTitle('Test conversation')
+            ->withMessages($messages)
+            ->build();
 
-        $databaseRowConverter = $this->createMock(DatabaseRowConverter::class);
-        $databaseRowConverter->expects($this->once())->method('convert')->willReturn([
-            'id' => $conversation->getId(),
-            'title' => 'Test conversation',
-            'directory' => $conversation->getDirectory()->getId(),
-        ]);
+        $this->bus->dispatch(new StoreConversation($conversation));
 
-        $denormalizer = $this->createMock(DenormalizerInterface::class);
-        $denormalizer->expects($this->once())->method('denormalize')->willReturn($conversation);
+        // ------------------- The test execution -------------------
 
-        $query  = new FindConversationByIdQuery(
-            $denormalizer,
-            self::createStub(SettingsHandler::class),
-            $databasePlatform,
-            $databaseRowConverter,
-        );
-        $result = $query->query(new FindConversationByIdParameters('123e4567-e89b-12d3-a456-426614174000'));
+        $result = $this->query->query(new FindConversationByIdParameters($conversation->getId()));
 
-        $databasePlatform->assertFetchCount(1);
-        self::assertSame($conversation, $result);
+        // ------------------- The test assertions -------------------
+
+        self::assertInstanceOf(Conversation::class, $result);
+        self::assertSame($conversation->getId(), $result->getId());
+        self::assertSame($conversation->getTitle(), $result->getTitle());
+        self::assertEquals($conversation->getMessages(), $result->getMessages());
     }
 
     #[Test]
-    public function queryReturnsNullWhenConversationNotFound(): void
+    public function theQueryReturnsNullWhenConversationNotFound(): void
     {
-        $normalizer = $this->createMock(DenormalizerInterface::class);
-        $normalizer->expects($this->never())->method('denormalize');
+        // ------------------- The test execution -------------------
 
-        $databasePlatform = new DatabasePlatformMock();
-        $databasePlatform->expectFetch(
-            'SELECT * FROM conversations WHERE id = :id',
-            ['id' => '123e4567-e89b-12d3-a456-426614174000'],
-            [],
-        );
+        $result = $this->query->query(new FindConversationByIdParameters('123e4567-e89b-12d3-a456-426614174000'));
 
-        $databaseRowConverter = $this->createMock(DatabaseRowConverter::class);
-        $databaseRowConverter->expects($this->never())->method('convert');
-
-        $query  = new FindConversationByIdQuery(
-            $normalizer,
-            self::createStub(SettingsHandler::class),
-            $databasePlatform,
-            $databaseRowConverter,
-        );
-        $result = $query->query(new FindConversationByIdParameters('123e4567-e89b-12d3-a456-426614174000'));
+        // ------------------- The test assertions -------------------
 
         self::assertNull($result);
     }

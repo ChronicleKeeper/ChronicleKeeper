@@ -21,15 +21,16 @@ class FindImagesByDirectoryQuery implements Query
     ) {
     }
 
-    /** @return list<Image> */
+    /** @return array<int, Image> */
     public function query(QueryParameters $parameters): array
     {
         assert($parameters instanceof FindImagesByDirectory);
 
-        $images = $this->databasePlatform->fetch(
-            'SELECT * FROM images WHERE directory = :directory_id ORDER BY title',
-            ['directory_id' => $parameters->id],
-        );
+        $images = $this->databasePlatform->createQueryBuilder()->createSelect()
+            ->from('images')
+            ->where('directory', '=', $parameters->id)
+            ->orderBy('title')
+            ->fetchAll();
 
         return array_map(
             fn ($image) => $this->denormalizer->denormalize($image, Image::class),

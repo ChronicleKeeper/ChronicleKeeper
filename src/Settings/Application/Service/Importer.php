@@ -41,8 +41,8 @@ class Importer
          * So the version 0.6 is required version to import from. This will also stop newer versions from being
          * imported.
          */
-        if (! version_compare($versionOfArchive, '0.6', 'eq')) {
-            throw new RuntimeException('Only import from version 0.6 is allowed for this version.');
+        if (! version_compare($versionOfArchive, '0.7', 'eq')) {
+            throw new RuntimeException('Only import from version 0.7 is allowed for this version.');
         }
 
         if ($importSettings->pruneLibrary === true) {

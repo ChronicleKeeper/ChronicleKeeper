@@ -10,8 +10,6 @@ use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
 
 use function assert;
 
-use function implode;
-
 final class SearchWorldItemsCountQuery implements Query
 {
     public function __construct(
@@ -23,29 +21,22 @@ final class SearchWorldItemsCountQuery implements Query
     {
         assert($parameters instanceof SearchWorldItemsCount);
 
-        $query           = 'SELECT COUNT(id) as count FROM world_items';
-        $queryParameters = [];
-        $addWhere        = [];
+        $queryBuilder = $this->platform->createQueryBuilder()->createSelect()
+            ->select('COUNT(id) as count')
+            ->from('world_items');
 
         if ($parameters->search !== '') {
-            $addWhere[]                = 'name LIKE :search';
-            $queryParameters['search'] = '%' . $parameters->search . '%';
+            $queryBuilder->where('name', 'LIKE', '%' . $parameters->search . '%');
         }
 
         if ($parameters->type !== '') {
-            $addWhere[]              = 'type = :type';
-            $queryParameters['type'] = $parameters->type;
+            $queryBuilder->where('type', '=', $parameters->type);
         }
 
         if ($parameters->exclude !== []) {
-            $addWhere[]                 = 'id NOT IN (:exclude)';
-            $queryParameters['exclude'] = implode(',', $parameters->exclude);
+            $queryBuilder->where('id', 'NOT IN', $parameters->exclude);
         }
 
-        if ($addWhere !== []) {
-            $query .= ' WHERE ' . implode(' AND ', $addWhere);
-        }
-
-        return $this->platform->fetchSingleRow($query, $queryParameters)['count']; // @phpstan-ignore offsetAccess.notFound
+        return $queryBuilder->fetchOne()['count'];
     }
 }

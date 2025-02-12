@@ -4,23 +4,27 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Test\Chat\Application\Service\ImportExport;
 
-use ChronicleKeeper\Chat\Application\Query\FindConversationByIdParameters;
+use ChronicleKeeper\Chat\Application\Command\StoreConversation;
 use ChronicleKeeper\Chat\Application\Service\ImportExport\ConversationExporter;
 use ChronicleKeeper\Settings\Application\Service\Exporter\ExportSettings;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
 use ChronicleKeeper\Test\Chat\Domain\Entity\ConversationBuilder;
-use ChronicleKeeper\Test\Shared\Infrastructure\Database\DatabasePlatformMock;
+use ChronicleKeeper\Test\Chat\Domain\Entity\ExtendedMessageBagBuilder;
+use ChronicleKeeper\Test\Chat\Domain\Entity\ExtendedMessageBuilder;
+use ChronicleKeeper\Test\Chat\Domain\Entity\LLMChain\AssistantMessageBuilder;
+use ChronicleKeeper\Test\Chat\Domain\Entity\LLMChain\SystemMessageBuilder;
+use ChronicleKeeper\Test\Chat\Domain\Entity\LLMChain\UserMessageBuilder;
+use ChronicleKeeper\Test\Shared\Infrastructure\Database\DatabaseTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\Small;
+use PHPUnit\Framework\Attributes\Large;
 use PHPUnit\Framework\Attributes\Test;
-use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Symfony\Component\Serializer\SerializerInterface;
 use ZipArchive;
 
 #[CoversClass(ConversationExporter::class)]
-#[Small]
-class ConversationExporterTest extends TestCase
+#[Large]
+class ConversationExporterTest extends DatabaseTestCase
 {
     #[Test]
     public function itIsDoingNothingOnEmptyConversationFetch(): void
@@ -31,41 +35,49 @@ class ConversationExporterTest extends TestCase
         $serializer = $this->createMock(SerializerInterface::class);
         $serializer->expects($this->never())->method('serialize');
 
-        $databasePlatform = new DatabasePlatformMock();
-        $databasePlatform->expectFetch('SELECT id FROM conversations', [], []);
+        $export = new ConversationExporter($queryService, $serializer, $this->databasePlatform, new NullLogger());
 
-        $export = new ConversationExporter($queryService, $serializer, $databasePlatform, new NullLogger());
         $export->export(self::createStub(ZipArchive::class), new ExportSettings('dev'));
     }
 
     #[Test]
     public function itIsAddingASerializedConversationToArchive(): void
     {
-        $conversation = (new ConversationBuilder())->withId('06b90bed-97dc-42a2-bb66-10bef04ec881')->build();
+        // ------------------- The test setup -------------------
+        $messages = (new ExtendedMessageBagBuilder())
+            ->withMessages(
+                (new ExtendedMessageBuilder())->withMessage((new SystemMessageBuilder())->build())->build(),
+                (new ExtendedMessageBuilder())->withMessage((new UserMessageBuilder())->build())->build(),
+                (new ExtendedMessageBuilder())->withMessage((new AssistantMessageBuilder())->build())->build(),
+            )
+            ->build();
 
-        $queryService = $this->createMock(QueryService::class);
-        $queryService->expects($this->once())
-            ->method('query')
-            ->with(self::isInstanceOf(FindConversationByIdParameters::class))
-            ->willReturn($conversation);
+        $conversation = (new ConversationBuilder())
+            ->withId('06b90bed-97dc-42a2-bb66-10bef04ec881')
+            ->withTitle('Test conversation')
+            ->withMessages($messages)
+            ->build();
+
+        $this->bus->dispatch(new StoreConversation($conversation));
+
+        // ------------------- Preparation of Mocks -----------------
 
         $serializer = $this->createMock(SerializerInterface::class);
         $serializer->expects($this->once())
             ->method('serialize')
-            ->willReturn('{"id":"06b90bed-97dc-42a2-bb66-10bef04ec881","name":"Test"}');
-
-        $databasePlatform = new DatabasePlatformMock();
-        $databasePlatform->expectFetch('SELECT id FROM conversations', [], [['id' => '06b90bed-97dc-42a2-bb66-10bef04ec881']]);
+            ->willReturn('{"id":"06b90bed-97dc-42a2-bb66-10bef04ec881","name":"Test conversation"}');
 
         $archive = $this->createMock(ZipArchive::class);
         $archive->expects($this->once())
             ->method('addFromString')
             ->with(
                 'library/conversations/06b90bed-97dc-42a2-bb66-10bef04ec881.json',
-                '{"id":"06b90bed-97dc-42a2-bb66-10bef04ec881","name":"Test"}',
+                '{"id":"06b90bed-97dc-42a2-bb66-10bef04ec881","name":"Test conversation"}',
             );
 
-        $export = new ConversationExporter($queryService, $serializer, $databasePlatform, new NullLogger());
+        // ------------------- The test execution -------------------
+
+        $export = new ConversationExporter($this->queryService, $serializer, $this->databasePlatform, new NullLogger());
         $export->export($archive, new ExportSettings('dev'));
     }
 }

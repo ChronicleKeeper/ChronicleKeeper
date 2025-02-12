@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ChronicleKeeper\Chat\Infrastructure\Database\Converter;
 
 use ChronicleKeeper\Chat\Domain\Entity\Conversation;
+use ChronicleKeeper\Chat\Domain\ValueObject\Settings;
 use ChronicleKeeper\Shared\Infrastructure\Database\Converter\RowConverter;
 use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
 
@@ -27,10 +28,14 @@ class ConversationRowConverter implements RowConverter
     /** @inheritDoc */
     public function convert(array $data): array
     {
-        $settings = $this->databasePlatform->fetch(
-            'SELECT * FROM conversation_settings WHERE conversation_id = :id',
-            ['id' => $data['id']],
-        )[0];
+        $settings = $this->databasePlatform->createQueryBuilder()->createSelect()
+            ->from('conversation_settings')
+            ->where('conversation_id', '=', $data['id'])
+            ->fetchOneOrNull();
+
+        if ($settings === null) {
+            $settings = (new Settings())->jsonSerialize();
+        }
 
         $conversation = [
             'id' => $data['id'],
@@ -38,17 +43,17 @@ class ConversationRowConverter implements RowConverter
             'directory' => $data['directory'],
             'settings' => [
                 'version' => $settings['version'],
-                'temperature' => $settings['temperature'],
-                'imagesMaxDistance' => $settings['images_max_distance'],
-                'documentsMaxDistance' => $settings['documents_max_distance'],
+                'temperature' => (float) $settings['temperature'],
+                'imagesMaxDistance' => (float) $settings['images_max_distance'],
+                'documentsMaxDistance' => (float) $settings['documents_max_distance'],
             ],
             'messages' => [],
         ];
 
-        $rawMessages = $this->databasePlatform->fetch(
-            'SELECT * FROM conversation_messages WHERE conversation_id = :id',
-            ['id' => $data['id']],
-        );
+        $rawMessages = $this->databasePlatform->createQueryBuilder()->createSelect()
+            ->from('conversation_messages')
+            ->where('conversation_id', '=', $data['id'])
+            ->fetchAll();
 
         foreach ($rawMessages as $rawMessage) {
             $conversation['messages'][] = [

@@ -30,32 +30,35 @@ class StoreConversationHandler
             $this->databasePlatform->beginTransaction();
 
             // Insert or update the conversation itself to the conversation table
-            $this->databasePlatform->insertOrUpdate(
-                'conversations',
-                [
+            $qb = $this->databasePlatform->createQueryBuilder()->createInsert();
+            $qb->insert('conversations')
+                ->asReplace()
+                ->values([
                     'id' => $message->conversation->getId(),
                     'title' => $message->conversation->getTitle(),
                     'directory' => $message->conversation->getDirectory()->getId(),
-                ],
-            );
+                ])
+                ->execute();
 
             // Insert or update the settings of the conversation to the settings table
-            $this->databasePlatform->insertOrUpdate(
-                'conversation_settings',
-                [
+            $qb = $this->databasePlatform->createQueryBuilder()->createInsert();
+            $qb->insert('conversation_settings')
+                ->asReplace()
+                ->onConflict(['conversation_id'])
+                ->values([
                     'conversation_id' => $message->conversation->getId(),
                     'version' => $message->conversation->getSettings()->version,
                     'temperature' => $message->conversation->getSettings()->temperature,
                     'images_max_distance' => $message->conversation->getSettings()->imagesMaxDistance,
                     'documents_max_distance' => $message->conversation->getSettings()->documentsMaxDistance,
-                ],
-            );
+                ])
+                ->execute();
 
             // Remove all messages from the conversation_messages table and insert all messages of the conversation
-            $this->databasePlatform->query(
-                'DELETE FROM conversation_messages WHERE conversation_id = :conversation_id',
-                ['conversation_id' => $message->conversation->getId()],
-            );
+            $qb = $this->databasePlatform->createQueryBuilder()->createDelete();
+            $qb->from('conversation_messages')
+                ->where('conversation_id', '=', $message->conversation->getId())
+                ->execute();
 
             foreach ($message->conversation->getMessages() as $conversationMessage) {
                 $messageArray = $conversationMessage->jsonSerialize();
@@ -68,17 +71,17 @@ class StoreConversationHandler
                     $messageContent = $messageContent['content'];
                 }
 
-                $this->databasePlatform->insert(
-                    'conversation_messages',
-                    [
+                $qb = $this->databasePlatform->createQueryBuilder()->createInsert();
+                $qb->insert('conversation_messages')
+                    ->values([
                         'id' => $messageArray['id'],
                         'conversation_id' => $message->conversation->getId(),
                         'role' => $messageArray['message']->getRole()->value,
                         'content' => $messageContent,
                         'context' => json_encode($messageArray['context'], JSON_THROW_ON_ERROR),
                         'debug' => json_encode($messageArray['debug'], JSON_THROW_ON_ERROR),
-                    ],
-                );
+                    ])
+                    ->execute();
             }
 
             $this->databasePlatform->commit();

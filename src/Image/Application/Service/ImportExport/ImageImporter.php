@@ -44,19 +44,18 @@ final readonly class ImageImporter implements SingleImport
             $content = $content['data'];
         }
 
-        if (
-            $settings->overwriteLibrary === false
-            && $this->databasePlatform->hasRows('images', ['id' => $content['id']])
-        ) {
+        if ($settings->overwriteLibrary === false && $this->hasImage($content['id'])) {
             $this->logger->debug('Image already exists, skipping.', ['image_id' => $content['id']]);
 
             return;
         }
 
         $this->logger->debug('Importing image.', ['image_id' => $content['id']]);
-        $this->databasePlatform->insertOrUpdate(
-            'images',
-            [
+
+        $this->databasePlatform->createQueryBuilder()->createInsert()
+            ->asReplace()
+            ->insert('images')
+            ->values([
                 'id' => $content['id'],
                 'title' => $content['title'],
                 'mime_type' => $content['mime_type'],
@@ -64,7 +63,16 @@ final readonly class ImageImporter implements SingleImport
                 'description' => $content['description'],
                 'directory' => $content['directory'],
                 'last_updated' => $content['last_updated'],
-            ],
-        );
+            ])
+            ->execute();
+    }
+
+    private function hasImage(string $id): bool
+    {
+        return $this->databasePlatform->createQueryBuilder()->createSelect()
+            ->select('id')
+            ->from('images')
+            ->where('id', '=', $id)
+            ->fetchOneOrNull() !== null;
     }
 }

@@ -21,15 +21,16 @@ class FindDocumentsByDirectoryQuery implements Query
     ) {
     }
 
-    /** @return list<Document> */
+    /** @return array<int, Document> */
     public function query(QueryParameters $parameters): array
     {
         assert($parameters instanceof FindDocumentsByDirectory);
 
-        $documents = $this->databasePlatform->fetch(
-            'SELECT * FROM documents WHERE directory = :directory ORDER BY title',
-            ['directory' => $parameters->id],
-        );
+        $documents = $this->databasePlatform->createQueryBuilder()->createSelect()
+            ->from('documents')
+            ->where('directory', '=', $parameters->id)
+            ->orderBy('title')
+            ->fetchAll();
 
         return array_map(
             fn (array $document) => $this->denormalizer->denormalize($document, Document::class),

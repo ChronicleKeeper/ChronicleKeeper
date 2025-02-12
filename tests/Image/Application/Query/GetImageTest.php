@@ -4,24 +4,46 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Test\Image\Application\Query;
 
+use ChronicleKeeper\Image\Application\Command\StoreImage;
 use ChronicleKeeper\Image\Application\Query\GetImage;
 use ChronicleKeeper\Image\Application\Query\GetImageQuery;
-use ChronicleKeeper\Image\Domain\Entity\Image;
 use ChronicleKeeper\Test\Image\Domain\Entity\ImageBuilder;
-use ChronicleKeeper\Test\Shared\Infrastructure\Database\DatabasePlatformMock;
+use ChronicleKeeper\Test\Shared\Infrastructure\Database\DatabaseTestCase;
+use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\Small;
+use PHPUnit\Framework\Attributes\Large;
 use PHPUnit\Framework\Attributes\Test;
-use PHPUnit\Framework\TestCase;
-use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
+
+use function assert;
 
 #[CoversClass(GetImage::class)]
 #[CoversClass(GetImageQuery::class)]
-#[Small]
-class GetImageTest extends TestCase
+#[Large]
+class GetImageTest extends DatabaseTestCase
 {
+    private GetImageQuery $query;
+
+    #[Override]
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $query = self::getContainer()->get(GetImageQuery::class);
+        assert($query instanceof GetImageQuery);
+
+        $this->query = $query;
+    }
+
+    #[Override]
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        unset($this->query);
+    }
+
     #[Test]
-    public function queryIsCorrect(): void
+    public function itIsUtilizingTheCorrectQueryClass(): void
     {
         $query = new GetImage('b22e89e8-54b0-4abd-b8d2-8a4c7f5c3150');
 
@@ -30,26 +52,21 @@ class GetImageTest extends TestCase
     }
 
     #[Test]
-    public function theQueryIsExectuted(): void
+    public function itIsSelectingTheCorrectImageFromDatabase(): void
     {
-        $databasePlatform = new DatabasePlatformMock();
-        $databasePlatform->expectFetch(
-            'SELECT * FROM images WHERE id = :id',
-            ['id' => '0db8d4df-3da3-4781-b07f-2e42ac103820'],
-            [['id' => '0db8d4df-3da3-4781-b07f-2e42ac103820']],
-        );
+        // ------------------- The test scenario -------------------
 
-        $denormalizer = $this->createMock(DenormalizerInterface::class);
-        $denormalizer->expects($this->once())
-            ->method('denormalize')
-            ->with(['id' => '0db8d4df-3da3-4781-b07f-2e42ac103820'], Image::class)
-            ->willReturn($image = (new ImageBuilder())->build());
+        $image = (new ImageBuilder())
+            ->withId('b48d23bc-7a04-4483-81da-56c72dbdc628')
+            ->build();
+        $this->bus->dispatch(new StoreImage($image));
 
-        $query = new GetImageQuery($databasePlatform, $denormalizer);
+        // ------------------- The test assertions -------------------
 
-        self::assertSame(
-            $image,
-            $query->query(new GetImage('0db8d4df-3da3-4781-b07f-2e42ac103820')),
-        );
+        $image = $this->query->query(new GetImage($image->getId()));
+
+        // ------------------- The test assertions -------------------
+
+        self::assertSame('b48d23bc-7a04-4483-81da-56c72dbdc628', $image->getId());
     }
 }

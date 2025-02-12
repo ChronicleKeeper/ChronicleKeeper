@@ -53,8 +53,8 @@ final class InitializeDatabaseCommand extends Command
         }
 
         $this->logger->debug('Removing existing database file at "' . $filename . '".');
-        $this->filesystem->remove($filename);
         try {
+            $this->schemaManager->dropSchema();
             $this->schemaManager->createSchema();
         } catch (Throwable $e) {
             $io->writeln('');

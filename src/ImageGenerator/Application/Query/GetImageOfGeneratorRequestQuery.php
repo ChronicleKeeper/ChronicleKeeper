@@ -24,10 +24,11 @@ final readonly class GetImageOfGeneratorRequestQuery implements Query
     {
         assert($parameters instanceof GetImageOfGeneratorRequest);
 
-        $images = $this->platform->fetchSingleRow(
-            'SELECT * FROM generator_results WHERE generatorRequest = :requestId AND id = :imageId',
-            ['requestId' => $parameters->requestId, 'imageId' => $parameters->imageId],
-        );
+        $images = $this->platform->createQueryBuilder()->createSelect()
+            ->from('generator_results')
+            ->where('generatorRequest', '=', $parameters->requestId)
+            ->where('id', '=', $parameters->imageId)
+            ->fetchOne();
 
         return $this->denormalizer->denormalize($images, GeneratorResult::class);
     }

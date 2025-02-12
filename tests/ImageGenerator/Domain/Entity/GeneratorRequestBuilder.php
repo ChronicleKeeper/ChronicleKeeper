@@ -18,9 +18,10 @@ class GeneratorRequestBuilder
 
     public function __construct()
     {
-        $this->id        = Uuid::v4()->toString();
-        $this->title     = 'Default Title';
-        $this->userInput = new UserInput('Default Prompt');
+        $this->id              = Uuid::v4()->toString();
+        $this->title           = 'Default Title';
+        $this->userInput       = new UserInput('Default Prompt');
+        $this->optimizedPrompt = new OptimizedPrompt('Default Optimized Prompt');
     }
 
     public function withId(string $id): self

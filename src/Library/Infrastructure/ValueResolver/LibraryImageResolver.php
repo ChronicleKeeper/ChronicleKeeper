@@ -7,7 +7,7 @@ namespace ChronicleKeeper\Library\Infrastructure\ValueResolver;
 use ChronicleKeeper\Image\Application\Query\GetImage;
 use ChronicleKeeper\Image\Domain\Entity\Image;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
-use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Exception\UnableToReadFile;
+use ChronicleKeeper\Shared\Infrastructure\Database\Exception\MissingResults;
 use RuntimeException;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Component\HttpFoundation\Request;
@@ -41,7 +41,7 @@ class LibraryImageResolver implements ValueResolverInterface
 
         try {
             $image = $this->queryService->query(new GetImage($imageIdentifier));
-        } catch (UnableToReadFile) {
+        } catch (MissingResults) {
             throw new RuntimeException('Image "' . $imageIdentifier . '" not found.');
         }
 

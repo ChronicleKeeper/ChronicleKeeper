@@ -76,31 +76,40 @@ class ChatTest extends WebTestCase
             ->withMessage((new UserMessageBuilder())->withContent('Hello World')->build())
             ->build();
 
-        $this->databasePlatform->insert('conversations', [
-            'id' => $conversation->getId(),
-            'title' => $conversation->getTitle(),
-            'directory' => $conversation->getDirectory()->getId(),
-        ]);
+        $this->databasePlatform->createQueryBuilder()->createInsert()
+            ->insert('conversations')
+            ->values([
+                'id' => $conversation->getId(),
+                'title' => $conversation->getTitle(),
+                'directory' => $conversation->getDirectory()->getId(),
+            ])
+            ->execute();
 
-        $this->databasePlatform->insert('conversation_settings', [
-            'conversation_id' => $conversation->getId(),
-            'version' => $conversation->getSettings()->version,
-            'temperature' => $conversation->getSettings()->temperature,
-            'images_max_distance' => $conversation->getSettings()->imagesMaxDistance,
-            'documents_max_distance' => $conversation->getSettings()->imagesMaxDistance,
-        ]);
+        $this->databasePlatform->createQueryBuilder()->createInsert()
+            ->insert('conversation_settings')
+            ->values([
+                'conversation_id' => $conversation->getId(),
+                'version' => $conversation->getSettings()->version,
+                'temperature' => $conversation->getSettings()->temperature,
+                'images_max_distance' => $conversation->getSettings()->imagesMaxDistance,
+                'documents_max_distance' => $conversation->getSettings()->imagesMaxDistance,
+            ])
+            ->execute();
 
         assert($message->message instanceof UserMessage);
         assert(isset($message->message->content[0]) && $message->message->content[0] instanceof Text);
 
-        $this->databasePlatform->insert('conversation_messages', [
-            'id' => $message->id,
-            'conversation_id' => $conversation->getId(),
-            'role' => $message->message->getRole()->value,
-            'content' => $message->message->content[0]->text,
-            'context' => '{}',
-            'debug' => '{}',
-        ]);
+        $this->databasePlatform->createQueryBuilder()->createInsert()
+            ->insert('conversation_messages')
+            ->values([
+                'id' => $message->id,
+                'conversation_id' => $conversation->getId(),
+                'role' => $message->message->getRole()->value,
+                'content' => $message->message->content[0]->text,
+                'context' => '{}',
+                'debug' => '{}',
+            ])
+            ->execute();
 
         $this->client->request(Request::METHOD_GET, '/chat/' . $conversation->getId());
 

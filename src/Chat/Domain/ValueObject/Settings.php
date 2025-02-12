@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Chat\Domain\ValueObject;
 
+use JsonSerializable;
 use PhpLlm\LlmChain\Bridge\OpenAI\GPT;
 
-class Settings
+class Settings implements JsonSerializable
 {
     public readonly string $version;
 
@@ -25,5 +26,23 @@ class Settings
             && $this->temperature === $settings->temperature
             && $this->imagesMaxDistance === $settings->imagesMaxDistance
             && $this->documentsMaxDistance === $settings->documentsMaxDistance;
+    }
+
+    /**
+     * @return array{
+     *     version: string,
+     *     temperature: float,
+     *     images_max_distance: float,
+     *     documents_max_distance: float,
+     * }
+     */
+    public function jsonSerialize(): array
+    {
+        return [
+            'version' => $this->version,
+            'temperature' => $this->temperature,
+            'images_max_distance' => $this->imagesMaxDistance,
+            'documents_max_distance' => $this->documentsMaxDistance,
+        ];
     }
 }

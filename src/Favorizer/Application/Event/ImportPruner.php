@@ -25,6 +25,8 @@ class ImportPruner
             ['pruner' => self::class, 'tables' => ['favorites']],
         );
 
-        $this->databasePlatform->truncateTable('favorites');
+        $this->databasePlatform->createQueryBuilder()->createDelete()
+            ->from('favorites')
+            ->execute();
     }
 }

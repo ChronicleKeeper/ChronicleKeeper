@@ -19,14 +19,14 @@ class StoreDocumentVectorsHandler
 
     public function __invoke(StoreDocumentVectors $command): void
     {
-        $this->platform->insertOrUpdate(
-            'documents_vectors',
-            [
+        $this->platform->createQueryBuilder()->createInsert()
+            ->insert('documents_vectors')
+            ->values([
                 'document_id' => $command->vectorDocument->document->getId(),
                 'embedding' => '[' . implode(',', $command->vectorDocument->vector) . ']',
                 'content' => $command->vectorDocument->content,
                 'vectorContentHash' => $command->vectorDocument->vectorContentHash,
-            ],
-        );
+            ])
+            ->execute();
     }
 }

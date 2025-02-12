@@ -35,7 +35,11 @@ final readonly class ConversationExporter implements SingleExport
 
     public function export(ZipArchive $archive, ExportSettings $exportSettings): void
     {
-        $conversationIdentifier = $this->databasePlatform->fetch('SELECT id FROM conversations');
+        $conversationIdentifier = $this->databasePlatform->createQueryBuilder()->createSelect()
+            ->select('id')
+            ->from('conversations')
+            ->fetchAll();
+
         if (count($conversationIdentifier) === 0) {
             $this->logger->debug('No conversations found, skipping export.');
 

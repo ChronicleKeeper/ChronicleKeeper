@@ -29,10 +29,10 @@ class FindConversationByIdQuery implements Query
     {
         assert($parameters instanceof FindConversationByIdParameters);
 
-        $data = $this->databasePlatform->fetchSingleRow(
-            'SELECT * FROM conversations WHERE id = :id',
-            ['id' => $parameters->id],
-        );
+        $data = $this->databasePlatform->createQueryBuilder()->createSelect()
+            ->from('conversations')
+            ->where('id', '=', $parameters->id)
+            ->fetchOneOrNull();
 
         if ($data === null) {
             return null;

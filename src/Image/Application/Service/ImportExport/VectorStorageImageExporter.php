@@ -41,20 +41,14 @@ final readonly class VectorStorageImageExporter implements SingleExport
             return;
         }
 
-        $query = <<<'SQL'
-            SELECT
-                image_id,
-                content,
-                vectorContentHash,
-                vec_to_json(embedding) as embedding
-            FROM
-                images_vectors
-            WHERE
-                image_id = :id
-        SQL;
-
         foreach ($images as $image) {
-            $embeddingsOfImage = $this->databasePlatform->fetch($query, ['id' => $image->getId()]);
+            $embeddingsOfImage = $this->databasePlatform->createQueryBuilder()
+                ->createSelect()
+                ->select('image_id', 'content', 'vectorContentHash')
+                ->vectorToJson('embedding', 'embedding')
+                ->from('images_vectors')
+                ->where('image_id', '=', $image->getId())
+                ->fetchAll();
 
             if (count($embeddingsOfImage) === 0) {
                 $this->logger->debug(

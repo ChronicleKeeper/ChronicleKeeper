@@ -17,6 +17,9 @@ class DeleteImageVectorsHandler
 
     public function __invoke(DeleteImageVectors $command): void
     {
-        $this->platform->query('DELETE FROM images_vectors WHERE image_id = :id', ['id' => $command->imageId]);
+        $this->platform->createQueryBuilder()->createDelete()
+            ->from('images_vectors')
+            ->where('image_id', '=', $command->imageId)
+            ->execute();
     }
 }

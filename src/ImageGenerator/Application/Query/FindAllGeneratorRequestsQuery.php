@@ -25,7 +25,10 @@ final readonly class FindAllGeneratorRequestsQuery implements Query
     /** @return list<GeneratorRequest> */
     public function query(QueryParameters $parameters): array
     {
-        $files = $this->databasePlatform->fetch('SELECT * FROM generator_requests ORDER BY title');
+        $files = $this->databasePlatform->createQueryBuilder()->createSelect()
+            ->from('generator_requests')
+            ->orderBy('title')
+            ->fetchAll();
 
         $requests = [];
         foreach ($files as $file) {

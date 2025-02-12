@@ -7,6 +7,8 @@ namespace ChronicleKeeper\Test\World\Presentation\Controller;
 use ChronicleKeeper\Test\WebTestCase;
 use ChronicleKeeper\Test\World\Domain\Entity\ItemBuilder;
 use ChronicleKeeper\World\Application\Query\SearchWorldItems;
+use ChronicleKeeper\World\Application\Query\SearchWorldItemsCount;
+use ChronicleKeeper\World\Application\Query\SearchWorldItemsCountQuery;
 use ChronicleKeeper\World\Application\Query\SearchWorldItemsQuery;
 use ChronicleKeeper\World\Domain\Entity\Item;
 use ChronicleKeeper\World\Domain\ValueObject\ItemType;
@@ -24,6 +26,8 @@ use Symfony\Component\HttpFoundation\Request;
 #[CoversClass(ItemSearch::class)]
 #[CoversClass(SearchWorldItems::class)]
 #[CoversClass(SearchWorldItemsQuery::class)]
+#[CoversClass(SearchWorldItemsCount::class)]
+#[CoversClass(SearchWorldItemsCountQuery::class)]
 #[Large]
 class WorldItemListingTest extends WebTestCase
 {
@@ -39,12 +43,15 @@ class WorldItemListingTest extends WebTestCase
             ->withType(ItemType::COUNTRY)
             ->build();
 
-        $this->databasePlatform->insert('world_items', [
-            'id' => $this->item->getId(),
-            'name' => $this->item->getName(),
-            'type' => $this->item->getType()->value,
-            'short_description' => $this->item->getShortDescription(),
-        ]);
+        $this->databasePlatform->createQueryBuilder()->createInsert()
+            ->insert('world_items')
+            ->values([
+                'id' => $this->item->getId(),
+                'name' => $this->item->getName(),
+                'type' => $this->item->getType()->value,
+                'short_description' => $this->item->getShortDescription(),
+            ])
+            ->execute();
     }
 
     #[Override]

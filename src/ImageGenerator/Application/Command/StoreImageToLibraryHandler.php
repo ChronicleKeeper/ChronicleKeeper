@@ -47,9 +47,10 @@ class StoreImageToLibraryHandler
 
         $this->bus->dispatch(new StoreImage($image));
 
-        $this->platform->query('UPDATE generator_results SET image = :image WHERE id = :id', [
-            'image' => $image->getId(),
-            'id'    => $request->imageId,
-        ]);
+        $this->platform->createQueryBuilder()->createUpdate()
+            ->update('generator_results')
+            ->set(['image' => $image->getId()])
+            ->where('id', '=', $request->imageId)
+            ->execute();
     }
 }

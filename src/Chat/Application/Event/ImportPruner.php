@@ -34,9 +34,9 @@ class ImportPruner
             ],
         );
 
-        $this->databasePlatform->truncateTable('conversation_settings');
-        $this->databasePlatform->truncateTable('conversation_messages');
-        $this->databasePlatform->truncateTable('conversations');
+        $this->databasePlatform->createQueryBuilder()->createDelete()->from('conversation_settings')->execute();
+        $this->databasePlatform->createQueryBuilder()->createDelete()->from('conversation_messages')->execute();
+        $this->databasePlatform->createQueryBuilder()->createDelete()->from('conversations')->execute();
 
         $temporaryConversationFile = $this->pathRegistry->get('temp')
             . DIRECTORY_SEPARATOR

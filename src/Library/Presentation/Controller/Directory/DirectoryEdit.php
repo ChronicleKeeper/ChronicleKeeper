@@ -11,16 +11,12 @@ use ChronicleKeeper\Library\Presentation\Form\DirectoryType;
 use ChronicleKeeper\Shared\Presentation\FlashMessages\Alert;
 use ChronicleKeeper\Shared\Presentation\FlashMessages\HandleFlashMessages;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Form\FormFactoryInterface;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Requirement\Requirement;
-use Symfony\Component\Routing\RouterInterface;
-use Twig\Environment;
 
 use function array_key_exists;
 use function assert;
@@ -36,9 +32,6 @@ class DirectoryEdit extends AbstractController
     use HandleFlashMessages;
 
     public function __construct(
-        private readonly Environment $environment,
-        private readonly RouterInterface $router,
-        private readonly FormFactoryInterface $formFactory,
         private readonly MessageBusInterface $bus,
     ) {
     }
@@ -49,7 +42,7 @@ class DirectoryEdit extends AbstractController
             throw new AccessDeniedHttpException();
         }
 
-        $form = $this->formFactory->create(
+        $form = $this->createForm(
             DirectoryType::class,
             ['title' => $directory->getTitle(), 'parent' => $directory->getParent()],
             ['exclude_directories' => [$directory]],
@@ -71,17 +64,12 @@ class DirectoryEdit extends AbstractController
                 'Das Verzeichnis "' . $directory->getTitle() . '" wurde erfolgreich bearbeitet.',
             );
 
-            return new RedirectResponse($this->router->generate(
-                'library',
-                ['directory' => $directory->getId()],
-            ));
+            return $this->redirectToRoute('library', ['directory' => $directory->getId()]);
         }
 
-        return new Response(
-            $this->environment->render(
-                'library/directory_edit.html.twig',
-                ['directory' => $directory, 'form' => $form->createView()],
-            ),
+        return $this->render(
+            'library/directory_edit.html.twig',
+            ['directory' => $directory, 'form' => $form->createView()],
         );
     }
 }

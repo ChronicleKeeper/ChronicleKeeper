@@ -18,11 +18,15 @@ class StoreDirectoryHandler
 
     public function __invoke(StoreDirectory $command): MessageEventResult
     {
-        $this->platform->insertOrUpdate('directories', [
-            'id' => $command->directory->getId(),
-            'title' => $command->directory->getTitle(),
-            'parent' => $command->directory->getParent()?->getId(),
-        ]);
+        $this->platform->createQueryBuilder()->createInsert()
+            ->asReplace()
+            ->insert('directories')
+            ->values([
+                'id' => $command->directory->getId(),
+                'title' => $command->directory->getTitle(),
+                'parent' => $command->directory->getParent()?->getId(),
+            ])
+            ->execute();
 
         return new MessageEventResult($command->directory->flushEvents());
     }

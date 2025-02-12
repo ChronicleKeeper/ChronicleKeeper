@@ -37,11 +37,14 @@ class GeneratorTest extends WebTestCase
         $generatorRequest     = (new GeneratorRequestBuilder())->build();
         $generatorRequest->id = '6695cae4-ba8f-4d22-90e6-623675502817';
 
-        $this->databasePlatform->insert('generator_requests', [
-            'id'       => $generatorRequest->id,
-            'title'    => 'Default Title',
-            'userInput' => json_encode($generatorRequest->userInput, JSON_THROW_ON_ERROR),
-        ]);
+        $this->databasePlatform->createQueryBuilder()->createInsert()
+            ->insert('generator_requests')
+            ->values([
+                'id'       => $generatorRequest->id,
+                'title'    => 'Default Title',
+                'userInput' => json_encode($generatorRequest->userInput, JSON_THROW_ON_ERROR),
+            ])
+            ->execute();
 
         $this->client->request(
             Request::METHOD_GET,

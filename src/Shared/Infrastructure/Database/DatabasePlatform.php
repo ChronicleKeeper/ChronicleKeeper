@@ -4,39 +4,41 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Shared\Infrastructure\Database;
 
+use ChronicleKeeper\Shared\Infrastructure\Database\QueryBuilder\QueryBuilderFactory;
+
 interface DatabasePlatform
 {
+    public function createQueryBuilder(): QueryBuilderFactory;
+
     /**
      * @param array<string, mixed> $parameters
      *
-     * @return list<mixed>
+     * @return array<int, array<string, mixed>>
      */
     public function fetch(string $sql, array $parameters = []): array;
 
     /**
      * @param array<string, mixed> $parameters
      *
+     * @return array<string, mixed>
+     */
+    public function fetchOne(string $sql, array $parameters = []): array;
+
+    /**
+     * @param array<string, mixed> $parameters
+     *
      * @return array<string, mixed>|null
      */
-    public function fetchSingleRow(string $sql, array $parameters = []): array|null;
+    public function fetchOneOrNull(string $sql, array $parameters = []): array|null;
 
     /** @param array<string, mixed> $parameters */
-    public function hasRows(string $table, array $parameters = []): bool;
+    public function query(string $sql, array $parameters = []): mixed;
 
-    /** @param array<string, mixed> $parameters */
-    public function query(string $sql, array $parameters = []): void;
-
-    /** @param array<string, mixed> $data */
-    public function insert(string $table, array $data): void;
-
-    /** @param array<string, mixed> $data */
-    public function insertOrUpdate(string $table, array $data): void;
+    public function executeRaw(string $sql): void;
 
     public function beginTransaction(): void;
 
     public function commit(): void;
 
     public function rollback(): void;
-
-    public function truncateTable(string $table): void;
 }

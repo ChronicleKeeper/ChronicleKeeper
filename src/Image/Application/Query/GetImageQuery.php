@@ -24,10 +24,10 @@ class GetImageQuery implements Query
     {
         assert($parameters instanceof GetImage);
 
-        $image = $this->databasePlatform->fetchSingleRow(
-            'SELECT * FROM images WHERE id = :id',
-            ['id' => $parameters->id],
-        );
+        $image = $this->databasePlatform->createQueryBuilder()->createSelect()
+            ->from('images')
+            ->where('id', '=', $parameters->id)
+            ->fetchOne();
 
         return $this->denormalizer->denormalize($image, Image::class);
     }

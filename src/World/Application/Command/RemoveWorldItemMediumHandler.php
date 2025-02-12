@@ -17,37 +17,31 @@ class RemoveWorldItemMediumHandler
     public function __invoke(RemoveWorldItemMedium $command): void
     {
         if ($command->mediumType === 'document') {
-            $this->platform->query(
-                'DELETE FROM world_item_documents WHERE world_item_id = :itemId AND document_id = :mediumId',
-                [
-                    'itemId' => $command->itemId,
-                    'mediumId' => $command->mediumId,
-                ],
-            );
+            $this->platform->createQueryBuilder()->createDelete()
+                ->from('world_item_documents')
+                ->where('world_item_id', '=', $command->itemId)
+                ->where('document_id', '=', $command->mediumId)
+                ->execute();
 
             return;
         }
 
         if ($command->mediumType === 'image') {
-            $this->platform->query(
-                'DELETE FROM world_item_images WHERE world_item_id = :itemId AND image_id = :mediumId',
-                [
-                    'itemId' => $command->itemId,
-                    'mediumId' => $command->mediumId,
-                ],
-            );
+            $this->platform->createQueryBuilder()->createDelete()
+                ->from('world_item_images')
+                ->where('world_item_id', '=', $command->itemId)
+                ->where('image_id', '=', $command->mediumId)
+                ->execute();
 
             return;
         }
 
         if ($command->mediumType === 'conversation') {
-            $this->platform->query(
-                'DELETE FROM world_item_conversations WHERE world_item_id = :itemId AND conversation_id = :mediumId',
-                [
-                    'itemId' => $command->itemId,
-                    'mediumId' => $command->mediumId,
-                ],
-            );
+            $this->platform->createQueryBuilder()->createDelete()
+                ->from('world_item_conversations')
+                ->where('world_item_id', '=', $command->itemId)
+                ->where('conversation_id', '=', $command->mediumId)
+                ->execute();
 
             return;
         }

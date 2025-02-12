@@ -27,10 +27,11 @@ class FindLatestConversationsQuery implements Query
     {
         assert($parameters instanceof FindLatestConversationsParameters);
 
-        $data = $this->databasePlatform->fetch(
-            'SELECT * FROM conversations ORDER BY title LIMIT :limit',
-            ['limit' => $parameters->maxEntries],
-        );
+        $data = $this->databasePlatform->createQueryBuilder()->createSelect()
+            ->from('conversations')
+            ->orderBy('title')
+            ->limit($parameters->maxEntries)
+            ->fetchAll();
 
         $conversations = [];
         foreach ($data as $conversation) {

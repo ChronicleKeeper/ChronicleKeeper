@@ -6,6 +6,7 @@ namespace ChronicleKeeper\Document\Application\Event;
 
 use ChronicleKeeper\Settings\Domain\Event\ExecuteImportPruning;
 use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
+use ChronicleKeeper\Shared\Infrastructure\Database\Exception\DatabaseQueryException;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
@@ -25,7 +26,22 @@ class ImportPruner
             ['pruner' => self::class, 'tables' => ['documents', 'documents_vectors']],
         );
 
-        $this->databasePlatform->truncateTable('documents_vectors');
-        $this->databasePlatform->truncateTable('documents');
+        try {
+            $this->databasePlatform->beginTransaction();
+
+            $this->databasePlatform->createQueryBuilder()->createDelete()
+                ->from('documents_vectors')
+                ->execute();
+
+            $this->databasePlatform->createQueryBuilder()->createDelete()
+                ->from('documents')
+                ->execute();
+
+            $this->databasePlatform->commit();
+        } catch (DatabaseQueryException $e) {
+            $this->databasePlatform->rollback();
+
+            throw $e;
+        }
     }
 }

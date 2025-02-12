@@ -23,7 +23,11 @@ final readonly class GetTargetBagQuery implements Query
 
     public function query(QueryParameters $parameters): TargetBag
     {
-        $content = $this->databasePlatform->fetch('SELECT * FROM favorites ORDER BY title');
+        $content = $this->databasePlatform->createQueryBuilder()->createSelect()
+            ->from('favorites')
+            ->orderBy('title')
+            ->fetchAll();
+
         if (count($content) === 0) {
             return new TargetBag();
         }

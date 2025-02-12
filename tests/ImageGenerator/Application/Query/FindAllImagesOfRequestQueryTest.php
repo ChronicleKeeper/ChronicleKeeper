@@ -4,23 +4,47 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Test\ImageGenerator\Application\Query;
 
+use ChronicleKeeper\ImageGenerator\Application\Command\StoreGeneratorRequest;
+use ChronicleKeeper\ImageGenerator\Application\Command\StoreGeneratorResult;
 use ChronicleKeeper\ImageGenerator\Application\Query\FindAllImagesOfRequest;
 use ChronicleKeeper\ImageGenerator\Application\Query\FindAllImagesOfRequestQuery;
-use ChronicleKeeper\ImageGenerator\Domain\Entity\GeneratorResult;
-use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
+use ChronicleKeeper\Test\ImageGenerator\Domain\Entity\GeneratorRequestBuilder;
 use ChronicleKeeper\Test\ImageGenerator\Domain\Entity\GeneratorResultBuilder;
+use ChronicleKeeper\Test\Shared\Infrastructure\Database\DatabaseTestCase;
+use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\Small;
+use PHPUnit\Framework\Attributes\Large;
 use PHPUnit\Framework\Attributes\Test;
-use PHPUnit\Framework\TestCase;
-use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Webmozart\Assert\InvalidArgumentException;
+
+use function assert;
 
 #[CoversClass(FindAllImagesOfRequestQuery::class)]
 #[CoversClass(FindAllImagesOfRequest::class)]
-#[Small]
-class FindAllImagesOfRequestQueryTest extends TestCase
+#[Large]
+class FindAllImagesOfRequestQueryTest extends DatabaseTestCase
 {
+    private FindAllImagesOfRequestQuery $query;
+
+    #[Override]
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $query = self::getContainer()->get(FindAllImagesOfRequestQuery::class);
+        assert($query instanceof FindAllImagesOfRequestQuery);
+
+        $this->query = $query;
+    }
+
+    #[Override]
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        unset($this->query);
+    }
+
     #[Test]
     public function correctQueryClassIsliked(): void
     {
@@ -42,41 +66,25 @@ class FindAllImagesOfRequestQueryTest extends TestCase
     #[Test]
     public function theImagesArrayIsBuild(): void
     {
-        $requestId = 'b06bd1f2-f7bb-43ca-948e-7fe38956667e';
+        // ------------------- The test setup -------------------
 
-        $databasePlatform = $this->createMock(DatabasePlatform::class);
-        $databasePlatform->expects($this->once())
-            ->method('fetch')
-            ->with('SELECT * FROM generator_results WHERE generatorRequest = :id', ['id' => $requestId])
-            ->willReturn([
-                ['title' => 'Image 1'],
-                ['title' => 'Image 2'],
-            ]);
+        $request = (new GeneratorRequestBuilder())->build();
+        $this->bus->dispatch(new StoreGeneratorRequest($request));
 
-        $denormalizer        = $this->createMock(DenormalizerInterface::class);
-        $denormalizerInvoker = $this->exactly(2);
-        $denormalizer
-            ->expects($denormalizerInvoker)
-            ->method('denormalize')
-            ->willReturnCallback(
-                static function (array $data, string $target) use ($denormalizerInvoker): GeneratorResult {
-                    self::assertSame(GeneratorResult::class, $target);
+        $result1 = (new GeneratorResultBuilder())->build();
+        $result2 = (new GeneratorResultBuilder())->build();
 
-                    if ($denormalizerInvoker->numberOfInvocations() === 1) {
-                        self::assertSame('Image 1', $data['title']);
+        $this->bus->dispatch(new StoreGeneratorResult($request->id, $result1));
+        $this->bus->dispatch(new StoreGeneratorResult($request->id, $result2));
 
-                        return (new GeneratorResultBuilder())->build();
-                    }
+        // ------------------- Execute tests --------------------
 
-                    self::assertSame('Image 2', $data['title']);
+        $response = $this->query->query(new FindAllImagesOfRequest($request->id));
 
-                    return (new GeneratorResultBuilder())->build();
-                },
-            );
-
-        $response = (new FindAllImagesOfRequestQuery($denormalizer, $databasePlatform))
-            ->query(new FindAllImagesOfRequest($requestId));
+        // ------------------- The test assertions -------------------
 
         self::assertCount(2, $response);
+        self::assertSame($result1->id, $response[0]->id);
+        self::assertSame($result2->id, $response[1]->id);
     }
 }

@@ -13,6 +13,7 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 use function assert;
 use function json_decode;
+use function sprintf;
 
 use const JSON_THROW_ON_ERROR;
 
@@ -28,13 +29,16 @@ final readonly class GetGeneratorRequestQuery implements Query
     {
         assert($parameters instanceof GetGeneratorRequest);
 
-        $request = $this->platform->fetchSingleRow(
-            'SELECT * FROM generator_requests WHERE id = :id',
-            ['id' => $parameters->id],
-        );
+        $request = $this->platform->createQueryBuilder()->createSelect()
+            ->from('generator_requests')
+            ->where('id', '=', $parameters->id)
+            ->fetchOneOrNull();
 
         if ($request === null) {
-            throw new InvalidArgumentException('Generator Request not found');
+            throw new InvalidArgumentException(sprintf(
+                'Generator request with id "%s" not found.',
+                $parameters->id,
+            ));
         }
 
         $request['userInput'] = json_decode(

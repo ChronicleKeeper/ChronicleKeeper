@@ -6,30 +6,60 @@ namespace ChronicleKeeper\Test\World\Application\Event;
 
 use ChronicleKeeper\Settings\Application\Service\ImportSettings;
 use ChronicleKeeper\Settings\Domain\Event\ExecuteImportPruning;
-use ChronicleKeeper\Test\Shared\Infrastructure\Database\DatabasePlatformMock;
+use ChronicleKeeper\Test\Shared\Infrastructure\Database\DatabaseTestCase;
+use ChronicleKeeper\Test\World\Domain\Entity\ItemBuilder;
+use ChronicleKeeper\World\Application\Command\StoreWorldItem;
 use ChronicleKeeper\World\Application\Event\ImportPruner;
+use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\Small;
+use PHPUnit\Framework\Attributes\Large;
 use PHPUnit\Framework\Attributes\Test;
-use PHPUnit\Framework\TestCase;
-use Psr\Log\NullLogger;
+
+use function assert;
 
 #[CoversClass(ImportPruner::class)]
-#[Small]
-class ImportPrunerTest extends TestCase
+#[Large]
+class ImportPrunerTest extends DatabaseTestCase
 {
+    private ImportPruner $importPruner;
+
+    #[Override]
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $importPruner = self::getContainer()->get(ImportPruner::class);
+        assert($importPruner instanceof ImportPruner);
+
+        $this->importPruner = $importPruner;
+    }
+
+    #[Override]
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        unset($this->importPruner);
+    }
+
     #[Test]
     public function itIsPruning(): void
     {
-        $databasePlatform = new DatabasePlatformMock();
+        // ------------------- The test setup -------------------
 
-        (new ImportPruner($databasePlatform, new NullLogger()))
-            ->__invoke(new ExecuteImportPruning(new ImportSettings()));
+        $worldItem = (new ItemBuilder())->build();
+        $this->bus->dispatch(new StoreWorldItem($worldItem));
 
-        $databasePlatform->assertExecutedQuery('DELETE FROM world_item_conversations');
-        $databasePlatform->assertExecutedQuery('DELETE FROM world_item_documents');
-        $databasePlatform->assertExecutedQuery('DELETE FROM world_item_images');
-        $databasePlatform->assertExecutedQuery('DELETE FROM world_item_relations');
-        $databasePlatform->assertExecutedQuery('DELETE FROM world_items');
+        // ------------------- The test execution -------------------
+
+        ($this->importPruner)(new ExecuteImportPruning(new ImportSettings()));
+
+        // ------------------- The test assertions -------------------
+
+        $this->assertTableIsEmpty('world_items');
+        $this->assertTableIsEmpty('world_item_relations');
+        $this->assertTableIsEmpty('world_item_images');
+        $this->assertTableIsEmpty('world_item_documents');
+        $this->assertTableIsEmpty('world_item_conversations');
     }
 }

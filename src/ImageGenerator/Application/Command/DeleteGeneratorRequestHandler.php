@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ChronicleKeeper\ImageGenerator\Application\Command;
 
 use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
+use ChronicleKeeper\Shared\Infrastructure\Database\Exception\DatabaseQueryException;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler]
@@ -17,10 +18,24 @@ class DeleteGeneratorRequestHandler
 
     public function __invoke(DeleteGeneratorRequest $request): void
     {
-        $this->platform->query(
-            'DELETE FROM generator_results WHERE generatorRequest = :id',
-            ['id' => $request->requestId],
-        );
-        $this->platform->query('DELETE FROM generator_requests WHERE id = :id', ['id' => $request->requestId]);
+        try {
+            $this->platform->beginTransaction();
+
+            $this->platform->createQueryBuilder()->createDelete()
+                ->from('generator_results')
+                ->where('generatorRequest', '=', $request->requestId)
+                ->execute();
+
+            $this->platform->createQueryBuilder()->createDelete()
+                ->from('generator_requests')
+                ->where('id', '=', $request->requestId)
+                ->execute();
+
+            $this->platform->commit();
+        } catch (DatabaseQueryException $e) {
+            $this->platform->rollback();
+
+            throw $e;
+        }
     }
 }

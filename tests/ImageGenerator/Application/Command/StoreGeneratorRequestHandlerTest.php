@@ -8,76 +8,59 @@ use ChronicleKeeper\ImageGenerator\Application\Command\StoreGeneratorRequest;
 use ChronicleKeeper\ImageGenerator\Application\Command\StoreGeneratorRequestHandler;
 use ChronicleKeeper\ImageGenerator\Application\Service\PromptOptimizer;
 use ChronicleKeeper\ImageGenerator\Domain\ValueObject\OptimizedPrompt;
-use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
 use ChronicleKeeper\Test\ImageGenerator\Domain\Entity\GeneratorRequestBuilder;
+use ChronicleKeeper\Test\Shared\Infrastructure\Database\DatabaseTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\Small;
+use PHPUnit\Framework\Attributes\Large;
 use PHPUnit\Framework\Attributes\Test;
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\SerializerInterface;
 
 #[CoversClass(StoreGeneratorRequestHandler::class)]
 #[CoversClass(StoreGeneratorRequest::class)]
-#[Small]
-class StoreGeneratorRequestHandlerTest extends TestCase
+#[Large]
+class StoreGeneratorRequestHandlerTest extends DatabaseTestCase
 {
     #[Test]
     public function testStoreRequestWithOptimizedPrompt(): void
     {
-        $serializer       = $this->createMock(SerializerInterface::class);
-        $promptOptimizer  = $this->createMock(PromptOptimizer::class);
-        $databasePlatform = $this->createMock(DatabasePlatform::class);
+        $serializer      = $this->createMock(SerializerInterface::class);
+        $promptOptimizer = $this->createMock(PromptOptimizer::class);
 
-        $handler = new StoreGeneratorRequestHandler($serializer, $promptOptimizer, $databasePlatform);
-        $request = new StoreGeneratorRequest((new GeneratorRequestBuilder())->build());
+        $handler = new StoreGeneratorRequestHandler($serializer, $promptOptimizer, $this->databasePlatform);
+        $request = new StoreGeneratorRequest((new GeneratorRequestBuilder())->withOptimizedPrompt(null)->build());
 
         $promptOptimizer->expects($this->once())
             ->method('optimize')
             ->willReturn('Optimized Prompt');
 
-        $databasePlatform->expects($this->once())
-            ->method('insertOrUpdate')
-            ->with(
-                'generator_requests',
-                [
-                    'id'       => $request->request->id,
-                    'title'    => $request->request->title,
-                    'userInput' => '',
-                    'prompt'   => 'Optimized Prompt',
-                ],
-            );
-
         $handler($request);
 
         self::assertSame('Optimized Prompt', $request->request->prompt?->prompt);
+
+        $rawGeneratorRequests = $this->getRowFromTable('generator_requests', 'id', $request->request->id);
+        self::assertNotNull($rawGeneratorRequests);
+        self::assertSame($request->request->id, $rawGeneratorRequests['id']);
+        self::assertSame('Optimized Prompt', $rawGeneratorRequests['prompt']);
     }
 
     #[Test]
     public function testStoreRequestWithoutOptimizedPrompt(): void
     {
-        $serializer       = $this->createMock(SerializerInterface::class);
-        $promptOptimizer  = $this->createMock(PromptOptimizer::class);
-        $databasePlatform = $this->createMock(DatabasePlatform::class);
+        $serializer      = $this->createMock(SerializerInterface::class);
+        $promptOptimizer = $this->createMock(PromptOptimizer::class);
 
-        $handler = new StoreGeneratorRequestHandler($serializer, $promptOptimizer, $databasePlatform);
+        $handler = new StoreGeneratorRequestHandler($serializer, $promptOptimizer, $this->databasePlatform);
         $request = new StoreGeneratorRequest((new GeneratorRequestBuilder())
             ->withOptimizedPrompt(new OptimizedPrompt('Already Optimized Prompt'))
             ->build());
 
         $promptOptimizer->expects($this->never())->method('optimize');
 
-        $databasePlatform->expects($this->once())
-            ->method('insertOrUpdate')
-            ->with(
-                'generator_requests',
-                [
-                    'id'       => $request->request->id,
-                    'title'    => $request->request->title,
-                    'userInput' => '',
-                    'prompt'   => 'Already Optimized Prompt',
-                ],
-            );
-
         $handler($request);
+
+        $rawGeneratorRequests = $this->getRowFromTable('generator_requests', 'id', $request->request->id);
+        self::assertNotNull($rawGeneratorRequests);
+        self::assertSame($request->request->id, $rawGeneratorRequests['id']);
+        self::assertSame('Already Optimized Prompt', $rawGeneratorRequests['prompt']);
     }
 }

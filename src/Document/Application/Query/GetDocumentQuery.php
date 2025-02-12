@@ -24,10 +24,10 @@ class GetDocumentQuery implements Query
     {
         assert($parameters instanceof GetDocument);
 
-        $document = $this->databasePlatform->fetchSingleRow(
-            'SELECT * FROM documents WHERE id = :id',
-            ['id' => $parameters->id],
-        );
+        $document = $this->databasePlatform->createQueryBuilder()->createSelect()
+            ->from('documents')
+            ->where('id', '=', $parameters->id)
+            ->fetchOne();
 
         return $this->denormalizer->denormalize($document, Document::class);
     }

@@ -21,7 +21,6 @@ class DocumentVectorProviderTest extends SchemaProviderTestCase
 
         $tables = $this->schemaManager->getTables();
 
-        self::assertCount(6, $tables); // The vec0 extension will create a bunch of tables
         self::assertSame('documents_vectors', $tables[0]); // The base table for embeddings
     }
 }

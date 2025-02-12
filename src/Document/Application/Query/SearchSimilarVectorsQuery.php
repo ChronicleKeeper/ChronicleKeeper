@@ -11,7 +11,6 @@ use ChronicleKeeper\Shared\Application\Query\QueryService;
 use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
 
 use function assert;
-use function implode;
 
 class SearchSimilarVectorsQuery implements Query
 {
@@ -26,14 +25,18 @@ class SearchSimilarVectorsQuery implements Query
     {
         assert($parameters instanceof SearchSimilarVectors);
 
-        $foundVectors = $this->databasePlatform->fetch(
-            'SELECT document_id, distance, content FROM documents_vectors WHERE embedding match :embedding AND k = :maxResults AND distance < :maxDistance ORDER BY distance',
-            [
-                'embedding' => '[' . implode(',', $parameters->searchedVectors) . ']',
-                'maxDistance' => $parameters->maxDistance,
-                'maxResults' => $parameters->maxResults,
-            ],
-        );
+        $foundVectors = $this->databasePlatform->createQueryBuilder()->createSelect()
+            ->select('document_id', 'content')
+            ->from('documents_vectors')
+            ->withVectorSearch(
+                'embedding',
+                $parameters->searchedVectors,
+                'distance',
+                $parameters->maxDistance,
+            )
+            ->limit($parameters->maxResults)
+            ->orderBy('distance')
+            ->fetchAll();
 
         $results = [];
         foreach ($foundVectors as $vector) {
@@ -42,7 +45,7 @@ class SearchSimilarVectorsQuery implements Query
             $results[] = [
                 'document' => $document,
                 'content' => $vector['content'],
-                'distance' => $vector['distance'],
+                'distance' => (float) $vector['distance'],
             ];
         }
 

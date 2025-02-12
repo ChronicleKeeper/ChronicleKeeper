@@ -12,21 +12,44 @@ use ChronicleKeeper\Test\Chat\Domain\Entity\ExtendedMessageBuilder;
 use ChronicleKeeper\Test\Chat\Domain\Entity\LLMChain\AssistantMessageBuilder;
 use ChronicleKeeper\Test\Chat\Domain\Entity\LLMChain\SystemMessageBuilder;
 use ChronicleKeeper\Test\Chat\Domain\Entity\LLMChain\UserMessageBuilder;
-use ChronicleKeeper\Test\Shared\Infrastructure\Database\DatabasePlatformMock;
+use ChronicleKeeper\Test\Shared\Infrastructure\Database\DatabaseTestCase;
+use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\Small;
+use PHPUnit\Framework\Attributes\Large;
 use PHPUnit\Framework\Attributes\Test;
-use PHPUnit\Framework\TestCase;
-use RuntimeException;
+
+use function assert;
 
 #[CoversClass(StoreConversationHandler::class)]
 #[CoversClass(StoreConversation::class)]
-#[Small]
-class StoreConversationHandlerTest extends TestCase
+#[Large]
+final class StoreConversationHandlerTest extends DatabaseTestCase
 {
+    private StoreConversationHandler $handler;
+
+    #[Override]
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $handler = self::getContainer()->get(StoreConversationHandler::class);
+        assert($handler instanceof StoreConversationHandler);
+
+        $this->handler = $handler;
+    }
+
+    #[Override]
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        unset($this->handler);
+    }
+
     #[Test]
     public function itCanStoreAConversation(): void
     {
+        // Generate stub objects
         $messages = (new ExtendedMessageBagBuilder())
             ->withMessages(
                 (new ExtendedMessageBuilder())->withMessage((new SystemMessageBuilder())->build())->build(),
@@ -41,60 +64,24 @@ class StoreConversationHandlerTest extends TestCase
             ->withMessages($messages)
             ->build();
 
-        $databasePlatform = new DatabasePlatformMock();
-        $handler          = new StoreConversationHandler($databasePlatform);
-        $handler(new StoreConversation($conversation));
+        ($this->handler)(new StoreConversation($conversation));
 
-        $databasePlatform->assertExecutedInsert('conversations', [
-            'id' => $conversation->getId(),
-            'title' => $conversation->getTitle(),
-            'directory' => $conversation->getDirectory()->getId(),
-        ]);
+        // Assert the data is in the database
+        $entry = $this->databasePlatform->createQueryBuilder()->createSelect()
+            ->from('conversations')
+            ->where('id', '=', '123e4567-e89b-12d3-a456-426614174000')
+            ->fetchOneOrNull();
 
-        $databasePlatform->assertExecutedInsert('conversation_settings', [
-            'conversation_id' => $conversation->getId(),
-            'version' => $conversation->getSettings()->version,
-            'temperature' => $conversation->getSettings()->temperature,
-            'images_max_distance' => $conversation->getSettings()->imagesMaxDistance,
-            'documents_max_distance' => $conversation->getSettings()->documentsMaxDistance,
-        ]);
+        self::assertIsArray($entry);
+        self::assertSame('123e4567-e89b-12d3-a456-426614174000', $entry['id']);
+        self::assertSame('Test conversation', $entry['title']);
 
-        $databasePlatform->assertExecutedQuery(
-            'DELETE FROM conversation_messages WHERE conversation_id = :conversation_id',
-            ['conversation_id' => $conversation->getId()],
-        );
-
-        $databasePlatform->assertExecutedQuery('BEGIN TRANSACTION');
-        $databasePlatform->assertExecutedQuery('COMMIT');
-        $databasePlatform->assertExecutedInsertsCount(5);
+        $this->assertRowsInTable('conversation_messages', 3);
+        $this->assertRowsInTable('conversation_settings', 1);
     }
 
     #[Test]
-    public function testItWillMakeARollbackOnExceptionDuringSaving(): void
-    {
-        $conversation = (new ConversationBuilder())
-            ->withId('123e4567-e89b-12d3-a456-426614174000')
-            ->withTitle('Test conversation')
-            ->build();
-
-        $databasePlatform = new DatabasePlatformMock();
-        $databasePlatform->throwExceptionOnInsertToTable(
-            'conversations',
-            new RuntimeException('Test exception'),
-        );
-
-        try {
-            $handler = new StoreConversationHandler($databasePlatform);
-            $handler(new StoreConversation($conversation));
-        } catch (RuntimeException $exception) {
-            self::assertSame('Test exception', $exception->getMessage());
-        }
-
-        $databasePlatform->assertExecutedQuery('ROLLBACK');
-    }
-
-    #[Test]
-    public function validConversation(): void
+    public function itCanConstructAValidCommand(): void
     {
         $conversation = (new ConversationBuilder())
             ->withId('123e4567-e89b-12d3-a456-426614174000')

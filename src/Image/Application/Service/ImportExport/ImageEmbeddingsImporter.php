@@ -13,7 +13,6 @@ use Psr\Log\LoggerInterface;
 
 use function assert;
 use function count;
-use function implode;
 use function json_decode;
 use function reset;
 
@@ -29,12 +28,6 @@ final readonly class ImageEmbeddingsImporter implements SingleImport
 
     public function import(Filesystem $filesystem, ImportSettings $settings): void
     {
-        if (count($filesystem->listContents('vector/image/')->toArray()) > 0) {
-            $this->classicImport($filesystem);
-
-            return;
-        }
-
         foreach ($filesystem->listContents('library/image_embeddings/') as $file) {
             assert($file instanceof FileAttributes);
 
@@ -48,61 +41,37 @@ final readonly class ImageEmbeddingsImporter implements SingleImport
             }
 
             $imageId = reset($content['data'])['image_id'];
-            if (
-                $settings->overwriteLibrary === false
-                && $this->databasePlatform->hasRows('images_vectors', ['image_id' => $imageId])
-            ) {
+            if ($settings->overwriteLibrary === false && $this->hasImageVectors($imageId)) {
                 // The image already has a vector storage, no need to overwrite
                 $this->logger->debug('Image already has a vector storage, skipping.', ['image_id' => $imageId]);
                 continue;
             }
 
-            $this->databasePlatform->query(
-                'DELETE FROM images_vectors WHERE image_id = :imageId',
-                ['imageId' => $imageId],
-            );
+            $this->databasePlatform->createQueryBuilder()->createDelete()
+                ->from('images_vectors')
+                ->where('image_id', '=', $imageId)
+                ->execute();
 
             foreach ($content['data'] as $row) {
-                $this->databasePlatform->insert(
-                    'images_vectors',
-                    [
+                $this->databasePlatform->createQueryBuilder()->createInsert()
+                    ->insert('images_vectors')
+                    ->values([
                         'image_id' => $row['image_id'],
                         'embedding' => $row['embedding'],
                         'content' => $row['content'],
                         'vectorContentHash' => $row['vectorContentHash'],
-                    ],
-                );
+                    ])
+                    ->execute();
             }
         }
     }
 
-    private function classicImport(Filesystem $filesystem): void
+    private function hasImageVectors(string $id): bool
     {
-        $libraryDirectoryPath = 'vector/image/';
-        foreach ($filesystem->listContents($libraryDirectoryPath) as $zippedFile) {
-            assert($zippedFile instanceof FileAttributes);
-
-            $fileContent = $filesystem->read($zippedFile->path());
-
-            /** @var array{id: string, imageId: string, content: string, vectorContentHash: string, vector: list<float>} $content */
-            $content = json_decode($fileContent, true, 512, JSON_THROW_ON_ERROR);
-
-            $this->databasePlatform->query(
-                'DELETE FROM images_vectors WHERE image_id = :imageId',
-                ['imageId' => $content['imageId']],
-            );
-
-            $this->databasePlatform->insertOrUpdate(
-                'images_vectors',
-                [
-                    'image_id' => $content['imageId'],
-                    'embedding' => '[' . implode(',', $content['vector']) . ']',
-                    'content' => $content['content'],
-                    'vectorContentHash' => $content['vectorContentHash'],
-                ],
-            );
-
-            $this->logger->debug('Image vector storage imported.', ['vector_id' => $content['id']]);
-        }
+        return $this->databasePlatform->createQueryBuilder()->createSelect()
+            ->select('image_id')
+            ->from('images_vectors')
+            ->where('image_id', '=', $id)
+            ->fetchOneOrNull() !== null;
     }
 }

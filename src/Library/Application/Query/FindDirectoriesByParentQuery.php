@@ -28,10 +28,10 @@ final class FindDirectoriesByParentQuery implements Query
     {
         assert($parameters instanceof FindDirectoriesByParent);
 
-        $directories = $this->databasePlatform->fetch(
-            'SELECT * FROM directories WHERE parent = :parentId',
-            ['parentId' => $parameters->parentId],
-        );
+        $directories = $this->databasePlatform->createQueryBuilder()->createSelect()
+            ->from('directories')
+            ->where('parent', '=', $parameters->parentId)
+            ->fetchAll();
 
         $directories = array_map(
             fn (array $directory) => $this->denormalizer->denormalize($directory, Directory::class),

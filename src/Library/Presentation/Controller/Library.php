@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Library\Presentation\Controller;
 
-use ChronicleKeeper\Library\Application\Service\CacheReader;
+use ChronicleKeeper\Library\Application\Query\FindDirectoryContent;
 use ChronicleKeeper\Library\Domain\Entity\Directory;
 use ChronicleKeeper\Library\Domain\RootDirectory;
+use ChronicleKeeper\Shared\Application\Query\QueryService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -23,13 +24,13 @@ class Library extends AbstractController
 {
     public function __construct(
         private readonly Environment $environment,
-        private readonly CacheReader $cacheReader,
+        private readonly QueryService $queryService,
     ) {
     }
 
     public function __invoke(Directory $directory): Response
     {
-        $directoryContent = $this->cacheReader->read($directory);
+        $directoryContent = $this->queryService->query(new FindDirectoryContent($directory->getId()));
 
         return new Response($this->environment->render(
             'library/library.html.twig',

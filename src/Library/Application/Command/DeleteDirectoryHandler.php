@@ -33,9 +33,10 @@ class DeleteDirectoryHandler
     {
         $this->thePurge($command->directory);
 
-        $this->platform->query('DELETE FROM directories WHERE id = :id', [
-            'id' => $command->directory->getId(),
-        ]);
+        $this->platform->createQueryBuilder()->createDelete()
+            ->from('directories')
+            ->where('id', '=', $command->directory->getId())
+            ->execute();
 
         return new MessageEventResult([new DirectoryDeleted($command->directory)]);
     }

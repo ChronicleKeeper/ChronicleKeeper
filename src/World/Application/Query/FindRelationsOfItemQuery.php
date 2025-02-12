@@ -26,19 +26,25 @@ class FindRelationsOfItemQuery implements Query
     {
         assert($parameters instanceof FindRelationsOfItem);
 
-        $fromItem     = $parameters->itemid;
-        $rawRelations = $this->platform->fetch(
-            'SELECT source_world_item_id as fromItem, target_world_item_id as toItem, relation_type as relationType FROM world_item_relations WHERE source_world_item_id = :itemId OR target_world_item_id = :itemId',
-            ['itemId' => $fromItem],
-        );
+        $fromItem = $parameters->itemid;
+
+        $rawRelations = $this->platform->createQueryBuilder()->createSelect()
+            ->select(
+                'source_world_item_id as from_item',
+                'target_world_item_id as to_item',
+                'relation_type as relation_type',
+            )
+            ->from('world_item_relations')
+            ->orWhere([['source_world_item_id', '=', $fromItem], ['target_world_item_id', '=', $fromItem]])
+            ->fetchAll();
 
         $relations = [];
         foreach ($rawRelations as $relation) {
-            $relationTarget = $relation['fromItem'] === $fromItem ? 'toItem' : 'fromItem';
+            $relationTarget = $relation['from_item'] === $fromItem ? 'to_item' : 'from_item';
             $toItem         = $this->queryService->query(new GetWorldItem($relation[$relationTarget]));
             assert($toItem instanceof Item);
 
-            $relations[] = new Relation($toItem, $relation['relationType']);
+            $relations[] = new Relation($toItem, $relation['relation_type']);
         }
 
         return $relations;
