@@ -25,10 +25,10 @@
                             </div>
                         </div>
                         <div class="card-footer text-end">
-                            <div class="d-flex">
-                                <a href="{{ path('library', {'directory': directory.id }) }}" class="btn btn-link">Abbruch</a>
-                                <button type="submit" class="btn btn-primary ms-auto">Speichern</button>
-                            </div>
+                            {{ component(
+                                'Form:FotterButtonGroup',
+                                {'cancelLink': path('library', {'directory': directory.id })}
+                            ) }}
                         </div>
                     </form>
                 </div>

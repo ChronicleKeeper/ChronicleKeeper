@@ -16,6 +16,7 @@ use ChronicleKeeper\Library\Domain\RootDirectory;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
 use ChronicleKeeper\Shared\Presentation\FlashMessages\Alert;
 use ChronicleKeeper\Shared\Presentation\FlashMessages\HandleFlashMessages;
+use ChronicleKeeper\Shared\Presentation\Twig\Form\HandleFooterButtonGroup;
 use PhpLlm\LlmChain\Model\Message\AssistantMessage;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -37,6 +38,7 @@ use function reset;
 class DocumentCreation extends AbstractController
 {
     use HandleFlashMessages;
+    use HandleFooterButtonGroup;
 
     public function __construct(
         private readonly QueryService $queryService,
@@ -54,14 +56,13 @@ class DocumentCreation extends AbstractController
             assert($document instanceof Document);
 
             $this->bus->dispatch(new StoreDocument($document));
+            $this->addFlashMessage($request, Alert::SUCCESS, 'Das Dokument wurde erfolgreich erstellt.');
 
-            $this->addFlashMessage(
+            return $this->redirectFromFooter(
                 $request,
-                Alert::SUCCESS,
-                'Das Dokument wurde erstellt, damit es in der Suche aktiv ist kannst du den Suchindex aktualisieren.',
+                $this->generateUrl('library', ['directory' => $document->getDirectory()->getId()]),
+                $this->generateUrl('library_document_view', ['document' => $document->getId()]),
             );
-
-            return $this->redirectToRoute('library', ['directory' => $document->getDirectory()->getId()]);
         }
 
         return $this->render(

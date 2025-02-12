@@ -9,15 +9,14 @@ use ChronicleKeeper\Library\Domain\Entity\Directory;
 use ChronicleKeeper\Library\Presentation\Form\DirectoryType;
 use ChronicleKeeper\Shared\Presentation\FlashMessages\Alert;
 use ChronicleKeeper\Shared\Presentation\FlashMessages\HandleFlashMessages;
+use ChronicleKeeper\Shared\Presentation\Twig\Form\HandleFooterButtonGroup;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormFactoryInterface;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Requirement\Requirement;
-use Symfony\Component\Routing\RouterInterface;
 use Twig\Environment;
 
 use function array_key_exists;
@@ -32,10 +31,10 @@ use function is_array;
 class DirectoryCreation extends AbstractController
 {
     use HandleFlashMessages;
+    use HandleFooterButtonGroup;
 
     public function __construct(
         private readonly Environment $environment,
-        private readonly RouterInterface $router,
         private readonly FormFactoryInterface $formFactory,
         private readonly MessageBusInterface $bus,
     ) {
@@ -59,10 +58,15 @@ class DirectoryCreation extends AbstractController
                 'Das Verzeichnis "' . $directory->getTitle() . '" wurde erfolgreich erstellt.',
             );
 
-            return new RedirectResponse($this->router->generate(
-                'library',
-                ['directory' => $directory->getId()],
-            ));
+            return $this->redirectFromFooter(
+                $request,
+                $this->generateUrl('library', ['directory' => $directory->getParent()?->getId()]),
+                $this->generateUrl('library', ['directory' => $directory->getId()]),
+                $this->generateUrl(
+                    'library_directory_create',
+                    ['parentDirectory' => $directory->getParent()?->getId()],
+                ),
+            );
         }
 
         return new Response(

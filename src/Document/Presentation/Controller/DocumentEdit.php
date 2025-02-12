@@ -9,6 +9,7 @@ use ChronicleKeeper\Document\Domain\Entity\Document;
 use ChronicleKeeper\Document\Presentation\Form\DocumentType;
 use ChronicleKeeper\Shared\Presentation\FlashMessages\Alert;
 use ChronicleKeeper\Shared\Presentation\FlashMessages\HandleFlashMessages;
+use ChronicleKeeper\Shared\Presentation\Twig\Form\HandleFooterButtonGroup;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -24,6 +25,7 @@ use Symfony\Component\Routing\Requirement\Requirement;
 class DocumentEdit extends AbstractController
 {
     use HandleFlashMessages;
+    use HandleFooterButtonGroup;
 
     public function __construct(
         private readonly MessageBusInterface $bus,
@@ -41,10 +43,14 @@ class DocumentEdit extends AbstractController
             $this->addFlashMessage(
                 $request,
                 Alert::SUCCESS,
-                'Das geänderte Dokument wurde in der Bbiliothek hinterlegt und steht in deinen Gesprächen nun zur Verfügung.',
+                'Das geänderte Dokument wurde erfolgreich gespeichert.',
             );
 
-            return $this->redirectToRoute('library', ['directory' => $document->getDirectory()->getId()]);
+            return $this->redirectFromFooter(
+                $request,
+                $this->generateUrl('library', ['directory' => $document->getDirectory()->getId()]),
+                $this->generateUrl('library_document_view', ['document' => $document->getId()]),
+            );
         }
 
         return $this->render(

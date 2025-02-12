@@ -11,6 +11,7 @@ use ChronicleKeeper\Library\Domain\Entity\Directory;
 use ChronicleKeeper\Settings\Domain\Entity\SystemPrompt;
 use ChronicleKeeper\Shared\Presentation\FlashMessages\Alert;
 use ChronicleKeeper\Shared\Presentation\FlashMessages\HandleFlashMessages;
+use ChronicleKeeper\Shared\Presentation\Twig\Form\HandleFooterButtonGroup;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -30,6 +31,7 @@ use function is_bool;
 class DocumentUpload extends AbstractController
 {
     use HandleFlashMessages;
+    use HandleFooterButtonGroup;
 
     public function __construct(
         private readonly FormFactoryInterface $formFactory,
@@ -58,10 +60,15 @@ class DocumentUpload extends AbstractController
                 $this->addFlashMessage(
                     $request,
                     Alert::SUCCESS,
-                    'Das Dokument mit dem Titel "' . $document->getTitle() . '" wurde erfolgreich hochgeladen. Bitte überprüfe den Text nach einer Optimierung.',
+                    'Das Dokument mit dem Titel "' . $document->getTitle() . '" wurde erfolgreich hochgeladen.',
                 );
 
-                return $this->redirectToRoute('library_document_view', ['document' => $document->getId()]);
+                return $this->redirectFromFooter(
+                    $request,
+                    $this->generateUrl('library', ['directory' => $document->getDirectory()->getId()]),
+                    $this->generateUrl('library_document_view', ['document' => $document->getId()]),
+                    $this->generateUrl('library_document_upload', ['directory' => $document->getDirectory()->getId()]),
+                );
             } catch (PDFHasEmptyContent) {
                 $this->addFlashMessage(
                     $request,

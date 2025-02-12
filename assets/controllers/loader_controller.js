@@ -21,9 +21,7 @@ export default class extends Controller {
 
             if (form && !isLiveActionForm) {
                 form.addEventListener('submit', (event) => {
-                    event.preventDefault();
                     showLoader();
-                    form.submit();
                 });
             }
         };

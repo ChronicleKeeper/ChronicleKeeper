@@ -1,0 +1,35 @@
+<div class="d-flex">
+    {% if cancelLink is defined and cancelLink is not empty %}
+        <a href="{{ cancelLink }}" class="btn btn-ghost-secondary">{{ ux_icon('tabler:cancel') }}Abbrechen</a>
+    {% endif %}
+    <div class="ms-auto align-items-end">
+        <div class="btn-group">
+
+            <button type="submit"
+                    name="saveAndRedirect"
+                    value="0"
+                    class="btn btn-primary"
+                    title="Speichern und zurück zur Liste"
+            >{{ ux_icon('tabler:check') }}Speichern</button>
+
+            {% if showRedirectToView %}
+                <button type="submit"
+                        name="saveAndRedirect"
+                        value="1"
+                        class="btn btn-outline-primary"
+                        title="Speichern und weiter zur Detailansicht"
+                >{{ ux_icon('tabler:search') }}Speichern und Ansehen</button>
+            {% endif %}
+
+            {% if showRedirectToCreate %}
+                <button type="submit"
+                        name="saveAndRedirect"
+                        value="2"
+                        class="btn btn-outline-primary"
+                        title="Speichern und weiteren Eintrag anlegen"
+                >{{ ux_icon('tabler:plus') }}Speichern und Weiter</button>
+            {% endif %}
+
+        </div>
+    </div>
+</div>
