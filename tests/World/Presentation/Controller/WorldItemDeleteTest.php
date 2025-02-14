@@ -82,6 +82,6 @@ class WorldItemDeleteTest extends WebTestCase
             'SELECT * FROM world_items WHERE id = :id',
             ['id' => $this->item->getId()],
         );
-        self::assertCount(0, $items);
+        self::assertEmpty($items);
     }
 }

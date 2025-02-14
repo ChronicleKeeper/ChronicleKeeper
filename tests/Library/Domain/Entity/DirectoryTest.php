@@ -108,7 +108,7 @@ final class DirectoryTest extends TestCase
 
         // Test event recording
         $events = $directory->flushEvents();
-        self::assertCount(0, $events);
+        self::assertEmpty($events);
     }
 
     #[Test]
@@ -137,7 +137,7 @@ final class DirectoryTest extends TestCase
 
         // Test event recording
         $events = $directory->flushEvents();
-        self::assertCount(0, $events);
+        self::assertEmpty($events);
     }
 
     #[Test]
@@ -151,7 +151,7 @@ final class DirectoryTest extends TestCase
 
         // Test event recording
         $events = $directory->flushEvents();
-        self::assertCount(0, $events);
+        self::assertEmpty($events);
     }
 
     #[Test]

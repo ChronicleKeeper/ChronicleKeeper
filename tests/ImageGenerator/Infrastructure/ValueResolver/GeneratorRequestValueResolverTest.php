@@ -40,7 +40,7 @@ class GeneratorRequestValueResolverTest extends TestCase
         $valueResolver = new GeneratorRequestValueResolver($queryService);
         $resolvedValue = $valueResolver->resolve(Request::create('/'), $argument);
 
-        self::assertCount(0, $resolvedValue);
+        self::assertEmpty($resolvedValue);
     }
 
     #[Test]
@@ -60,7 +60,7 @@ class GeneratorRequestValueResolverTest extends TestCase
         $valueResolver = new GeneratorRequestValueResolver($queryService);
         $resolvedValue = $valueResolver->resolve(Request::create('/'), $argument);
 
-        self::assertCount(0, $resolvedValue);
+        self::assertEmpty($resolvedValue);
     }
 
     #[Test]
@@ -87,7 +87,7 @@ class GeneratorRequestValueResolverTest extends TestCase
         $valueResolver = new GeneratorRequestValueResolver($queryService);
         $resolvedValue = $valueResolver->resolve($request, $argument);
 
-        self::assertCount(0, $resolvedValue);
+        self::assertEmpty($resolvedValue);
     }
 
     #[Test]
@@ -114,7 +114,7 @@ class GeneratorRequestValueResolverTest extends TestCase
         $valueResolver = new GeneratorRequestValueResolver($queryService);
         $resolvedValue = $valueResolver->resolve($request, $argument);
 
-        self::assertCount(0, $resolvedValue);
+        self::assertEmpty($resolvedValue);
     }
 
     #[Test]
@@ -148,7 +148,7 @@ class GeneratorRequestValueResolverTest extends TestCase
         $valueResolver = new GeneratorRequestValueResolver($queryService);
         $resolvedValue = $valueResolver->resolve($request, $argument);
 
-        self::assertCount(0, $resolvedValue);
+        self::assertEmpty($resolvedValue);
     }
 
     #[Test]
@@ -183,7 +183,7 @@ class GeneratorRequestValueResolverTest extends TestCase
         $valueResolver = new GeneratorRequestValueResolver($queryService);
         $resolvedValue = $valueResolver->resolve($request, $argument);
 
-        self::assertCount(0, $resolvedValue);
+        self::assertEmpty($resolvedValue);
     }
 
     #[Test]

@@ -75,6 +75,6 @@ class WorldItemRelationRemoveTest extends WebTestCase
 
         $relations = $this->queryService->query(new FindRelationsOfItem($this->sourceItem->getId()));
         self::assertIsArray($relations);
-        self::assertCount(0, $relations);
+        self::assertEmpty($relations);
     }
 }

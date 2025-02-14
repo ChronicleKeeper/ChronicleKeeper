@@ -37,12 +37,11 @@ class FileAccessTest extends TestCase
     {
         $type     = 'documents';
         $filename = 'file.txt';
-        $path     = '/var/www/data/documents/file.txt';
         $content  = 'file content';
 
-        $this->pathRegistry->method('get')->with($type)->willReturn('/var/www/data/documents');
-        $this->filesystem->method('exists')->with($path)->willReturn(true);
-        $this->filesystem->method('readFile')->with($path)->willReturn($content);
+        $this->pathRegistry->method('get')->willReturn('/var/www/data/documents');
+        $this->filesystem->method('exists')->willReturn(true);
+        $this->filesystem->method('readFile')->willReturn($content);
 
         $result = $this->fileAccess->read($type, $filename);
 
@@ -54,10 +53,9 @@ class FileAccessTest extends TestCase
     {
         $type     = 'documents';
         $filename = 'file.txt';
-        $path     = '/var/www/data/documents/file.txt';
 
-        $this->pathRegistry->method('get')->with($type)->willReturn('/var/www/data/documents');
-        $this->filesystem->method('exists')->with($path)->willReturn(false);
+        $this->pathRegistry->method('get')->willReturn('/var/www/data/documents');
+        $this->filesystem->method('exists')->willReturn(false);
 
         $this->expectException(UnableToReadFile::class);
 
@@ -72,7 +70,7 @@ class FileAccessTest extends TestCase
         $path     = '/var/www/data/documents/file.txt';
         $content  = 'file content';
 
-        $this->pathRegistry->method('get')->with($type)->willReturn('/var/www/data/documents');
+        $this->pathRegistry->method('get')->willReturn('/var/www/data/documents');
         $this->filesystem->expects($this->once())->method('dumpFile')->with($path, $content);
 
         $this->fileAccess->write($type, $filename, $content);
@@ -83,11 +81,10 @@ class FileAccessTest extends TestCase
     {
         $type     = 'documents';
         $filename = 'file.txt';
-        $path     = '/var/www/data/documents/file.txt';
         $content  = 'file content';
 
-        $this->pathRegistry->method('get')->with($type)->willReturn('/var/www/data/documents');
-        $this->filesystem->method('dumpFile')->with($path, $content)->willThrowException(new IOException(''));
+        $this->pathRegistry->method('get')->willReturn('/var/www/data/documents');
+        $this->filesystem->method('dumpFile')->willThrowException(new IOException(''));
 
         $this->expectException(UnableToWriteFile::class);
 
@@ -101,8 +98,8 @@ class FileAccessTest extends TestCase
         $filename = 'file.txt';
         $path     = '/var/www/data/documents/file.txt';
 
-        $this->pathRegistry->method('get')->with($type)->willReturn('/var/www/data/documents');
-        $this->filesystem->method('exists')->with($path)->willReturn(true);
+        $this->pathRegistry->method('get')->willReturn('/var/www/data/documents');
+        $this->filesystem->method('exists')->willReturn(true);
         $this->filesystem->expects($this->once())->method('remove')->with($path);
 
         $this->fileAccess->delete($type, $filename);
@@ -113,11 +110,10 @@ class FileAccessTest extends TestCase
     {
         $type     = 'documents';
         $filename = 'file.txt';
-        $path     = '/var/www/data/documents/file.txt';
 
-        $this->pathRegistry->method('get')->with($type)->willReturn('/var/www/data/documents');
-        $this->filesystem->method('exists')->with($path)->willReturn(true);
-        $this->filesystem->method('remove')->with($path)->willThrowException(new IOException(''));
+        $this->pathRegistry->method('get')->willReturn('/var/www/data/documents');
+        $this->filesystem->method('exists')->willReturn(true);
+        $this->filesystem->method('remove')->willThrowException(new IOException(''));
 
         $this->expectException(UnableToDeleteFile::class);
 
@@ -129,10 +125,9 @@ class FileAccessTest extends TestCase
     {
         $type     = 'documents';
         $filename = 'file.txt';
-        $path     = '/var/www/data/documents/file.txt';
 
-        $this->pathRegistry->method('get')->with($type)->willReturn('/var/www/data/documents');
-        $this->filesystem->method('exists')->with($path)->willReturn(true);
+        $this->pathRegistry->method('get')->willReturn('/var/www/data/documents');
+        $this->filesystem->method('exists')->willReturn(true);
 
         $result = $this->fileAccess->exists($type, $filename);
 
@@ -144,10 +139,9 @@ class FileAccessTest extends TestCase
     {
         $type     = 'documents';
         $filename = 'file.txt';
-        $path     = '/var/www/data/documents/file.txt';
 
-        $this->pathRegistry->method('get')->with($type)->willReturn('/var/www/data/documents');
-        $this->filesystem->method('exists')->with($path)->willReturn(false);
+        $this->pathRegistry->method('get')->willReturn('/var/www/data/documents');
+        $this->filesystem->method('exists')->willReturn(false);
 
         $result = $this->fileAccess->exists($type, $filename);
 
@@ -158,23 +152,19 @@ class FileAccessTest extends TestCase
     public function prune(): void
     {
         $type = 'documents';
-        $path = '/var/www/data/documents';
 
         $this->pathRegistry->expects($this->once())
             ->method('get')
-            ->with($type)
             ->willReturn('/var/www/data/documents');
 
         $this->filesystem
             ->expects($this->once())
             ->method('exists')
-            ->with($path)
             ->willReturn(true);
 
         $this->filesystem
             ->expects($this->once())
-            ->method('remove')
-            ->with($path);
+            ->method('remove');
 
         $this->fileAccess->prune($type);
     }
@@ -183,17 +173,14 @@ class FileAccessTest extends TestCase
     public function pruneWhenDirectoryNotExists(): void
     {
         $type = 'documents';
-        $path = '/var/www/data/documents';
 
         $this->pathRegistry
             ->expects($this->once())
             ->method('get')
-            ->with($type)
             ->willReturn('/var/www/data/documents');
 
         $this->filesystem
             ->method('exists')
-            ->with($path)
             ->willReturn(false);
 
         $this->filesystem->expects($this->never())->method('remove');

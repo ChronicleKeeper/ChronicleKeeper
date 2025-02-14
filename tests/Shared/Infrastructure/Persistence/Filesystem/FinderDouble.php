@@ -58,11 +58,8 @@ class FinderDouble implements Finder, ResetInterface
             ->testDouble(
                 SplFileInfo::class,
                 true,
-                false,
                 callOriginalConstructor: false,
                 callOriginalClone: false,
-                cloneArguments: false,
-                allowMockingUnknownTypes: false,
             );
 
         $stub->method('getFilename')->willReturn($filename);

@@ -135,7 +135,7 @@ final class PgSqlDatabasePlatformTest extends DatabaseTestCase
         $this->databasePlatform->rollback();
 
         $result = $this->databasePlatform->fetch('SELECT * FROM test WHERE name = :name', ['name' => 'test4']);
-        self::assertCount(0, $result);
+        self::assertEmpty($result);
     }
 
     #[Test]

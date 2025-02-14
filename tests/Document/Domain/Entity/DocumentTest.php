@@ -75,7 +75,7 @@ class DocumentTest extends TestCase
         self::assertSame($now, $document->getUpdatedAt());
 
         $events = $document->flushEvents();
-        self::assertCount(0, $events);
+        self::assertEmpty($events);
     }
 
     #[Test]
@@ -207,7 +207,7 @@ class DocumentTest extends TestCase
         self::assertSame($originalUpdatedAt, $document->getUpdatedAt());
 
         $events = $document->flushEvents();
-        self::assertCount(0, $events);
+        self::assertEmpty($events);
     }
 
     #[Test]
@@ -223,7 +223,7 @@ class DocumentTest extends TestCase
         self::assertSame($originalUpdatedAt, $document->getUpdatedAt());
 
         $events = $document->flushEvents();
-        self::assertCount(0, $events);
+        self::assertEmpty($events);
     }
 
     #[Test]
@@ -239,6 +239,6 @@ class DocumentTest extends TestCase
         self::assertSame($originalUpdatedAt, $document->getUpdatedAt());
 
         $events = $document->flushEvents();
-        self::assertCount(0, $events);
+        self::assertEmpty($events);
     }
 }
