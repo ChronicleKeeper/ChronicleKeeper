@@ -38,7 +38,7 @@ class CalendarDateTest extends TestCase
 
         self::assertSame($year, $date->getYear());
         self::assertSame($month, $date->getMonth());
-        self::assertSame($expectedDayLabel, $date->getDay());
+        self::assertSame($expectedDayLabel, $date->getDay()->getLabel());
     }
 
     public static function provideDateCreationCases(): Generator
@@ -183,15 +183,6 @@ class CalendarDateTest extends TestCase
 
         $calendar = ExampleCalendars::getFullFeatured();
         new CalendarDate($calendar, 1, 4, 1);
-    }
-
-    #[Test]
-    public function ifFormatsARegularDate(): void
-    {
-        $calendar = ExampleCalendars::getFullFeatured();
-        $date     = new CalendarDate($calendar, 1, 3, 10);
-
-        self::assertSame('10. ThirdMonth 1 after Boom', $date->format());
     }
 
     #[Test]
@@ -554,6 +545,43 @@ class CalendarDateTest extends TestCase
         yield 'A random day in the regular calendar year 15 has correct weekday' => [
             new CalendarDate($calendar, 12, 7, 15),
             '11. July 12 AD',
+        ];
+    }
+
+    #[Test]
+    #[DataProvider('provideDateFormattingCases')]
+    public function ifFormatsARegularDate(CalendarDate $date, string $format, string $expected): void
+    {
+        self::assertSame($expected, $date->format($format));
+    }
+
+    public static function provideDateFormattingCases(): Generator
+    {
+        $calendar = ExampleCalendars::getFullFeatured();
+        $date     = new CalendarDate($calendar, 1, 3, 10);
+
+        yield 'Default format' => [
+            $date,
+            '%d. %M %Y',
+            '10. ThirdMonth 1 after Boom',
+        ];
+
+        yield 'Custom format with day only' => [
+            $date,
+            '%d',
+            '10',
+        ];
+
+        yield 'Custom format with month name only' => [
+            $date,
+            '%M',
+            'ThirdMonth',
+        ];
+
+        yield 'Custom format with year and epoch' => [
+            $date,
+            '%Y',
+            '1 after Boom',
         ];
     }
 }

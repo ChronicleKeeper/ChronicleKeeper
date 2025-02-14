@@ -10,6 +10,7 @@ use ChronicleKeeper\Test\WebTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Large;
 use PHPUnit\Framework\Attributes\Test;
+use Symfony\Component\HttpFoundation\Request;
 
 #[CoversClass(Calendar::class)]
 #[CoversClass(TableCalendar::class)]
@@ -25,12 +26,12 @@ final class CalendarTest extends WebTestCase
 
         // -------------------- Test Execution -------------------- //
 
-        $this->client->request('GET', '/calendar');
+        $this->client->request(Request::METHOD_GET, '/calendar');
 
         // -------------------- Test Assertions -------------------- //
 
         self::assertResponseIsSuccessful();
-        self::assertSelectorTextContains('h2', '14. Imbolc 1262 nach der Flut');
+        self::assertSelectorTextContains('h2', 'Imbolc 1262 nach der Flut');
     }
 
     #[Test]
@@ -42,12 +43,12 @@ final class CalendarTest extends WebTestCase
 
         // -------------------- Test Execution -------------------- //
 
-        $this->client->request('GET', '/calendar/0/3');
+        $this->client->request(Request::METHOD_GET, '/calendar/0/3');
 
         // -------------------- Test Assertions -------------------- //
 
         self::assertResponseIsSuccessful();
-        self::assertSelectorTextContains('h2', '1. Brigid 0 nach der Flut');
+        self::assertSelectorTextContains('h2', 'Brigid 0 nach der Flut');
     }
 
     #[Test]
@@ -59,7 +60,7 @@ final class CalendarTest extends WebTestCase
 
         // -------------------- Test Execution -------------------- //
 
-        $this->client->request('GET', '/calendar/-12/5');
+        $this->client->request(Request::METHOD_GET, '/calendar/-12/5');
 
         // -------------------- Test Assertions -------------------- //
 
@@ -75,7 +76,7 @@ final class CalendarTest extends WebTestCase
 
         // -------------------- Test Execution -------------------- //
 
-        $this->client->request('GET', '/calendar/1/-5');
+        $this->client->request(Request::METHOD_GET, '/calendar/1/-5');
 
         // -------------------- Test Assertions -------------------- //
 
@@ -91,7 +92,7 @@ final class CalendarTest extends WebTestCase
 
         // -------------------- Test Execution -------------------- //
 
-        $this->client->request('GET', '/calendar/0/13');
+        $this->client->request(Request::METHOD_GET, '/calendar/0/13');
 
         // -------------------- Test Assertions -------------------- //
 
@@ -107,7 +108,7 @@ final class CalendarTest extends WebTestCase
 
         // -------------------- Test Execution -------------------- //
 
-        $this->client->request('GET', '/calendar/0/0');
+        $this->client->request(Request::METHOD_GET, '/calendar/0/0');
 
         // -------------------- Test Assertions -------------------- //
 

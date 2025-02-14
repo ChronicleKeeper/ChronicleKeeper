@@ -16,11 +16,11 @@ use function count;
 
 final class DayCollection implements Countable
 {
-    /** @var array<int, $leapDays> */
-    private array $leapDays = [];
+    /** @var array<int, LeapDay> */
+    private array $leapDays;
 
     /** @var array<int, Day> */
-    private array $daysInTheMonth = [];
+    private array $daysInTheMonth;
     /** @var array<int, array<int, Day>> */
     private array $daysInMonthOfYear = [];
 

@@ -4,22 +4,23 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Calendar\Domain\Entity;
 
+use ChronicleKeeper\Calendar\Domain\Entity\Calendar\Day;
 use ChronicleKeeper\Calendar\Domain\Entity\Calendar\Month;
 use ChronicleKeeper\Calendar\Domain\Exception\DayNotExistsInMonth;
 use ChronicleKeeper\Calendar\Domain\Exception\MonthNotExists;
 use ChronicleKeeper\Calendar\Domain\Exception\YearIsInvalidInCalendar;
-use ChronicleKeeper\Calendar\Domain\ValueObject\LeapDay;
+use ChronicleKeeper\Calendar\Domain\Service\DateFormatter;
 use ChronicleKeeper\Calendar\Domain\ValueObject\MoonState;
 use ChronicleKeeper\Calendar\Domain\ValueObject\WeekDay;
 
 use function abs;
 use function count;
-use function sprintf;
-use function trim;
 
 class CalendarDate
 {
     private readonly Month $currentMonth;
+    private readonly DateFormatter $formatter;
+    private Day|null $dayInYear = null;
 
     public function __construct(
         private readonly Calendar $calendar,
@@ -40,6 +41,8 @@ class CalendarDate
         if ($this->day < 1 || $this->day > $maxDaysInMonthOfATheYear) {
             throw new DayNotExistsInMonth($this->year, $this->day, $this->month);
         }
+
+        $this->formatter = new DateFormatter();
     }
 
     public function getYear(): int
@@ -52,9 +55,9 @@ class CalendarDate
         return $this->month;
     }
 
-    public function getDay(): string
+    public function getDay(): Day
     {
-        return $this->currentMonth->days->getDayInYear($this->day, $this->year)->getLabel();
+        return $this->dayInYear ?? ($this->dayInYear = $this->currentMonth->days->getDayInYear($this->day, $this->year));
     }
 
     public function getCalendar(): Calendar
@@ -69,27 +72,9 @@ class CalendarDate
             && $this->day === $calendarDate->day;
     }
 
-    public function format(): string
+    public function format(string $format = '%d. %M %Y'): string
     {
-        $currentMonth = $this->calendar->getMonth($this->month);
-        $dayToDisplay = $currentMonth->days->getDayInYear($this->day, $this->year);
-
-        if ($dayToDisplay instanceof LeapDay) {
-            return trim(sprintf(
-                '%s %d %s',
-                $dayToDisplay->getLabel(),
-                $this->year,
-                $this->calendar->getEpochCollection()->getEpochForYear($this->year)->name,
-            ));
-        }
-
-        return trim(sprintf(
-            '%d. %s %d %s',
-            $dayToDisplay->getLabel(),
-            $this->calendar->getMonth($this->month)->name,
-            $this->year,
-            $this->calendar->getEpochCollection()->getEpochForYear($this->year)->name,
-        ));
+        return $this->formatter->format($this, $format);
     }
 
     public function addDays(int $days): CalendarDate

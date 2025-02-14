@@ -1,6 +1,6 @@
 {% extends 'layout.html.twig' %}
 
-{% block page_title %}{{ viewDate.format }}{% endblock %}
+{% block page_title %}{{ viewDate.format('%M %Y') }}{% endblock %}
 
 {% block page_title_actions %}
     <div class="col-auto ms-auto d-print-none">

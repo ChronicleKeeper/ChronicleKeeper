@@ -21,7 +21,7 @@
                             <tr>
                                 {% for day in week %}
 
-                                    <td data-date="{{ day.year ~ '-' ~ day.month ~ '-' ~ day.day }}"
+                                    <td data-date="{{ day.year ~ '-' ~ day.month ~ '-' ~ day.day.label }}"
                                         class="{{ day.isSame(currentDate) ? 'bg-primary-subtle ' }}{{ this.isInCurrentMonth(day) ? 'day-in-current-month ' }}border align-content-start"
                                     >
                                         <div class="day-content overflow-hidden">
@@ -30,10 +30,10 @@
                                                     {% if day.year < 0 %}
                                                     {% elseif not this.isInCurrentMonth(day) %}
                                                         <div class="text-muted small">
-                                                            {{ day.day }}
+                                                            {{ day.day.label }}
                                                         </div>
                                                     {% else %}
-                                                        {{ day.day }}
+                                                        {{ day.day.label }}
                                                     {% endif %}
                                                 </div>
                                                 {% if this.isInCurrentMonth(day) %}
