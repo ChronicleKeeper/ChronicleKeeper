@@ -12,6 +12,7 @@ use ChronicleKeeper\Calendar\Domain\Entity\Calendar\Month;
 use ChronicleKeeper\Calendar\Domain\Entity\Calendar\MoonCycle;
 use ChronicleKeeper\Calendar\Domain\Entity\Calendar\WeekConfiguration;
 use ChronicleKeeper\Calendar\Domain\ValueObject\Epoch;
+use ChronicleKeeper\Calendar\Domain\ValueObject\LeapDay;
 use ChronicleKeeper\Calendar\Domain\ValueObject\WeekDay;
 use ChronicleKeeper\Shared\Application\Query\Query;
 use ChronicleKeeper\Shared\Application\Query\QueryParameters;
@@ -24,7 +25,10 @@ final class LoadCalendarQuery implements Query
 
         // Configure Months
         $calendar->setMonths(
-            new Month($calendar, 1, 'Taranis', new DayCollection(25)),
+            new Month($calendar, 1, 'Taranis', new DayCollection(
+                25,
+                new LeapDay(21, 'Mittwinter'),
+            )),
             new Month($calendar, 2, 'Imbolc', new DayCollection(30)),
             new Month($calendar, 3, 'Brigid', new DayCollection(25)),
             new Month($calendar, 4, 'Lughnasad', new DayCollection(25)),

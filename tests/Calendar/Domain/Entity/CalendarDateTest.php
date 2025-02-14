@@ -196,9 +196,9 @@ class CalendarDateTest extends TestCase
 
     #[Test]
     #[DataProvider('provideRegularWeekDayCalculationCases')]
-    public function itCalculatesWeekDaysCorrectWithRegularDayCalendar(CalendarDate $date, int $expectedWeekDay): void
+    public function itCalculatesWeekDaysCorrect(CalendarDate $date, int|null $expectedWeekDay): void
     {
-        self::assertSame($expectedWeekDay, $date->getWeekDay()->index);
+        self::assertSame($expectedWeekDay, $date->getWeekDay()?->index);
     }
 
     public static function provideRegularWeekDayCalculationCases(): Generator
@@ -206,56 +206,78 @@ class CalendarDateTest extends TestCase
         $calendar = ExampleCalendars::getOnlyRegularDays();
 
         // Year 0
-        yield 'First day of the first month of year 0' => [new CalendarDate($calendar, 0, 1, 1), 1];
-        yield 'Last day of the first month of year 0' => [new CalendarDate($calendar, 0, 1, 31), 3];
-        yield 'First day of the second month of year 0' => [new CalendarDate($calendar, 0, 2, 1), 4];
-        yield 'Last day of the second month of year 0' => [new CalendarDate($calendar, 0, 2, 28), 3];
-        yield 'First day of the third month of year 0' => [new CalendarDate($calendar, 0, 3, 1), 4];
-        yield 'Last day of the third month of year 0' => [new CalendarDate($calendar, 0, 3, 31), 6];
-        yield 'First day of the fourth month of year 0' => [new CalendarDate($calendar, 0, 4, 1), 7];
-        yield 'Last day of the fourth month of year 0' => [new CalendarDate($calendar, 0, 4, 30), 1];
-        yield 'First day of the fifth month of year 0' => [new CalendarDate($calendar, 0, 5, 1), 2];
-        yield 'Last day of the fifth month of year 0' => [new CalendarDate($calendar, 0, 5, 31), 4];
-        yield 'First day of the sixth month of year 0' => [new CalendarDate($calendar, 0, 6, 1), 5];
-        yield 'Last day of the sixth month of year 0' => [new CalendarDate($calendar, 0, 6, 30), 6];
-        yield 'First day of the seventh month of year 0' => [new CalendarDate($calendar, 0, 7, 1), 7];
-        yield 'Last day of the seventh month of year 0' => [new CalendarDate($calendar, 0, 7, 31), 2];
-        yield 'First day of the eighth month of year 0' => [new CalendarDate($calendar, 0, 8, 1), 3];
-        yield 'Last day of the eighth month of year 0' => [new CalendarDate($calendar, 0, 8, 31), 5];
-        yield 'First day of the ninth month of year 0' => [new CalendarDate($calendar, 0, 9, 1), 6];
-        yield 'Last day of the ninth month of year 0' => [new CalendarDate($calendar, 0, 9, 30), 7];
-        yield 'First day of the tenth month of year 0' => [new CalendarDate($calendar, 0, 10, 1), 1];
-        yield 'Last day of the tenth month of year 0' => [new CalendarDate($calendar, 0, 10, 31), 3];
-        yield 'First day of the eleventh month of year 0' => [new CalendarDate($calendar, 0, 11, 1), 4];
-        yield 'Last day of the eleventh month of year 0' => [new CalendarDate($calendar, 0, 11, 30), 5];
-        yield 'First day of the twelfth month of year 0' => [new CalendarDate($calendar, 0, 12, 1), 6];
-        yield 'Last day of the twelfth month of year 0' => [new CalendarDate($calendar, 0, 12, 31), 1];
+        yield 'RegularCalendar: First day of the first month of year 0' => [new CalendarDate($calendar, 0, 1, 1), 1];
+        yield 'RegularCalendar: Last day of the first month of year 0' => [new CalendarDate($calendar, 0, 1, 31), 3];
+        yield 'RegularCalendar: First day of the second month of year 0' => [new CalendarDate($calendar, 0, 2, 1), 4];
+        yield 'RegularCalendar: Last day of the second month of year 0' => [new CalendarDate($calendar, 0, 2, 28), 3];
+        yield 'RegularCalendar: First day of the third month of year 0' => [new CalendarDate($calendar, 0, 3, 1), 4];
+        yield 'RegularCalendar: Last day of the third month of year 0' => [new CalendarDate($calendar, 0, 3, 31), 6];
+        yield 'RegularCalendar: First day of the fourth month of year 0' => [new CalendarDate($calendar, 0, 4, 1), 7];
+        yield 'RegularCalendar: Last day of the fourth month of year 0' => [new CalendarDate($calendar, 0, 4, 30), 1];
+        yield 'RegularCalendar: First day of the fifth month of year 0' => [new CalendarDate($calendar, 0, 5, 1), 2];
+        yield 'RegularCalendar: Last day of the fifth month of year 0' => [new CalendarDate($calendar, 0, 5, 31), 4];
+        yield 'RegularCalendar: First day of the sixth month of year 0' => [new CalendarDate($calendar, 0, 6, 1), 5];
+        yield 'RegularCalendar: Last day of the sixth month of year 0' => [new CalendarDate($calendar, 0, 6, 30), 6];
+        yield 'RegularCalendar: First day of the seventh month of year 0' => [new CalendarDate($calendar, 0, 7, 1), 7];
+        yield 'RegularCalendar: Last day of the seventh month of year 0' => [new CalendarDate($calendar, 0, 7, 31), 2];
+        yield 'RegularCalendar: First day of the eighth month of year 0' => [new CalendarDate($calendar, 0, 8, 1), 3];
+        yield 'RegularCalendar: Last day of the eighth month of year 0' => [new CalendarDate($calendar, 0, 8, 31), 5];
+        yield 'RegularCalendar: First day of the ninth month of year 0' => [new CalendarDate($calendar, 0, 9, 1), 6];
+        yield 'RegularCalendar: Last day of the ninth month of year 0' => [new CalendarDate($calendar, 0, 9, 30), 7];
+        yield 'RegularCalendar: First day of the tenth month of year 0' => [new CalendarDate($calendar, 0, 10, 1), 1];
+        yield 'RegularCalendar: Last day of the tenth month of year 0' => [new CalendarDate($calendar, 0, 10, 31), 3];
+        yield 'RegularCalendar: First day of the eleventh month of year 0' => [new CalendarDate($calendar, 0, 11, 1), 4];
+        yield 'RegularCalendar: Last day of the eleventh month of year 0' => [new CalendarDate($calendar, 0, 11, 30), 5];
+        yield 'RegularCalendar: First day of the twelfth month of year 0' => [new CalendarDate($calendar, 0, 12, 1), 6];
+        yield 'RegularCalendar: Last day of the twelfth month of year 0' => [new CalendarDate($calendar, 0, 12, 31), 1];
 
         // Year 1
-        yield 'First day of the first month of year 1' => [new CalendarDate($calendar, 1, 1, 1), 2];
-        yield 'Last day of the first month of year 1' => [new CalendarDate($calendar, 1, 1, 31), 4];
-        yield 'First day of the second month of year 1' => [new CalendarDate($calendar, 1, 2, 1), 5];
-        yield 'Last day of the second month of year 1' => [new CalendarDate($calendar, 1, 2, 28), 4];
-        yield 'First day of the third month of year 1' => [new CalendarDate($calendar, 1, 3, 1), 5];
-        yield 'Last day of the third month of year 1' => [new CalendarDate($calendar, 1, 3, 31), 7];
-        yield 'First day of the fourth month of year 1' => [new CalendarDate($calendar, 1, 4, 1), 1];
-        yield 'Last day of the fourth month of year 1' => [new CalendarDate($calendar, 1, 4, 30), 2];
-        yield 'First day of the fifth month of year 1' => [new CalendarDate($calendar, 1, 5, 1), 3];
-        yield 'Last day of the fifth month of year 1' => [new CalendarDate($calendar, 1, 5, 31), 5];
-        yield 'First day of the sixth month of year 1' => [new CalendarDate($calendar, 1, 6, 1), 6];
-        yield 'Last day of the sixth month of year 1' => [new CalendarDate($calendar, 1, 6, 30), 7];
-        yield 'First day of the seventh month of year 1' => [new CalendarDate($calendar, 1, 7, 1), 1];
-        yield 'Last day of the seventh month of year 1' => [new CalendarDate($calendar, 1, 7, 31), 3];
-        yield 'First day of the eighth month of year 1' => [new CalendarDate($calendar, 1, 8, 1), 4];
-        yield 'Last day of the eighth month of year 1' => [new CalendarDate($calendar, 1, 8, 31), 6];
-        yield 'First day of the ninth month of year 1' => [new CalendarDate($calendar, 1, 9, 1), 7];
-        yield 'Last day of the ninth month of year 1' => [new CalendarDate($calendar, 1, 9, 30), 1];
-        yield 'First day of the tenth month of year 1' => [new CalendarDate($calendar, 1, 10, 1), 2];
-        yield 'Last day of the tenth month of year 1' => [new CalendarDate($calendar, 1, 10, 31), 4];
-        yield 'First day of the eleventh month of year 1' => [new CalendarDate($calendar, 1, 11, 1), 5];
-        yield 'Last day of the eleventh month of year 1' => [new CalendarDate($calendar, 1, 11, 30), 6];
-        yield 'First day of the twelfth month of year 1' => [new CalendarDate($calendar, 1, 12, 1), 7];
-        yield 'Last day of the twelfth month of year 1' => [new CalendarDate($calendar, 1, 12, 31), 2];
+        yield 'RegularCalendar: First day of the first month of year 1' => [new CalendarDate($calendar, 1, 1, 1), 2];
+        yield 'RegularCalendar: Last day of the first month of year 1' => [new CalendarDate($calendar, 1, 1, 31), 4];
+        yield 'RegularCalendar: First day of the second month of year 1' => [new CalendarDate($calendar, 1, 2, 1), 5];
+        yield 'RegularCalendar: Last day of the second month of year 1' => [new CalendarDate($calendar, 1, 2, 28), 4];
+        yield 'RegularCalendar: First day of the third month of year 1' => [new CalendarDate($calendar, 1, 3, 1), 5];
+        yield 'RegularCalendar: Last day of the third month of year 1' => [new CalendarDate($calendar, 1, 3, 31), 7];
+        yield 'RegularCalendar: First day of the fourth month of year 1' => [new CalendarDate($calendar, 1, 4, 1), 1];
+        yield 'RegularCalendar: Last day of the fourth month of year 1' => [new CalendarDate($calendar, 1, 4, 30), 2];
+        yield 'RegularCalendar: First day of the fifth month of year 1' => [new CalendarDate($calendar, 1, 5, 1), 3];
+        yield 'RegularCalendar: Last day of the fifth month of year 1' => [new CalendarDate($calendar, 1, 5, 31), 5];
+        yield 'RegularCalendar: First day of the sixth month of year 1' => [new CalendarDate($calendar, 1, 6, 1), 6];
+        yield 'RegularCalendar: Last day of the sixth month of year 1' => [new CalendarDate($calendar, 1, 6, 30), 7];
+        yield 'RegularCalendar: First day of the seventh month of year 1' => [new CalendarDate($calendar, 1, 7, 1), 1];
+        yield 'RegularCalendar: Last day of the seventh month of year 1' => [new CalendarDate($calendar, 1, 7, 31), 3];
+        yield 'RegularCalendar: First day of the eighth month of year 1' => [new CalendarDate($calendar, 1, 8, 1), 4];
+        yield 'RegularCalendar: Last day of the eighth month of year 1' => [new CalendarDate($calendar, 1, 8, 31), 6];
+        yield 'RegularCalendar: First day of the ninth month of year 1' => [new CalendarDate($calendar, 1, 9, 1), 7];
+        yield 'RegularCalendar: Last day of the ninth month of year 1' => [new CalendarDate($calendar, 1, 9, 30), 1];
+        yield 'RegularCalendar: First day of the tenth month of year 1' => [new CalendarDate($calendar, 1, 10, 1), 2];
+        yield 'RegularCalendar: Last day of the tenth month of year 1' => [new CalendarDate($calendar, 1, 10, 31), 4];
+        yield 'RegularCalendar: First day of the eleventh month of year 1' => [new CalendarDate($calendar, 1, 11, 1), 5];
+        yield 'RegularCalendar: Last day of the eleventh month of year 1' => [new CalendarDate($calendar, 1, 11, 30), 6];
+        yield 'RegularCalendar: First day of the twelfth month of year 1' => [new CalendarDate($calendar, 1, 12, 1), 7];
+        yield 'RegularCalendar: Last day of the twelfth month of year 1' => [new CalendarDate($calendar, 1, 12, 31), 2];
+
+        $calendar = ExampleCalendars::getLinearWithLeapDays();
+
+        // Year 0
+        yield 'LinearCalendar LeapDays: First day of the first month of year 0' => [new CalendarDate($calendar, 0, 1, 1), 1];
+        yield 'LinearCalendar LeapDays: Third day of the first month of year 0' => [new CalendarDate($calendar, 0, 1, 3), null];
+        yield 'LinearCalendar LeapDays: Last day of the first month of year 0' => [new CalendarDate($calendar, 0, 1, 31), 1];
+
+        // Year 1
+        yield 'LinearCalendar LeapDays: First day of the seventh month of year 0' => [new CalendarDate($calendar, 0, 7, 1), 3];
+        yield 'LinearCalendar LeapDays: Second day of the seventh month of year 0' => [new CalendarDate($calendar, 0, 7, 2), null];
+        yield 'LinearCalendar LeapDays: Last day of the seventh month of year 0' => [new CalendarDate($calendar, 0, 7, 32), 4];
+
+        // Year 1
+        yield 'LinearCalendar LeapDays: First day of the first month of year 1' => [new CalendarDate($calendar, 1, 1, 1), 7];
+        yield 'LinearCalendar LeapDays: Third day of the first month of year 1' => [new CalendarDate($calendar, 1, 1, 3), null];
+        yield 'LinearCalendar LeapDays: Last day of the first month of year 1' => [new CalendarDate($calendar, 1, 1, 31), 7];
+
+        // Year 1
+        yield 'LinearCalendar LeapDays: First day of the seventh month of year 1' => [new CalendarDate($calendar, 1, 7, 1), 9];
+        yield 'LinearCalendar LeapDays: Second day of the seventh month of year 1' => [new CalendarDate($calendar, 1, 7, 2), 10];
+        yield 'LinearCalendar LeapDays: Last day of the seventh month of year 1' => [new CalendarDate($calendar, 1, 7, 31), 9];
     }
 
     #[Test]
@@ -436,6 +458,107 @@ class CalendarDateTest extends TestCase
         yield 'Last day of the third month of year 0 in regular calendar' => [
             new CalendarDate($calendar, 0, 3, 31),
             90,
+        ];
+
+        $calendar = ExampleCalendars::getLinearWithLeapDays();
+
+        yield 'First day of the first month of year 0 in linear calendar' => [
+            new CalendarDate($calendar, 0, 1, 1),
+            1,
+        ];
+
+        yield 'Last day of the first month of year 0 in linear calendar' => [
+            new CalendarDate($calendar, 0, 1, 30),
+            30,
+        ];
+
+        yield 'Second day of the third month of year 2 in linear calendar' => [
+            new CalendarDate($calendar, 2, 3, 2),
+            794,
+        ];
+
+        yield 'Fifteenth day of the seventh month of year 0 in linear calendar' => [
+            new CalendarDate($calendar, 7, 7, 15),
+            2754,
+        ];
+    }
+
+    #[Test]
+    #[DataProvider('provideTotalDaysWithoutLeapDaysCountCases')]
+    public function itCalculatesTheTotalDaysWithoutLeapDaysFromTheStartOfTheCalendar(CalendarDate $date, int $expectedDays): void
+    {
+        self::assertSame($expectedDays, $date->getTotalDaysFromCalendarStart(true));
+    }
+
+    public static function provideTotalDaysWithoutLeapDaysCountCases(): Generator
+    {
+        $calendar = ExampleCalendars::getOnlyRegularDays();
+
+        yield 'First day of the first month of year 0 in regular calendar' => [
+            new CalendarDate($calendar, 0, 1, 1),
+            1,
+        ];
+
+        yield 'Last day of the first month of year 0 in regular calendar' => [
+            new CalendarDate($calendar, 0, 1, 31),
+            31,
+        ];
+
+        yield 'First day of the second month of year 0 in regular calendar' => [
+            new CalendarDate($calendar, 0, 2, 1),
+            32,
+        ];
+
+        yield 'Last day of the second month of year 0 in regular calendar' => [
+            new CalendarDate($calendar, 0, 2, 28),
+            59,
+        ];
+
+        yield 'First day of the third month of year 0 in regular calendar' => [
+            new CalendarDate($calendar, 0, 3, 1),
+            60,
+        ];
+
+        yield 'Last day of the third month of year 0 in regular calendar' => [
+            new CalendarDate($calendar, 0, 3, 31),
+            90,
+        ];
+
+        $calendar = ExampleCalendars::getLinearWithLeapDays();
+
+        yield 'First day of the first month of year 0 in linear calendar' => [
+            new CalendarDate($calendar, 0, 1, 1),
+            1,
+        ];
+
+        yield 'Last day of the first month of year 0 in linear calendar' => [
+            new CalendarDate($calendar, 0, 1, 31),
+            30,
+        ];
+
+        yield 'Last day of year 0 in linear calendar' => [
+            new CalendarDate($calendar, 0, 12, 30),
+            360,
+        ];
+
+        yield 'Second day of the third month of year 2 in linear calendar' => [
+            new CalendarDate($calendar, 2, 3, 2),
+            782,
+        ];
+
+        yield 'First day of the seventh month of year 7 in linear calendar' => [
+            new CalendarDate($calendar, 7, 7, 1),
+            2701,
+        ];
+
+        yield 'Fifteenth day of the seventh month of year 7 in linear calendar' => [
+            new CalendarDate($calendar, 7, 7, 15),
+            2715,
+        ];
+
+        yield 'Last day of the seventh month of year 7 in linear calendar' => [
+            new CalendarDate($calendar, 7, 7, 31),
+            2730,
         ];
     }
 

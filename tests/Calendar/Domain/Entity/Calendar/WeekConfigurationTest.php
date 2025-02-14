@@ -98,5 +98,17 @@ final class WeekConfigurationTest extends TestCase
             new CalendarDate($calendar, 12, 7, 15),
             '11. July 12 AD',
         ];
+
+        $calendar = ExampleCalendars::getLinearWithLeapDays();
+
+        yield 'First day of the linear calendar is also the first weekday' => [
+            new CalendarDate($calendar, 0, 1, 1),
+            '1. Taranis 0 after the Flood',
+        ];
+
+        yield 'First day of the tenth month in the year must not be a leap day' => [
+            new CalendarDate($calendar, 0, 10, 1),
+            '26. Mabon 0 after the Flood',
+        ];
     }
 }

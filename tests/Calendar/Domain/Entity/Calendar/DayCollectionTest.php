@@ -135,6 +135,7 @@ class DayCollectionTest extends TestCase
         int $expectedGeneralCount,
         int $expectedCountInYear,
         int $expectedCountOfRegularDays,
+        int $expectedCountOfLeapDays,
     ): void {
         self::assertCount(
             $expectedGeneralCount,
@@ -151,6 +152,11 @@ class DayCollectionTest extends TestCase
             $dayCollection->countRegularDays(),
             'Count of regular days is incorrect',
         );
+        self::assertSame(
+            $expectedCountOfLeapDays,
+            $dayCollection->countLeapDaysInYear($inYear),
+            'Count of leap days is incorrect',
+        );
     }
 
     public static function provideDayCountCases(): Generator
@@ -163,6 +169,7 @@ class DayCollectionTest extends TestCase
             31,
             31,
             31,
+            0,
         ];
 
         yield 'Get another regular day in a regular month' => [
@@ -171,6 +178,7 @@ class DayCollectionTest extends TestCase
             30,
             30,
             30,
+            0,
         ];
 
         $calendar = ExampleCalendars::getLinearWithLeapDays();
@@ -181,6 +189,7 @@ class DayCollectionTest extends TestCase
             31,
             31,
             30,
+            1,
         ];
 
         yield 'Get a leap day in a month with multiple leap days' => [
@@ -189,6 +198,7 @@ class DayCollectionTest extends TestCase
             32,
             31,
             30,
+            1,
         ];
 
         yield 'Get a leap day in a month with multiple leap days in day where leap day is ignored' => [
@@ -197,6 +207,20 @@ class DayCollectionTest extends TestCase
             32,
             32,
             30,
+            2,
         ];
+    }
+
+    #[Test]
+    public function itCanCountTheLeapDaysUpToADateInAYear(): void
+    {
+        $dayCollection = new DayCollection(
+            30,
+            new LeapDay(15, 'Some Leap Day', 2),
+        );
+
+        self::assertSame(0, $dayCollection->countLeapDaysUpToDayInYear(14,1));
+        self::assertSame(1, $dayCollection->countLeapDaysUpToDayInYear(16,2));
+        self::assertSame(0, $dayCollection->countLeapDaysUpToDayInYear(16, 3));
     }
 }

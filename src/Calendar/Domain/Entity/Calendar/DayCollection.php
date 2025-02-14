@@ -111,6 +111,14 @@ final class DayCollection implements Countable
         ));
     }
 
+    public function countLeapDaysInYear(int $year): int
+    {
+        return count(array_filter(
+            $this->daysInTheMonth,
+            static fn (Day $day): bool => $day instanceof LeapDay && $day->isActiveInYear($year),
+        ));
+    }
+
     public function count(): int
     {
         return count($this->daysInTheMonth);
@@ -122,5 +130,20 @@ final class DayCollection implements Countable
             $this->daysInTheMonth,
             static fn (Day $day): bool => $day instanceof RegularDay,
         ));
+    }
+
+    public function countLeapDaysUpToDayInYear(int $maxDay, int $year): int
+    {
+        $leapDays = array_filter(
+            $this->daysInTheMonth,
+            static fn (Day $day): bool => $day instanceof LeapDay && $day->isActiveInYear($year),
+        );
+
+        $leapDays = array_filter(
+            $leapDays,
+            static fn (Day $day): bool => $day->dayOfTheMonth <= $maxDay,
+        );
+
+        return count($leapDays);
     }
 }

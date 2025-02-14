@@ -10,6 +10,7 @@ use ChronicleKeeper\Calendar\Domain\Exception\DayNotExistsInMonth;
 use ChronicleKeeper\Calendar\Domain\Exception\MonthNotExists;
 use ChronicleKeeper\Calendar\Domain\Exception\YearIsInvalidInCalendar;
 use ChronicleKeeper\Calendar\Domain\Service\DateFormatter;
+use ChronicleKeeper\Calendar\Domain\ValueObject\LeapDay;
 use ChronicleKeeper\Calendar\Domain\ValueObject\MoonState;
 use ChronicleKeeper\Calendar\Domain\ValueObject\WeekDay;
 
@@ -39,7 +40,7 @@ class CalendarDate
         $maxDaysInMonthOfATheYear = $this->currentMonth->days->countInYear($this->year);
 
         if ($this->day < 1 || $this->day > $maxDaysInMonthOfATheYear) {
-            throw new DayNotExistsInMonth($this->year, $this->day, $this->month);
+            throw new DayNotExistsInMonth($this->year, $this->month, $this->day);
         }
 
         $this->formatter = new DateFormatter();
@@ -142,16 +143,21 @@ class CalendarDate
         }
     }
 
-    public function diffInDays(CalendarDate $date): int
+    public function diffInDays(CalendarDate $date, bool $withoutLeapDays = false): int
     {
-        $thisTotalDays = $this->getTotalDaysFromCalendarStart();
-        $dateTotalDays = $date->getTotalDaysFromCalendarStart();
+        $thisTotalDays = $this->getTotalDaysFromCalendarStart($withoutLeapDays);
+        $dateTotalDays = $date->getTotalDaysFromCalendarStart($withoutLeapDays);
 
         return abs($thisTotalDays - $dateTotalDays);
     }
 
-    public function getWeekDay(): WeekDay
+    public function getWeekDay(): WeekDay|null
     {
+        if ($this->getDay() instanceof LeapDay) {
+            // Leap days do not have a week day
+            return null;
+        }
+
         $weekDays  = $this->calendar->getWeeks()->getDays();
         $totalDays = $this->getTotalDaysFromCalendarStart();
         $index     = ($totalDays - 1) % count($weekDays) + 1;
@@ -181,15 +187,28 @@ class CalendarDate
         return new CalendarDate($this->calendar, $this->year, $this->month, $maxDaysInMonth);
     }
 
-    public function getTotalDaysFromCalendarStart(): int
+    public function getTotalDaysFromCalendarStart(bool $withoutLeapDays = false): int
     {
         $totalDays = 0;
 
+
+        $countsUpToThisYear = $this->calendar->getDaysUpToMonthInYear($this->year, $this->month);
+
         // Add days from complete months in current year
-        $totalDays += $this->calendar->getDaysUpToMonthInYear($this->year, $this->month);
+        $totalDays += $countsUpToThisYear['days'];
+
+        // Remove leap days if we do not want to have them
+        if ($withoutLeapDays === true) {
+            $totalDays -= $countsUpToThisYear['leapDays'];
+        }
 
         // Add remaining days in current month
         $totalDays += $this->day;
+
+        // Remove leap dys that were before this day if we want to exclude them
+        if ($withoutLeapDays === true) {
+            $totalDays -= $this->currentMonth->days->countLeapDaysUpToDayInYear($this->day, $this->year);
+        }
 
         return $totalDays;
     }

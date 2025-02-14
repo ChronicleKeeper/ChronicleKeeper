@@ -6,6 +6,7 @@ namespace ChronicleKeeper\Calendar\Domain\Entity\Calendar;
 
 use ChronicleKeeper\Calendar\Domain\Entity\CalendarDate;
 use ChronicleKeeper\Calendar\Domain\Exception\InvalidWeekConfiguration;
+use ChronicleKeeper\Calendar\Domain\ValueObject\LeapDay;
 use ChronicleKeeper\Calendar\Domain\ValueObject\WeekDay;
 
 use function abs;
@@ -50,13 +51,23 @@ readonly class WeekConfiguration
     public function getFirstDayOfWeekByDate(CalendarDate $date): CalendarDate
     {
         $weekDayOfDate = $date->getWeekDay();
+        if ($weekDayOfDate === null) {
+            return $this->getFirstDayOfWeekByDate($date->addDays(1));
+        }
 
         if ($weekDayOfDate->index === 1) {
             return $date;
         }
 
         $daysBackToTheFirstDayOfWeek = abs(1 - $weekDayOfDate->index);
+        $firstWeekDay = $date->subDays($daysBackToTheFirstDayOfWeek);
 
-        return $date->subDays($daysBackToTheFirstDayOfWeek);
+        if ($firstWeekDay->getDay() instanceof LeapDay) {
+            do {
+                $firstWeekDay = $firstWeekDay->addDays(1);
+            } while ($firstWeekDay->getDay() instanceof LeapDay);
+        }
+
+        return $firstWeekDay;
     }
 }
