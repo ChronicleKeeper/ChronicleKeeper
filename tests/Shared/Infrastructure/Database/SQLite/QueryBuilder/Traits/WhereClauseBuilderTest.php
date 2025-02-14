@@ -7,13 +7,13 @@ namespace ChronicleKeeper\Test\Shared\Infrastructure\Database\SQLite\QueryBuilde
 use ChronicleKeeper\Shared\Infrastructure\Database\SQLite\QueryBuilder\Traits\WhereClauseBuilder;
 use ChronicleKeeper\Test\Shared\Infrastructure\Database\SQLite\QueryBuilder\Traits\Stub\TestQueryBuilder;
 use InvalidArgumentException;
-use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversTrait;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(WhereClauseBuilder::class)]
+#[CoversTrait(WhereClauseBuilder::class)]
 #[Group('sqlite')]
 #[Small]
 class WhereClauseBuilderTest extends TestCase

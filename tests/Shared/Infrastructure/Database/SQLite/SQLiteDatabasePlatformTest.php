@@ -120,7 +120,7 @@ final class SQLiteDatabasePlatformTest extends TestCase
         $this->platform->rollback();
 
         $result = $this->platform->fetch('SELECT * FROM test WHERE name = :name', ['name' => 'test4']);
-        self::assertCount(0, $result);
+        self::assertEmpty($result);
     }
 
     #[Test]

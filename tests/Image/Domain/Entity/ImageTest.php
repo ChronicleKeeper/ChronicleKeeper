@@ -50,7 +50,7 @@ final class ImageTest extends TestCase
 
         // Test there are no events recorded on construction
         $events = $image->flushEvents();
-        self::assertCount(0, $events);
+        self::assertEmpty($events);
     }
 
     #[Test]
@@ -124,7 +124,7 @@ final class ImageTest extends TestCase
 
         // Test no events are recorded
         $events = $image->flushEvents();
-        self::assertCount(0, $events);
+        self::assertEmpty($events);
     }
 
     #[Test]
@@ -158,7 +158,7 @@ final class ImageTest extends TestCase
 
         // Test no events are recorded
         $events = $image->flushEvents();
-        self::assertCount(0, $events);
+        self::assertEmpty($events);
     }
 
     #[Test]
@@ -192,7 +192,7 @@ final class ImageTest extends TestCase
 
         // Test no events are recorded
         $events = $image->flushEvents();
-        self::assertCount(0, $events);
+        self::assertEmpty($events);
     }
 
     #[Test]

@@ -59,6 +59,6 @@ final class FindUserPromptsTest extends DatabaseTestCase
 
         // ------------------- The test assertions -------------------
 
-        self::assertCount(0, $results);
+        self::assertEmpty($results);
     }
 }

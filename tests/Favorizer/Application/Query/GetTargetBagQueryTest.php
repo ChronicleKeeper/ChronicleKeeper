@@ -56,7 +56,7 @@ class GetTargetBagQueryTest extends DatabaseTestCase
     {
         $targetBag = $this->query->query(new GetTargetBag());
 
-        self::assertCount(0, $targetBag);
+        self::assertEmpty($targetBag);
     }
 
     #[Test]

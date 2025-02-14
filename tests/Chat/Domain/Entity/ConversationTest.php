@@ -143,7 +143,7 @@ class ConversationTest extends TestCase
         $conversation->rename('Same Title');
 
         $events = $conversation->flushEvents();
-        self::assertCount(0, $events);
+        self::assertEmpty($events);
     }
 
     #[Test]
@@ -171,7 +171,7 @@ class ConversationTest extends TestCase
         $conversation->moveToDirectory($directory);
 
         $events = $conversation->flushEvents();
-        self::assertCount(0, $events);
+        self::assertEmpty($events);
     }
 
     #[Test]
@@ -203,6 +203,6 @@ class ConversationTest extends TestCase
         $conversation->changeSettings($newSettings);
 
         $events = $conversation->flushEvents();
-        self::assertCount(0, $events);
+        self::assertEmpty($events);
     }
 }

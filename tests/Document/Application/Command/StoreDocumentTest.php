@@ -66,7 +66,7 @@ class StoreDocumentTest extends DatabaseTestCase
         // ------------------- The test assertions -------------------
 
         $events = $result->getEvents();
-        self::assertCount(0, $events); // No events as created with builder
+        self::assertEmpty($events); // No events as created with builder
 
         $this->assertRowsInTable('documents', 1);
     }
