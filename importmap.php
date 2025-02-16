@@ -99,4 +99,7 @@ return [
     'bootstrap' => [
         'version' => '5.3.3',
     ],
+    'marked' => [
+        'version' => '15.0.7',
+    ],
 ];

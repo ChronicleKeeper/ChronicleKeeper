@@ -1,0 +1,50 @@
+{% extends 'layout.html.twig' %}
+{% import "components/chat/_message.html.twig" as message_macros %}
+
+{% block page_title %}Streaming Chat{% endblock %}
+
+{% block page_content %}
+    <div class="container-xl" data-controller="chat-stream">
+       <div class="row row-deck row-cards" data-chat-stream-target="messages">
+           <!-- The Messages that are alredy existing ... --->
+           {% for message in messages %}
+               {% include 'components/chat/_message.html.twig' with { conversation, message } %}
+           {% endfor %}
+
+           <!-- The Loading State Messages, after message form was sent and we wait for response ... -->
+           {{ message_macros.loading(
+               'Chronicle Keeper',
+               'Knarzend klingen die Dielen, und ein staubiger Nebel liegt in der Luft, während die Archive durchsucht werden ...',
+               'loading-bot-message',
+               true
+           ) }}
+
+           {{ message_macros.loading('Der Unbekannte', '', 'loading-user-message') }}
+       </div>
+
+        <div class="row row-deck row-cards mt-2">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <form data-action="submit->chat-stream#send" class="d-flex gap-2">
+                            <input type="text"
+                                   data-chat-stream-target="input"
+                                   class="form-control"
+                                   placeholder="Type your message..."
+                                   required>
+                            <button type="submit" class="btn btn-primary">Send</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="position-fixed bottom-0 end-0 mb-5 me-3" style="z-index: 1000;">
+            <button class="btn btn-outline-primary p-2"
+                    data-chat-stream-target="scrollButton"
+                    data-action="click->chat-stream#scrollToBottom">
+                {{ ux_icon('tabler:arrow-down', {'class': 'icon icon-tabler icons-tabler-outline m-0'}) }}
+            </button>
+        </div>
+    </div>
+{% endblock %}
