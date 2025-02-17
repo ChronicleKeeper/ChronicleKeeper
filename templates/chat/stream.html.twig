@@ -4,7 +4,7 @@
 {% block page_title %}Streaming Chat{% endblock %}
 
 {% block page_content %}
-    <div class="container-xl" data-controller="chat-stream">
+    <div class="container-xl" data-controller="chat-stream" data-conversation-id="{{ isTemporary ? '' : conversation.id }}">
        <div class="row row-deck row-cards" data-chat-stream-target="messages">
            <!-- The Messages that are alredy existing ... --->
            {% for message in messages %}
@@ -23,20 +23,19 @@
        </div>
 
         <div class="row row-deck row-cards mt-2">
+            <form data-action="submit->chat-stream#send" class="d-flex gap-2">
             <div class="col-12">
                 <div class="card">
                     <div class="card-body">
-                        <form data-action="submit->chat-stream#send" class="d-flex gap-2">
-                            <input type="text"
-                                   data-chat-stream-target="input"
-                                   class="form-control"
-                                   placeholder="Type your message..."
-                                   required>
-                            <button type="submit" class="btn btn-primary">Send</button>
-                        </form>
+                        <div class="input-group mb-2">
+                            <input data-chat-stream-target="input" type="text" class="form-control" placeholder="Was gibt's ... ?">
+                            <button class="btn btn-outline-secondary border-0" type="submit">Sach an!</button>
+                            <button class="btn btn-outline-secondary border-0 btn-icon" type="button" data-bs-toggle="modal" data-bs-target="#store-conversation-modal">{{ ux_icon('tabler:device-floppy') }}</button>
+                        </div>
                     </div>
                 </div>
             </div>
+            </form>
         </div>
 
         <div class="position-fixed bottom-0 end-0 mb-5 me-3" style="z-index: 1000;">
@@ -47,4 +46,10 @@
             </button>
         </div>
     </div>
+
+    {% component "Tabler:Modal" with {id: 'store-conversation-modal'} %}
+        {% block modal_full_content %}
+            {{ component('Chat:StoreConversation', { 'conversationId': not isTemporary ? conversation.id : null }) }}
+        {% endblock %}
+    {% endcomponent %}
 {% endblock %}

@@ -30,8 +30,9 @@ export default class extends Controller {
     scrollToBottom() {
         window.scrollTo({
             top: document.documentElement.scrollHeight,
-            behavior: 'smooth'
+            behavior: 'instant'
         });
+
         this.toggleScrollButton();
     }
 
@@ -40,6 +41,9 @@ export default class extends Controller {
 
         const message = this.messageInput.value;
         this.messageInput.value = '';
+
+        // Get conversation ID from data attribute if available
+        const conversationId = this.element.dataset.conversationId || '';
 
         // Clone and prepare user message
         const userTemplate = document.getElementById('loading-user-message');
@@ -60,7 +64,7 @@ export default class extends Controller {
         this.scrollToBottom();
 
         // Handle streaming response
-        const eventSource = new EventSource(`/chat/stream/message?message=${encodeURIComponent(message)}`);
+        const eventSource = new EventSource(`/chat/stream/message?message=${encodeURIComponent(message)}&conversation=${conversationId}`);
         let accumulatedText = '';
 
         eventSource.onmessage = (e) => {
