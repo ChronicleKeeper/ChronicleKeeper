@@ -51,8 +51,8 @@ readonly class WeekConfiguration
     public function getFirstDayOfWeekByDate(CalendarDate $date): CalendarDate
     {
         $weekDayOfDate = $date->getWeekDay();
-        if ($weekDayOfDate === null) {
-            return $this->getFirstDayOfWeekByDate($date->addDays(1));
+        if (! $weekDayOfDate instanceof WeekDay) {
+            return $this->getFirstDayOfWeekByDate($date->subDays(1));
         }
 
         if ($weekDayOfDate->index === 1) {
@@ -60,14 +60,47 @@ readonly class WeekConfiguration
         }
 
         $daysBackToTheFirstDayOfWeek = abs(1 - $weekDayOfDate->index);
-        $firstWeekDay = $date->subDays($daysBackToTheFirstDayOfWeek);
+        $firstWeekDay                = $date->subDays($daysBackToTheFirstDayOfWeek);
+
+        // Subtract leap days if there were some in the week because they are skipped
+        $leapDaysToSkipInWeek = $date->countLeapDaysBetween($firstWeekDay);
+        $firstWeekDay         = $firstWeekDay->subDays($leapDaysToSkipInWeek);
 
         if ($firstWeekDay->getDay() instanceof LeapDay) {
             do {
-                $firstWeekDay = $firstWeekDay->addDays(1);
+                $firstWeekDay = $firstWeekDay->subDays(1);
             } while ($firstWeekDay->getDay() instanceof LeapDay);
         }
 
         return $firstWeekDay;
+    }
+
+    public function getLastDayOfWeekByDate(CalendarDate $date): CalendarDate
+    {
+        $weekDayOfDate = $date->getWeekDay();
+        if (! $weekDayOfDate instanceof WeekDay) {
+            return $this->getLastDayOfWeekByDate($date->addDays(1));
+        }
+
+        if ($weekDayOfDate->index === $this->countDays()) {
+            return $date;
+        }
+
+        // Get the raw diff of days until the next last week day
+        $daysUntilTheNextLastWeekDay = abs($this->countDays() - $weekDayOfDate->index);
+        $lastWeekDay                 = $date->addDays($daysUntilTheNextLastWeekDay);
+
+        // Add leap days to count if there were some in the week because they are skipped
+        $leapDaysToSkipInWeek = $date->countLeapDaysBetween($lastWeekDay);
+
+        $lastWeekDay = $lastWeekDay->addDays($leapDaysToSkipInWeek);
+
+        if ($lastWeekDay->getDay() instanceof LeapDay) {
+            do {
+                $lastWeekDay = $lastWeekDay->addDays(1);
+            } while ($lastWeekDay->getDay() instanceof LeapDay);
+        }
+
+        return $lastWeekDay;
     }
 }

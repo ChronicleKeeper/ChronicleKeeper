@@ -68,7 +68,7 @@ final class WeekConfigurationTest extends TestCase
 
     #[Test]
     #[DataProvider('provideFirstWeekDayCases')]
-    public function itCalculatesWeekDaysCorrectWithRegularDayCalendar(CalendarDate $date, string $expectedDate): void
+    public function itCalculatesFirstWeekDaysCorrectWithRegularDayCalendar(CalendarDate $date, string $expectedDate): void
     {
         $calendarWeeks = $date->getCalendar()->getWeeks();
 
@@ -108,7 +108,63 @@ final class WeekConfigurationTest extends TestCase
 
         yield 'First day of the tenth month in the year must not be a leap day' => [
             new CalendarDate($calendar, 0, 10, 1),
-            '26. Mabon 0 after the Flood',
+            '1. Cerun 0 after the Flood',
+        ];
+    }
+
+    #[Test]
+    #[DataProvider('provideLastWeekDayCases')]
+    public function itCalculatesLastWeekDaysCorrectWithRegularDayCalendar(CalendarDate $date, string $expectedDate): void
+    {
+        $calendarWeeks = $date->getCalendar()->getWeeks();
+
+        self::assertSame($expectedDate, $calendarWeeks->getLastDayOfWeekByDate($date)->format());
+    }
+
+    public static function provideLastWeekDayCases(): Generator
+    {
+        $calendar = ExampleCalendars::getOnlyRegularDays();
+
+        yield 'First day of the regular calendar is also not the first weekday' => [
+            new CalendarDate($calendar, 0, 1, 1),
+            '7. January 0 AD',
+        ];
+
+        yield 'Last day of the regular calendar first week is also the last week day' => [
+            new CalendarDate($calendar, 0, 1, 7),
+            '7. January 0 AD',
+        ];
+
+        yield 'Some day in the first week of the regular calendar will move to last day' => [
+            new CalendarDate($calendar, 0, 1, 2),
+            '7. January 0 AD',
+        ];
+
+        yield 'Some random day in the regular calendar year 0 has correct last weekday' => [
+            new CalendarDate($calendar, 0, 7, 15),
+            '15. July 0 AD',
+        ];
+
+        yield 'A random day in the regular calendar year 15 has correct last weekday' => [
+            new CalendarDate($calendar, 12, 7, 15),
+            '17. July 12 AD',
+        ];
+
+        $calendar = ExampleCalendars::getLinearWithLeapDays();
+
+        yield 'Last day of the linear calendar is not the first weekday' => [
+            new CalendarDate($calendar, 0, 1, 1),
+            '10. Taranis 0 after the Flood',
+        ];
+
+        yield 'Last last weekday of the linear calendar is the correct last week, even with leap day in week' => [
+            new CalendarDate($calendar, 0, 1, 10),
+            '10. Taranis 0 after the Flood',
+        ];
+
+        yield 'Last day of the tenth month in the year must not be a leap day' => [
+            new CalendarDate($calendar, 0, 10, 1),
+            '10. Cerun 0 after the Flood',
         ];
     }
 }

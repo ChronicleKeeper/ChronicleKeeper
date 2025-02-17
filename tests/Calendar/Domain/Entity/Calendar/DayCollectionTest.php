@@ -219,8 +219,8 @@ class DayCollectionTest extends TestCase
             new LeapDay(15, 'Some Leap Day', 2),
         );
 
-        self::assertSame(0, $dayCollection->countLeapDaysUpToDayInYear(14,1));
-        self::assertSame(1, $dayCollection->countLeapDaysUpToDayInYear(16,2));
+        self::assertSame(0, $dayCollection->countLeapDaysUpToDayInYear(14, 1));
+        self::assertSame(1, $dayCollection->countLeapDaysUpToDayInYear(16, 2));
         self::assertSame(0, $dayCollection->countLeapDaysUpToDayInYear(16, 3));
     }
 }

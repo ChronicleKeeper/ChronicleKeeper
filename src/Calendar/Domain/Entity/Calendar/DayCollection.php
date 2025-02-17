@@ -17,7 +17,7 @@ use function count;
 final class DayCollection implements Countable
 {
     /** @var array<int, LeapDay> */
-    private array $leapDays;
+    private readonly array $leapDays;
 
     /** @var array<int, Day> */
     private array $daysInTheMonth;

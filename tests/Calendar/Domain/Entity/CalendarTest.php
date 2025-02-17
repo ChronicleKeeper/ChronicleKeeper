@@ -119,7 +119,7 @@ class CalendarTest extends TestCase
         Calendar $calendar,
         int $year,
         int $expectedRegularDays,
-        int $expectedLeapDays
+        int $expectedLeapDays,
     ): void {
         self::assertSame(
             ['days' => $expectedRegularDays, 'leapDays' => $expectedLeapDays],
@@ -180,7 +180,7 @@ class CalendarTest extends TestCase
 
         $calendar = ExampleCalendars::getLinearWithLeapDays();
 
-        yield 'Year 0, Month 1 in the linear calendar, with leap days' => [$calendar, 0, 1, 0, 1];
+        yield 'Year 0, Month 1 in the linear calendar, with leap days' => [$calendar, 0, 1, 0, 0];
         yield 'Year 0, Month 2 in the linear calendar, with leap days' => [$calendar, 0, 2, 31, 1];
         yield 'Year 0, Month 3 in the linear calendar, with leap days' => [$calendar, 0, 3, 61, 1];
         yield 'Year 0, Month 7 in the linear calendar, with leap days' => [$calendar, 0, 7, 182, 2];

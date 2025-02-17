@@ -151,6 +151,14 @@ class CalendarDate
         return abs($thisTotalDays - $dateTotalDays);
     }
 
+    public function countLeapDaysBetween(CalendarDate $date): int
+    {
+        $daysDiffIncludingLeapDays = $this->diffInDays($date);
+        $daysDiffExcludingLeapDays = $this->diffInDays($date, true);
+
+        return abs($daysDiffIncludingLeapDays - $daysDiffExcludingLeapDays);
+    }
+
     public function getWeekDay(): WeekDay|null
     {
         if ($this->getDay() instanceof LeapDay) {
@@ -159,7 +167,7 @@ class CalendarDate
         }
 
         $weekDays  = $this->calendar->getWeeks()->getDays();
-        $totalDays = $this->getTotalDaysFromCalendarStart();
+        $totalDays = $this->getTotalDaysFromCalendarStart(true);
         $index     = ($totalDays - 1) % count($weekDays) + 1;
 
         return $weekDays[$index];
@@ -168,6 +176,11 @@ class CalendarDate
     public function getFirstDayOfWeek(): CalendarDate
     {
         return $this->calendar->getWeeks()->getFirstDayOfWeekByDate($this);
+    }
+
+    public function getLastDayOfWeek(): CalendarDate
+    {
+        return $this->calendar->getWeeks()->getLastDayOfWeekByDate($this);
     }
 
     public function getMoonState(): MoonState
@@ -190,7 +203,6 @@ class CalendarDate
     public function getTotalDaysFromCalendarStart(bool $withoutLeapDays = false): int
     {
         $totalDays = 0;
-
 
         $countsUpToThisYear = $this->calendar->getDaysUpToMonthInYear($this->year, $this->month);
 

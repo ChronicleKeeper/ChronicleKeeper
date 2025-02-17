@@ -38,8 +38,6 @@ class TableCalendar
                 $calendarStartsWith = $this->getNextRegularDay($calendarStartsWith);
             }
 
-            dump($week);
-
             yield $week;
         }
     }
@@ -51,14 +49,7 @@ class TableCalendar
 
     public function getLasRegularDay(CalendarDate $date): CalendarDate
     {
-        $generalLastDay = $date->getLastDayOfMonth();
-        if ($generalLastDay->getDay() instanceof LeapDay) {
-            do {
-                $generalLastDay = $generalLastDay->subDays(1);
-            } while ($generalLastDay->getDay() instanceof LeapDay);
-        }
-
-        return $generalLastDay;
+        return $date->getLastDayOfMonth()->getLastDayOfWeek();
     }
 
     public function isInCurrentMonth(CalendarDate $date): bool

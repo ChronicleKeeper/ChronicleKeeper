@@ -133,14 +133,14 @@ class Calendar
     public function getDaysUpToYear(int $year): array
     {
         if (! isset($this->cachedDaysInYear[$year])) {
-            $days = 0;
+            $days     = 0;
             $leapDays = 0;
             for ($i = $this->configuration->beginsInYear; $i < $year; $i++) {
-                $days += $this->countDaysInYear($i);
+                $days     += $this->countDaysInYear($i);
                 $leapDays += $this->countLeapDaysInYear($i);
             }
 
-            $this->cachedDaysInYear[$year] = $days;
+            $this->cachedDaysInYear[$year]     = $days;
             $this->cachedLeapDaysInYear[$year] = $leapDays;
         }
 
@@ -156,15 +156,15 @@ class Calendar
         if (! isset($this->cachedDaysInMonth[$year][$month])) {
             $daysFromYear = $this->getDaysUpToYear($year);
 
-            $days = $daysFromYear['days'];
+            $days     = $daysFromYear['days'];
             $leapDays = $daysFromYear['leapDays'];
 
             for ($m = 1; $m < $month; $m++) {
-                $days += $this->getMonth($m)->days->countInYear($year);
+                $days     += $this->getMonth($m)->days->countInYear($year);
                 $leapDays += $this->getMonth($m)->days->countLeapDaysInYear($year);
             }
 
-            $this->cachedDaysInMonth[$year][$month] = $days;
+            $this->cachedDaysInMonth[$year][$month]     = $days;
             $this->cachedLeapDaysInMonth[$year][$month] = $leapDays;
         }
 

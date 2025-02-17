@@ -262,22 +262,22 @@ class CalendarDateTest extends TestCase
         // Year 0
         yield 'LinearCalendar LeapDays: First day of the first month of year 0' => [new CalendarDate($calendar, 0, 1, 1), 1];
         yield 'LinearCalendar LeapDays: Third day of the first month of year 0' => [new CalendarDate($calendar, 0, 1, 3), null];
-        yield 'LinearCalendar LeapDays: Last day of the first month of year 0' => [new CalendarDate($calendar, 0, 1, 31), 1];
+        yield 'LinearCalendar LeapDays: Last day of the first month of year 0' => [new CalendarDate($calendar, 0, 1, 31), 10];
 
         // Year 1
-        yield 'LinearCalendar LeapDays: First day of the seventh month of year 0' => [new CalendarDate($calendar, 0, 7, 1), 3];
+        yield 'LinearCalendar LeapDays: First day of the seventh month of year 0' => [new CalendarDate($calendar, 0, 7, 1), 1];
         yield 'LinearCalendar LeapDays: Second day of the seventh month of year 0' => [new CalendarDate($calendar, 0, 7, 2), null];
-        yield 'LinearCalendar LeapDays: Last day of the seventh month of year 0' => [new CalendarDate($calendar, 0, 7, 32), 4];
+        yield 'LinearCalendar LeapDays: Last day of the seventh month of year 0' => [new CalendarDate($calendar, 0, 7, 32), 10];
 
         // Year 1
-        yield 'LinearCalendar LeapDays: First day of the first month of year 1' => [new CalendarDate($calendar, 1, 1, 1), 7];
+        yield 'LinearCalendar LeapDays: First day of the first month of year 1' => [new CalendarDate($calendar, 1, 1, 1), 1];
         yield 'LinearCalendar LeapDays: Third day of the first month of year 1' => [new CalendarDate($calendar, 1, 1, 3), null];
-        yield 'LinearCalendar LeapDays: Last day of the first month of year 1' => [new CalendarDate($calendar, 1, 1, 31), 7];
+        yield 'LinearCalendar LeapDays: Last day of the first month of year 1' => [new CalendarDate($calendar, 1, 1, 31), 10];
 
         // Year 1
-        yield 'LinearCalendar LeapDays: First day of the seventh month of year 1' => [new CalendarDate($calendar, 1, 7, 1), 9];
-        yield 'LinearCalendar LeapDays: Second day of the seventh month of year 1' => [new CalendarDate($calendar, 1, 7, 2), 10];
-        yield 'LinearCalendar LeapDays: Last day of the seventh month of year 1' => [new CalendarDate($calendar, 1, 7, 31), 9];
+        yield 'LinearCalendar LeapDays: First day of the seventh month of year 1' => [new CalendarDate($calendar, 1, 7, 1), 1];
+        yield 'LinearCalendar LeapDays: Second day of the seventh month of year 1' => [new CalendarDate($calendar, 1, 7, 2), 2];
+        yield 'LinearCalendar LeapDays: Last day of the seventh month of year 1' => [new CalendarDate($calendar, 1, 7, 31), 10];
     }
 
     #[Test]
@@ -705,6 +705,39 @@ class CalendarDateTest extends TestCase
             $date,
             '%Y',
             '1 after Boom',
+        ];
+    }
+
+    #[Test]
+    #[DataProvider('provideLeapDayCountCases')]
+    public function itCanCalculateTheAmountOfLeapDaysBetweenTwoDates(
+        CalendarDate $fromDate,
+        CalendarDate $toDate,
+        int $expectedLeapDayCount,
+    ): void {
+        self::assertSame($expectedLeapDayCount, $fromDate->countLeapDaysBetween($toDate));
+    }
+
+    public static function provideLeapDayCountCases(): Generator
+    {
+        $calendar = ExampleCalendars::getLinearWithLeapDays();
+
+        yield 'Linear Calendar - Leap day count within a single month' => [
+            new CalendarDate($calendar, 0, 1, 1),
+            new CalendarDate($calendar, 0, 1, 30),
+            1,
+        ];
+
+        yield 'Linear Calendar - Leap day count in year 0' => [
+            new CalendarDate($calendar, 0, 1, 1),
+            new CalendarDate($calendar, 0, 12, 30),
+            6,
+        ];
+
+        yield 'Linear Calendar - Leap day count in year 1' => [
+            new CalendarDate($calendar, 1, 1, 1),
+            new CalendarDate($calendar, 1, 12, 30),
+            5,
         ];
     }
 }
