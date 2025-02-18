@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace ChronicleKeeper\Calendar\Domain\Service;
 
 use ChronicleKeeper\Calendar\Domain\Entity\CalendarDate;
-use ChronicleKeeper\Calendar\Domain\ValueObject\LeapDay;
 
 use function call_user_func;
 use function sprintf;
@@ -25,10 +24,6 @@ final class DateFormatter
 
     public function format(CalendarDate $date, string $format): string
     {
-        if ($this->isLeapDay($date)) {
-            return $this->formatLeapDay($date);
-        }
-
         $result = $format;
         foreach (self::PLACEHOLDERS as $placeholder => $method) {
             if (! str_contains($format, '%' . $placeholder)) {
@@ -42,24 +37,9 @@ final class DateFormatter
         return $result;
     }
 
-    private function isLeapDay(CalendarDate $date): bool
+    private function getDayNumber(CalendarDate $date): string
     {
-        return $date->getDay() instanceof LeapDay;
-    }
-
-    private function formatLeapDay(CalendarDate $date): string
-    {
-        return sprintf(
-            '%s %d %s',
-            $date->getDay()->getLabel(),
-            $date->getYear(),
-            $date->getCalendar()->getEpochCollection()->getEpochForYear($date->getYear())->name,
-        );
-    }
-
-    private function getDayNumber(CalendarDate $date): int
-    {
-        return (int) $date->getDay()->getLabel();
+        return $date->getDay()->getLabel();
     }
 
     private function getDayLabel(CalendarDate $date): string

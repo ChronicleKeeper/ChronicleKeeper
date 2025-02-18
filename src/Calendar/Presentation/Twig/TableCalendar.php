@@ -65,4 +65,24 @@ class TableCalendar
 
         return $date;
     }
+
+    public function getPreviousRegularDay(CalendarDate $date): CalendarDate
+    {
+        do {
+            $date = $date->subDays(1);
+        } while ($date->getDay() instanceof LeapDay);
+
+        return $date;
+    }
+
+    public function createDateFromLeapDay(LeapDay $day, CalendarDate $viewDate): CalendarDate
+    {
+        return new CalendarDate($this->calendar, $viewDate->getYear(), $viewDate->getMonth(), $day->dayOfTheMonth);
+    }
+
+    /** @return LeapDay[] */
+    public function getLeapDaysWithinMonth(CalendarDate $date): array
+    {
+        return $date->getCalendar()->getMonth($date->getMonth())->days->getLeapDaysInYear($date->getYear());
+    }
 }

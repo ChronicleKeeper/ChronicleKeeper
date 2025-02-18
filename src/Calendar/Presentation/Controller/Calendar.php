@@ -28,7 +28,7 @@ final class Calendar extends AbstractController
     public function __invoke(int|null $year = null, int|null $month = null): Response
     {
         $calendar = $this->queryService->query(new LoadCalendar());
-        $today    = new CalendarDate($calendar, 1262, 2, 14);
+        $today    = new CalendarDate($calendar, 1262, 1, 21);
 
         if ($year === null || $month === null) {
             return $this->render(

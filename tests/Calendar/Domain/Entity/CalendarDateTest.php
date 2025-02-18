@@ -9,6 +9,7 @@ use ChronicleKeeper\Calendar\Domain\Entity\CalendarDate;
 use ChronicleKeeper\Calendar\Domain\Exception\DayNotExistsInMonth;
 use ChronicleKeeper\Calendar\Domain\Exception\MonthNotExists;
 use ChronicleKeeper\Calendar\Domain\Exception\YearIsInvalidInCalendar;
+use ChronicleKeeper\Calendar\Domain\Service\DateFormatter;
 use ChronicleKeeper\Calendar\Domain\ValueObject\MoonState;
 use ChronicleKeeper\Test\Calendar\Domain\Entity\Fixture\ExampleCalendars;
 use Generator;
@@ -22,6 +23,7 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(DayNotExistsInMonth::class)]
 #[CoversClass(MonthNotExists::class)]
 #[CoversClass(YearIsInvalidInCalendar::class)]
+#[CoversClass(DateFormatter::class)]
 #[Small]
 class CalendarDateTest extends TestCase
 {
@@ -155,6 +157,12 @@ class CalendarDateTest extends TestCase
             new CalendarDate($calendar, 4, 7, 2),
             2,
             '3. Arthan 4 after the Flood',
+        ];
+
+        yield 'Linear Calendar - Add enough days to land at an inactive leap day' => [
+            new CalendarDate($calendar, 3, 7, 30),
+            2,
+            '1. Telisias 3 after the Flood',
         ];
     }
 
@@ -600,6 +608,20 @@ class CalendarDateTest extends TestCase
             365,
             '1. January 0 AD',
         ];
+
+        $calendar = ExampleCalendars::getLinearWithLeapDays();
+
+        yield 'Linear Calendar - subtract a single day to a leap day' => [
+            new CalendarDate($calendar, 0, 7, 3),
+            1,
+            'Shieldday Arthan 0 after the Flood',
+        ];
+
+        yield 'Linear Calendar - subtract a single day to a leap day that is inactive' => [
+            new CalendarDate($calendar, 1, 7, 3),
+            1,
+            '2. Arthan 1 after the Flood',
+        ];
     }
 
     #[Test]
@@ -673,7 +695,7 @@ class CalendarDateTest extends TestCase
 
     #[Test]
     #[DataProvider('provideDateFormattingCases')]
-    public function ifFormatsARegularDate(CalendarDate $date, string $format, string $expected): void
+    public function ifFormatsADate(CalendarDate $date, string|null $format, string $expected): void
     {
         self::assertSame($expected, $date->format($format));
     }
@@ -685,7 +707,7 @@ class CalendarDateTest extends TestCase
 
         yield 'Default format' => [
             $date,
-            '%d. %M %Y',
+            null,
             '10. ThirdMonth 1 after Boom',
         ];
 
@@ -705,6 +727,20 @@ class CalendarDateTest extends TestCase
             $date,
             '%Y',
             '1 after Boom',
+        ];
+
+        $date = new CalendarDate(ExampleCalendars::getLinearWithLeapDays(), 0, 7, 2);
+
+        yield 'Default format for leap day' => [
+            $date,
+            null,
+            'Shieldday 0 after the Flood',
+        ];
+
+        yield 'Custom format with leap day' => [
+            $date,
+            '%D %M %y',
+            'Shieldday Arthan 0',
         ];
     }
 

@@ -76,7 +76,7 @@ class DateFormatterTest extends TestCase
 
         self::assertSame(
             'Mithwinter 1 after the Flood',
-            $this->formatter->format($date, '%d. %M %Y'),
+            $this->formatter->format($date, '%d %Y'),
         );
     }
 }

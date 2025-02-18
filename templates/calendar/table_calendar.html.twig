@@ -20,8 +20,7 @@
 
                             <tr>
                                 {% for day in week %}
-
-                                    <td data-date="{{ day.year ~ '-' ~ day.month ~ '-' ~ day.day.label }}"
+                                    <td data-date="{{ day.year ~ '-' ~ day.month ~ '-' ~ day.day.dayOfTheMonth }}"
                                         class="{{ day.isSame(currentDate) ? 'bg-primary-subtle ' }}{{ this.isInCurrentMonth(day) ? 'day-in-current-month ' }}border align-content-start"
                                     >
                                         <div class="day-content overflow-hidden">
@@ -64,5 +63,26 @@
                 </div>
             </div>
         </div>
+
+        {% for leapDay in this.leapDaysWithinMonth(viewDate) %}
+            {% set leapDayDate = this.createDateFromLeapDay(leapDay, viewDate) %}
+
+            <div class="col-4" data-date="{{ leapDayDate.year ~ '-' ~ leapDayDate.month ~ '-' ~ leapDayDate.day.dayOfTheMonth }}">
+                <div class="card{{ currentDate.same(leapDayDate) ? ' bg-primary-lt' }}">
+                    <div class="card-header">
+                        <h3 class="card-title">{{ leapDay.name }}</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-5">Zwischen</div>
+                            <div class="col-7 text-muted">
+                                {{ this.getPreviousRegularDay(leapDayDate).format }}<br />
+                                {{ this.getNextRegularDay(leapDayDate).format }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
     </div>
 </div>

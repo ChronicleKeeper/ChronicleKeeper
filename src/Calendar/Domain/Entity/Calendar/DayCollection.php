@@ -146,4 +146,13 @@ final class DayCollection implements Countable
 
         return count($leapDays);
     }
+
+    /** @return LeapDay[] */
+    public function getLeapDaysInYear(int $year): array
+    {
+        return array_filter(
+            $this->daysInTheMonth,
+            static fn (Day $day): bool => $day instanceof LeapDay && $day->isActiveInYear($year),
+        );
+    }
 }

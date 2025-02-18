@@ -223,4 +223,17 @@ class DayCollectionTest extends TestCase
         self::assertSame(1, $dayCollection->countLeapDaysUpToDayInYear(16, 2));
         self::assertSame(0, $dayCollection->countLeapDaysUpToDayInYear(16, 3));
     }
+
+    #[Test]
+    public function itCanGetTheLeapDaysInAYear(): void
+    {
+        $dayCollection = new DayCollection(
+            30,
+            new LeapDay(15, 'Some Leap Day', 2),
+            new LeapDay(16, 'Some Leap Day'),
+        );
+
+        self::assertCount(2, $dayCollection->getLeapDaysInYear(2));
+        self::assertCount(1, $dayCollection->getLeapDaysInYear(1));
+    }
 }

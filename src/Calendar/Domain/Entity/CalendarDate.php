@@ -73,14 +73,18 @@ class CalendarDate
             && $this->day === $calendarDate->day;
     }
 
-    public function format(string $format = '%d. %M %Y'): string
+    public function format(string|null $format = null): string
     {
-        return $this->formatter->format($this, $format);
+        if ($this->getDay() instanceof LeapDay) {
+            return $this->formatter->format($this, $format ?? '%d %Y');
+        }
+
+        return $this->formatter->format($this, $format ?? '%d. %M %Y');
     }
 
     public function addDays(int $days): CalendarDate
     {
-        $maxDaysInMonth = $this->calendar->getMonth($this->month)->days->count();
+        $maxDaysInMonth = $this->calendar->getMonth($this->month)->days->countInYear($this->year);
 
         // We stay in same month, so all fine
         if ($this->day + $days <= $maxDaysInMonth) {
@@ -122,7 +126,7 @@ class CalendarDate
                 $this->calendar,
                 $this->year,
                 $previousMonth->indexInYear,
-                $previousMonth->days->count(),
+                $previousMonth->days->countInYear($this->year),
             );
 
             return $monthChangeDate->subDays($daysLeftAfterMonthChange);
@@ -136,7 +140,7 @@ class CalendarDate
                 $this->calendar,
                 $previousYear,
                 $previousMonth->indexInYear,
-                $previousMonth->days->count(),
+                $previousMonth->days->countInYear($previousYear),
             );
 
             return $yearStartDate->subDays($daysLeftAfterMonthChange);
@@ -195,7 +199,7 @@ class CalendarDate
 
     public function getLastDayOfMonth(): CalendarDate
     {
-        $maxDaysInMonth = $this->calendar->getMonth($this->month)->days->count();
+        $maxDaysInMonth = $this->calendar->getMonth($this->month)->days->countInYear($this->year);
 
         return new CalendarDate($this->calendar, $this->year, $this->month, $maxDaysInMonth);
     }
