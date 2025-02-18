@@ -32,6 +32,7 @@ final class TableCalendarTest extends KernelTestCase
 {
     use InteractsWithTwigComponents;
 
+    /** @param list<list<int>> $expectedWeeks */
     #[Test]
     #[DataProvider('provideCalendarWeeksCalculationCases')]
     public function itCanCalculateACorrectCalendarWeeks(
