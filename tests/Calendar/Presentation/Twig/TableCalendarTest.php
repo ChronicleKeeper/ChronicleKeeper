@@ -165,4 +165,23 @@ final class TableCalendarTest extends KernelTestCase
             ],
         ];
     }
+
+    #[Test]
+    public function itIsAbleToHandlePreviousRegularDayWhenFirstDayOfCalendarIsLeapDay(): void
+    {
+        $date = new CalendarDate(
+            ExampleCalendars::getCalendarWithLeapDayAsFirstDayOfTheYear(),
+            0,
+            1,
+            1,
+        );
+
+        $component = $this->mountTwigComponent(
+            name: TableCalendar::class,
+            data: ['currentDate' => $date, 'viewDate' => $date, 'calendar' => $date->getCalendar()],
+        );
+        assert($component instanceof TableCalendar);
+
+        self::assertNull($component->getPreviousRegularDay($date));
+    }
 }

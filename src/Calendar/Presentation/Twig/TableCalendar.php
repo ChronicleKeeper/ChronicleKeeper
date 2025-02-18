@@ -6,6 +6,7 @@ namespace ChronicleKeeper\Calendar\Presentation\Twig;
 
 use ChronicleKeeper\Calendar\Domain\Entity\Calendar;
 use ChronicleKeeper\Calendar\Domain\Entity\CalendarDate;
+use ChronicleKeeper\Calendar\Domain\Exception\YearIsInvalidInCalendar;
 use ChronicleKeeper\Calendar\Domain\ValueObject\LeapDay;
 use Generator;
 use Symfony\UX\TwigComponent\Attribute\AsTwigComponent;
@@ -66,13 +67,18 @@ class TableCalendar
         return $date;
     }
 
-    public function getPreviousRegularDay(CalendarDate $date): CalendarDate
+    public function getPreviousRegularDay(CalendarDate $date): CalendarDate|null
     {
-        do {
-            $date = $date->subDays(1);
-        } while ($date->getDay() instanceof LeapDay);
+        try {
+            do {
+                $date = $date->subDays(1);
+            } while ($date->getDay() instanceof LeapDay);
 
-        return $date;
+            return $date;
+        } catch (YearIsInvalidInCalendar) {
+            // Totally fine when we run out of the calendar
+            return null;
+        }
     }
 
     public function createDateFromLeapDay(LeapDay $day, CalendarDate $viewDate): CalendarDate

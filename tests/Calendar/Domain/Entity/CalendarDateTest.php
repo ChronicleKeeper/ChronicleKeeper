@@ -664,7 +664,7 @@ class CalendarDateTest extends TestCase
     ): void {
         $firstWeekDay = $date->getFirstDayOfWeek();
 
-        self::assertSame(1, $firstWeekDay->getWeekDay()->index);
+        self::assertSame(1, $firstWeekDay->getWeekDay()?->index);
         self::assertSame($expectedDate, $firstWeekDay->format());
     }
 

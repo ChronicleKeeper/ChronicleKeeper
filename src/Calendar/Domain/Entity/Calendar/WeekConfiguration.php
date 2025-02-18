@@ -6,6 +6,7 @@ namespace ChronicleKeeper\Calendar\Domain\Entity\Calendar;
 
 use ChronicleKeeper\Calendar\Domain\Entity\CalendarDate;
 use ChronicleKeeper\Calendar\Domain\Exception\InvalidWeekConfiguration;
+use ChronicleKeeper\Calendar\Domain\Exception\YearIsInvalidInCalendar;
 use ChronicleKeeper\Calendar\Domain\ValueObject\LeapDay;
 use ChronicleKeeper\Calendar\Domain\ValueObject\WeekDay;
 
@@ -52,7 +53,12 @@ readonly class WeekConfiguration
     {
         $weekDayOfDate = $date->getWeekDay();
         if (! $weekDayOfDate instanceof WeekDay) {
-            return $this->getFirstDayOfWeekByDate($date->subDays(1));
+            try {
+                return $this->getFirstDayOfWeekByDate($date->subDays(1));
+            } catch (YearIsInvalidInCalendar) {
+                // Totally fine when we run out of the calendar by looking backwards, then we look forward
+                return $this->getFirstDayOfWeekByDate($date->addDays(1));
+            }
         }
 
         if ($weekDayOfDate->index === 1) {

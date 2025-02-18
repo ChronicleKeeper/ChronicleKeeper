@@ -76,7 +76,8 @@
                         <div class="row">
                             <div class="col-5">Zwischen</div>
                             <div class="col-7 text-muted">
-                                {{ this.getPreviousRegularDay(leapDayDate).format }}<br />
+                                {% set previousDay = this.getPreviousRegularDay(leapDayDate) %}
+                                {{ previousDay is not empty ? previousDay.format : 'Calendarbeginn' }}<br />
                                 {{ this.getNextRegularDay(leapDayDate).format }}
                             </div>
                         </div>

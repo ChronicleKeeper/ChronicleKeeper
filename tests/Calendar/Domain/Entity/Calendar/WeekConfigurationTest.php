@@ -110,6 +110,13 @@ final class WeekConfigurationTest extends TestCase
             new CalendarDate($calendar, 0, 10, 1),
             '1. Cerun 0 after the Flood',
         ];
+
+        $calendar = ExampleCalendars::getCalendarWithLeapDayAsFirstDayOfTheYear();
+
+        yield 'Leap day calendar start is able to deliver the every first weekday' => [
+            new CalendarDate($calendar, 0, 1, 1),
+            '1. First 0 AD',
+        ];
     }
 
     #[Test]

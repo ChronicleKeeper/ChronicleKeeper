@@ -120,4 +120,27 @@ class ExampleCalendars
 
         return $calendar;
     }
+
+    public static function getCalendarWithLeapDayAsFirstDayOfTheYear(): Calendar
+    {
+        $calendar = new Calendar(new Configuration(beginsInYear: 0));
+        $calendar->setEpochCollection(new EpochCollection(new Epoch('AD', 0)));
+        $calendar->setMoonCycle(new MoonCycle(10));
+        $calendar->setWeekConfiguration(new WeekConfiguration(
+            new WeekDay(1, 'First Day'),
+            new WeekDay(2, 'Second Day'),
+            new WeekDay(3, 'Party Day'),
+        ));
+
+        $calendar->setMonths(
+            new Month($calendar, 1, 'First', new DayCollection(
+                10,
+                new LeapDay(1, 'Happy New Year!'),
+            )),
+            new Month($calendar, 2, 'Second', new DayCollection(15)),
+            new Month($calendar, 3, 'Third', new DayCollection(20)),
+        );
+
+        return $calendar;
+    }
 }
