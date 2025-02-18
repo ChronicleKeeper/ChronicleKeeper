@@ -614,7 +614,7 @@ class CalendarDateTest extends TestCase
         yield 'Linear Calendar - subtract a single day to a leap day' => [
             new CalendarDate($calendar, 0, 7, 3),
             1,
-            'Shieldday Arthan 0 after the Flood',
+            'Shieldday 0 after the Flood',
         ];
 
         yield 'Linear Calendar - subtract a single day to a leap day that is inactive' => [

@@ -31,7 +31,7 @@ final class CalendarTest extends WebTestCase
         // -------------------- Test Assertions -------------------- //
 
         self::assertResponseIsSuccessful();
-        self::assertSelectorTextContains('h2', 'Imbolc 1262 nach der Flut');
+        self::assertSelectorTextContains('h2', 'Taranis 1262 nach der Flut');
     }
 
     #[Test]
