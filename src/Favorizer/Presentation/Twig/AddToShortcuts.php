@@ -9,6 +9,7 @@ use ChronicleKeeper\Favorizer\Application\Query\GetTargetBag;
 use ChronicleKeeper\Favorizer\Domain\TargetBag;
 use ChronicleKeeper\Favorizer\Domain\TargetFactory;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
 use Symfony\UX\LiveComponent\Attribute\LiveAction;
@@ -28,7 +29,9 @@ class AddToShortcuts
     #[LiveProp(writable: true)]
     public string $type;
     #[LiveProp(writable: true)]
-    public bool $asButton = false;
+    public bool $asButton       = false;
+    #[LiveProp(writable: true)]
+    public string $extraClasses = '';
 
     private TargetBag $targetBag;
 
@@ -56,7 +59,7 @@ class AddToShortcuts
     }
 
     #[LiveAction]
-    public function favorize(): void
+    public function favorize(Request $request): void
     {
         if (! isset($this->targetBag)) {
             $this->targetBag = $this->queryService->query(new GetTargetBag());

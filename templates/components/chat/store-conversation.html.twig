@@ -1,7 +1,7 @@
 <div {{ attributes }}>
     {{ form_start(form, {
         attr: {
-            'data-action': 'live#action:prevent live#action:store',
+            'data-action': 'live#action:prevent',
             'data-live-action-param': 'store'
         }
     }) }}
@@ -17,7 +17,11 @@
     </div>
 
     <div class="modal-footer">
-        <button class="btn btn-primary" type="submit" data-loading="addAttribute(disabled)">
+        <button
+            class="btn btn-primary"
+            type="submit"
+            data-loading="addAttribute(disabled)"
+        >
             <span class="spinner-border spinner-border-sm d-none" data-loading="removeClass(d-none)" role="status" aria-hidden="true" style="margin-right: 5px;"></span>
             Speichern
         </button>

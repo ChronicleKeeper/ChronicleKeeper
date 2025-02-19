@@ -2,12 +2,13 @@ import { Controller } from '@hotwired/stimulus';
 import { marked } from 'marked';
 
 export default class extends Controller {
-    static targets = ['messages', 'input', 'scrollButton'];
+    static targets = ['messages', 'input', 'scrollButton', 'storeButton'];
 
     connect() {
         this.messageContainer = this.messagesTarget;
         this.messageInput = this.inputTarget;
         this.scrollButton = this.scrollButtonTarget;
+        this.storeButton = this.storeButtonTarget;
 
         marked.setOptions({
             breaks: true,
@@ -17,8 +18,11 @@ export default class extends Controller {
         });
 
         window.addEventListener('scroll', () => this.toggleScrollButton());
-        this.toggleScrollButton();
-        requestAnimationFrame(() => this.scrollToBottom());
+
+        window.addEventListener('load', () => {
+            requestAnimationFrame(() => this.scrollToBottom());
+            this.messageInput.focus();
+        });
     }
 
     toggleScrollButton() {
@@ -41,6 +45,9 @@ export default class extends Controller {
 
         const message = this.messageInput.value;
         this.messageInput.value = '';
+
+        this.storeButton.disabled = true;
+        this.messageInput.disabled = true;
 
         // Get conversation ID from data attribute if available
         const conversationId = this.element.dataset.conversationId || '';
@@ -76,6 +83,19 @@ export default class extends Controller {
 
         eventSource.onerror = () => {
             eventSource.close();
+            this.storeButton.disabled = false;
+            this.messageInput.disabled = false;
+            this.messageInput.focus();
         };
+
+        eventSource.onclose = () => {
+            this.storeButton.disabled = false;
+            this.messageInput.disabled = false;
+            this.messageInput.focus();
+        };
+    }
+
+    preventScroll(event) {
+        event.preventDefault();
     }
 }

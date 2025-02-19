@@ -14,15 +14,14 @@ use ChronicleKeeper\Chat\Presentation\Twig\Chat\ExtendedMessageBagToViewConverte
 use ChronicleKeeper\Shared\Application\Query\QueryService;
 use ChronicleKeeper\Shared\Infrastructure\LLMChain\LLMChainFactory;
 use PhpLlm\LlmChain\Model\Message\Message;
+use PhpLlm\LlmChain\Model\Response\StreamResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Attribute\Route;
-
 use Symfony\Component\Routing\Requirement\Requirement;
-use Symfony\Contracts\Service\Attribute\Required;
 
 use function assert;
 use function flush;
@@ -42,10 +41,10 @@ class StreamedChat extends AbstractController
     }
 
     #[Route(
-        '/chat/stream/{conversation}',
+        '/chat/stream/{conversationId}',
         name: 'chat_stream',
-        requirements: ['conversation' => Requirement::UUID],
-        defaults: ['conversation' => null],
+        requirements: ['conversationId' => Requirement::UUID],
+        defaults: ['conversationId' => null],
         priority: 150,
     )]
     public function streamedChat(string|null $conversationId): Response
@@ -95,6 +94,7 @@ class StreamedChat extends AbstractController
                     'stream' => true,
                 ],
             );
+            assert($response instanceof StreamResponse);
 
             $fullResponse = '';
             foreach ($response->getContent() as $chunk) {
@@ -112,7 +112,7 @@ class StreamedChat extends AbstractController
             } else {
                 $this->bus->dispatch(new StoreConversation($conversation));
             }
-        }, 200, [
+        }, Response::HTTP_OK, [
             'Content-Type' => 'text/event-stream',
             'Cache-Control' => 'no-cache',
             'Connection' => 'keep-alive',
