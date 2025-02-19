@@ -29,7 +29,48 @@ import { marked } from 'marked';
  */
 
 /**
- * @typedef {ChunkMessage | CompleteMessage} ChatStreamMessage
+ * @typedef {Object} DebugCall
+ * @property {string} tool - Name of the called function/tool
+ * @property {Object} arguments - Arguments passed to the function
+ * @property {Object} result - Result returned from the function
+ */
+
+/**
+ * @typedef {Object} ContextDocument extends Message
+ * @property {'document'} type
+ * @property {string} id
+ * @property {string} title
+ */
+
+/**
+ * @typedef {Object} ContextImage extends Message
+ * @property {'image'} type
+ * @property {string} id
+ * @property {string} title
+ */
+
+/**
+ * @typedef {Object} Context
+ * @property {ContextDocument[]} documents
+ * @property {ContextImage[]} images
+ */
+
+/**
+ * @typedef {Object} ContextMessage
+ * @property {'context'} type
+ * @property {string} id
+ * @property {Context} context
+ */
+
+/**
+ * @typedef {Object} DebugMessage
+ * @property {'debug'} type
+ * @property {string} id
+ * @property {DebugCall[]} debug
+ */
+
+/**
+ * @typedef {ChunkMessage | CompleteMessage | DebugMessage | ContextMessage} ChatStreamMessage
  */
 
 const CONFIG = {
@@ -86,6 +127,14 @@ export default class ChatStreamController extends Controller {
     #setupEventListeners() {
         this.#boundScrollHandler = () => this.#handleScroll();
         window.addEventListener('scroll', this.#boundScrollHandler);
+
+        // Handle accordion state changes
+        document.addEventListener('shown.bs.collapse', () => {
+            requestAnimationFrame(() => this.#handleScroll());
+        });
+        document.addEventListener('hidden.bs.collapse', () => {
+            requestAnimationFrame(() => this.#handleScroll());
+        });
 
         window.addEventListener('load', () => {
             requestAnimationFrame(() => this.scrollToBottom());
@@ -177,13 +226,25 @@ export default class ChatStreamController extends Controller {
         switch (data.type) {
             case CONFIG.MESSAGE_TYPES.CHUNK:
                 this.#handleChunkMessage(data.chunk, botMessageBody);
+                this.scrollToBottom();
+                break;
+            case CONFIG.MESSAGE_TYPES.DEBUG:
+                botMessageBody.insertAdjacentHTML('beforeend', this.#renderDebugSection(data));
+                requestAnimationFrame(() => {
+                    setTimeout(() => this.scrollToBottom(), 100);
+                });
+                break;
+            case CONFIG.MESSAGE_TYPES.CONTEXT:
+                botMessageBody.insertAdjacentHTML('beforeend', this.#renderContextSection(data));
+                requestAnimationFrame(() => {
+                    setTimeout(() => this.scrollToBottom(), 100);
+                });
                 break;
             case CONFIG.MESSAGE_TYPES.COMPLETE:
                 this.#handleCompleteMessage(data.id, botMessage);
+                this.scrollToBottom();
                 break;
         }
-
-        this.scrollToBottom();
     }
 
     /**
@@ -259,4 +320,92 @@ export default class ChatStreamController extends Controller {
         this.inputTarget.disabled = false;
         this.inputTarget.focus();
     }
+
+    /**
+     * @private
+     * @param {DebugMessage} data
+     * @returns {string}
+     */
+    #renderDebugSection(data) {
+        if (!data.debug || !data.debug.length) return '';
+
+        return `
+            <div class="hr-text text-warning">GPT Functions Debugging Ausgaben</div>
+            <div class="accordion" id="debug-tool-calls-${data.id}">
+                ${data.debug.map((call, index) => `
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="heading-${data.id}-${index}">
+                            <button class="accordion-button collapsed" type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#collapse-${data.id}-${index}">
+                                Aufgerufene Funktion: ${call.tool}
+                            </button>
+                        </h2>
+                        <div id="collapse-${data.id}-${index}" class="accordion-collapse collapse"
+                            data-bs-parent="#debug-tool-calls-${data.id}">
+                            <div class="accordion-body pt-0">
+                                <pre>${JSON.stringify(call.arguments, null, 2)}</pre>
+                                <pre>${JSON.stringify(call.result, null, 2)}</pre>
+                            </div>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>`;
+    }
+
+    /**
+     * @private
+     * @param {ContextMessage} data
+     * @returns {string}
+     */
+    #renderContextSection(data) {
+        const {documents, images} = data.context;
+        if (!documents.length && !images.length) return '';
+
+        const sections = [
+            {
+                type: 'documents',
+                title: 'Verwendete Dokumente',
+                items: documents,
+                urlPrefix: '/library/document/'
+            },
+            {
+                type: 'images',
+                title: 'Verwendete Bilder',
+                items: images,
+                urlPrefix: '/library/image/'
+            }
+        ].filter(section => section.items.length > 0);
+
+        const renderAccordionItem = ({type, title, items, urlPrefix}) => `
+        <div class="accordion-item">
+            <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#context-${type}-${data.id}">
+                    ${title}
+                </button>
+            </h2>
+            <div id="context-${type}-${data.id}" class="accordion-collapse collapse"
+                 data-bs-parent="#context-information-${data.id}">
+                <div class="accordion-body pt-0">
+                    <div class="list-group list-group-flush">
+                        ${items.map(item => `
+                            <a href="${urlPrefix}${item.id}"
+                               class="list-group-item list-group-item-action">
+                                ${item.title}
+                            </a>
+                        `).join('')}
+                    </div>
+                </div>
+            </div>
+        </div>`;
+
+        return `
+        <div class="hr-text text-warning">GPT Functions Used Information</div>
+        <div class="accordion" id="context-information-${data.id}">
+            ${sections.map(renderAccordionItem).join('')}
+        </div>`;
+    }
+
 }

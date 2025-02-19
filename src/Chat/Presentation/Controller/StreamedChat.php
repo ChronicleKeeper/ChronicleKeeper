@@ -10,7 +10,14 @@ use ChronicleKeeper\Chat\Application\Query\FindConversationByIdParameters;
 use ChronicleKeeper\Chat\Application\Query\GetTemporaryConversationParameters;
 use ChronicleKeeper\Chat\Domain\Entity\Conversation;
 use ChronicleKeeper\Chat\Domain\Entity\ExtendedMessage;
+use ChronicleKeeper\Chat\Domain\ValueObject\MessageContext;
+use ChronicleKeeper\Chat\Domain\ValueObject\MessageDebug;
+use ChronicleKeeper\Chat\Domain\ValueObject\Reference;
+use ChronicleKeeper\Chat\Infrastructure\LLMChain\RuntimeCollector;
 use ChronicleKeeper\Chat\Presentation\Twig\Chat\ExtendedMessageBagToViewConverter;
+use ChronicleKeeper\Document\Infrastructure\LLMChain\DocumentSearch;
+use ChronicleKeeper\Library\Infrastructure\LLMChain\Tool\ImageSearch;
+use ChronicleKeeper\Settings\Application\SettingsHandler;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
 use ChronicleKeeper\Shared\Infrastructure\LLMChain\LLMChainFactory;
 use PhpLlm\LlmChain\Model\Message\Message;
@@ -37,6 +44,10 @@ class StreamedChat extends AbstractController
         private readonly QueryService $queryService,
         private readonly ExtendedMessageBagToViewConverter $messageBagToViewConverter,
         private readonly MessageBusInterface $bus,
+        private readonly DocumentSearch $libraryDocuments,
+        private readonly ImageSearch $libraryImages,
+        private readonly RuntimeCollector $runtimeCollector,
+        private readonly SettingsHandler $settingsHandler,
     ) {
     }
 
@@ -86,6 +97,10 @@ class StreamedChat extends AbstractController
             $messages   = $conversation->getMessages();
             $messages[] = new ExtendedMessage(message: Message::ofUser($message));
 
+            // Set Maximum distances in tools
+            $this->libraryDocuments->setOneTimeMaxDistance($conversation->getSettings()->documentsMaxDistance);
+            $this->libraryImages->setOneTimeMaxDistance($conversation->getSettings()->imagesMaxDistance);
+
             $response = $this->chain->create()->call(
                 $messages->getLLMChainMessages(),
                 [
@@ -108,7 +123,38 @@ class StreamedChat extends AbstractController
             }
 
             // Add the messages to conversation and persist
-            $messages[] = $fullMessage = new ExtendedMessage(message: Message::ofAssistant($fullResponse));
+            $fullMessage          = new ExtendedMessage(message: Message::ofAssistant($fullResponse));
+            $fullMessage->context = $this->buildMessageContext();
+            $fullMessage->debug   = $this->buildMessageDebug();
+
+            $messages[] = $fullMessage;
+
+            $settings = $this->settingsHandler->get();
+            if ($fullMessage->debug->functions !== [] && $settings->getChatbotFunctions()->isAllowDebugOutput()) {
+                echo 'data: ' . json_encode([
+                    'type' => 'debug',
+                    'id' => $fullMessage->id,
+                    'debug' => $fullMessage->debug->functions,
+                ], JSON_THROW_ON_ERROR) . "\n\n";
+                ob_flush();
+                flush();
+            }
+
+            $chatbotGeneralSettings = $settings->getChatbotGeneral();
+            if (
+                ($chatbotGeneralSettings->showReferencedImages() && $fullMessage->context->images !== [])
+                || ($chatbotGeneralSettings->showReferencedDocuments() && $fullMessage->context->documents !== [])
+            ) {
+                echo 'data: ' . json_encode([
+                    'type' => 'context',
+                    'context' => [
+                        'documents' => $fullMessage->context->documents,
+                        'images' => $fullMessage->context->images,
+                    ],
+                ], JSON_THROW_ON_ERROR) . "\n\n";
+                ob_flush();
+                flush();
+            }
 
             // Send completion message
             echo 'data: ' . json_encode([
@@ -129,5 +175,18 @@ class StreamedChat extends AbstractController
             'Cache-Control' => 'no-cache',
             'Connection' => 'keep-alive',
         ]);
+    }
+
+    private function buildMessageDebug(): MessageDebug
+    {
+        return new MessageDebug(functions: $this->runtimeCollector->flushFunctionDebug());
+    }
+
+    private function buildMessageContext(): MessageContext
+    {
+        return new MessageContext(
+            documents: $this->runtimeCollector->flushReferenceByType(Reference::TYPE_DOCUMENT),
+            images: $this->runtimeCollector->flushReferenceByType(Reference::TYPE_IMAGE),
+        );
     }
 }

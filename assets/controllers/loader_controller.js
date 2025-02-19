@@ -2,8 +2,6 @@ import {Controller} from '@hotwired/stimulus';
 
 export default class extends Controller {
     connect() {
-        return;
-
         const loaderElement = this.element;
 
         const showLoader = () => {
