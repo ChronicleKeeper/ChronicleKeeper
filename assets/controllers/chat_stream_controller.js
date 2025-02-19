@@ -1,126 +1,262 @@
 import { Controller } from '@hotwired/stimulus';
 import { marked } from 'marked';
 
-const MessageEventType = {
-    CHUNK: 'chunk',
-    COMPLETE: 'complete',
-    DEBUG: 'debug',
-    CONTEXT: 'context'
+/** @typedef {import('marked').MarkedOptions} MarkedOptions */
+
+/**
+ * @typedef {Object} ChatStreamTargets
+ * @property {HTMLElement} messagesTarget
+ * @property {HTMLInputElement} inputTarget
+ * @property {HTMLButtonElement} scrollButtonTarget
+ * @property {HTMLButtonElement} storeButtonTarget
+ */
+
+/**
+ * @typedef {Object} BaseMessage
+ * @property {keyof typeof CONFIG.MESSAGE_TYPES} type
+ */
+
+/**
+ * @typedef {Object} ChunkMessage
+ * @property {'chunk'} type
+ * @property {string} chunk
+ */
+
+/**
+ * @typedef {Object} CompleteMessage
+ * @property {'complete'} type
+ * @property {string} id
+ */
+
+/**
+ * @typedef {ChunkMessage | CompleteMessage} ChatStreamMessage
+ */
+
+const CONFIG = {
+    MESSAGE_TYPES: {
+        CHUNK: 'chunk',
+        COMPLETE: 'complete',
+        DEBUG: 'debug',
+        CONTEXT: 'context'
+    },
+    SCROLL: {
+        THRESHOLD: 100,
+        BEHAVIOR: 'instant'
+    },
+    MARKED_OPTIONS: /** @type {MarkedOptions} */ ({
+        breaks: true,
+        gfm: true,
+        mangle: false,
+        headerIds: false
+    })
 };
 
-export default class extends Controller {
+/**
+ * @extends {Controller & ChatStreamTargets}
+ */
+export default class ChatStreamController extends Controller {
     static targets = ['messages', 'input', 'scrollButton', 'storeButton'];
 
+    /** @type {string} */
+    #accumulatedText = '';
+
+    /** @type {Function} */
+    #boundScrollHandler;
+
     connect() {
-        this.messageContainer = this.messagesTarget;
-        this.messageInput = this.inputTarget;
-        this.scrollButton = this.scrollButtonTarget;
-        this.storeButton = this.storeButtonTarget;
-        this.accumulatedText = '';
+        this.#initializeMarkedOptions();
+        this.#setupEventListeners();
+        this.#initializeUI();
+    }
 
-        marked.setOptions({
-            breaks: true,
-            gfm: true,
-            mangle: false,
-            headerIds: false
-        });
+    disconnect() {
+        window.removeEventListener('scroll', this.#boundScrollHandler);
+    }
 
-        window.addEventListener('scroll', () => this.toggleScrollButton());
+    /**
+     * @private
+     */
+    #initializeMarkedOptions() {
+        marked.setOptions(CONFIG.MARKED_OPTIONS);
+    }
+
+    /**
+     * @private
+     */
+    #setupEventListeners() {
+        this.#boundScrollHandler = () => this.#handleScroll();
+        window.addEventListener('scroll', this.#boundScrollHandler);
 
         window.addEventListener('load', () => {
             requestAnimationFrame(() => this.scrollToBottom());
-            this.messageInput.focus();
+            this.inputTarget.focus();
         });
     }
 
-    toggleScrollButton() {
-        const threshold = 100;
-        const scrolledToBottom = (window.innerHeight + window.scrollY) >= document.documentElement.scrollHeight - threshold;
-        this.scrollButton.style.display = scrolledToBottom ? 'none' : 'block';
+    /**
+     * @private
+     */
+    #initializeUI() {
+        this.#accumulatedText = '';
+    }
+
+    /**
+     * @private
+     */
+    #handleScroll() {
+        const { THRESHOLD } = CONFIG.SCROLL;
+        const scrolledToBottom = (window.innerHeight + window.scrollY) >=
+            document.documentElement.scrollHeight - THRESHOLD;
+
+        this.scrollButtonTarget.style.display = scrolledToBottom ? 'none' : 'block';
     }
 
     scrollToBottom() {
         window.scrollTo({
             top: document.documentElement.scrollHeight,
-            behavior: 'instant'
+            behavior: CONFIG.SCROLL.BEHAVIOR
         });
 
-        this.toggleScrollButton();
+        this.#handleScroll();
     }
 
+    /**
+     * @param {Event} event
+     */
     async send(event) {
         event.preventDefault();
-
-        const message = this.messageInput.value;
-        this.messageInput.value = '';
-        this.accumulatedText = ''; // Reset accumulated text
-        this.disableInputs();
-
-        // Get conversation ID from data attribute if available
+        const message = this.inputTarget.value;
         const conversationId = this.element.dataset.conversationId || '';
-        const userMessage = this.createUserMessage(message);
-        const botMessage = this.createBotMessage();
 
-        // Add messages to the chat and scroll back to the new bottom of the window
+        this.#resetUIState();
+        await this.#sendMessage(message, conversationId);
+    }
+
+    /**
+     * @private
+     * @param {string} message
+     * @param {string} conversationId
+     */
+    async #sendMessage(message, conversationId) {
+        const userMessage = this.#createUserMessage(message);
+        const botMessage = this.#createBotMessage();
+
         this.messagesTarget.appendChild(userMessage);
         this.messagesTarget.appendChild(botMessage);
         this.scrollToBottom();
 
-        // Handle streaming response
-        const eventSource = new EventSource(`/chat/stream/message?message=${encodeURIComponent(message)}&conversation=${conversationId}`);
+        const eventSource = new EventSource(
+            `/chat/stream/message?message=${encodeURIComponent(message)}&conversation=${conversationId}`
+        );
 
-        eventSource.onmessage = (e) => this.handleStreamMessage(e, botMessage);
-        eventSource.onerror = () => this.handleStreamEnd(eventSource);
-        eventSource.onclose = () => this.handleStreamEnd(eventSource);
+        this.#setupMessageStream(eventSource, botMessage);
     }
 
-    handleStreamMessage(event, botMessage) {
+    /**
+     * @private
+     * @param {EventSource} eventSource
+     * @param {HTMLElement} botMessage
+     */
+    #setupMessageStream(eventSource, botMessage) {
+        eventSource.onmessage = (e) => this.#handleStreamMessage(e, botMessage);
+        eventSource.onerror = () => this.#handleStreamEnd(eventSource);
+    }
+
+    /**
+     * @private
+     * @param {MessageEvent} event
+     * @param {HTMLElement} botMessage
+     */
+    #handleStreamMessage(event, botMessage) {
+        /** @type {ChatStreamMessage} */
         const data = JSON.parse(event.data);
         const botMessageBody = botMessage.querySelector('.card-body.message');
 
-        switch (data.type) {
-            case MessageEventType.CHUNK:
-                this.accumulatedText += data.chunk;
-                botMessageBody.innerHTML = marked.parse(this.accumulatedText);
-                break;
+        if (!botMessageBody) return;
 
-            case MessageEventType.COMPLETE:
-                botMessage.id = `message-${data.id}`;
-                botMessage.dataset.messageId = data.id;
+        switch (data.type) {
+            case CONFIG.MESSAGE_TYPES.CHUNK:
+                this.#handleChunkMessage(data.chunk, botMessageBody);
+                break;
+            case CONFIG.MESSAGE_TYPES.COMPLETE:
+                this.#handleCompleteMessage(data.id, botMessage);
                 break;
         }
 
         this.scrollToBottom();
     }
 
-    createUserMessage(message) {
-        const userTemplate = document.getElementById('loading-user-message');
-        const userMessage = userTemplate.cloneNode(true);
+    /**
+     * @private
+     * @param {string} chunk
+     * @param {HTMLElement} messageBody
+     */
+    #handleChunkMessage(chunk, messageBody) {
+        this.#accumulatedText += chunk;
+        messageBody.innerHTML = marked.parse(this.#accumulatedText);
+    }
+
+    /**
+     * @private
+     * @param {string} messageId
+     * @param {HTMLElement} message
+     */
+    #handleCompleteMessage(messageId, message) {
+        message.id = `message-${messageId}`;
+        message.dataset.messageId = messageId;
+    }
+
+    /**
+     * @private
+     */
+    #resetUIState() {
+        this.inputTarget.value = '';
+        this.#accumulatedText = '';
+        this.storeButtonTarget.disabled = true;
+        this.inputTarget.disabled = true;
+    }
+
+    /**
+     * @private
+     * @param {string} message
+     * @returns {HTMLElement}
+     */
+    #createUserMessage(message) {
+        const template = document.getElementById('loading-user-message');
+        const userMessage = template?.cloneNode(true);
+        if (!userMessage) throw new Error('User message template not found');
+
         userMessage.removeAttribute('id');
         userMessage.classList.remove('d-none');
-        userMessage.querySelector('.card-body').textContent = message;
+        const body = userMessage.querySelector('.card-body');
+        if (body) body.textContent = message;
 
         return userMessage;
     }
 
-    createBotMessage() {
-        const botTemplate = document.getElementById('loading-bot-message');
-        const botMessage = botTemplate.cloneNode(true);
+    /**
+     * @private
+     * @returns {HTMLElement}
+     */
+    #createBotMessage() {
+        const template = document.getElementById('loading-bot-message');
+        const botMessage = template?.cloneNode(true);
+        if (!botMessage) throw new Error('Bot message template not found');
+
         botMessage.removeAttribute('id');
         botMessage.classList.remove('d-none');
 
         return botMessage;
     }
 
-    disableInputs() {
-        this.storeButton.disabled = true;
-        this.messageInput.disabled = true;
-    }
-
-    handleStreamEnd(eventSource) {
+    /**
+     * @private
+     * @param {EventSource} eventSource
+     */
+    #handleStreamEnd(eventSource) {
         eventSource.close();
-        this.storeButton.disabled = false;
-        this.messageInput.disabled = false;
-        this.messageInput.focus();
+        this.storeButtonTarget.disabled = false;
+        this.inputTarget.disabled = false;
+        this.inputTarget.focus();
     }
 }
