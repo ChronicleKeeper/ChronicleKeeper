@@ -99,14 +99,26 @@ class StreamedChat extends AbstractController
             $fullResponse = '';
             foreach ($response->getContent() as $chunk) {
                 $fullResponse .= $chunk;
-                echo 'data: ' . json_encode(['chunk' => $chunk], JSON_THROW_ON_ERROR) . "\n\n";
+                echo 'data: ' . json_encode([
+                    'type' => 'chunk',
+                    'chunk' => $chunk,
+                ], JSON_THROW_ON_ERROR) . "\n\n";
                 ob_flush();
                 flush();
             }
 
             // Add the messages to conversation and persist
-            $messages[] = new ExtendedMessage(message: Message::ofAssistant($fullResponse));
+            $messages[] = $fullMessage = new ExtendedMessage(message: Message::ofAssistant($fullResponse));
 
+            // Send completion message
+            echo 'data: ' . json_encode([
+                'type' => 'complete',
+                'id' => $fullMessage->id,
+            ], JSON_THROW_ON_ERROR) . "\n\n";
+            ob_flush();
+            flush();
+
+            // And do some stuff, like storing, after the connection from frontend was closed
             if ($isTemporary) {
                 $this->bus->dispatch(new StoreTemporaryConversation($conversation));
             } else {

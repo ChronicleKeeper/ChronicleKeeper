@@ -5,7 +5,7 @@
 {% endif %}
 
 {% macro bot(conversation, content) %}
-    <div class="col-12">
+    <div class="col-12" id="message-{{ content.extended.id }}" data-message-id="{{ content.extended.id }}">
         <div class="card">
             <div class="card-header">
                 <h3 class="card-title">{{ content.role }}</h3>
@@ -30,7 +30,7 @@
 {% endmacro %}
 
 {% macro user(conversation, content) %}
-    <div class="col-12">
+    <div class="col-12" id="message-{{ content.extended.id }}" data-message-id="{{ content.extended.id }}">
         <div class="card">
             <div class="card-header">
                 <h3 class="card-title">{{ content.role }}</h3>
