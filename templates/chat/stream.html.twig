@@ -5,7 +5,7 @@
 
 {% block page_content %}
     <div class="container-xl" data-controller="chat-stream" data-conversation-id="{{ isTemporary ? '' : conversation.id }}">
-       <div class="row row-deck row-cards" data-chat-stream-target="messages">
+       <div class="row row-deck row-cards chatbot-message" data-chat-stream-target="messages">
            <!-- The Messages that are alredy existing ... --->
            {% for message in messages %}
                {% include 'components/chat/_message.html.twig' with { conversation, message } %}
