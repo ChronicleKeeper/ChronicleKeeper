@@ -83,7 +83,7 @@ class TableCalendar
 
     public function createDateFromLeapDay(LeapDay $day, CalendarDate $viewDate): CalendarDate
     {
-        return new CalendarDate($this->calendar, $viewDate->getYear(), $viewDate->getMonth(), $day->dayOfTheMonth);
+        return new CalendarDate($this->calendar, $viewDate->getYear(), $viewDate->getMonth(), $day->getDayOfTheMonth());
     }
 
     /** @return LeapDay[] */

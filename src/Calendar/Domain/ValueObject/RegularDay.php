@@ -9,8 +9,8 @@ use ChronicleKeeper\Calendar\Domain\Entity\Calendar\Day;
 final readonly class RegularDay implements Day
 {
     public function __construct(
-        public int $dayOfTheMonth,
-        public int $dayToDisplay,
+        private int $dayOfTheMonth,
+        private int $dayToDisplay,
     ) {
     }
 

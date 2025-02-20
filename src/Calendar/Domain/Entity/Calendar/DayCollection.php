@@ -31,7 +31,7 @@ final class DayCollection implements Countable
     ) {
         // Reformat the leap days array to be indexed by the dayOfTheMonth setting
         $leapDays = array_combine(
-            array_map(static fn (LeapDay $day): int => $day->dayOfTheMonth, $leapDays),
+            array_map(static fn (LeapDay $day): int => $day->getDayOfTheMonth(), $leapDays),
             $leapDays,
         );
 
@@ -141,7 +141,7 @@ final class DayCollection implements Countable
 
         $leapDays = array_filter(
             $leapDays,
-            static fn (Day $day): bool => $day->dayOfTheMonth <= $maxDay,
+            static fn (Day $day): bool => $day->getDayOfTheMonth() <= $maxDay,
         );
 
         return count($leapDays);

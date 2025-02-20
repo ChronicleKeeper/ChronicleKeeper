@@ -9,8 +9,8 @@ use ChronicleKeeper\Calendar\Domain\Entity\Calendar\Day;
 final readonly class LeapDay implements Day
 {
     public function __construct(
-        public int $dayOfTheMonth,
-        public string $name,
+        private int $dayOfTheMonth,
+        private string $name,
         public int $yearInterval = 1, // Default is every year
     ) {
     }
