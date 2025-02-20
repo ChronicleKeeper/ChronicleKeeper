@@ -13,44 +13,39 @@ use ChronicleKeeper\Calendar\Domain\Entity\Calendar\WeekConfiguration;
 
 class Calendar
 {
-    private MonthCollection $months;
+    private readonly MonthCollection $months;
+    private readonly EpochCollection $epochCollection;
+    private readonly WeekConfiguration $weekConfiguration;
 
     /** @var array<int, int> */
     private array $cachedDaysInYear = [];
-    /** @var array<int, int> */
-    private array $cachedLeapDaysInYear = [];
-
     /** @var array<int, array<int, int>> */
     private array $cachedDaysInMonth = [];
+    /** @var array<int, int> */
+    private array $cachedLeapDaysInYear = [];
     /** @var array<int, array<int, int>> */
     private array $cachedLeapDaysInMonth = [];
 
-    private EpochCollection $epochCollection;
-    private WeekConfiguration $weekConfiguration;
-    private MoonCycle $moonCycle;
-
+    /**
+     * @param array<array{index: int, name: string, days: int<0, max>, leapDays?: array<array{day: int, name: string, yearInterval?: int}>}> $monthsData
+     * @param array<array{name: string, startYear: int<0, max>, endYear?: int<0, max>|null}>                                                 $epochs
+     * @param array<array{index: int, name: string}>                                                                                         $weekDays
+     */
     public function __construct(
         private readonly Configuration $configuration,
+        array $monthsData,
+        array $epochs,
+        array $weekDays,
+        private readonly MoonCycle $moonCycle,
     ) {
-        $this->months = new MonthCollection();
+        $this->months            = MonthCollection::fromArray($this, $monthsData);
+        $this->epochCollection   = EpochCollection::fromArray($epochs);
+        $this->weekConfiguration = WeekConfiguration::fromArray($weekDays);
     }
 
-    public function setMonths(MonthCollection $months): void
+    public function getMonths(): MonthCollection
     {
-        if (isset($this->months) && $this->months->count() > 0) {
-            return;
-        }
-
-        $this->months = $months;
-    }
-
-    public function setEpochCollection(EpochCollection $epochCollection): void
-    {
-        if (isset($this->epochCollection)) {
-            return;
-        }
-
-        $this->epochCollection = $epochCollection;
+        return $this->months;
     }
 
     public function getEpochCollection(): EpochCollection
@@ -58,37 +53,14 @@ class Calendar
         return $this->epochCollection;
     }
 
-    public function setWeekConfiguration(WeekConfiguration $weekConfiguration): void
-    {
-        if (isset($this->weekConfiguration)) {
-            return;
-        }
-
-        $this->weekConfiguration = $weekConfiguration;
-    }
-
     public function getWeeks(): WeekConfiguration
     {
         return $this->weekConfiguration;
     }
 
-    public function setMoonCycle(MoonCycle $moonCycle): void
-    {
-        if (isset($this->moonCycle)) {
-            return;
-        }
-
-        $this->moonCycle = $moonCycle;
-    }
-
     public function getMoonCycle(): MoonCycle
     {
         return $this->moonCycle;
-    }
-
-    public function getMonths(): MonthCollection
-    {
-        return $this->months;
     }
 
     public function getConfiguration(): Configuration

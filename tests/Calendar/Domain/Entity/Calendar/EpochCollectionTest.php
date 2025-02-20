@@ -21,7 +21,7 @@ final class EpochCollectionTest extends TestCase
     public function itWillFailCreationWithoutAnyEpochs(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('At least one epoch is required');
+        $this->expectExceptionMessage('At least a single epoch should be given.');
 
         new EpochCollection();
     }
@@ -102,5 +102,23 @@ final class EpochCollectionTest extends TestCase
         self::assertSame('Third Epoch', $epochCollection->getEpochForYear(5)->name);
         self::assertSame('Third Epoch', $epochCollection->getEpochForYear(6)->name);
         self::assertSame('Third Epoch', $epochCollection->getEpochForYear(275)->name);
+    }
+
+    #[Test]
+    public function testFromArray(): void
+    {
+        $epochsData = [
+            ['name' => 'Second Age', 'startYear' => 1000],
+            ['name' => 'First Age', 'startYear' => 1, 'endYear' => 999],
+        ];
+
+        $epochs     = EpochCollection::fromArray($epochsData);
+        $collection = $epochs->getEpochs();
+
+        self::assertCount(2, $collection);
+        self::assertEquals('First Age', $collection[0]->name);
+        self::assertEquals(1, $collection[0]->beginsInYear);
+        self::assertEquals('Second Age', $collection[1]->name);
+        self::assertEquals(1000, $collection[1]->beginsInYear);
     }
 }

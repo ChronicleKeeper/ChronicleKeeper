@@ -155,4 +155,16 @@ final class DayCollection implements Countable
             static fn (Day $day): bool => $day instanceof LeapDay && $day->isActiveInYear($year),
         );
     }
+
+    /** @param array{regularDays: int<0, max>, leapDays?: array<array{day: int, name: string, yearInterval?: int}>} $data */
+    public static function fromArray(array $data): self
+    {
+        return new self(
+            $data['regularDays'],
+            ...array_map(
+                LeapDay::fromArray(...),
+                $data['leapDays'] ?? [],
+            ),
+        );
+    }
 }

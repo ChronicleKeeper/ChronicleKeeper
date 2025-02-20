@@ -16,6 +16,8 @@ use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
+use function dump;
+
 #[CoversClass(WeekConfiguration::class)]
 #[CoversClass(WeekDay::class)]
 #[CoversClass(InvalidWeekConfiguration::class)]
@@ -173,5 +175,24 @@ final class WeekConfigurationTest extends TestCase
             new CalendarDate($calendar, 0, 10, 1),
             '10. Cerun 0 after the Flood',
         ];
+    }
+
+    #[Test]
+    public function testFromArray(): void
+    {
+        $weekDays = [
+            ['index' => 1, 'name' => 'Monday'],
+            ['index' => 2, 'name' => 'Tuesday'],
+        ];
+
+        $config = WeekConfiguration::fromArray($weekDays);
+        $days   = $config->getDays();
+
+        self::assertCount(2, $days);
+
+        self::assertEquals('Monday', $days[1]->name);
+        self::assertEquals(1, $days[1]->index);
+        self::assertEquals('Tuesday', $days[2]->name);
+        self::assertEquals(2, $days[2]->index);
     }
 }

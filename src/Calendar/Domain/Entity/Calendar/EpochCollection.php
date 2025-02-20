@@ -14,19 +14,18 @@ use function usort;
 
 class EpochCollection
 {
-    /** @var Epoch[] */
+    /** @var list<Epoch> */
     private readonly array $epochs;
 
     public function __construct(Epoch ...$epochs)
     {
         if ($epochs === []) {
-            throw new InvalidArgumentException('At least one epoch is required');
+            throw new InvalidArgumentException('At least a single epoch should be given.');
         }
 
-        // Sort epochs by beginsInYear
         usort($epochs, static fn (Epoch $a, Epoch $b) => $a->beginsInYear <=> $b->beginsInYear);
-
         $this->validateEpochs($epochs);
+
         $this->epochs = $epochs;
     }
 
@@ -77,7 +76,18 @@ class EpochCollection
         }
     }
 
-    /** @return Epoch[] */
+    /** @param array<array{name: string, startYear: int<0, max>, endYear?: int<0, max>|null}> $epochs */
+    public static function fromArray(array $epochs): self
+    {
+        $collection = [];
+        foreach ($epochs as $epoch) {
+            $collection[] = new Epoch($epoch['name'], $epoch['startYear'], $epoch['endYear'] ?? null);
+        }
+
+        return new self(...$collection);
+    }
+
+    /** @return list<Epoch> */
     public function getEpochs(): array
     {
         return $this->epochs;

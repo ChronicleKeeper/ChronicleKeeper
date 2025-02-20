@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace ChronicleKeeper\Test\Calendar\Domain\Entity;
 
 use ChronicleKeeper\Calendar\Domain\Entity\Calendar;
-use ChronicleKeeper\Calendar\Domain\Entity\Calendar\MonthCollection;
 use ChronicleKeeper\Calendar\Domain\Exception\MonthNotExists;
 use ChronicleKeeper\Calendar\Domain\Exception\YearHasNotASequentialListOfMonths;
 use ChronicleKeeper\Calendar\Domain\Exception\YearIsNotStartingWithFirstMonth;
@@ -41,15 +40,6 @@ class CalendarTest extends TestCase
 
         $calendar = $this->getCalendar();
         $calendar->getMonth(4);
-    }
-
-    #[Test]
-    public function itFailsOverwritingTheAlreadySetMonths(): void
-    {
-        $calendar = $this->getCalendar();
-        $calendar->setMonths($overwrite = new MonthCollection());
-
-        self::assertNotSame($calendar->getMonths(), $overwrite);
     }
 
     private function getCalendar(): Calendar

@@ -12,4 +12,10 @@ readonly class Epoch
         public int|null $endsInYear = null,
     ) {
     }
+
+    /** @param array{name: string, startYear: int} $data */
+    public static function fromArray(array $data): self
+    {
+        return new self($data['name'], $data['startYear']);
+    }
 }

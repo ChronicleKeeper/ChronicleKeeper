@@ -6,15 +6,7 @@ namespace ChronicleKeeper\Calendar\Application\Query;
 
 use ChronicleKeeper\Calendar\Domain\Entity\Calendar;
 use ChronicleKeeper\Calendar\Domain\Entity\Calendar\Configuration;
-use ChronicleKeeper\Calendar\Domain\Entity\Calendar\DayCollection;
-use ChronicleKeeper\Calendar\Domain\Entity\Calendar\EpochCollection;
-use ChronicleKeeper\Calendar\Domain\Entity\Calendar\Month;
-use ChronicleKeeper\Calendar\Domain\Entity\Calendar\MonthCollection;
 use ChronicleKeeper\Calendar\Domain\Entity\Calendar\MoonCycle;
-use ChronicleKeeper\Calendar\Domain\Entity\Calendar\WeekConfiguration;
-use ChronicleKeeper\Calendar\Domain\ValueObject\Epoch;
-use ChronicleKeeper\Calendar\Domain\ValueObject\LeapDay;
-use ChronicleKeeper\Calendar\Domain\ValueObject\WeekDay;
 use ChronicleKeeper\Shared\Application\Query\Query;
 use ChronicleKeeper\Shared\Application\Query\QueryParameters;
 
@@ -22,55 +14,45 @@ final class LoadCalendarQuery implements Query
 {
     public function query(QueryParameters $parameters): Calendar
     {
-        $calendar = new Calendar(new Configuration());
-
-        // Configure Months
-        $calendar->setMonths(new MonthCollection(
-            new Month($calendar, 1, 'Taranis', new DayCollection(
-                25,
-                new LeapDay(21, 'Mittwinter'),
-            )),
-            new Month($calendar, 2, 'Imbolc', new DayCollection(30)),
-            new Month($calendar, 3, 'Brigid', new DayCollection(25)),
-            new Month($calendar, 4, 'Lughnasad', new DayCollection(25)),
-            new Month($calendar, 5, 'Beltain', new DayCollection(30)),
-            new Month($calendar, 6, 'Litha', new DayCollection(30)),
-            new Month($calendar, 7, 'Arthan', new DayCollection(
-                30,
-            )),
-            new Month($calendar, 8, 'Telisias', new DayCollection(30)),
-            new Month($calendar, 9, 'Mabon', new DayCollection(
-                30,
-            )),
-            new Month($calendar, 10, 'Cerun', new DayCollection(30)),
-            new Month($calendar, 11, 'Sawuin', new DayCollection(
-                30,
-            )),
-            new Month($calendar, 12, 'Nox', new DayCollection(30)),
-        ));
-
-        // Configure Epochs
-        $calendar->setEpochCollection(new EpochCollection(
-            new Epoch('nach der Flut', 0),
-        ));
-
-        // Configure Weeks
-        $calendar->setWeekConfiguration(new WeekConfiguration(
-            new WeekDay(1, 'Ersttag'),
-            new WeekDay(2, 'Zweittag'),
-            new WeekDay(3, 'Drittag'),
-            new WeekDay(4, 'Vierttag'),
-            new WeekDay(5, 'Fünfttag'),
-            new WeekDay(6, 'Sechsttag'),
-            new WeekDay(7, 'Siebttag'),
-            new WeekDay(8, 'Achsttag'),
-            new WeekDay(9, 'Neunttag'),
-            new WeekDay(10, 'Zehnttag'),
-        ));
-
-        // Configure Moon Cycle
-        $calendar->setMoonCycle(new MoonCycle(30));
-
-        return $calendar;
+        return new Calendar(
+            new Configuration(),
+            [
+                [
+                    'index' => 1,
+                    'name' => 'Taranis',
+                    'days' => 25,
+                    'leapDays' => [
+                        ['day' => 21, 'name' => 'Mittwinter'],
+                    ],
+                ],
+                ['index' => 2, 'name' => 'Imbolc', 'days' => 30],
+                ['index' => 3, 'name' => 'Brigid', 'days' => 25],
+                ['index' => 4, 'name' => 'Lughnasad', 'days' => 25],
+                ['index' => 5, 'name' => 'Beltain', 'days' => 30],
+                ['index' => 6, 'name' => 'Litha', 'days' => 30],
+                ['index' => 7, 'name' => 'Arthan', 'days' => 30],
+                ['index' => 8, 'name' => 'Telisias', 'days' => 30],
+                ['index' => 9, 'name' => 'Mabon', 'days' => 30],
+                ['index' => 10, 'name' => 'Cerun', 'days' => 30],
+                ['index' => 11, 'name' => 'Sawuin', 'days' => 30],
+                ['index' => 12, 'name' => 'Nox', 'days' => 30],
+            ],
+            [
+                ['name' => 'nach der Flut', 'startYear' => 0],
+            ],
+            [
+                ['index' => 1, 'name' => 'Ersttag'],
+                ['index' => 2, 'name' => 'Zweittag'],
+                ['index' => 3, 'name' => 'Drittag'],
+                ['index' => 4, 'name' => 'Vierttag'],
+                ['index' => 5, 'name' => 'Fünfttag'],
+                ['index' => 6, 'name' => 'Sechsttag'],
+                ['index' => 7, 'name' => 'Siebttag'],
+                ['index' => 8, 'name' => 'Achsttag'],
+                ['index' => 9, 'name' => 'Neunttag'],
+                ['index' => 10, 'name' => 'Zehnttag'],
+            ],
+            new MoonCycle(30),
+        );
     }
 }

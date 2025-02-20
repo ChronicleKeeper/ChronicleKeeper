@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Calendar\Domain\Entity\Calendar;
 
+use ChronicleKeeper\Calendar\Domain\Entity\Calendar;
 use ChronicleKeeper\Calendar\Domain\Exception\MonthNotExists;
 use ChronicleKeeper\Calendar\Domain\Exception\YearHasNotASequentialListOfMonths;
 use ChronicleKeeper\Calendar\Domain\Exception\YearIsNotStartingWithFirstMonth;
+use ChronicleKeeper\Calendar\Domain\ValueObject\LeapDay;
 use Countable;
 
 use function array_combine;
@@ -14,6 +16,7 @@ use function array_keys;
 use function array_map;
 use function array_reduce;
 use function count;
+use function ksort;
 use function range;
 use function reset;
 use function usort;
@@ -89,5 +92,30 @@ final class MonthCollection implements Countable
     public function count(): int
     {
         return count($this->months);
+    }
+
+    /** @param array<array{index: int, name: string, days: int<0, max>, leapDays?: array<array{day: int, name: string, yearInterval?: int}>}> $monthsData */
+    public static function fromArray(Calendar $calendar, array $monthsData): self
+    {
+        $months = [];
+        foreach ($monthsData as $monthData) {
+            $leapDays = [];
+            if (isset($monthData['leapDays'])) {
+                foreach ($monthData['leapDays'] as $leapDay) {
+                    $leapDays[] = new LeapDay(
+                        $leapDay['day'],
+                        $leapDay['name'],
+                        $leapDay['yearInterval'] ?? 1,
+                    );
+                }
+            }
+
+            $days                        = new DayCollection($monthData['days'], ...$leapDays);
+            $months[$monthData['index']] = new Month($calendar, $monthData['index'], $monthData['name'], $days);
+        }
+
+        ksort($months);
+
+        return new self(...$months);
     }
 }

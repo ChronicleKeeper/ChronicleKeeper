@@ -11,4 +11,10 @@ readonly class WeekDay
         public string $name,
     ) {
     }
+
+    /** @param array{index: int, name: string} $data */
+    public static function fromArray(array $data): self
+    {
+        return new self($data['index'], $data['name']);
+    }
 }

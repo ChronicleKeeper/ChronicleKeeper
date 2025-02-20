@@ -38,6 +38,17 @@ readonly class WeekConfiguration
         }
     }
 
+    /** @param array<array{index: int, name: string}> $weekDays */
+    public static function fromArray(array $weekDays): self
+    {
+        $days = [];
+        foreach ($weekDays as $weekDay) {
+            $days[] = new WeekDay($weekDay['index'], $weekDay['name']);
+        }
+
+        return new self(...$days);
+    }
+
     /** @return array<int, WeekDay> */
     public function getDays(): array
     {

@@ -33,4 +33,14 @@ final readonly class LeapDay implements Day
 
         return $year % $this->yearInterval === 0;
     }
+
+    /** @param array{day: int, name: string, yearInterval?: int} $data */
+    public static function fromArray(array $data): self
+    {
+        return new self(
+            $data['day'],
+            $data['name'],
+            $data['yearInterval'] ?? 1,
+        );
+    }
 }

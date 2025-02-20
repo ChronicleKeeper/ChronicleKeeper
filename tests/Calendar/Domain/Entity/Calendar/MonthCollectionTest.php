@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace ChronicleKeeper\Test\Calendar\Domain\Entity\Calendar;
 
 use ChronicleKeeper\Calendar\Domain\Entity\Calendar;
-use ChronicleKeeper\Calendar\Domain\Entity\Calendar\Configuration;
-use ChronicleKeeper\Calendar\Domain\Entity\Calendar\DayCollection;
-use ChronicleKeeper\Calendar\Domain\Entity\Calendar\Month;
 use ChronicleKeeper\Calendar\Domain\Entity\Calendar\MonthCollection;
 use ChronicleKeeper\Calendar\Domain\Exception\MonthNotExists;
 use ChronicleKeeper\Calendar\Domain\Exception\YearHasNotASequentialListOfMonths;
@@ -21,25 +18,19 @@ use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(MonthCollection::class)]
+#[CoversClass(YearIsNotStartingWithFirstMonth::class)]
+#[CoversClass(YearHasNotASequentialListOfMonths::class)]
+#[CoversClass(MonthNotExists::class)]
 #[Small]
 class MonthCollectionTest extends TestCase
 {
-    #[Test]
-    public function itWorksWithEmptyMonthList(): void
-    {
-        $collection = new MonthCollection();
-        self::assertCount(0, $collection);
-    }
-
     #[Test]
     public function itFailsWhenMonthsDoNotStartWithOne(): void
     {
         $this->expectException(YearIsNotStartingWithFirstMonth::class);
 
-        $calendar = new Calendar(new Configuration());
-        new MonthCollection(
-            new Month($calendar, 2, 'SecondMonth', new DayCollection(10)),
-        );
+        $calendar = ExampleCalendars::getOnlyRegularDays();
+        new MonthCollection($calendar->getMonths()->get(2));
     }
 
     #[Test]
@@ -47,11 +38,8 @@ class MonthCollectionTest extends TestCase
     {
         $this->expectException(YearHasNotASequentialListOfMonths::class);
 
-        $calendar = new Calendar(new Configuration());
-        new MonthCollection(
-            new Month($calendar, 1, 'FirstMonth', new DayCollection(10)),
-            new Month($calendar, 3, 'ThirdMonth', new DayCollection(10)),
-        );
+        $calendar = ExampleCalendars::getOnlyRegularDays();
+        new MonthCollection($calendar->getMonths()->get(1), $calendar->getMonths()->get(3));
     }
 
     #[Test]
@@ -66,12 +54,12 @@ class MonthCollectionTest extends TestCase
     #[Test]
     public function itGetsMonthByIndex(): void
     {
-        $calendar = new Calendar(new Configuration());
-        $month    = new Month($calendar, 1, 'FirstMonth', new DayCollection(10));
+        $calendar = ExampleCalendars::getOnlyRegularDays();
+        $months   = new MonthCollection($calendar->getMonths()->get(1));
 
-        $collection = new MonthCollection($month);
-
-        self::assertSame($month, $collection->get(1));
+        $month = $months->get(1);
+        self::assertSame('January', $month->name);
+        self::assertCount(31, $month->days);
     }
 
     #[Test]
@@ -101,13 +89,6 @@ class MonthCollectionTest extends TestCase
     }
 
     #[Test]
-    public function itIsWorkingWithAnEmptyListOfMonths(): void
-    {
-        $calendar = new Calendar(new Configuration());
-        self::assertSame(0, $calendar->getMonths()->countDaysInYear(1));
-    }
-
-    #[Test]
     #[DataProvider('provideLeapDaysInYearCases')]
     public function itCanCountTheLeapDaysInAYear(Calendar $calendar, int $year, int $expectedLeapDays): void
     {
@@ -131,5 +112,42 @@ class MonthCollectionTest extends TestCase
         yield 'Linear Calendar with Leap Days - Year 2' => [$calendar, 2, 5];
         yield 'Linear Calendar with Leap Days - Year 3' => [$calendar, 3, 5];
         yield 'Linear Calendar with Leap Days - Year 4' => [$calendar, 4, 6];
+    }
+
+    #[Test]
+    public function testFromArray(): void
+    {
+        $monthsData = [
+            [
+                'index' => 1,
+                'name' => 'January',
+                'days' => 31,
+                'leapDays' => [
+                    ['day' => 29, 'name' => 'Leap Day', 'yearInterval' => 4],
+                ],
+            ],
+            [
+                'index' => 2,
+                'name' => 'February',
+                'days' => 28,
+            ],
+        ];
+
+        $calendar = ExampleCalendars::getOnlyRegularDays();
+        $months   = MonthCollection::fromArray($calendar, $monthsData);
+
+        self::assertCount(2, $months->getAll());
+        self::assertSame('January', $months->get(1)->name);
+        self::assertSame('February', $months->get(2)->name);
+
+        self::assertCount(32, $months->get(1)->days);
+        self::assertCount(28, $months->get(2)->days);
+
+        self::assertCount(1, $months->get(1)->days->getLeapDaysInYear(0));
+        self::assertCount(0, $months->get(1)->days->getLeapDaysInYear(1));
+        self::assertCount(0, $months->get(2)->days->getLeapDaysInYear(1));
+
+        self::assertSame(60, $months->countDaysInYear(0));
+        self::assertSame(59, $months->countDaysInYear(1));
     }
 }

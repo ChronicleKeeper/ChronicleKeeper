@@ -6,150 +6,189 @@ namespace ChronicleKeeper\Test\Calendar\Domain\Entity\Fixture;
 
 use ChronicleKeeper\Calendar\Domain\Entity\Calendar;
 use ChronicleKeeper\Calendar\Domain\Entity\Calendar\Configuration;
-use ChronicleKeeper\Calendar\Domain\Entity\Calendar\DayCollection;
-use ChronicleKeeper\Calendar\Domain\Entity\Calendar\EpochCollection;
-use ChronicleKeeper\Calendar\Domain\Entity\Calendar\Month;
-use ChronicleKeeper\Calendar\Domain\Entity\Calendar\MonthCollection;
 use ChronicleKeeper\Calendar\Domain\Entity\Calendar\MoonCycle;
-use ChronicleKeeper\Calendar\Domain\Entity\Calendar\WeekConfiguration;
-use ChronicleKeeper\Calendar\Domain\ValueObject\Epoch;
-use ChronicleKeeper\Calendar\Domain\ValueObject\LeapDay;
-use ChronicleKeeper\Calendar\Domain\ValueObject\WeekDay;
 
 class ExampleCalendars
 {
     public static function getFullFeatured(): Calendar
     {
-        $calendar = new Calendar(new Configuration());
-        $calendar->setEpochCollection(new EpochCollection(new Epoch('after Boom', 0)));
-
-        $dayCollection = new DayCollection(10);
-        $thirdMonth    = new Month($calendar, 3, 'ThirdMonth', $dayCollection);
-
-        $months = new MonthCollection(
-            new Month($calendar, 1, 'FirstMonth', new DayCollection(
-                10,
-            )),
-            $thirdMonth,
-            new Month($calendar, 2, 'SecondMonth', new DayCollection(15)),
+        return new Calendar(
+            new Configuration(),
+            [
+                ['index' => 1, 'name' => 'FirstMonth', 'days' => 10],
+                ['index' => 2, 'name' => 'SecondMonth', 'days' => 15],
+                ['index' => 3, 'name' => 'ThirdMonth', 'days' => 10],
+            ],
+            [
+                ['name' => 'after Boom', 'startYear' => 0],
+            ],
+            [
+                ['index' => 1, 'name' => 'Day'],
+            ],
+            new MoonCycle(30),
         );
-
-        $calendar->setMonths($months);
-
-        return $calendar;
     }
 
     public static function getOnlyRegularDays(): Calendar
     {
-        $calendar = new Calendar(new Configuration(beginsInYear: 0));
-        $calendar->setEpochCollection(new EpochCollection(new Epoch('AD', 0)));
-        $calendar->setMoonCycle(new MoonCycle(29.5));
-        $calendar->setWeekConfiguration(new WeekConfiguration(
-            new WeekDay(1, 'Monday'),
-            new WeekDay(2, 'Tuesday'),
-            new WeekDay(3, 'Wednesday'),
-            new WeekDay(4, 'Thursday'),
-            new WeekDay(5, 'Friday'),
-            new WeekDay(6, 'Saturday'),
-            new WeekDay(7, 'Sunday'),
-        ));
-
-        $months = new MonthCollection(
-            new Month($calendar, 1, 'January', new DayCollection(31)),
-            new Month($calendar, 2, 'February', new DayCollection(28)),
-            new Month($calendar, 3, 'March', new DayCollection(31)),
-            new Month($calendar, 4, 'April', new DayCollection(30)),
-            new Month($calendar, 5, 'May', new DayCollection(31)),
-            new Month($calendar, 6, 'June', new DayCollection(30)),
-            new Month($calendar, 7, 'July', new DayCollection(31)),
-            new Month($calendar, 8, 'August', new DayCollection(31)),
-            new Month($calendar, 9, 'September', new DayCollection(30)),
-            new Month($calendar, 10, 'October', new DayCollection(31)),
-            new Month($calendar, 11, 'November', new DayCollection(30)),
-            new Month($calendar, 12, 'December', new DayCollection(31)),
+        return new Calendar(
+            new Configuration(beginsInYear: 0),
+            [
+                ['index' => 1, 'name' => 'January', 'days' => 31],
+                ['index' => 2, 'name' => 'February', 'days' => 28],
+                ['index' => 3, 'name' => 'March', 'days' => 31],
+                ['index' => 4, 'name' => 'April', 'days' => 30],
+                ['index' => 5, 'name' => 'May', 'days' => 31],
+                ['index' => 6, 'name' => 'June', 'days' => 30],
+                ['index' => 7, 'name' => 'July', 'days' => 31],
+                ['index' => 8, 'name' => 'August', 'days' => 31],
+                ['index' => 9, 'name' => 'September', 'days' => 30],
+                ['index' => 10, 'name' => 'October', 'days' => 31],
+                ['index' => 11, 'name' => 'November', 'days' => 30],
+                ['index' => 12, 'name' => 'December', 'days' => 31],
+            ],
+            [
+                ['name' => 'AD', 'startYear' => 0],
+            ],
+            [
+                ['index' => 1, 'name' => 'Monday'],
+                ['index' => 2, 'name' => 'Tuesday'],
+                ['index' => 3, 'name' => 'Wednesday'],
+                ['index' => 4, 'name' => 'Thursday'],
+                ['index' => 5, 'name' => 'Friday'],
+                ['index' => 6, 'name' => 'Saturday'],
+                ['index' => 7, 'name' => 'Sunday'],
+            ],
+            new MoonCycle(29.5),
         );
-
-        $calendar->setMonths($months);
-
-        return $calendar;
     }
 
     public static function getLinearWithLeapDays(): Calendar
     {
-        $calendar = new Calendar(new Configuration(beginsInYear: 0));
-        $calendar->setEpochCollection(new EpochCollection(new Epoch('after the Flood', 0)));
-        $calendar->setMoonCycle(new MoonCycle(30));
-        $calendar->setWeekConfiguration(new WeekConfiguration(
-            new WeekDay(1, 'Firstday'),
-            new WeekDay(2, 'Secondday'),
-            new WeekDay(3, 'Thirdday'),
-            new WeekDay(4, 'Fourthday'),
-            new WeekDay(5, 'Fithday'),
-            new WeekDay(6, 'Sixthday'),
-            new WeekDay(7, 'Seventhday'),
-            new WeekDay(8, 'Eigthday'),
-            new WeekDay(9, 'Ninthday'),
-            new WeekDay(10, 'Tenthday'),
-        ));
-
-        $months = new MonthCollection(
-            new Month($calendar, 1, 'Taranis', new DayCollection(
-                30,
-                new LeapDay(3, 'Mithwinter'),
-            )),
-            new Month($calendar, 2, 'Imbolc', new DayCollection(30)),
-            new Month($calendar, 3, 'Brigid', new DayCollection(30)),
-            new Month($calendar, 4, 'Lughnasad', new DayCollection(
-                30,
-                new LeapDay(18, 'Firstseed'),
-            )),
-            new Month($calendar, 5, 'Beltain', new DayCollection(30)),
-            new Month($calendar, 6, 'Litha', new DayCollection(30)),
-            new Month($calendar, 7, 'Arthan', new DayCollection(
-                30,
-                new LeapDay(2, 'Shieldday', yearInterval: 4),
-                new LeapDay(21, 'Midsummer'),
-            )),
-            new Month($calendar, 8, 'Telisias', new DayCollection(30)),
-            new Month($calendar, 9, 'Mabon', new DayCollection(
-                30,
-                new LeapDay(27, 'Highharvest'),
-            )),
-            new Month($calendar, 10, 'Cerun', new DayCollection(30)),
-            new Month($calendar, 11, 'Sawuin', new DayCollection(
-                30,
-                new LeapDay(15, 'Moonfeast'),
-            )),
-            new Month($calendar, 12, 'Nox', new DayCollection(30)),
+        return new Calendar(
+            new Configuration(beginsInYear: 0),
+            [
+                [
+                    'index' => 1,
+                    'name' => 'Taranis',
+                    'days' => 30,
+                    'leapDays' => [
+                        ['day' => 3, 'name' => 'Mithwinter'],
+                    ],
+                ],
+                [
+                    'index' => 2,
+                    'name' => 'Imbolc',
+                    'days' => 30,
+                ],
+                [
+                    'index' => 3,
+                    'name' => 'Brigid',
+                    'days' => 30,
+                ],
+                [
+                    'index' => 4,
+                    'name' => 'Lughnasad',
+                    'days' => 30,
+                    'leapDays' => [
+                        ['day' => 18, 'name' => 'Firstseed'],
+                    ],
+                ],
+                [
+                    'index' => 5,
+                    'name' => 'Beltain',
+                    'days' => 30,
+                ],
+                [
+                    'index' => 6,
+                    'name' => 'Litha',
+                    'days' => 30,
+                ],
+                [
+                    'index' => 7,
+                    'name' => 'Arthan',
+                    'days' => 30,
+                    'leapDays' => [
+                        ['day' => 2, 'name' => 'Shieldday', 'yearInterval' => 4],
+                        ['day' => 21, 'name' => 'Midsummer'],
+                    ],
+                ],
+                [
+                    'index' => 8,
+                    'name' => 'Telisias',
+                    'days' => 30,
+                ],
+                [
+                    'index' => 9,
+                    'name' => 'Mabon',
+                    'days' => 30,
+                    'leapDays' => [
+                        ['day' => 27, 'name' => 'Highharvest'],
+                    ],
+                ],
+                [
+                    'index' => 10,
+                    'name' => 'Cerun',
+                    'days' => 30,
+                ],
+                [
+                    'index' => 11,
+                    'name' => 'Sawuin',
+                    'days' => 30,
+                    'leapDays' => [
+                        ['day' => 15, 'name' => 'Moonfeast'],
+                    ],
+                ],
+                [
+                    'index' => 12,
+                    'name' => 'Nox',
+                    'days' => 30,
+                ],
+            ],
+            [
+                ['name' => 'after the Flood', 'startYear' => 0],
+            ],
+            [
+                ['index' => 1, 'name' => 'Firstday'],
+                ['index' => 2, 'name' => 'Secondday'],
+                ['index' => 3, 'name' => 'Thirdday'],
+                ['index' => 4, 'name' => 'Fourthday'],
+                ['index' => 5, 'name' => 'Fithday'],
+                ['index' => 6, 'name' => 'Sixthday'],
+                ['index' => 7, 'name' => 'Seventhday'],
+                ['index' => 8, 'name' => 'Eigthday'],
+                ['index' => 9, 'name' => 'Ninthday'],
+                ['index' => 10, 'name' => 'Tenthday'],
+            ],
+            new MoonCycle(30),
         );
-
-        $calendar->setMonths($months);
-
-        return $calendar;
     }
 
     public static function getCalendarWithLeapDayAsFirstDayOfTheYear(): Calendar
     {
-        $calendar = new Calendar(new Configuration(beginsInYear: 0));
-        $calendar->setEpochCollection(new EpochCollection(new Epoch('AD', 0)));
-        $calendar->setMoonCycle(new MoonCycle(10));
-        $calendar->setWeekConfiguration(new WeekConfiguration(
-            new WeekDay(1, 'First Day'),
-            new WeekDay(2, 'Second Day'),
-            new WeekDay(3, 'Party Day'),
-        ));
-
-        $months = new MonthCollection(
-            new Month($calendar, 1, 'First', new DayCollection(
-                10,
-                new LeapDay(1, 'Happy New Year!'),
-            )),
-            new Month($calendar, 2, 'Second', new DayCollection(15)),
-            new Month($calendar, 3, 'Third', new DayCollection(20)),
+        return new Calendar(
+            new Configuration(beginsInYear: 0),
+            [
+                [
+                    'index' => 1,
+                    'name' => 'First',
+                    'days' => 10,
+                    'leapDays' => [
+                        ['day' => 1, 'name' => 'Happy New Year!'],
+                    ],
+                ],
+                ['index' => 2, 'name' => 'Second', 'days' => 15],
+                ['index' => 3, 'name' => 'Third', 'days' => 20],
+            ],
+            [
+                ['name' => 'AD', 'startYear' => 0],
+            ],
+            [
+                ['index' => 1, 'name' => 'First Day'],
+                ['index' => 2, 'name' => 'Second Day'],
+                ['index' => 3, 'name' => 'Party Day'],
+            ],
+            new MoonCycle(10),
         );
-
-        $calendar->setMonths($months);
-
-        return $calendar;
     }
 }
