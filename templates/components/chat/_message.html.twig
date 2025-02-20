@@ -47,6 +47,11 @@
         <div class="card placeholder-glow">
             <div class="card-header">
                 <h3 class="card-title">{{ role }}</h3>
+                {% if isAssistant %}
+                    <div class="card-actions btn-actions d-none">
+                        <a href="#" title="Dokument erstellen" class="btn-action takeover-document">{{ ux_icon('tabler:file-plus') }}</a>
+                    </div>
+                {% endif %}
             </div>
             <div class="card-body message">
                 {% if isAssistant %}

@@ -160,6 +160,10 @@ class StreamedChat extends AbstractController
             echo 'data: ' . json_encode([
                 'type' => 'complete',
                 'id' => $fullMessage->id,
+                'convertToDocumentTarget' => $this->generateUrl(
+                    'library_document_create',
+                    ['conversation' => $conversation->getId(), 'conversation_message' => $fullMessage->id],
+                ),
             ], JSON_THROW_ON_ERROR) . "\n\n";
             ob_flush();
             flush();

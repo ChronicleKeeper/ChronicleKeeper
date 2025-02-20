@@ -26,6 +26,7 @@ import { marked } from 'marked';
  * @typedef {Object} CompleteMessage
  * @property {'complete'} type
  * @property {string} id
+ * @property {string} convertToDocumentTarget
  */
 
 /**
@@ -241,7 +242,7 @@ export default class ChatStreamController extends Controller {
                 });
                 break;
             case CONFIG.MESSAGE_TYPES.COMPLETE:
-                this.#handleCompleteMessage(data.id, botMessage);
+                this.#handleCompleteMessage(data, botMessage);
                 this.scrollToBottom();
                 break;
         }
@@ -259,12 +260,30 @@ export default class ChatStreamController extends Controller {
 
     /**
      * @private
-     * @param {string} messageId
+     * @param {CompleteMessage} data
      * @param {HTMLElement} message
      */
-    #handleCompleteMessage(messageId, message) {
+    #handleCompleteMessage(data, message) {
+        const messageId = data.id;
+
         message.id = `message-${messageId}`;
         message.dataset.messageId = messageId;
+
+        this.#addDocumentToLibraryLink(data, message);
+    }
+
+    /**
+     * @private
+     * @param {CompleteMessage} data
+     * @param {HTMLElement} message
+     */
+    #addDocumentToLibraryLink(data, message) {
+        const actionsArea = message.querySelector('.card-actions');
+        const documentButton = actionsArea.querySelector('.takeover-document');
+        if (documentButton) {
+            documentButton.href = data.convertToDocumentTarget;
+            actionsArea.classList.remove('d-none');
+        }
     }
 
     /**
