@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ChronicleKeeper\World\Application\Command;
 
 use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
+use ChronicleKeeper\Shared\Infrastructure\Messenger\MessageEventResult;
 use ChronicleKeeper\World\Domain\ValueObject\ConversationReference;
 use ChronicleKeeper\World\Domain\ValueObject\DocumentReference;
 use ChronicleKeeper\World\Domain\ValueObject\ImageReference;
@@ -18,7 +19,7 @@ class StoreWorldItemHandler
     {
     }
 
-    public function __invoke(StoreWorldItem $command): void
+    public function __invoke(StoreWorldItem $command): MessageEventResult
     {
         try {
             $this->platform->beginTransaction();
@@ -84,5 +85,7 @@ class StoreWorldItemHandler
 
             throw $e;
         }
+
+        return new MessageEventResult($command->item->flushEvents());
     }
 }
