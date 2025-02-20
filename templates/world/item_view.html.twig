@@ -63,7 +63,7 @@
                                             {% if media.type == 'document' %}
                                                 <a href="{{ path('library_document_view', {'document': media.mediaId}) }}" title="Ansehen">{{ ux_icon('tabler:file-search') }}</a>
                                             {% elseif media.type == 'conversation' %}
-                                                <a href="{{ path('chat', {'conversation': media.mediaId}) }}" title="Gespräch fortführen">{{ ux_icon('tabler:message-2-share') }}</a>
+                                                <a href="{{ path('chat', {'conversationId': media.mediaId}) }}" title="Gespräch fortführen">{{ ux_icon('tabler:message-2-share') }}</a>
                                             {% elseif media.type == 'image' %}
                                                 <a href="{{ path('library_image_view', {'image': media.mediaId}) }}" title="Ansehen">{{ ux_icon('tabler:photo-search') }}</a>
                                             {% endif %}

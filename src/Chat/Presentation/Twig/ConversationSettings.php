@@ -112,6 +112,6 @@ class ConversationSettings extends AbstractController
 
         $this->bus->dispatch(new StoreConversationCommand($this->conversation));
 
-        return $this->redirectToRoute('chat', ['conversation' => $this->conversation->getId()]);
+        return $this->redirectToRoute('chat', ['conversationId' => $this->conversation->getId()]);
     }
 }

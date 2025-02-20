@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Test\ImageGenerator\Application\Service;
 
-use ChronicleKeeper\Chat\Application\Service\ChatMessageExecution;
+use ChronicleKeeper\Chat\Application\Service\SingleChatMessageExecution;
 use ChronicleKeeper\Chat\Domain\Entity\Conversation;
 use ChronicleKeeper\Chat\Domain\Entity\ExtendedMessage;
 use ChronicleKeeper\ImageGenerator\Application\Service\PromptOptimizer;
@@ -29,7 +29,7 @@ class PromptOptimizerTest extends TestCase
             ->method('getDefaultForPurpose')
             ->willReturn(SystemPrompt::createSystemPrompt('foo', Purpose::IMAGE_GENERATOR_OPTIMIZER, 'bar', 'baz'));
 
-        $chatMessageExecution = $this->createMock(ChatMessageExecution::class);
+        $chatMessageExecution = $this->createMock(SingleChatMessageExecution::class);
         $chatMessageExecution
             ->expects($this->once())
             ->method('execute')

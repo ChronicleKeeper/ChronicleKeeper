@@ -1,7 +1,7 @@
 {% extends 'layout.html.twig' %}
 {% import "components/chat/_message.html.twig" as message_macros %}
 
-{% block page_title %}Streaming Chat{% endblock %}
+{% block page_title %}{{ conversation.title }}{% endblock %}
 
 {% block page_content %}
     <div class="container-xl" data-controller="chat-stream" data-conversation-id="{{ isTemporary ? '' : conversation.id }}">

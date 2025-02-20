@@ -108,7 +108,7 @@ class FavoritesOffcanvas
         }
 
         if ($target instanceof ChatConversationTarget) {
-            return $this->router->generate('chat', ['conversation' => $target->getId()]);
+            return $this->router->generate('chat', ['conversationId' => $target->getId()]);
         }
 
         if ($target instanceof WorldItemTarget) {

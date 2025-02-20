@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Test\Chat\Application\Service;
 
-use ChronicleKeeper\Chat\Application\Service\ChatMessageExecution;
+use ChronicleKeeper\Chat\Application\Service\SingleChatMessageExecution;
 use ChronicleKeeper\Chat\Infrastructure\LLMChain\RuntimeCollector;
 use ChronicleKeeper\Document\Infrastructure\LLMChain\DocumentSearch;
 use ChronicleKeeper\Library\Infrastructure\LLMChain\Tool\ImageSearch;
@@ -21,9 +21,9 @@ use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(ChatMessageExecution::class)]
+#[CoversClass(SingleChatMessageExecution::class)]
 #[Small]
-class ChatMessageExecutionTest extends TestCase
+class SingleChatMessageExecutionTest extends TestCase
 {
     #[Test]
     public function itWorksAsExpectedAtMinimalService(): void
@@ -48,7 +48,7 @@ class ChatMessageExecutionTest extends TestCase
 
         $runtimeCollector = self::createStub(RuntimeCollector::class);
 
-        $chatMessageExecution = new ChatMessageExecution(
+        $chatMessageExecution = new SingleChatMessageExecution(
             $chainFactory,
             $serarchDocuments,
             $searchImages,

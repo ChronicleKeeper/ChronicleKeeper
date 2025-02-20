@@ -105,6 +105,6 @@ class StoreConversation extends AbstractController
                 : 'Die Unterhaltung wurde erfolgreich aktualisiert.',
         );
 
-        return $this->redirectToRoute('chat', ['conversation' => $conversationData->getId()]);
+        return $this->redirectToRoute('chat', ['conversationId' => $conversationData->getId()]);
     }
 }

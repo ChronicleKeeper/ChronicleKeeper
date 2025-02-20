@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\ImageGenerator\Application\Service;
 
-use ChronicleKeeper\Chat\Application\Service\ChatMessageExecution;
+use ChronicleKeeper\Chat\Application\Service\SingleChatMessageExecution;
 use ChronicleKeeper\Chat\Domain\Entity\Conversation;
 use ChronicleKeeper\Chat\Domain\Entity\ExtendedMessage;
 use ChronicleKeeper\Settings\Application\Service\SystemPromptRegistry;
@@ -18,7 +18,7 @@ use function assert;
 class PromptOptimizer
 {
     public function __construct(
-        private readonly ChatMessageExecution $chatMessageExecution,
+        private readonly SingleChatMessageExecution $chatMessageExecution,
         private readonly SystemPromptRegistry $systemPromptRegistry,
     ) {
     }

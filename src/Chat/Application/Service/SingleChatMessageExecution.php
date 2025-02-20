@@ -18,7 +18,7 @@ use PhpLlm\LlmChain\Model\Response\TextResponse;
 
 use function assert;
 
-class ChatMessageExecution
+class SingleChatMessageExecution
 {
     public function __construct(
         private readonly LLMChainFactory $chain,
