@@ -85,4 +85,45 @@ class TargetBagTest extends TestCase
             $targetBag->jsonSerialize(),
         );
     }
+
+    #[Test]
+    public function replaceExistingEntry(): void
+    {
+        $target = new ChatConversationTarget(
+            'f3ce2cce-888d-4812-8470-72cdd96faf4c',
+            'Chat Conversation',
+        );
+
+        $updatedTarget = new ChatConversationTarget(
+            'f3ce2cce-888d-4812-8470-72cdd96faf4c',
+            'Updated Chat Conversation',
+        );
+
+        $targetBag = new TargetBag($target);
+        $targetBag->replace($updatedTarget);
+
+        self::assertTrue($targetBag->exists($updatedTarget));
+        self::assertSame(
+            [$updatedTarget],
+            $targetBag->jsonSerialize(),
+        );
+    }
+
+    #[Test]
+    public function replaceNonExistingEntry(): void
+    {
+        $target = new ChatConversationTarget(
+            'f3ce2cce-888d-4812-8470-72cdd96faf4c',
+            'Chat Conversation',
+        );
+
+        $targetBag = new TargetBag();
+        $targetBag->replace($target);
+
+        self::assertTrue($targetBag->exists($target));
+        self::assertSame(
+            [$target],
+            $targetBag->jsonSerialize(),
+        );
+    }
 }

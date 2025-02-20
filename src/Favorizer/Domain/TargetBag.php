@@ -29,6 +29,12 @@ class TargetBag extends ArrayObject implements JsonSerializable
         return false;
     }
 
+    public function replace(Target $target): void
+    {
+        $this->remove($target);
+        $this->append($target);
+    }
+
     public function remove(Target $target): void
     {
         foreach ($this as $key => $checkTarget) {
