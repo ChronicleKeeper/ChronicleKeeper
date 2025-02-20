@@ -16,6 +16,9 @@
 - The directory cache in the library is gone again, it is not needed anymore after SQLite and PostgreSQL implementation.
 - Update Dependencies to the latest versions.
 
+**Fixed**
+- The favorites did not recognize when an entry was renamed.
+
 ## [alpha-0.7] - Moving Forward
 
 **Added**
