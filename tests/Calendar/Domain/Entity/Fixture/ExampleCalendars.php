@@ -9,6 +9,7 @@ use ChronicleKeeper\Calendar\Domain\Entity\Calendar\Configuration;
 use ChronicleKeeper\Calendar\Domain\Entity\Calendar\DayCollection;
 use ChronicleKeeper\Calendar\Domain\Entity\Calendar\EpochCollection;
 use ChronicleKeeper\Calendar\Domain\Entity\Calendar\Month;
+use ChronicleKeeper\Calendar\Domain\Entity\Calendar\MonthCollection;
 use ChronicleKeeper\Calendar\Domain\Entity\Calendar\MoonCycle;
 use ChronicleKeeper\Calendar\Domain\Entity\Calendar\WeekConfiguration;
 use ChronicleKeeper\Calendar\Domain\ValueObject\Epoch;
@@ -25,13 +26,15 @@ class ExampleCalendars
         $dayCollection = new DayCollection(10);
         $thirdMonth    = new Month($calendar, 3, 'ThirdMonth', $dayCollection);
 
-        $calendar->setMonths(
+        $months = new MonthCollection(
             new Month($calendar, 1, 'FirstMonth', new DayCollection(
                 10,
             )),
             $thirdMonth,
             new Month($calendar, 2, 'SecondMonth', new DayCollection(15)),
         );
+
+        $calendar->setMonths($months);
 
         return $calendar;
     }
@@ -51,7 +54,7 @@ class ExampleCalendars
             new WeekDay(7, 'Sunday'),
         ));
 
-        $calendar->setMonths(
+        $months = new MonthCollection(
             new Month($calendar, 1, 'January', new DayCollection(31)),
             new Month($calendar, 2, 'February', new DayCollection(28)),
             new Month($calendar, 3, 'March', new DayCollection(31)),
@@ -65,6 +68,8 @@ class ExampleCalendars
             new Month($calendar, 11, 'November', new DayCollection(30)),
             new Month($calendar, 12, 'December', new DayCollection(31)),
         );
+
+        $calendar->setMonths($months);
 
         return $calendar;
     }
@@ -87,7 +92,7 @@ class ExampleCalendars
             new WeekDay(10, 'Tenthday'),
         ));
 
-        $calendar->setMonths(
+        $months = new MonthCollection(
             new Month($calendar, 1, 'Taranis', new DayCollection(
                 30,
                 new LeapDay(3, 'Mithwinter'),
@@ -118,6 +123,8 @@ class ExampleCalendars
             new Month($calendar, 12, 'Nox', new DayCollection(30)),
         );
 
+        $calendar->setMonths($months);
+
         return $calendar;
     }
 
@@ -132,7 +139,7 @@ class ExampleCalendars
             new WeekDay(3, 'Party Day'),
         ));
 
-        $calendar->setMonths(
+        $months = new MonthCollection(
             new Month($calendar, 1, 'First', new DayCollection(
                 10,
                 new LeapDay(1, 'Happy New Year!'),
@@ -140,6 +147,8 @@ class ExampleCalendars
             new Month($calendar, 2, 'Second', new DayCollection(15)),
             new Month($calendar, 3, 'Third', new DayCollection(20)),
         );
+
+        $calendar->setMonths($months);
 
         return $calendar;
     }

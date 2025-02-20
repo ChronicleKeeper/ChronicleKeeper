@@ -133,7 +133,7 @@ class CalendarDate
         } catch (MonthNotExists) {
             // There is no previous month, so we have to go back a year and start with the last month
             $previousYear             = $this->year - 1;
-            $previousMonth            = $this->calendar->getMonth(count($this->calendar->getMonths()));
+            $previousMonth            = $this->calendar->getMonth($this->calendar->getMonths()->count());
             $daysLeftAfterMonthChange = $days - $this->day;
 
             $yearStartDate = new CalendarDate(

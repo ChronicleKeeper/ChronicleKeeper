@@ -5,9 +5,7 @@ declare(strict_types=1);
 namespace ChronicleKeeper\Test\Calendar\Domain\Entity;
 
 use ChronicleKeeper\Calendar\Domain\Entity\Calendar;
-use ChronicleKeeper\Calendar\Domain\Entity\Calendar\Configuration;
-use ChronicleKeeper\Calendar\Domain\Entity\Calendar\DayCollection;
-use ChronicleKeeper\Calendar\Domain\Entity\Calendar\Month;
+use ChronicleKeeper\Calendar\Domain\Entity\Calendar\MonthCollection;
 use ChronicleKeeper\Calendar\Domain\Exception\MonthNotExists;
 use ChronicleKeeper\Calendar\Domain\Exception\YearHasNotASequentialListOfMonths;
 use ChronicleKeeper\Calendar\Domain\Exception\YearIsNotStartingWithFirstMonth;
@@ -37,60 +35,6 @@ class CalendarTest extends TestCase
     }
 
     #[Test]
-    #[DataProvider('provideCountInYearCases')]
-    public function itCanCountTheDaysInAYear(Calendar $calendar, int $year, int $expectedDays): void
-    {
-        self::assertSame($expectedDays, $calendar->countDaysInYear($year));
-    }
-
-    public static function provideCountInYearCases(): Generator
-    {
-        $calendar = ExampleCalendars::getOnlyRegularDays();
-
-        yield 'Regular Days Only Calendar - Year 0' => [$calendar, 0, 365];
-        yield 'Regular Days Only Calendar - Year 1' => [$calendar, 1, 365];
-        yield 'Regular Days Only Calendar - Year 2' => [$calendar, 1, 365];
-        yield 'Regular Days Only Calendar - Year 3' => [$calendar, 1, 365];
-        yield 'Regular Days Only Calendar - Year 4' => [$calendar, 1, 365];
-
-        $calendar = ExampleCalendars::getLinearWithLeapDays();
-
-        yield 'Linear Calendar with Leap Days - Year 0' => [$calendar, 0, 366];
-        yield 'Linear Calendar with Leap Days - Year 1' => [$calendar, 1, 365];
-        yield 'Linear Calendar with Leap Days - Year 2' => [$calendar, 2, 365];
-        yield 'Linear Calendar with Leap Days - Year 3' => [$calendar, 3, 365];
-        yield 'Linear Calendar with Leap Days - Year 4' => [$calendar, 4, 366];
-    }
-
-    #[Test]
-    public function itIsWorkingWithAnEmptyListOfMonths(): void
-    {
-        $calendar = new Calendar(new Configuration());
-        self::assertSame(0, $calendar->countDaysInYear(1));
-    }
-
-    #[Test]
-    public function itFailsSettingMonthsWithIndexNotStartingWithOne(): void
-    {
-        $this->expectException(YearIsNotStartingWithFirstMonth::class);
-
-        $calendar = new Calendar(new Configuration());
-        $calendar->setMonths(new Month($calendar, 2, 'SecondMonth', new DayCollection(10)));
-    }
-
-    #[Test]
-    public function itFailsSettingMonthsWithNonSequentialIndexes(): void
-    {
-        $this->expectException(YearHasNotASequentialListOfMonths::class);
-
-        $calendar = new Calendar(new Configuration());
-        $calendar->setMonths(
-            new Month($calendar, 1, 'FirstMonth', new DayCollection(10)),
-            new Month($calendar, 3, 'ThirdMonth', new DayCollection(10)),
-        );
-    }
-
-    #[Test]
     public function itFailsGettingNonExistentMonth(): void
     {
         $this->expectException(MonthNotExists::class);
@@ -103,9 +47,9 @@ class CalendarTest extends TestCase
     public function itFailsOverwritingTheAlreadySetMonths(): void
     {
         $calendar = $this->getCalendar();
-        $calendar->setMonths();
+        $calendar->setMonths($overwrite = new MonthCollection());
 
-        self::assertNotSame(0, $calendar->countDaysInYear(1));
+        self::assertNotSame($calendar->getMonths(), $overwrite);
     }
 
     private function getCalendar(): Calendar

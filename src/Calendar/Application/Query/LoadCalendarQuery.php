@@ -9,6 +9,7 @@ use ChronicleKeeper\Calendar\Domain\Entity\Calendar\Configuration;
 use ChronicleKeeper\Calendar\Domain\Entity\Calendar\DayCollection;
 use ChronicleKeeper\Calendar\Domain\Entity\Calendar\EpochCollection;
 use ChronicleKeeper\Calendar\Domain\Entity\Calendar\Month;
+use ChronicleKeeper\Calendar\Domain\Entity\Calendar\MonthCollection;
 use ChronicleKeeper\Calendar\Domain\Entity\Calendar\MoonCycle;
 use ChronicleKeeper\Calendar\Domain\Entity\Calendar\WeekConfiguration;
 use ChronicleKeeper\Calendar\Domain\ValueObject\Epoch;
@@ -24,7 +25,7 @@ final class LoadCalendarQuery implements Query
         $calendar = new Calendar(new Configuration());
 
         // Configure Months
-        $calendar->setMonths(
+        $calendar->setMonths(new MonthCollection(
             new Month($calendar, 1, 'Taranis', new DayCollection(
                 25,
                 new LeapDay(21, 'Mittwinter'),
@@ -46,7 +47,7 @@ final class LoadCalendarQuery implements Query
                 30,
             )),
             new Month($calendar, 12, 'Nox', new DayCollection(30)),
-        );
+        ));
 
         // Configure Epochs
         $calendar->setEpochCollection(new EpochCollection(

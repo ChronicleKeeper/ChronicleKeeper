@@ -7,25 +7,13 @@ namespace ChronicleKeeper\Calendar\Domain\Entity;
 use ChronicleKeeper\Calendar\Domain\Entity\Calendar\Configuration;
 use ChronicleKeeper\Calendar\Domain\Entity\Calendar\EpochCollection;
 use ChronicleKeeper\Calendar\Domain\Entity\Calendar\Month;
+use ChronicleKeeper\Calendar\Domain\Entity\Calendar\MonthCollection;
 use ChronicleKeeper\Calendar\Domain\Entity\Calendar\MoonCycle;
 use ChronicleKeeper\Calendar\Domain\Entity\Calendar\WeekConfiguration;
-use ChronicleKeeper\Calendar\Domain\Exception\MonthNotExists;
-use ChronicleKeeper\Calendar\Domain\Exception\YearHasNotASequentialListOfMonths;
-use ChronicleKeeper\Calendar\Domain\Exception\YearIsNotStartingWithFirstMonth;
-
-use function array_combine;
-use function array_keys;
-use function array_map;
-use function array_reduce;
-use function count;
-use function range;
-use function reset;
-use function usort;
 
 class Calendar
 {
-    /** @var array<int, Month> */
-    private array $months = [];
+    private MonthCollection $months;
 
     /** @var array<int, int> */
     private array $cachedDaysInYear = [];
@@ -44,31 +32,16 @@ class Calendar
     public function __construct(
         private readonly Configuration $configuration,
     ) {
+        $this->months = new MonthCollection();
     }
 
-    public function setMonths(Month ...$months): void
+    public function setMonths(MonthCollection $months): void
     {
-        if ($months === []) {
+        if (isset($this->months) && $this->months->count() > 0) {
             return;
         }
 
-        usort($months, static fn (Month $a, Month $b) => $a->indexInYear <=> $b->indexInYear);
-
-        $this->months = array_combine(
-            array_map(static fn (Month $month) => $month->indexInYear, $months),
-            $months,
-        );
-
-        // Check if the numeric indexes of the months are valid
-        $firstMonth = reset($months);
-        if ($firstMonth->indexInYear !== 1) {
-            throw new YearIsNotStartingWithFirstMonth();
-        }
-
-        // Check if the numeric indexes of the months are a sequence from lowest to highest
-        if (array_keys($this->months) !== range(1, count($this->months))) {
-            throw new YearHasNotASequentialListOfMonths();
-        }
+        $this->months = $months;
     }
 
     public function setEpochCollection(EpochCollection $epochCollection): void
@@ -113,8 +86,7 @@ class Calendar
         return $this->moonCycle;
     }
 
-    /** @return Month[] */
-    public function getMonths(): array
+    public function getMonths(): MonthCollection
     {
         return $this->months;
     }
@@ -126,7 +98,7 @@ class Calendar
 
     public function getMonth(int $index): Month
     {
-        return $this->months[$index] ?? throw new MonthNotExists($index);
+        return $this->months->get($index);
     }
 
     /** @return array{days: int, leapDays: int} */
@@ -136,8 +108,8 @@ class Calendar
             $days     = 0;
             $leapDays = 0;
             for ($i = $this->configuration->beginsInYear; $i < $year; $i++) {
-                $days     += $this->countDaysInYear($i);
-                $leapDays += $this->countLeapDaysInYear($i);
+                $days     += $this->months->countDaysInYear($i);
+                $leapDays += $this->months->countLeapDaysInYear($i);
             }
 
             $this->cachedDaysInYear[$year]     = $days;
@@ -172,23 +144,5 @@ class Calendar
             'days' => $this->cachedDaysInMonth[$year][$month],
             'leapDays' => $this->cachedLeapDaysInMonth[$year][$month],
         ];
-    }
-
-    public function countDaysInYear(int $year): int
-    {
-        return array_reduce(
-            $this->months,
-            static fn (int $carry, Month $month) => $carry + $month->days->countInYear($year),
-            0,
-        );
-    }
-
-    public function countLeapDaysInYear(int $year): int
-    {
-        return array_reduce(
-            $this->months,
-            static fn (int $carry, Month $month) => $carry + $month->days->countLeapDaysInYear($year),
-            0,
-        );
     }
 }
