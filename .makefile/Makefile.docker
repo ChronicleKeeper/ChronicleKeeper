@@ -1,0 +1,16 @@
+SHELL := /bin/bash
+.PHONY: *
+
+docker-build:
+ifeq ($(APP_ENV),prod)
+	docker compose -f compose.yaml -f compose.prod.yaml build
+else
+	docker compose --profile=dev build
+endif
+
+docker-up:
+ifeq ($(APP_ENV),prod)
+	docker compose -f compose.yaml -f compose.prod.yaml up --wait
+else
+	docker compose --profile=dev up --wait
+endif
