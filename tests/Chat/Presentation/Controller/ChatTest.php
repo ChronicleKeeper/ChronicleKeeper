@@ -4,6 +4,11 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Test\Chat\Presentation\Controller;
 
+use ChronicleKeeper\Chat\Application\Query\FindConversationByIdParameters;
+use ChronicleKeeper\Chat\Application\Query\FindConversationByIdQuery;
+use ChronicleKeeper\Chat\Application\Query\GetTemporaryConversationParameters;
+use ChronicleKeeper\Chat\Application\Query\GetTemporaryConversationQuery;
+use ChronicleKeeper\Chat\Application\Service\ExtendedMessageBagToViewConverter;
 use ChronicleKeeper\Chat\Domain\Entity\Conversation;
 use ChronicleKeeper\Chat\Presentation\Controller\Chat;
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
@@ -24,6 +29,11 @@ use function json_encode;
 use const JSON_THROW_ON_ERROR;
 
 #[CoversClass(Chat::class)]
+#[CoversClass(ExtendedMessageBagToViewConverter::class)]
+#[CoversClass(FindConversationByIdParameters::class)]
+#[CoversClass(FindConversationByIdQuery::class)]
+#[CoversClass(GetTemporaryConversationParameters::class)]
+#[CoversClass(GetTemporaryConversationQuery::class)]
 #[Large]
 class ChatTest extends WebTestCase
 {
