@@ -1,0 +1,100 @@
+{% extends 'layout.html.twig' %}
+{% import "components/chat/_message.html.twig" as message_macros %}
+
+{% block page_title %}{{ conversation.title }}{% endblock %}
+
+{% block page_content %}
+    <div class="container-xl" data-controller="chat-stream" data-conversation-id="{{ isTemporary ? '' : conversation.id }}">
+       <div class="row row-deck row-cards chatbot-message" data-chat-stream-target="messages">
+           <!-- The Messages that are alredy existing ... --->
+           {% for message in messages %}
+               {% include 'components/chat/_message.html.twig' with { conversation, message } %}
+           {% endfor %}
+
+           <!-- The Loading State Messages, after message form was sent and we wait for response ... -->
+           {{ message_macros.loading(
+               settings_handler.get.chatbotGeneral.chatbotName,
+               'Knarzend klingen die Dielen, und ein staubiger Nebel liegt in der Luft, während die Archive durchsucht werden ...',
+               'loading-bot-message',
+               true
+           ) }}
+
+           {{ message_macros.loading(settings_handler.get.chatbotGeneral.chatterName, '', 'loading-user-message') }}
+       </div>
+
+        <div class="row row-deck row-cards mt-2">
+            <form data-action="submit->chat-stream#send" class="d-flex gap-2">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body p-1">
+                        <div class="input-group">
+                            <input data-chat-stream-target="input" type="text" class="form-control" placeholder="Wie kann ich dir bei der Erforschung der Welt behilflich sein?" required>
+                            <button class="btn btn-icon btn-outline-primary border-0" type="submit" data-chat-stream-target="storeButton">
+                                {{ ux_icon('tabler:arrow-right')}}
+                            </button>
+                            <button
+                                title="Speichern des Gespräches"
+                                class="btn btn-outline-secondary border-0 btn-icon"
+                                type="button"
+                                data-bs-toggle="modal"
+                                data-bs-target="#store-conversation-modal"
+                            >{{ ux_icon('tabler:device-floppy') }}</button>
+                            <button
+                                title="Einstellungen des Gespräches bearbeiten"
+                                class="btn btn-outline-secondary border-0 btn-icon"
+                                type="button"
+                                data-bs-toggle="modal"
+                                data-bs-target="#conversation-settings-modal"
+                            >{{ ux_icon('tabler:settings') }}</button>
+                            {% if not isTemporary %}
+                                <twig:Favorizer:AddToShortcuts
+                                    id="{{ conversation.id }}"
+                                    type="{{ constant('class', conversation) }}"
+                                    asButton="true"
+                                    extraClasses="btn-outline-secondary border-0"
+                                />
+                            {% endif %}
+                            <button
+                                title="Neues Gespräch starten"
+                                class="btn btn-outline-secondary border-0 btn-icon"
+                                type="button"
+                                data-bs-toggle="modal"
+                                data-bs-target="#create-conversation-modal"
+                            >{{ ux_icon('tabler:message-plus') }}</button>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </form>
+        </div>
+
+        <div class="position-fixed bottom-0 end-0 mb-5 me-3" style="z-index: 1000;">
+            <button class="btn btn-outline-primary p-2"
+                    data-chat-stream-target="scrollButton"
+                    data-action="click->chat-stream#scrollToBottom">
+                {{ ux_icon('tabler:arrow-down', {'class': 'icon icon-tabler icons-tabler-outline m-0'}) }}
+            </button>
+        </div>
+    </div>
+
+    {% component "Tabler:Modal" with {id: 'store-conversation-modal'} %}
+        {% block modal_full_content %}
+            {{ component('Chat:StoreConversation', { 'conversationId': not isTemporary ? conversation.id : null }) }}
+        {% endblock %}
+    {% endcomponent %}
+
+    {% set chatOptions = not isTemporary ? {'conversation': conversation} : {} %}
+
+    {% component "Tabler:Modal" with {id: 'conversation-settings-modal'} %}
+        {% block modal_full_content %}
+            {{ component('Chat:ConversationSettings', chatOptions) }}
+        {% endblock %}
+    {% endcomponent %}
+
+    {% component "Tabler:Modal" with {id: 'create-conversation-modal'} %}
+        {% block modal_full_content %}
+            {{ component('Chat:CreateConversation') }}
+        {% endblock %}
+    {% endcomponent %}
+{% endblock %}

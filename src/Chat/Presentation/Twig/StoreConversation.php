@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ChronicleKeeper\Chat\Presentation\Twig;
 
 use ChronicleKeeper\Chat\Application\Command\StoreConversation as StoreConversationCommand;
+use ChronicleKeeper\Chat\Application\Command\StoreTemporaryConversation;
 use ChronicleKeeper\Chat\Application\Query\FindConversationByIdParameters;
 use ChronicleKeeper\Chat\Application\Query\GetTemporaryConversationParameters;
 use ChronicleKeeper\Chat\Domain\Entity\Conversation;
@@ -19,8 +20,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
 use Symfony\UX\LiveComponent\Attribute\LiveAction;
-use Symfony\UX\LiveComponent\Attribute\LiveArg;
-use Symfony\UX\LiveComponent\Attribute\LiveListener;
 use Symfony\UX\LiveComponent\Attribute\LiveProp;
 use Symfony\UX\LiveComponent\ComponentWithFormTrait;
 use Symfony\UX\LiveComponent\DefaultActionTrait;
@@ -76,20 +75,6 @@ class StoreConversation extends AbstractController
         return $this->createForm(StoreConversationType::class, $this->conversation);
     }
 
-    #[LiveListener('conversation_updated')]
-    public function updateConversation(
-        #[LiveArg]
-        string $conversationId,
-    ): void {
-        $conversation = $this->queryService->query(new FindConversationByIdParameters($conversationId));
-        if ($conversation === null) {
-            $conversation = $this->queryService->query(new GetTemporaryConversationParameters());
-        }
-
-        $this->conversation = $conversation;
-        $this->getForm()->setData($this->conversation);
-    }
-
     #[LiveAction]
     public function store(Request $request): Response
     {
@@ -103,9 +88,14 @@ class StoreConversation extends AbstractController
 
         if ($this->isTemporary === true) {
             $conversationData = Conversation::createFromConversation($conversationData);
-        }
+            $this->bus->dispatch(new StoreConversationCommand($conversationData));
 
-        $this->bus->dispatch(new StoreConversationCommand($conversationData));
+            $tempConversation = Conversation::createFromConversation($conversationData);
+            $tempConversation->getMessages()->reset();
+            $this->bus->dispatch(new StoreTemporaryConversation($tempConversation));
+        } else {
+            $this->bus->dispatch(new StoreConversationCommand($conversationData));
+        }
 
         $this->addFlashMessage(
             $request,
@@ -115,6 +105,6 @@ class StoreConversation extends AbstractController
                 : 'Die Unterhaltung wurde erfolgreich aktualisiert.',
         );
 
-        return $this->redirectToRoute('chat', ['conversation' => $conversationData->getId()]);
+        return $this->redirectToRoute('chat', ['conversationId' => $conversationData->getId()]);
     }
 }

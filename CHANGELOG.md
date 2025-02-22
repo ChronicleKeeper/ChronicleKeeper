@@ -1,9 +1,10 @@
 # Changelog
 
-## [alpha-0.8] - First Steps to the Cloud
+## [alpha-0.8] - Steps to the cloud
 
 **Added**
-- Added PostgreSQL support to the database layer.
+- Database: PostgreSQL support for enhanced scalability
+- Chat Interface: Live streaming of LLM responses to show real-time "thinking"
 
 **Changed**
 - Some forms now contain an improved footer with more button submit choiced
@@ -17,7 +18,7 @@
 - Update Dependencies to the latest versions.
 
 **Fixed**
-- The favorites did not recognize when an entry was renamed.
+- Favorites now properly track renamed entries
 
 ## [alpha-0.7] - Moving Forward
 

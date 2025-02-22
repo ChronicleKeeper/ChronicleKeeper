@@ -48,7 +48,7 @@
         <td class="text-secondary"></td>
         <td class="text-secondary"></td>
         <td>
-            <a href="{{ path('chat', {'conversation': conversation.id}) }}" title="Gespräch fortführen">{{ ux_icon('tabler:message-2-share') }}</a>
+            <a href="{{ path('chat', {'conversationId': conversation.id}) }}" title="Gespräch fortführen">{{ ux_icon('tabler:message-2-share') }}</a>
             <twig:Favorizer:AddToShortcuts id="{{ conversation.id }}" type="{{ 'ChronicleKeeper\\Chat\\Domain\\Entity\\Conversation' }}" />
             <a href="{{ path('chat_delete', {'conversation': conversation.id}) }}"
                title="Gespräch löschen"

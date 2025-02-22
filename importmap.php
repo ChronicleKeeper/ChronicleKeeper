@@ -26,19 +26,19 @@ return [
         'version' => '3.2.2',
     ],
     '@hotwired/turbo' => [
-        'version' => '8.0.4',
+        'version' => '8.0.12',
     ],
     '@toast-ui/editor' => [
         'version' => '3.2.2',
     ],
     'prosemirror-model' => [
-        'version' => '1.19.4',
+        'version' => '1.24.1',
     ],
     'prosemirror-view' => [
-        'version' => '1.32.7',
+        'version' => '1.38.0',
     ],
     'prosemirror-transform' => [
-        'version' => '1.10.0',
+        'version' => '1.10.2',
     ],
     'prosemirror-state' => [
         'version' => '1.4.3',
@@ -47,13 +47,13 @@ return [
         'version' => '1.2.2',
     ],
     'prosemirror-commands' => [
-        'version' => '1.5.2',
+        'version' => '1.6.2',
     ],
     'prosemirror-inputrules' => [
-        'version' => '1.3.0',
+        'version' => '1.4.0',
     ],
     'prosemirror-history' => [
-        'version' => '1.3.2',
+        'version' => '1.4.1',
     ],
     'orderedmap' => [
         'version' => '2.1.1',
@@ -65,7 +65,7 @@ return [
         'version' => '1.3.4',
     ],
     'prosemirror-view/style/prosemirror.min.css' => [
-        'version' => '1.32.7',
+        'version' => '1.38.0',
         'type' => 'css',
     ],
     '@toast-ui/editor/dist/toastui-editor.css' => [
@@ -73,7 +73,7 @@ return [
         'type' => 'css',
     ],
     'tom-select' => [
-        'version' => '2.4.1',
+        'version' => '2.4.3',
     ],
     '@orchidjs/sifter' => [
         'version' => '1.1.0',
@@ -82,7 +82,7 @@ return [
         'version' => '1.1.2',
     ],
     'tom-select/dist/css/tom-select.default.min.css' => [
-        'version' => '2.4.1',
+        'version' => '2.4.3',
         'type' => 'css',
     ],
     '@popperjs/core' => [
@@ -98,5 +98,8 @@ return [
     ],
     'bootstrap' => [
         'version' => '5.3.3',
+    ],
+    'marked' => [
+        'version' => '15.0.7',
     ],
 ];

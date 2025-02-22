@@ -28,6 +28,11 @@ final class ExtendedMessageBag extends ArrayObject implements JsonSerializable
         ));
     }
 
+    public function reset(): void
+    {
+        $this->exchangeArray([$this[0]]);
+    }
+
     /** @return list<ExtendedMessage> */
     public function jsonSerialize(): array
     {

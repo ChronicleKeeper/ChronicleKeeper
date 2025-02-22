@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ChronicleKeeper\Chat\Presentation\Twig\Chat;
+namespace ChronicleKeeper\Chat\Application\Service;
 
 use ChronicleKeeper\Chat\Domain\Entity\ExtendedMessage;
 use ChronicleKeeper\Chat\Domain\Entity\ExtendedMessageBag;

@@ -1,5 +1,5 @@
 {% set last_conversation = app.session.get('last_conversation') %}
-{% set home_url = last_conversation is defined and last_conversation is not null ? path('chat', {'conversation': last_conversation}) : path('chat') %}
+{% set home_url = last_conversation is defined and last_conversation is not null ? path('chat', {'conversationId': last_conversation}) : path('chat') %}
 
 {% set isFirstStart = settings_handler.get.application.hasOpenAIApiKey is same as false %}
 
