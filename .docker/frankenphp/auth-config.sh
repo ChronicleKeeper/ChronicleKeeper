@@ -15,4 +15,7 @@ if [ -n "$BASIC_AUTH_USER" ] && [ -n "$BASIC_AUTH_PASSWORD" ]; then
         }
     }
 EOF
+else
+    # Create empty file when no credentials are provided
+    : > /etc/caddy/auth.conf
 fi

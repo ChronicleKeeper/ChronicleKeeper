@@ -5,10 +5,6 @@ FROM frankenphp_upstream AS chronicle_keeper_base
 WORKDIR /app
 VOLUME /app/var/
 
-RUN apt-get update && \
-    apt-get install -y apache2-utils && \
-    rm -rf /var/lib/apt/lists/*
-
 RUN install-php-extensions \
     @composer \
 	gd \
