@@ -16,6 +16,8 @@ class LLMChainFactoryDouble extends LLMChainFactory
 {
     /** @var array<class-string<Model>, ResponseInterface> */
     private array $knownResponses = [];
+    /** @var array<string, ResponseInterface> */
+    private array $knownCalls = [];
 
     /** @phpstan-ignore constructor.missingParentCall */
     public function __construct()
@@ -25,11 +27,18 @@ class LLMChainFactoryDouble extends LLMChainFactory
     #[Override]
     public function create(): ChainInterface
     {
-        return new class implements ChainInterface {
+        $knownCalls = $this->knownCalls;
+
+        return new class ($knownCalls) implements ChainInterface {
+            /** @param array<string, ResponseInterface> $knownCalls */
+            public function __construct(private readonly array $knownCalls = [])
+            {
+            }
+
             /** @inheritDoc */
             public function call(MessageBagInterface $messages, array $options = []): ResponseInterface
             {
-                return new class implements ResponseInterface {
+                return $this->knownCalls[$options['model']] ?? new class implements ResponseInterface {
                     public function getContent(): string
                     {
                         return 'Mocked Response';
@@ -67,5 +76,10 @@ class LLMChainFactoryDouble extends LLMChainFactory
     public function addPlatformResponse(string $model, ResponseInterface $response): void
     {
         $this->knownResponses[$model] = $response;
+    }
+
+    public function addCallResponse(string $model, ResponseInterface $response): void
+    {
+        $this->knownCalls[$model] = $response;
     }
 }

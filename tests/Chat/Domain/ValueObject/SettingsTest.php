@@ -50,4 +50,20 @@ class SettingsTest extends TestCase
         self::assertFalse($settings1->equals($settings3));
         self::assertFalse($settings2->equals($settings3));
     }
+
+    #[Test]
+    public function itCanSerializeToJson(): void
+    {
+        $settings = new Settings('customVersion', 0.9, 0.8, 0.9);
+
+        self::assertSame(
+            [
+                'version' => 'customVersion',
+                'temperature' => 0.9,
+                'images_max_distance' => 0.8,
+                'documents_max_distance' => 0.9,
+            ],
+            $settings->jsonSerialize(),
+        );
+    }
 }

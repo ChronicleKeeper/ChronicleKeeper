@@ -65,4 +65,20 @@ class ExtendedMessageBagTest extends TestCase
         self::assertSame($extendedMessage1, $serialized[0]);
         self::assertSame($extendedMessage2, $serialized[1]);
     }
+
+    #[Test]
+    public function resetsCorrectly(): void
+    {
+        $message1 = $this->createMock(MessageInterface::class);
+        $message2 = $this->createMock(MessageInterface::class);
+
+        $extendedMessage1 = new ExtendedMessage($message1);
+        $extendedMessage2 = new ExtendedMessage($message2);
+
+        $extendedMessageBag = new ExtendedMessageBag($extendedMessage1, $extendedMessage2);
+        $extendedMessageBag->reset();
+
+        self::assertCount(1, $extendedMessageBag);
+        self::assertSame($extendedMessage1, $extendedMessageBag[0]);
+    }
 }

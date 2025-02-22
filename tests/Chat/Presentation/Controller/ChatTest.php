@@ -16,8 +16,10 @@ use ChronicleKeeper\Test\Chat\Domain\Entity\ExtendedMessageBuilder;
 use ChronicleKeeper\Test\Chat\Domain\Entity\LLMChain\UserMessageBuilder;
 use ChronicleKeeper\Test\Shared\Infrastructure\Persistence\Filesystem\FileAccessDouble;
 use ChronicleKeeper\Test\WebTestCase;
+use Generator;
 use PhpLlm\LlmChain\Model\Message\Content\Text;
 use PhpLlm\LlmChain\Model\Message\UserMessage;
+use PhpLlm\LlmChain\Model\Response\StreamResponse;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Large;
 use PHPUnit\Framework\Attributes\Test;
@@ -25,6 +27,8 @@ use Symfony\Component\HttpFoundation\Request;
 
 use function assert;
 use function json_encode;
+use function ob_get_clean;
+use function ob_start;
 
 use const JSON_THROW_ON_ERROR;
 
@@ -134,5 +138,40 @@ class ChatTest extends WebTestCase
         $this->client->request(Request::METHOD_GET, '/chat/455af8a7-14f6-4516-910e-3bdb460c5418');
 
         self::assertResponseRedirects('/');
+    }
+
+    #[Test]
+    public function itWillStreamAMessageResponseCorrectlyWithEmptyResponse(): void
+    {
+        ob_start();
+        $this->client->request(Request::METHOD_GET, '/chat/stream/message?message=Hello&conversation=');
+        $response = (string) ob_get_clean();
+
+        self::assertResponseIsSuccessful();
+        self::assertStringContainsString('data: {"type":"complete"', $response);
+    }
+
+    #[Test]
+    public function itWillStreamAResponseFromAssistant(): void
+    {
+        $this->llmChainFactory->addCallResponse(
+            'gpt-4o-mini',
+            new StreamResponse($this->createGeneratorForStreamedResponse()),
+        );
+
+        ob_start();
+        $this->client->request(Request::METHOD_GET, '/chat/stream/message?message=Hello&conversation=');
+        $response = (string) ob_get_clean();
+
+        self::assertResponseIsSuccessful();
+        self::assertStringContainsString('data: {"type":"chunk","chunk":"Hello World"}', $response);
+        self::assertStringContainsString('data: {"type":"chunk","chunk":"Hello World Again"}', $response);
+        self::assertStringContainsString('data: {"type":"complete"', $response);
+    }
+
+    private function createGeneratorForStreamedResponse(): Generator
+    {
+        yield 'Hello World';
+        yield 'Hello World Again';
     }
 }
