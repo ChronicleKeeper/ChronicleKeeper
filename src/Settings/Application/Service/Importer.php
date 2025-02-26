@@ -42,7 +42,7 @@ class Importer
          * imported.
          */
         if (! version_compare($versionOfArchive, '0.7', '>=')) {
-            throw new RuntimeException('Only import from version 0.7 and higher is allowed for this version.');
+            throw new RuntimeException('Only import from version 0.7 or 0.8 is allowed for this version.');
         }
 
         if ($importSettings->pruneLibrary === true) {

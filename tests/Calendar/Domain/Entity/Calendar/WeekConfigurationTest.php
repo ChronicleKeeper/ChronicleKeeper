@@ -16,8 +16,6 @@ use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
-use function dump;
-
 #[CoversClass(WeekConfiguration::class)]
 #[CoversClass(WeekDay::class)]
 #[CoversClass(InvalidWeekConfiguration::class)]

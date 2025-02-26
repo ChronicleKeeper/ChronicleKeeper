@@ -6,9 +6,6 @@ namespace ChronicleKeeper\Settings\Presentation\Controller;
 
 use ChronicleKeeper\Settings\Application\SettingsHandler;
 use ChronicleKeeper\Settings\Presentation\Form\ApplicationType;
-use ChronicleKeeper\Settings\Presentation\Form\CalendarGeneralType;
-use ChronicleKeeper\Settings\Presentation\Form\CalendarHolidayType;
-use ChronicleKeeper\Settings\Presentation\Form\CalendarMoonType;
 use ChronicleKeeper\Settings\Presentation\Form\ChatbotGeneralType;
 use ChronicleKeeper\Settings\Presentation\Form\ChatbotTuningType;
 use ChronicleKeeper\Shared\Presentation\FlashMessages\Alert;
@@ -34,9 +31,6 @@ class ChangeSettings extends AbstractController
         'application' => ApplicationType::class,
         'chatbot_general' => ChatbotGeneralType::class,
         'chatbot_tuning' => ChatbotTuningType::class,
-        'calendar_general' => CalendarGeneralType::class,
-        'calendar_holiday' => CalendarHolidayType::class,
-        'calendar_moon' => CalendarMoonType::class,
     ];
 
     public function __construct(
