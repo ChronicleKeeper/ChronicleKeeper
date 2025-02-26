@@ -144,8 +144,8 @@ class MonthCollectionTest extends TestCase
         self::assertCount(28, $months->get(2)->days);
 
         self::assertCount(1, $months->get(1)->days->getLeapDaysInYear(0));
-        self::assertCount(0, $months->get(1)->days->getLeapDaysInYear(1));
-        self::assertCount(0, $months->get(2)->days->getLeapDaysInYear(1));
+        self::assertEmpty($months->get(1)->days->getLeapDaysInYear(1));
+        self::assertEmpty($months->get(2)->days->getLeapDaysInYear(1));
 
         self::assertSame(60, $months->countDaysInYear(0));
         self::assertSame(59, $months->countDaysInYear(1));

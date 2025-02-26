@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ChronicleKeeper\Settings\Domain\ValueObject;
 
 use ChronicleKeeper\Settings\Domain\ValueObject\Settings\Application;
+use ChronicleKeeper\Settings\Domain\ValueObject\Settings\CalendarSettings;
 use ChronicleKeeper\Settings\Domain\ValueObject\Settings\ChatbotFunctions;
 use ChronicleKeeper\Settings\Domain\ValueObject\Settings\ChatbotGeneral;
 use ChronicleKeeper\Settings\Domain\ValueObject\Settings\ChatbotTuning;
@@ -14,6 +15,7 @@ use ChronicleKeeper\Settings\Domain\ValueObject\Settings\ChatbotTuning;
  * @phpstan-import-type ChatbotGeneralSettings from ChatbotGeneral
  * @phpstan-import-type ChatbotTuningArray from ChatbotTuning
  * @phpstan-import-type ChatbotFunctionsArray from ChatbotFunctions
+ * @phpstan-import-type CalendarSettingsArray from CalendarSettings
  * @phpstan-type SettingsArray = array{
  *     application?: ApplicationSettings,
  *     chatbot: array{
@@ -21,6 +23,7 @@ use ChronicleKeeper\Settings\Domain\ValueObject\Settings\ChatbotTuning;
  *         tuning: ChatbotTuningArray,
  *         functions: ChatbotFunctionsArray
  *     },
+ *     calendar_config?: CalendarSettingsArray
  * }
  */
 class Settings
@@ -29,6 +32,7 @@ class Settings
     private ChatbotGeneral $chatbotGeneral;
     private ChatbotTuning $chatbotTuning;
     private ChatbotFunctions $chatbotFunctions;
+    private CalendarSettings $calendarSettings;
 
     public function __construct()
     {
@@ -36,6 +40,7 @@ class Settings
         $this->chatbotGeneral   = new ChatbotGeneral();
         $this->chatbotTuning    = new ChatbotTuning();
         $this->chatbotFunctions = new ChatbotFunctions();
+        $this->calendarSettings = new CalendarSettings();
     }
 
     /** @param SettingsArray $settingsArray */
@@ -48,6 +53,10 @@ class Settings
         $settings->setChatbotGeneral(ChatbotGeneral::fromArray($settingsArray['chatbot']['general']));
         $settings->setChatbotTuning(ChatbotTuning::fromArray($settingsArray['chatbot']['tuning']));
         $settings->setChatbotFunctions(ChatbotFunctions::fromArray($settingsArray['chatbot']['functions']));
+
+        if (isset($settingsArray['calendar_config'])) {
+            $settings->setCalendarSettings(CalendarSettings::fromArray($settingsArray['calendar_config']));
+        }
 
         return $settings;
     }
@@ -62,6 +71,7 @@ class Settings
                 'tuning' => $this->chatbotTuning->toArray(),
                 'functions' => $this->chatbotFunctions->toArray(),
             ],
+            'calendar_config' => $this->calendarSettings->toArray(),
         ];
     }
 
@@ -103,5 +113,15 @@ class Settings
     public function setChatbotFunctions(ChatbotFunctions $chatbotFunctions): void
     {
         $this->chatbotFunctions = $chatbotFunctions;
+    }
+
+    public function getCalendarSettings(): CalendarSettings
+    {
+        return $this->calendarSettings;
+    }
+
+    public function setCalendarSettings(CalendarSettings $calendarSettings): void
+    {
+        $this->calendarSettings = $calendarSettings;
     }
 }
