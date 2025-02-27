@@ -125,7 +125,7 @@ class DocumentDenormalizerTest extends TestCase
             )
             ->willReturn($directory = (new DirectoryBuilder())->build());
 
-        $documentDenormalizer = (new DocumentDenormalizer($queryService));
+        $documentDenormalizer = new DocumentDenormalizer($queryService);
         $documentDenormalizer->setDenormalizer($denormalizer);
 
         $document = $documentDenormalizer->denormalize($array, Document::class);
@@ -162,7 +162,7 @@ class DocumentDenormalizerTest extends TestCase
             )
             ->willReturn($directory = (new DirectoryBuilder())->build());
 
-        $documentDenormalizer = (new DocumentDenormalizer($queryService));
+        $documentDenormalizer = new DocumentDenormalizer($queryService);
         $documentDenormalizer->setDenormalizer($denormalizer);
 
         $document       = $documentDenormalizer->denormalize($array, Document::class);
