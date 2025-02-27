@@ -1,7 +1,8 @@
 @charset "utf-8";
+
 div.chatbot-message img, .markdown img {
-    max-width: 400px;
-    max-height: 400px;
+    max-width: 200px;
+    max-height: 200px;
 }
 
 div.search-loading {
@@ -17,4 +18,25 @@ div.search-loading input {
 div.search-loading button {
     pointer-events:none;
     cursor: wait;
+}
+
+@media (min-width: 576px) {
+    div.chatbot-message img, .markdown img {
+        max-width: 200px;
+        max-height: 200px;
+    }
+}
+
+@media (min-width: 768px) {
+    div.chatbot-message img, .markdown img {
+        max-width: 300px;
+        max-height: 300px;
+    }
+}
+
+@media (min-width: 992px) {
+    div.chatbot-message img, .markdown img {
+        max-width: 400px;
+        max-height: 400px;
+    }
 }
