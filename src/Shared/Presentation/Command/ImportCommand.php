@@ -6,6 +6,7 @@ namespace ChronicleKeeper\Shared\Presentation\Command;
 
 use ChronicleKeeper\Settings\Application\Service\Importer;
 use ChronicleKeeper\Settings\Application\Service\ImportSettings;
+use RuntimeException;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -13,8 +14,20 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Throwable;
 
+use function fclose;
+use function feof;
+use function fopen;
+use function fread;
+use function fwrite;
+use function is_string;
 use function realpath;
+use function sys_get_temp_dir;
+use function tempnam;
+use function unlink;
+
+use const STDIN;
 
 #[AsCommand(
     name: 'app:import',
@@ -28,12 +41,19 @@ final class ImportCommand extends Command
         parent::__construct();
     }
 
-    public function configure(): void
+    protected function configure(): void
     {
         $this->addArgument(
             'archive',
-            InputArgument::REQUIRED,
+            InputArgument::OPTIONAL,
             'The path to the ZIP archive to import',
+        );
+
+        $this->addOption(
+            'stream',
+            't',
+            InputOption::VALUE_NONE,
+            'Read the ZIP file from STDIN instead of a file',
         );
 
         $this->addOption(
@@ -63,26 +83,115 @@ final class ImportCommand extends Command
         $io = new SymfonyStyle($input, $output);
         $io->title('Importing ZIP Archive');
 
-        $archiveFilename = realpath($input->getArgument('archive'));
-        if ($archiveFilename === false) {
-            $io->error('The provided archive "' . $input->getArgument('archive') . '" file does not exist.');
+        $isStream = (bool) $input->getOption('stream');
+        $tempFile = null;
+
+        try {
+            if ($isStream) {
+                $archiveFilename = $this->handleStreamInput($io);
+                $tempFile        = $archiveFilename; // Store for cleanup
+            } else {
+                $archiveFilename = $this->handleFileInput($input, $io);
+            }
+
+            if ($archiveFilename === null) {
+                return self::FAILURE;
+            }
+
+            $io->info('Importing application from: ' . $archiveFilename);
+
+            $importSettings = $this->createImportSettings($input);
+            $this->importer->import($archiveFilename, $importSettings);
+
+            $io->success('ZIP Archive was imported successfully.');
+
+            return self::SUCCESS;
+        } catch (Throwable $e) {
+            $io->error('Import failed: ' . $e->getMessage());
 
             return self::FAILURE;
+        } finally {
+            // Clean up temporary file if it exists
+            if ($isStream && $tempFile !== null) {
+                @unlink($tempFile);
+            }
+        }
+    }
+
+    /**
+     * Handles input from STDIN stream
+     */
+    private function handleStreamInput(SymfonyStyle $io): string|null
+    {
+        $tempFile = tempnam(sys_get_temp_dir(), 'import_');
+        if ($tempFile === false) {
+            $io->error('Failed to create temporary file.');
+
+            return null;
         }
 
-        $io->info('Importing application from: ' . $archiveFilename);
+        $handle = fopen($tempFile, 'wb');
+        if ($handle === false) {
+            $io->error('Failed to open temporary file for writing.');
+            @unlink($tempFile);
 
-        $importSettings = ImportSettings::fromArray([
-            'overwrite_settings' => $input->getOption('overwrite_settings'),
-            'overwrite_library' => $input->getOption('overwrite_library'),
-            'prune_library' => $input->getOption('prune_library'),
+            return null;
+        }
+
+        try {
+            while (! feof(STDIN)) {
+                $data = fread(STDIN, 8192);
+                if ($data === false) {
+                    throw new RuntimeException('Failed to read from STDIN');
+                }
+
+                if (fwrite($handle, $data) === false) {
+                    throw new RuntimeException('Failed to write to temporary file');
+                }
+            }
+
+            return $tempFile;
+        } catch (Throwable $e) {
+            $io->error($e->getMessage());
+
+            return null;
+        } finally {
+            fclose($handle);
+        }
+    }
+
+    /**
+     * Handles input from file argument
+     */
+    private function handleFileInput(InputInterface $input, SymfonyStyle $io): string|null
+    {
+        $archivePath = $input->getArgument('archive');
+        if (! is_string($archivePath)) {
+            $io->error('Archive path must be provided when not using stream mode.');
+
+            return null;
+        }
+
+        $archiveFilename = realpath($archivePath);
+        if ($archiveFilename === false) {
+            $io->error('The provided archive "' . $archivePath . '" file does not exist.');
+
+            return null;
+        }
+
+        return $archiveFilename;
+    }
+
+    /**
+     * Creates ImportSettings object from command input
+     */
+    private function createImportSettings(InputInterface $input): ImportSettings
+    {
+        return ImportSettings::fromArray([
+            'overwrite_settings' => (bool) $input->getOption('overwrite_settings'),
+            'overwrite_library' => (bool) $input->getOption('overwrite_library'),
+            'prune_library' => (bool) $input->getOption('prune_library'),
             'remove_archive' => false,
         ]);
-
-        $this->importer->import($archiveFilename, $importSettings);
-
-        $io->success('ZIP Archive was imported successfully.');
-
-        return self::SUCCESS;
     }
 }

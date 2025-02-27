@@ -1,0 +1,64 @@
+# Version control
+.git/
+.gitattributes
+.gitignore
+.github/
+
+# Development environments
+.idea/
+.vscode/
+.editorconfig
+
+# Temporary project files
+var/settings.json
+var/system_prompts.json
+var/tmp/*
+
+# Test and coverage
+.phpunit.cache/
+.phpcs-cache
+coverage/
+coverage.xml
+tests/
+phpunit.xml
+.phpbench/
+phpstan.neon
+phpcs.xml.dist
+
+# Environment files (except dist)
+.env.*
+!.env.dist
+
+# Docker
+.docker/*/Dockerfile
+docker-compose*.yml
+compose*.yaml
+!compose.yaml
+!compose.prod.yaml
+
+# Cache and logs
+var/cache/*
+var/log/*
+
+# Dependencies
+vendor/
+assets/vendor/
+
+# Documentation and non-essential files
+CHANGELOG.md
+CONTRIBUTING.md
+README.md
+LICENSE
+
+# Development tools configuration
+.makefile/
+
+# Database
+*.sqlite
+*.sqlite3
+
+# Temporary files
+*.cache
+*.log
+.DS_Store
+Thumbs.db

@@ -1,0 +1,9 @@
+services:
+  php:
+    build:
+      context: .
+      target: chronicle_keeper_prod
+    environment:
+      APP_SECRET: ${APP_SECRET}
+      BASIC_AUTH_USER: ${BASIC_AUTH_USER:-}
+      BASIC_AUTH_PASSWORD: ${BASIC_AUTH_PASSWORD:-}

@@ -12,10 +12,10 @@ use function end;
 use function explode;
 use function preg_match_all;
 
-final readonly class Version
+class Version
 {
     public function __construct(
-        private FileAccess $fileAccess,
+        private readonly FileAccess $fileAccess,
     ) {
     }
 
