@@ -3,14 +3,14 @@
 ## [alpha-0.8] - Steps to the cloud
 
 **Added**
-- Database: PostgreSQL support for enhanced scalability
-- Chat Interface: Live streaming of LLM responses to show real-time "thinking"
+- Database: PostgreSQL support for enhanced scalability.
+- Chat Interface: Live streaming of LLM responses to show real-time "thinking".
 
 **Changed**
-- Some forms now contain an improved footer with more button submit choiced
-    - The default is moving back to the list
-    - You can move to the view mode of the created item
-    - You can create an additional item after the current one
+- Some forms now contain an improved footer with more button submit choiced.
+    - The default is moving back to the list.
+    - You can move to the view mode of the created item.
+    - You can create an additional item after the current one.
 - The Makefile environment has widely changed to be more open for the different database environments.
 - There is a docker setup again for the PostgreSQL environment.
 - The CI is now testing SQLite and PostgreSQL environments during development of features.
@@ -18,7 +18,8 @@
 - Update Dependencies to the latest versions.
 
 **Fixed**
-- Favorites now properly track renamed entries
+- Favorites now properly track renamed entries.
+- Add missing hamburger menu for small displays.
 
 ## [alpha-0.7] - Moving Forward
 
