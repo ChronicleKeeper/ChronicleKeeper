@@ -44,7 +44,6 @@
                                         <th>Bezeichnung</th>
                                         <th class="text-center">Begin im Jahr</th>
                                         <th class="text-center">Ende im Jahr</th>
-                                        <th class="w-1">&nbsp;</th>
                                     </tr>
                                     </thead>
                                     <tbody>
@@ -53,7 +52,6 @@
                                             <td>{{ epoch.name }}</td>
                                             <td class="text-center">{{ epoch.startYear }}</td>
                                             <td class="text-center">{{ epoch.endYear ?: '' }}</td>
-                                            <td>&nbsp;</td>
                                         </tr>
                                     {% else %}
                                         <tr>
@@ -66,8 +64,8 @@
                             <div id="tab-top-months" class="card tab-pane" role="tabpanel">
                                 <div class="card-body">
                                     <div class="btn-list justify-content-end">
-                                        <a href="{{ path('settings_system_prompts_create') }}" class="btn d-none d-sm-inline-block">
-                                            {{ ux_icon('tabler:text-plus') }}Hinzufügen
+                                        <a href="{{ path('settings_calendar_months') }}" class="btn d-none d-sm-inline-block">
+                                            {{ ux_icon('tabler:list-search') }}Bearbeiten
                                         </a>
                                     </div>
                                 </div>
@@ -86,7 +84,9 @@
                                             <td>{{ month.name }}</td>
                                             <td>{{ month.days }}</td>
                                             <td>{{ month.leapDays|length }}</td>
-                                            <td>&nbsp;</td>
+                                            <td>
+                                                <a href="{{ path('settings_calendar_leap_days', {'month': month.index}) }}">{{ ux_icon('tabler:list-search', {'color': 'var(--tblr-warning)'}) }}</a>
+                                            </td>
                                         </tr>
                                     {% else %}
                                         <tr>
@@ -108,14 +108,12 @@
                                     <thead>
                                     <tr>
                                         <th>Bezeichnung</th>
-                                        <th class="w-1">&nbsp;</th>
                                     </tr>
                                     </thead>
                                     <tbody>
                                     {% for week in calendar_settings.weeks %}
                                         <tr>
                                             <td>{{ week.name }}</td>
-                                            <td>&nbsp;</td>
                                         </tr>
                                     {% else %}
                                         <tr>
