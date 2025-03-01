@@ -1,0 +1,134 @@
+{% extends 'layout.html.twig' %}
+
+{% block page_title %}Einstellungen - Kalender{% endblock %}
+
+{% block page_content %}
+<div class="container-xl">
+    <div class="card">
+        <div class="row g-0">
+            {% include 'settings/_includes/settings_nav.html.twig' %}
+            <div class="col-12 col-md-9 d-flex flex-column">
+                <div class="card-body">
+                    <div class="alert alert-warning" role="alert">
+                        <span class="strong">Aktive Testphase</span> - Der Kalender ermöglicht dir eine flexible Möglichkeit
+                        in deiner Spielwelt einen Kalender zu führen, der sich nicht an der realen Welt orientiert. Er ist
+                        von dieser vollständige losgelöst und wird auch nur den Tag ändern, wenn du einstellst, das Zeit
+                        vergangen ist. Der ganze Kalender ist, aufgrund der komplexen Berechnungen, in einer aktiven
+                        Testphase und dein Feedback ist gefragt!
+                        <br /><br />
+                        Erscheint dir etwas in den Berechnungen des Kalenders, wie Wochentage, Monatsübergänge oder
+                        die Mondphase als nicht korrekt, dann gib uns gerne Informationen zu deinen Einstellungen,
+                        damit die Berechnung möglichst detailiert nachgestellt werden kann.
+                    </div>
+
+                    <div class="card-tabs">
+                        <!-- Cards navigation -->
+                        <ul class="nav nav-tabs" role="tablist">
+                            <li class="nav-item" role="presentation"><a href="#tab-top-epochs" class="nav-link active" data-bs-toggle="tab" aria-selected="true" role="tab">Epochen</a></li>
+                            <li class="nav-item" role="presentation"><a href="#tab-top-months" class="nav-link" data-bs-toggle="tab" aria-selected="false" role="tab" tabindex="-1">Monate</a></li>
+                            <li class="nav-item" role="presentation"><a href="#tab-top-weekdays" class="nav-link" data-bs-toggle="tab" aria-selected="false" role="tab" tabindex="-1">Wochentage</a></li>
+                        </ul>
+                        <div class="tab-content">
+                            <!-- Content of epoch listing -->
+                            <div id="tab-top-epochs" class="card tab-pane active show" role="tabpanel">
+                                <div class="card-body">
+                                    <div class="btn-list justify-content-end">
+                                        <a href="{{ path('settings_calendar_epochs') }}" class="btn d-none d-sm-inline-block">
+                                            {{ ux_icon('tabler:list-search') }}Bearbeiten
+                                        </a>
+                                    </div>
+                                </div>
+                                <table class="table table-responsive mb-0">
+                                    <thead>
+                                    <tr>
+                                        <th>Bezeichnung</th>
+                                        <th class="text-center">Begin im Jahr</th>
+                                        <th class="text-center">Ende im Jahr</th>
+                                        <th class="w-1">&nbsp;</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for epoch in calendar_settings.epochs %}
+                                        <tr>
+                                            <td>{{ epoch.name }}</td>
+                                            <td class="text-center">{{ epoch.startYear }}</td>
+                                            <td class="text-center">{{ epoch.endYear ?: '' }}</td>
+                                            <td>&nbsp;</td>
+                                        </tr>
+                                    {% else %}
+                                        <tr>
+                                            <td colspan="4" class="text-center">Keine Epochen vorhanden</td>
+                                        </tr>
+                                    {% endfor %}
+                                </table>
+                            </div>
+                            <!-- Content of month listing -->
+                            <div id="tab-top-months" class="card tab-pane" role="tabpanel">
+                                <div class="card-body">
+                                    <div class="btn-list justify-content-end">
+                                        <a href="{{ path('settings_system_prompts_create') }}" class="btn d-none d-sm-inline-block">
+                                            {{ ux_icon('tabler:text-plus') }}Hinzufügen
+                                        </a>
+                                    </div>
+                                </div>
+                                <table class="table table-responsive mb-0">
+                                    <thead>
+                                    <tr>
+                                        <th>Bezeichnung</th>
+                                        <th>Tage</th>
+                                        <th>Sondertage</th>
+                                        <th class="w-1">&nbsp;</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for month in calendar_settings.months %}
+                                        <tr>
+                                            <td>{{ month.name }}</td>
+                                            <td>{{ month.days }}</td>
+                                            <td>{{ month.leapDays|length }}</td>
+                                            <td>&nbsp;</td>
+                                        </tr>
+                                    {% else %}
+                                        <tr>
+                                            <td colspan="4" class="text-center">Keine Monate vorhanden</td>
+                                        </tr>
+                                    {% endfor %}
+                                </table>
+                            </div>
+                            <!-- Content of weekday listing -->
+                            <div id="tab-top-weekdays" class="card tab-pane" role="tabpanel">
+                                <div class="card-body">
+                                    <div class="btn-list justify-content-end">
+                                        <a href="{{ path('settings_system_prompts_create') }}" class="btn d-none d-sm-inline-block">
+                                            {{ ux_icon('tabler:text-plus') }}Hinzufügen
+                                        </a>
+                                    </div>
+                                </div>
+                                <table class="table table-responsive mb-0">
+                                    <thead>
+                                    <tr>
+                                        <th>Bezeichnung</th>
+                                        <th class="w-1">&nbsp;</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for week in calendar_settings.weeks %}
+                                        <tr>
+                                            <td>{{ week.name }}</td>
+                                            <td>&nbsp;</td>
+                                        </tr>
+                                    {% else %}
+                                        <tr>
+                                            <td colspan="4" class="text-center">Keine Wochentage vorhanden</td>
+                                        </tr>
+                                    {% endfor %}
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
