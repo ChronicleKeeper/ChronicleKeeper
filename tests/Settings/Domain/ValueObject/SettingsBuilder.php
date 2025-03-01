@@ -74,7 +74,7 @@ class SettingsBuilder
         $epoch   = new EpochSettings('First Age', 0, null);
         $week    = new WeekSettings(1, 'First Day');
 
-        $this->calendarSettings = new CalendarSettings([$month], [$epoch], [$week]);
+        $this->calendarSettings = new CalendarSettings(30, true, [$month], [$epoch], [$week]);
 
         return $this;
     }

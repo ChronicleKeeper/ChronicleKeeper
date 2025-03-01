@@ -30,6 +30,8 @@ final class CalendarSettingsTest extends TestCase
     public function itConstructsFromArray(): void
     {
         $data = [
+            'moon_cycle_days' => 301,
+            'is_finished' => true,
             'months' => [
                 [
                     'index' => 1,
@@ -64,6 +66,9 @@ final class CalendarSettingsTest extends TestCase
         self::assertCount(1, $settings->getMonths());
         self::assertCount(1, $settings->getEpochs());
         self::assertCount(1, $settings->getWeeks());
+
+        self::assertSame(301, $settings->getMoonCycleDays());
+        self::assertTrue($settings->isFinished());
     }
 
     #[Test]
@@ -74,9 +79,11 @@ final class CalendarSettingsTest extends TestCase
         $epoch   = new EpochSettings('First Age', 1, 100);
         $week    = new WeekSettings(1, 'Monday');
 
-        $settings = new CalendarSettings([$month], [$epoch], [$week]);
+        $settings = new CalendarSettings(301, true, [$month], [$epoch], [$week]);
 
         $expected = [
+            'moon_cycle_days' => 301,
+            'is_finished' => true,
             'months' => [
                 [
                     'index' => 1,
@@ -117,9 +124,11 @@ final class CalendarSettingsTest extends TestCase
         $epoch   = new EpochSettings('First Age', 1, 100);
         $week    = new WeekSettings(1, 'Monday');
 
-        $settings = new CalendarSettings([$month], [$epoch], [$week]);
+        $settings = new CalendarSettings(35, false, [$month], [$epoch], [$week]);
 
         $expected = [
+            'moon_cycle_days' => 35,
+            'is_finished' => false,
             'months' => [
                 [
                     'index' => 1,

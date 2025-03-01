@@ -24,20 +24,45 @@
                     <div class="card-tabs">
                         <!-- Cards navigation -->
                         <ul class="nav nav-tabs" role="tablist">
-                            <li class="nav-item" role="presentation"><a href="#tab-top-epochs" class="nav-link active" data-bs-toggle="tab" aria-selected="true" role="tab">Epochen</a></li>
+                            <li class="nav-item" role="presentation"><a href="#tab-top-general" class="nav-link active" data-bs-toggle="tab" aria-selected="true" role="tab">Allgemein</a></li>
+                            <li class="nav-item" role="presentation"><a href="#tab-top-epochs" class="nav-link" data-bs-toggle="tab" aria-selected="true" role="tab">Epochen</a></li>
                             <li class="nav-item" role="presentation"><a href="#tab-top-months" class="nav-link" data-bs-toggle="tab" aria-selected="false" role="tab" tabindex="-1">Monate</a></li>
                             <li class="nav-item" role="presentation"><a href="#tab-top-weekdays" class="nav-link" data-bs-toggle="tab" aria-selected="false" role="tab" tabindex="-1">Wochentage</a></li>
                         </ul>
                         <div class="tab-content">
-                            <!-- Content of epoch listing -->
-                            <div id="tab-top-epochs" class="card tab-pane active show" role="tabpanel">
+                            <!-- Content of general calendar settings -->
+                            <div id="tab-top-general" class="card tab-pane active show" role="tabpanel">
                                 <div class="card-body">
                                     <div class="btn-list justify-content-end">
-                                        <a href="{{ path('settings_calendar_epochs') }}" class="btn d-none d-sm-inline-block">
+                                        <a href="{{ path('settings_calendar_general') }}" class="btn d-none d-sm-inline-block">
                                             {{ ux_icon('tabler:list-search') }}Bearbeiten
                                         </a>
                                     </div>
                                 </div>
+                                <table class="table table-responsive mb-0">
+                                    <thead>
+                                    <tr>
+                                        <th>Bezeichnung</th>
+                                        <th>Wert</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Mondzyklus</td>
+                                            <td>{{ calendar_settings.moonCycleDays }}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <!-- Content of epoch listing -->
+                            <div id="tab-top-epochs" class="card tab-pane" role="tabpanel">
+                                    <div class="card-body">
+                                        <div class="btn-list justify-content-end">
+                                            <a href="{{ path('settings_calendar_epochs') }}" class="btn d-none d-sm-inline-block">
+                                                {{ ux_icon('tabler:list-search') }}Bearbeiten
+                                            </a>
+                                        </div>
+                                    </div>
                                 <table class="table table-responsive mb-0">
                                     <thead>
                                     <tr>

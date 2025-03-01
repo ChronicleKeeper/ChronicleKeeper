@@ -14,6 +14,8 @@ use JsonSerializable;
  * @phpstan-import-type EpochSettingsArray from EpochSettings
  * @phpstan-import-type WeekSettingsArray from WeekSettings
  * @phpstan-type CalendarSettingsArray = array{
+ *     moon_cycle_days?: int,
+ *     is_finished?: bool,
  *     months: array<MonthSettingsArray>,
  *     epochs: array<EpochSettingsArray>,
  *     weeks: array<WeekSettingsArray>,
@@ -27,6 +29,8 @@ class CalendarSettings implements JsonSerializable
      * @param array<WeekSettings>  $weeks
      */
     public function __construct(
+        private readonly int $moonCycleDays = 30,
+        private readonly bool $isFinished = false,
         private readonly array $months = [],
         private readonly array $epochs = [],
         private readonly array $weeks = [],
@@ -51,7 +55,13 @@ class CalendarSettings implements JsonSerializable
             $weeks[] = WeekSettings::fromArray($weekData);
         }
 
-        return new self($months, $epochs, $weeks);
+        return new self(
+            $array['moon_cycle_days'] ?? 30,
+            $array['is_finished'] ?? false,
+            $months,
+            $epochs,
+            $weeks,
+        );
     }
 
     /** @return CalendarSettingsArray */
@@ -73,6 +83,8 @@ class CalendarSettings implements JsonSerializable
         }
 
         return [
+            'moon_cycle_days' => $this->moonCycleDays,
+            'is_finished' => $this->isFinished,
             'months' => $months,
             'epochs' => $epochs,
             'weeks' => $weeks,
@@ -83,6 +95,16 @@ class CalendarSettings implements JsonSerializable
     public function jsonSerialize(): array
     {
         return $this->toArray();
+    }
+
+    public function isFinished(): bool
+    {
+        return $this->isFinished;
+    }
+
+    public function getMoonCycleDays(): int
+    {
+        return $this->moonCycleDays;
     }
 
     /** @return array<MonthSettings> */
