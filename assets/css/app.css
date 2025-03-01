@@ -137,4 +137,10 @@ a.disabled {
     border-left: 0;
 }
 
+.w-12 {
+    width: 5rem!important;
+}
 
+.w-24 {
+    width: 10rem!important;
+}
