@@ -15,6 +15,8 @@ final class GeneralType extends AbstractType
     /** @inheritDoc */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $builder->add('current_day', CurrentDayType::class);
+
         $builder->add(
             'moonCycleDays',
             IntegerType::class,

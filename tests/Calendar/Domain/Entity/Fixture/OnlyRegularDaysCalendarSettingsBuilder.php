@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Test\Calendar\Domain\Entity\Fixture;
 
+use ChronicleKeeper\Settings\Domain\ValueObject\Settings\CalendarSettings\CurrentDay;
 use ChronicleKeeper\Settings\Domain\ValueObject\Settings\CalendarSettings\EpochSettings;
 use ChronicleKeeper\Settings\Domain\ValueObject\Settings\CalendarSettings\MonthSettings;
 use ChronicleKeeper\Settings\Domain\ValueObject\Settings\CalendarSettings\WeekSettings;
@@ -12,6 +13,7 @@ final class OnlyRegularDaysCalendarSettingsBuilder extends DefaultCalendarSettin
 {
     public function __construct()
     {
+        $this->currentDay    = new CurrentDay(1985, 9, 11);
         $this->moonCycleDays = 29.5;
         $this->isFinished    = true;
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Test\Calendar\Domain\Entity\Fixture;
 
+use ChronicleKeeper\Settings\Domain\ValueObject\Settings\CalendarSettings\CurrentDay;
 use ChronicleKeeper\Settings\Domain\ValueObject\Settings\CalendarSettings\EpochSettings;
 use ChronicleKeeper\Settings\Domain\ValueObject\Settings\CalendarSettings\MonthSettings;
 use ChronicleKeeper\Settings\Domain\ValueObject\Settings\CalendarSettings\WeekSettings;
@@ -31,5 +32,7 @@ final class FullFeaturedCalendarSettingsBuilder extends DefaultCalendarSettingsB
         $this->weeks = [
             new WeekSettings(1, 'Day'),
         ];
+
+        $this->currentDay = new CurrentDay(1, 1, 1);
     }
 }

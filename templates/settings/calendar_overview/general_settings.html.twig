@@ -12,6 +12,20 @@
             <div class="col-12 col-md-9 d-flex flex-column">
                 <div class="card-body">
 
+                    {{ form_errors(form) }}
+
+                    <div class="row g-5 pb-5">
+                        <div class="col-4">
+                            {{ form_row(form.current_day.year) }}
+                        </div>
+                        <div class="col-4">
+                            {{ form_row(form.current_day.month) }}
+                        </div>
+                        <div class="col-4">
+                            {{ form_row(form.current_day.day) }}
+                        </div>
+                    </div>
+
                     {{ form_row(form.moonCycleDays) }}
 
                 </div>

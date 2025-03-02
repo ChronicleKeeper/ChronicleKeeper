@@ -48,6 +48,11 @@
                                     </thead>
                                     <tbody>
                                         <tr>
+                                            <td>Aktuelles Datum (Heute)</td>
+                                            {% set currentDay = calendar_settings.currentDay %}
+                                            <td>{{ currentDay is empty ? 'Keine Einstellung vorhanden (Standard: 0-1-1)' : currentDay.year ~ '-' ~ currentDay.month ~ '-' ~ currentDay.day }}</td>
+                                        </tr>
+                                        <tr>
                                             <td>Mondzyklus</td>
                                             <td>{{ calendar_settings.moonCycleDays }}</td>
                                         </tr>

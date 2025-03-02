@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ChronicleKeeper\Test\Settings\Domain\ValueObject\Settings;
 
 use ChronicleKeeper\Settings\Domain\ValueObject\Settings\CalendarSettings;
+use ChronicleKeeper\Settings\Domain\ValueObject\Settings\CalendarSettings\CurrentDay;
 use ChronicleKeeper\Settings\Domain\ValueObject\Settings\CalendarSettings\EpochSettings;
 use ChronicleKeeper\Settings\Domain\ValueObject\Settings\CalendarSettings\LeapDaySettings;
 use ChronicleKeeper\Settings\Domain\ValueObject\Settings\CalendarSettings\MonthSettings;
@@ -23,6 +24,7 @@ use const JSON_THROW_ON_ERROR;
 #[CoversClass(LeapDaySettings::class)]
 #[CoversClass(MonthSettings::class)]
 #[CoversClass(WeekSettings::class)]
+#[CoversClass(CurrentDay::class)]
 #[Small]
 final class CalendarSettingsTest extends TestCase
 {
@@ -59,6 +61,11 @@ final class CalendarSettingsTest extends TestCase
                     'name' => 'Monday',
                 ],
             ],
+            'current_day' => [
+                'year' => 1262,
+                'month' => 1,
+                'day' => 21,
+            ],
         ];
 
         $settings = CalendarSettings::fromArray($data);
@@ -69,10 +76,99 @@ final class CalendarSettingsTest extends TestCase
 
         self::assertSame(301.0, $settings->getMoonCycleDays());
         self::assertTrue($settings->isFinished());
+
+        $currentDay = $settings->getCurrentDay();
+        self::assertNotNull($currentDay);
+        self::assertSame(1262, $currentDay->getYear());
+        self::assertSame(1, $currentDay->getMonth());
+        self::assertSame(21, $currentDay->getDay());
+    }
+
+    #[Test]
+    public function itConstructsFromArrayWithoutCurrentDay(): void
+    {
+        $data = [
+            'moon_cycle_days' => 301,
+            'is_finished' => true,
+            'months' => [
+                [
+                    'index' => 1,
+                    'name' => 'January',
+                    'days' => 31,
+                ],
+            ],
+            'epochs' => [
+                [
+                    'name' => 'First Age',
+                    'start_year' => 1,
+                    'end_year' => 100,
+                ],
+            ],
+            'weeks' => [
+                [
+                    'index' => 1,
+                    'name' => 'Monday',
+                ],
+            ],
+        ];
+
+        $settings = CalendarSettings::fromArray($data);
+        self::assertNull($settings->getCurrentDay());
     }
 
     #[Test]
     public function itConvertsToArray(): void
+    {
+        $leapDay    = new LeapDaySettings(29, 'Leap Day', 4);
+        $month      = new MonthSettings(1, 'January', 31, [$leapDay]);
+        $epoch      = new EpochSettings('First Age', 1, 100);
+        $week       = new WeekSettings(1, 'Monday');
+        $currentDay = new CurrentDay(1262, 1, 21);
+
+        $settings = new CalendarSettings(301.0, true, [$month], [$epoch], [$week], $currentDay);
+
+        $expected = [
+            'moon_cycle_days' => 301.0,
+            'is_finished' => true,
+            'months' => [
+                [
+                    'index' => 1,
+                    'name' => 'January',
+                    'days' => 31,
+                    'leap_days' => [
+                        [
+                            'day' => 29,
+                            'name' => 'Leap Day',
+                            'year_interval' => 4,
+                        ],
+                    ],
+                ],
+            ],
+            'epochs' => [
+                [
+                    'name' => 'First Age',
+                    'start_year' => 1,
+                    'end_year' => 100,
+                ],
+            ],
+            'weeks' => [
+                [
+                    'index' => 1,
+                    'name' => 'Monday',
+                ],
+            ],
+            'current_day' => [
+                'year' => 1262,
+                'month' => 1,
+                'day' => 21,
+            ],
+        ];
+
+        self::assertSame($expected, $settings->toArray());
+    }
+
+    #[Test]
+    public function itConvertsToArrayWithoutCurrentDay(): void
     {
         $leapDay = new LeapDaySettings(29, 'Leap Day', 4);
         $month   = new MonthSettings(1, 'January', 31, [$leapDay]);
@@ -111,6 +207,7 @@ final class CalendarSettingsTest extends TestCase
                     'name' => 'Monday',
                 ],
             ],
+            'current_day' => null,
         ];
 
         self::assertSame($expected, $settings->toArray());
@@ -119,12 +216,13 @@ final class CalendarSettingsTest extends TestCase
     #[Test]
     public function itSerializesToJson(): void
     {
-        $leapDay = new LeapDaySettings(29, 'Leap Day', 4);
-        $month   = new MonthSettings(1, 'January', 31, [$leapDay]);
-        $epoch   = new EpochSettings('First Age', 1, 100);
-        $week    = new WeekSettings(1, 'Monday');
+        $leapDay    = new LeapDaySettings(29, 'Leap Day', 4);
+        $month      = new MonthSettings(1, 'January', 31, [$leapDay]);
+        $epoch      = new EpochSettings('First Age', 1, 100);
+        $week       = new WeekSettings(1, 'Monday');
+        $currentDay = new CurrentDay(1262, 1, 21);
 
-        $settings = new CalendarSettings(35, false, [$month], [$epoch], [$week]);
+        $settings = new CalendarSettings(35, false, [$month], [$epoch], [$week], $currentDay);
 
         $expected = [
             'moon_cycle_days' => 35,
@@ -155,6 +253,11 @@ final class CalendarSettingsTest extends TestCase
                     'index' => 1,
                     'name' => 'Monday',
                 ],
+            ],
+            'current_day' => [
+                'year' => 1262,
+                'month' => 1,
+                'day' => 21,
             ],
         ];
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Test\Calendar\Domain\Entity\Fixture;
 
+use ChronicleKeeper\Settings\Domain\ValueObject\Settings\CalendarSettings\CurrentDay;
 use ChronicleKeeper\Settings\Domain\ValueObject\Settings\CalendarSettings\EpochSettings;
 use ChronicleKeeper\Settings\Domain\ValueObject\Settings\CalendarSettings\LeapDaySettings;
 use ChronicleKeeper\Settings\Domain\ValueObject\Settings\CalendarSettings\MonthSettings;
@@ -13,6 +14,7 @@ final class LinearWithLeapDaysCalendarSettingsBuilder extends DefaultCalendarSet
 {
     public function __construct()
     {
+        $this->currentDay    = new CurrentDay(2163, 6, 7);
         $this->moonCycleDays = 30;
         $this->isFinished    = true;
 

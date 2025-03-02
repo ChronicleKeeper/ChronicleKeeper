@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Test\Calendar\Presentation\Controller;
 
+use ChronicleKeeper\Calendar\Application\Query\GetCurrentDate;
+use ChronicleKeeper\Calendar\Application\Query\GetCurrentDateQuery;
 use ChronicleKeeper\Calendar\Application\Query\LoadCalendar;
 use ChronicleKeeper\Calendar\Application\Query\LoadCalendarQuery;
 use ChronicleKeeper\Calendar\Application\Service\CalendarFactory;
@@ -22,6 +24,8 @@ use Symfony\Component\HttpFoundation\Request;
 #[CoversClass(LoadCalendarQuery::class)]
 #[CoversClass(CalendarFactory::class)]
 #[CoversClass(TableCalendar::class)]
+#[CoversClass(GetCurrentDate::class)]
+#[CoversClass(GetCurrentDateQuery::class)]
 #[Large]
 final class CalendarTest extends WebTestCase
 {
@@ -45,7 +49,7 @@ final class CalendarTest extends WebTestCase
         // -------------------- Test Assertions -------------------- //
 
         self::assertResponseIsSuccessful();
-        self::assertSelectorTextContains('h2', 'Taranis 1262 after the Flood');
+        self::assertSelectorTextContains('h2', 'Litha 2163 after the Flood');
     }
 
     #[Test]

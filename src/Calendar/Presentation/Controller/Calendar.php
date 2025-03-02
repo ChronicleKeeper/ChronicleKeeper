@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Calendar\Presentation\Controller;
 
+use ChronicleKeeper\Calendar\Application\Query\GetCurrentDate;
 use ChronicleKeeper\Calendar\Application\Query\LoadCalendar;
 use ChronicleKeeper\Calendar\Domain\Entity\CalendarDate;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
@@ -28,7 +29,7 @@ final class Calendar extends AbstractController
     public function __invoke(int|null $year = null, int|null $month = null): Response
     {
         $calendar = $this->queryService->query(new LoadCalendar());
-        $today    = new CalendarDate($calendar, 1262, 1, 21);
+        $today    = $this->queryService->query(new GetCurrentDate());
 
         if ($year === null || $month === null) {
             return $this->render(

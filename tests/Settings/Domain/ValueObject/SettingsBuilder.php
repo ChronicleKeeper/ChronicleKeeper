@@ -7,6 +7,7 @@ namespace ChronicleKeeper\Test\Settings\Domain\ValueObject;
 use ChronicleKeeper\Settings\Domain\ValueObject\Settings;
 use ChronicleKeeper\Settings\Domain\ValueObject\Settings\Application;
 use ChronicleKeeper\Settings\Domain\ValueObject\Settings\CalendarSettings;
+use ChronicleKeeper\Settings\Domain\ValueObject\Settings\CalendarSettings\CurrentDay;
 use ChronicleKeeper\Settings\Domain\ValueObject\Settings\CalendarSettings\EpochSettings;
 use ChronicleKeeper\Settings\Domain\ValueObject\Settings\CalendarSettings\LeapDaySettings;
 use ChronicleKeeper\Settings\Domain\ValueObject\Settings\CalendarSettings\MonthSettings;
@@ -74,7 +75,14 @@ class SettingsBuilder
         $epoch   = new EpochSettings('First Age', 0, null);
         $week    = new WeekSettings(1, 'First Day');
 
-        $this->calendarSettings = new CalendarSettings(30, true, [$month], [$epoch], [$week]);
+        $this->calendarSettings = new CalendarSettings(
+            30,
+            true,
+            [$month],
+            [$epoch],
+            [$week],
+            new CurrentDay(1, 1, 1),
+        );
 
         return $this;
     }

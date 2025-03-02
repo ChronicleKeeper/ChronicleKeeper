@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Settings\Domain\ValueObject\Settings;
 
+use ChronicleKeeper\Settings\Domain\ValueObject\Settings\CalendarSettings\CurrentDay;
 use ChronicleKeeper\Settings\Domain\ValueObject\Settings\CalendarSettings\EpochSettings;
 use ChronicleKeeper\Settings\Domain\ValueObject\Settings\CalendarSettings\MonthSettings;
 use ChronicleKeeper\Settings\Domain\ValueObject\Settings\CalendarSettings\WeekSettings;
@@ -13,12 +14,14 @@ use JsonSerializable;
  * @phpstan-import-type MonthSettingsArray from MonthSettings
  * @phpstan-import-type EpochSettingsArray from EpochSettings
  * @phpstan-import-type WeekSettingsArray from WeekSettings
+ * @phpstan-import-type CurrentDayArray from CurrentDay
  * @phpstan-type CalendarSettingsArray = array{
  *     moon_cycle_days?: float,
  *     is_finished?: bool,
  *     months: array<MonthSettingsArray>,
  *     epochs: array<EpochSettingsArray>,
  *     weeks: array<WeekSettingsArray>,
+ *     current_day?: CurrentDayArray|null,
  * }
  */
 class CalendarSettings implements JsonSerializable
@@ -34,6 +37,7 @@ class CalendarSettings implements JsonSerializable
         private readonly array $months = [],
         private readonly array $epochs = [],
         private readonly array $weeks = [],
+        private readonly CurrentDay|null $currentDay = null,
     ) {
     }
 
@@ -61,6 +65,7 @@ class CalendarSettings implements JsonSerializable
             $months,
             $epochs,
             $weeks,
+            isset($array['current_day']) ? CurrentDay::fromArray($array['current_day']) : null,
         );
     }
 
@@ -88,6 +93,7 @@ class CalendarSettings implements JsonSerializable
             'months' => $months,
             'epochs' => $epochs,
             'weeks' => $weeks,
+            'current_day' => $this->currentDay?->toArray(),
         ];
     }
 
@@ -123,5 +129,10 @@ class CalendarSettings implements JsonSerializable
     public function getWeeks(): array
     {
         return $this->weeks;
+    }
+
+    public function getCurrentDay(): CurrentDay|null
+    {
+        return $this->currentDay;
     }
 }
