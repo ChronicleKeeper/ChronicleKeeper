@@ -9,6 +9,7 @@ use ChronicleKeeper\Calendar\Application\Query\GetCurrentDateQuery;
 use ChronicleKeeper\Calendar\Application\Query\LoadCalendar;
 use ChronicleKeeper\Calendar\Application\Query\LoadCalendarQuery;
 use ChronicleKeeper\Calendar\Application\Service\CalendarFactory;
+use ChronicleKeeper\Calendar\Application\Service\CalendarSettingsChecker;
 use ChronicleKeeper\Calendar\Presentation\Controller\Calendar;
 use ChronicleKeeper\Calendar\Presentation\Twig\TableCalendar;
 use ChronicleKeeper\Test\Calendar\Domain\Entity\Fixture\LinearWithLeapDaysCalendarSettingsBuilder;
@@ -20,6 +21,7 @@ use PHPUnit\Framework\Attributes\Test;
 use Symfony\Component\HttpFoundation\Request;
 
 #[CoversClass(Calendar::class)]
+#[CoversClass(CalendarSettingsChecker::class)]
 #[CoversClass(LoadCalendar::class)]
 #[CoversClass(LoadCalendarQuery::class)]
 #[CoversClass(CalendarFactory::class)]

@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Calendar\Presentation\Controller;
 
+use ChronicleKeeper\Calendar\Application\Exception\CalendarConfigurationIncomplete;
 use ChronicleKeeper\Calendar\Application\Query\GetCurrentDate;
 use ChronicleKeeper\Calendar\Application\Query\LoadCalendar;
+use ChronicleKeeper\Calendar\Application\Service\CalendarSettingsChecker;
 use ChronicleKeeper\Calendar\Domain\Entity\CalendarDate;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -18,6 +20,7 @@ final class Calendar extends AbstractController
 {
     public function __construct(
         private readonly QueryService $queryService,
+        private readonly CalendarSettingsChecker $calendarSettingsChecker,
     ) {
     }
 
@@ -28,6 +31,15 @@ final class Calendar extends AbstractController
     )]
     public function __invoke(int|null $year = null, int|null $month = null): Response
     {
+        try {
+            $this->calendarSettingsChecker->hasValidSettings();
+        } catch (CalendarConfigurationIncomplete $e) {
+            return $this->render(
+                'calendar/incomplete_settings.html.twig',
+                ['missingSettings' => $e->missingSettings],
+            );
+        }
+
         $calendar = $this->queryService->query(new LoadCalendar());
         $today    = $this->queryService->query(new GetCurrentDate());
 
