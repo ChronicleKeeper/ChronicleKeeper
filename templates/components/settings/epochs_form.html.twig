@@ -1,0 +1,61 @@
+<div
+    {{ attributes }}
+>
+    {{ form_start(form, attr: {
+        'data-action': 'live#action:prevent',
+        'data-live-action-param': 'save'
+    }) }}
+
+    {# Display global form errors #}
+    {{ form_errors(form) }}
+
+    {# Display collection-level errors #}
+    {{ form_errors(form.epochs) }}
+
+    <table class="table table-borderless form-no-mb">
+        <thead>
+        <tr>
+            <td>Bezeichnung</td>
+            <td>Begin</td>
+            <td>Ende</td>
+            <th class="w-1">&nbsp;</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for epoch_form in form.epochs %}
+            <tr>
+                <td>
+                    {{ form_row(epoch_form.name, {
+                        label: false,
+                        row_attr: {class: 'mb-1'},
+                        attr: {
+                            placeholder: 'Walk the pygmy hippo'
+                        }
+                    }) }}
+                </td>
+                <td>
+                    {{ form_row(epoch_form.start_year, {
+                        row_attr: {class: ''},
+                        label: false,
+                    }) }}
+                </td>
+                <td>
+                    {{ form_row(epoch_form.end_year, {
+                        row_attr: {class: ''},
+                        label: false,
+                    }) }}
+                </td>
+                <td>
+                    {{ form_row(epoch_form.vars.button_delete, {label: 'X', attr: {class: 'btn btn-outline-danger'}}) }}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="btn-group">
+        {{ form_widget(form.epochs.vars.button_add, {label: 'Hinzufügen', attr: {class: 'btn btn-outline-primary'}}) }}
+        <button type="submit" class="btn btn-primary" formnovalidate>{{ ux_icon('tabler:check') }}Speichern</button>
+    </div>
+    {{ form_end(form) }}
+</div>

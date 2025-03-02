@@ -7,11 +7,9 @@
             <a href="{{ path('settings_system_prompts') }}" class="list-group-item list-group-item-action{{ app.request.attributes.get('_route') is same as 'settings_system_prompts' ? ' active' : '' }}">Prompts</a>
             <a href="{{ path('settings_chatbot_functions') }}" class="list-group-item list-group-item-action{{ app.request.attributes.get('_route') is same as 'settings_chatbot_functions' ? ' active' : '' }}">Funktionen</a>
         </div>
-        <h4 class="subheader mt-4">Kalender</h4>
+        <h4 class="subheader mt-4">Sonstiges</h4>
         <div class="list-group list-group-transparent">
-            <a href="{{ path('settings', {'section': 'calendar_general'}) }}" class="list-group-item list-group-item-action{{ form is defined and form.vars.name is same as 'calendar_general' ? ' active' : '' }}">Allgemein</a>
-            <a href="{{ path('settings', {'section': 'calendar_holiday'}) }}" class="list-group-item list-group-item-action{{ form is defined and form.vars.name is same as 'calendar_holiday' ? ' active' : '' }}">Feiertage</a>
-            <a href="{{ path('settings', {'section': 'calendar_moon'}) }}" class="list-group-item list-group-item-action{{ form is defined and form.vars.name is same as 'calendar_moon' ? ' active' : '' }}">Mondkalender</a>
+            <a href="{{ path('settings_calendar_overview') }}" class="list-group-item list-group-item-action{{ app.request.attributes.get('_route') is same as 'settings_calendar_overview' ? ' active' : '' }}">Kalender</a>
         </div>
         <h4 class="subheader mt-4">Anwendung</h4>
         <div class="list-group list-group-transparent">

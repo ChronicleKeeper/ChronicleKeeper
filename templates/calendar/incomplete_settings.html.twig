@@ -1,0 +1,47 @@
+{% extends 'layout.html.twig' %}
+
+{% block page_title %}Kalender - Unvollständige Konfiguration{% endblock %}
+
+{% block page_title_actions %}
+    <div class="col-auto ms-auto d-print-none">
+        <div class="btn-list">
+            <a href="{{ path('settings_calendar_overview') }}"
+               class="btn d-none d-sm-inline-block"
+               title="Einstellungen aufrufen"            >
+                {{ ux_icon('tabler:settings') }} Kalender-Einstellungen
+            </a>
+        </div>
+    </div>
+{% endblock %}
+
+{% block page_content %}
+<div class="container-xl">
+    <div class="row row-deck row-cards">
+        <div class="col-sm-6">
+            <div class="card">
+                <div class="card-status-start bg-warning"></div>
+                <div class="card-body">
+                    <h3 class="card-title">Kalender - Unvollständige Konfiguration</h3>
+                    <p>
+                        Die Kalenderansicht steht erst zur Verfügung, wenn du eine vollständige Konfiguration
+                        vorgenommen hast. Bitte habe Verständnis dafür, dass wir dir keinen Kalender anzeigen können
+                        ohne Informationen über den Kalender in deiner Welt zu haben.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Fehlende Einstellungen</h3>
+                </div>
+                <div class="list-group list-group-flush">
+                    {% for setting in missingSettings %}
+                        <div class="list-group-item list-group-item-action">{{ setting }}</div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

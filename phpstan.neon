@@ -29,6 +29,4 @@ parameters:
 
     ignoreErrors:
         -
-            identifier: argument.named
-        -
             identifier: missingType.generics

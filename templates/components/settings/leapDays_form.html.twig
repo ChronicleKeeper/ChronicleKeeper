@@ -1,0 +1,65 @@
+<div
+    {{ attributes }}
+>
+    {{ form_start(form, attr: {
+        'data-action': 'live#action:prevent',
+        'data-live-action-param': 'save'
+    }) }}
+
+    {# Display global form errors #}
+    {{ form_errors(form) }}
+
+    {{ form_row(form.index) }}
+    {{ form_row(form.name) }}
+    {{ form_row(form.days) }}
+
+    {# Display collection-level errors #}
+    {{ form_errors(form.leap_days) }}
+
+    <table class="table table-borderless form-no-mb">
+        <thead>
+        <tr>
+            <td class="w-24">Tag</td>
+            <td class="w-24">Intervall</td>
+            <td>Bezeichnung</td>
+            <th class="w-1">&nbsp;</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for leap_day_form in form.leap_days %}
+            <tr>
+                <td>
+                    {{ form_row(leap_day_form.day, {
+                        row_attr: {class: ''},
+                        label: false,
+                    }) }}
+                </td>
+                <td>
+                    {{ form_row(leap_day_form.year_interval, {
+                        row_attr: {class: ''},
+                        label: false,
+                    }) }}
+                </td>
+                <td>
+                    {{ form_row(leap_day_form.name, {
+                        label: false,
+                        row_attr: {class: 'mb-1'},
+                        attr: {
+                            placeholder: 'Walk the pygmy hippo'
+                        }
+                    }) }}
+                </td>
+                <td>
+                    {{ form_row(leap_day_form.vars.button_delete, {label: 'X', attr: {class: 'btn btn-outline-danger'}}) }}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="btn-group">
+        {{ form_widget(form.leap_days.vars.button_add, {label: 'Hinzufügen', attr: {class: 'btn btn-outline-primary'}}) }}
+        <button type="submit" class="btn btn-primary" formnovalidate>{{ ux_icon('tabler:check') }}Speichern</button>
+    </div>
+    {{ form_end(form) }}
+</div>

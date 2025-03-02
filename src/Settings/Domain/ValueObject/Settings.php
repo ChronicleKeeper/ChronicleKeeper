@@ -5,21 +5,17 @@ declare(strict_types=1);
 namespace ChronicleKeeper\Settings\Domain\ValueObject;
 
 use ChronicleKeeper\Settings\Domain\ValueObject\Settings\Application;
-use ChronicleKeeper\Settings\Domain\ValueObject\Settings\Calendar;
+use ChronicleKeeper\Settings\Domain\ValueObject\Settings\CalendarSettings;
 use ChronicleKeeper\Settings\Domain\ValueObject\Settings\ChatbotFunctions;
 use ChronicleKeeper\Settings\Domain\ValueObject\Settings\ChatbotGeneral;
 use ChronicleKeeper\Settings\Domain\ValueObject\Settings\ChatbotTuning;
-use ChronicleKeeper\Settings\Domain\ValueObject\Settings\Holiday;
-use ChronicleKeeper\Settings\Domain\ValueObject\Settings\MoonCalendar;
 
 /**
  * @phpstan-import-type ApplicationSettings from Application
  * @phpstan-import-type ChatbotGeneralSettings from ChatbotGeneral
  * @phpstan-import-type ChatbotTuningArray from ChatbotTuning
  * @phpstan-import-type ChatbotFunctionsArray from ChatbotFunctions
- * @phpstan-import-type CalendarSettings from Calendar
- * @phpstan-import-type MoonCalendarSettings from MoonCalendar
- * @phpstan-import-type HolidaySettings from Holiday
+ * @phpstan-import-type CalendarSettingsArray from CalendarSettings
  * @phpstan-type SettingsArray = array{
  *     application?: ApplicationSettings,
  *     chatbot: array{
@@ -27,11 +23,7 @@ use ChronicleKeeper\Settings\Domain\ValueObject\Settings\MoonCalendar;
  *         tuning: ChatbotTuningArray,
  *         functions: ChatbotFunctionsArray
  *     },
- *     calendar: array{
- *         general: CalendarSettings,
- *         moon: MoonCalendarSettings,
- *         holiday: HolidaySettings
- *     }
+ *     calendar_config?: CalendarSettingsArray
  * }
  */
 class Settings
@@ -40,9 +32,7 @@ class Settings
     private ChatbotGeneral $chatbotGeneral;
     private ChatbotTuning $chatbotTuning;
     private ChatbotFunctions $chatbotFunctions;
-    private Calendar $calendar;
-    private MoonCalendar $moonCalendar;
-    private Holiday $holiday;
+    private CalendarSettings $calendarSettings;
 
     public function __construct()
     {
@@ -50,9 +40,7 @@ class Settings
         $this->chatbotGeneral   = new ChatbotGeneral();
         $this->chatbotTuning    = new ChatbotTuning();
         $this->chatbotFunctions = new ChatbotFunctions();
-        $this->calendar         = new Calendar();
-        $this->moonCalendar     = new MoonCalendar();
-        $this->holiday          = new Holiday();
+        $this->calendarSettings = new CalendarSettings();
     }
 
     /** @param SettingsArray $settingsArray */
@@ -65,9 +53,10 @@ class Settings
         $settings->setChatbotGeneral(ChatbotGeneral::fromArray($settingsArray['chatbot']['general']));
         $settings->setChatbotTuning(ChatbotTuning::fromArray($settingsArray['chatbot']['tuning']));
         $settings->setChatbotFunctions(ChatbotFunctions::fromArray($settingsArray['chatbot']['functions']));
-        $settings->setCalendar(Calendar::fromArray($settingsArray['calendar']['general']));
-        $settings->setHoliday(Holiday::fromArray($settingsArray['calendar']['holiday']));
-        $settings->setMoonCalendar(MoonCalendar::fromArray($settingsArray['calendar']['moon']));
+
+        if (isset($settingsArray['calendar_config'])) {
+            $settings->setCalendarSettings(CalendarSettings::fromArray($settingsArray['calendar_config']));
+        }
 
         return $settings;
     }
@@ -82,11 +71,7 @@ class Settings
                 'tuning' => $this->chatbotTuning->toArray(),
                 'functions' => $this->chatbotFunctions->toArray(),
             ],
-            'calendar' => [
-                'general' => $this->calendar->toArray(),
-                'moon' => $this->moonCalendar->toArray(),
-                'holiday' => $this->holiday->toArray(),
-            ],
+            'calendar_config' => $this->calendarSettings->toArray(),
         ];
     }
 
@@ -130,33 +115,13 @@ class Settings
         $this->chatbotFunctions = $chatbotFunctions;
     }
 
-    public function getCalendar(): Calendar
+    public function getCalendarSettings(): CalendarSettings
     {
-        return $this->calendar;
+        return $this->calendarSettings;
     }
 
-    public function setCalendar(Calendar $calendar): void
+    public function setCalendarSettings(CalendarSettings $calendarSettings): void
     {
-        $this->calendar = $calendar;
-    }
-
-    public function getMoonCalendar(): MoonCalendar
-    {
-        return $this->moonCalendar;
-    }
-
-    public function setMoonCalendar(MoonCalendar $moonCalendar): void
-    {
-        $this->moonCalendar = $moonCalendar;
-    }
-
-    public function getHoliday(): Holiday
-    {
-        return $this->holiday;
-    }
-
-    public function setHoliday(Holiday $holiday): void
-    {
-        $this->holiday = $holiday;
+        $this->calendarSettings = $calendarSettings;
     }
 }

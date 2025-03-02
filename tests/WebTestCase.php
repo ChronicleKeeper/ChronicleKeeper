@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Test;
 
+use ChronicleKeeper\Settings\Application\SettingsHandler;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
 use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
 use ChronicleKeeper\Shared\Infrastructure\Database\Schema\SchemaManager;
@@ -24,6 +25,7 @@ class WebTestCase extends SymfonyWebTestCase
     protected MessageBusInterface $bus;
     protected SchemaManager $schemaManager;
     protected LLMChainFactoryDouble $llmChainFactory;
+    protected SettingsHandler $settingsHandler;
 
     protected function setUp(): void
     {
@@ -53,6 +55,11 @@ class WebTestCase extends SymfonyWebTestCase
         assert($llmChainFactory instanceof LLMChainFactoryDouble);
 
         $this->llmChainFactory = $llmChainFactory;
+
+        $settingsHandler = $this->client->getContainer()->get(SettingsHandler::class);
+        assert($settingsHandler instanceof SettingsHandler);
+
+        $this->settingsHandler = $settingsHandler;
 
         if (! self::willSetupSchema()) {
             return;
