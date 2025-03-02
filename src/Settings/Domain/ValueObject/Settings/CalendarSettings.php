@@ -14,7 +14,7 @@ use JsonSerializable;
  * @phpstan-import-type EpochSettingsArray from EpochSettings
  * @phpstan-import-type WeekSettingsArray from WeekSettings
  * @phpstan-type CalendarSettingsArray = array{
- *     moon_cycle_days?: int,
+ *     moon_cycle_days?: float,
  *     is_finished?: bool,
  *     months: array<MonthSettingsArray>,
  *     epochs: array<EpochSettingsArray>,
@@ -29,7 +29,7 @@ class CalendarSettings implements JsonSerializable
      * @param array<WeekSettings>  $weeks
      */
     public function __construct(
-        private readonly int $moonCycleDays = 30,
+        private readonly float $moonCycleDays = 30,
         private readonly bool $isFinished = false,
         private readonly array $months = [],
         private readonly array $epochs = [],
@@ -102,7 +102,7 @@ class CalendarSettings implements JsonSerializable
         return $this->isFinished;
     }
 
-    public function getMoonCycleDays(): int
+    public function getMoonCycleDays(): float
     {
         return $this->moonCycleDays;
     }

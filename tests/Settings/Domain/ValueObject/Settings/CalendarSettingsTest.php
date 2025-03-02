@@ -67,7 +67,7 @@ final class CalendarSettingsTest extends TestCase
         self::assertCount(1, $settings->getEpochs());
         self::assertCount(1, $settings->getWeeks());
 
-        self::assertSame(301, $settings->getMoonCycleDays());
+        self::assertSame(301.0, $settings->getMoonCycleDays());
         self::assertTrue($settings->isFinished());
     }
 
@@ -79,10 +79,10 @@ final class CalendarSettingsTest extends TestCase
         $epoch   = new EpochSettings('First Age', 1, 100);
         $week    = new WeekSettings(1, 'Monday');
 
-        $settings = new CalendarSettings(301, true, [$month], [$epoch], [$week]);
+        $settings = new CalendarSettings(301.0, true, [$month], [$epoch], [$week]);
 
         $expected = [
-            'moon_cycle_days' => 301,
+            'moon_cycle_days' => 301.0,
             'is_finished' => true,
             'months' => [
                 [

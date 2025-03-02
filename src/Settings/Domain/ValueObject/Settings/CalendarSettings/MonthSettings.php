@@ -88,6 +88,7 @@ class MonthSettings implements JsonSerializable
         return $this->name;
     }
 
+    /** @return int<0, max> */
     public function getDays(): int
     {
         return $this->days;

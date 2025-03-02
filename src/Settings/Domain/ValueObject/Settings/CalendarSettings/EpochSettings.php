@@ -62,11 +62,13 @@ class EpochSettings implements JsonSerializable
         return $this->name;
     }
 
+    /** @return int<0, max> */
     public function getStartYear(): int
     {
         return $this->startYear;
     }
 
+    /** @return int<0, max>|null */
     public function getEndYear(): int|null
     {
         return $this->endYear;
