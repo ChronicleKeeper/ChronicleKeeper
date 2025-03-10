@@ -13,6 +13,7 @@ use function array_key_exists;
 use function json_decode;
 use function json_encode;
 
+use const JSON_PRETTY_PRINT;
 use const JSON_THROW_ON_ERROR;
 
 final readonly class SettingsImporter implements SingleImport
@@ -32,14 +33,19 @@ final readonly class SettingsImporter implements SingleImport
         }
 
         $content = $filesystem->read('settings.json');
+
         $content = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
+        if (array_key_exists('appVersion', $content)) {
+            // The new import is hidden in data key
+            $content = $content['data'];
+        }
 
         $content = $this->removeOldCalendarSettings($content);
 
         $this->fileAccess->write(
             'storage',
             'settings.json',
-            json_encode($content, JSON_THROW_ON_ERROR),
+            json_encode($content, JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR),
         );
     }
 
