@@ -67,15 +67,18 @@
         {% for leapDay in this.leapDaysWithinMonth(viewDate) %}
             {% set leapDayDate = this.createDateFromLeapDay(leapDay, viewDate) %}
 
-            <div class="col-4" data-date="{{ leapDayDate.year ~ '-' ~ leapDayDate.month ~ '-' ~ leapDayDate.day.dayOfTheMonth }}">
+            <div class="col-sm-12 col-md-6" data-date="{{ leapDayDate.year ~ '-' ~ leapDayDate.month ~ '-' ~ leapDayDate.day.dayOfTheMonth }}">
                 <div class="card{{ currentDate.same(leapDayDate) ? ' bg-primary-lt' }}">
                     <div class="card-header">
                         <h3 class="card-title">{{ leapDay.label }}</h3>
+                        <div class="ms-auto">
+                            <span title="{{ calendar.moonCycle.moonStateOfDay(leapDayDate).label }}">{{ calendar.moonCycle.moonStateOfDay(leapDayDate).icon }}</span>
+                        </div>
                     </div>
                     <div class="card-body">
                         <div class="row">
-                            <div class="col-5">Zwischen</div>
-                            <div class="col-7 text-muted">
+                            <div class="col-sm-5">Zwischen</div>
+                            <div class="col-sm-7 text-muted">
                                 {% set previousDay = this.getPreviousRegularDay(leapDayDate) %}
                                 {{ previousDay is not empty ? previousDay.format : 'Calendarbeginn' }}<br />
                                 {{ this.getNextRegularDay(leapDayDate).format }}
