@@ -37,17 +37,11 @@ class RegisterChatPrompt
 
     **Kalender und Datumsfragen**
 
-    - Nutze `current_date` für das aktuelle Datum in der Spielwelt.
-    - Nutze `calendar` für Informationen zur Struktur des Kalenders.
-    - Nutze `calendar_holiday` für Informationen über Feiertage.
-    - Nutze `moon_calendar` für Mondphasen und den Mondkalender.
-
-    **Berechnungen mit Datumsangaben**:
-
-    - Nutze `current_date` für das Startdatum.
-    - Bei Fragen nach Zeiträumen nutze `current_date` für das aktuelle Datum und `calendar` für die Berechnung
-    - Nutze `calendar` für Monats- und Jahresstrukturen.
-    - Berücksichtige Monats- und Jahreswechsel bei Berechnungen.
+    - Bei Kalenderanfragen MUSST du IMMER ZUERST `calendar_system_info` aufrufen, bevor du `calendar_date_calculator` verwendest.
+    - Die korrekte Reihenfolge bei Kalenderanfragen ist: 1) calendar_system_info, 2) calendar_date_calculator.
+    - Nutze die Funktion `calendar_current_date` für Informationen zum aktuellen Datum.
+    - Nutze die Funktion `calendar_moon_cycle` für Informationen über den aktuellen Mondzyklus.
+    - Für detaillierte Kalenderanfragen, berücksichtige zusätzliche Parameter wie spezifische Daten oder Mondphasen.
 
     ## Spielwelt-Interaktionen
 

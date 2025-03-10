@@ -20,6 +20,7 @@ final class DateFormatter
         'M' => 'getMonthName',
         'y' => 'getYear',
         'Y' => 'getYearWithEpoch',
+        'w' => 'getWeekDay',
     ];
 
     public function format(CalendarDate $date, string $format): string
@@ -69,5 +70,10 @@ final class DateFormatter
             $date->getYear(),
             $date->getCalendar()->getEpochCollection()->getEpochForYear($date->getYear())->name,
         );
+    }
+
+    private function getWeekDay(CalendarDate $date): string
+    {
+        return (string) $date->getWeekDay()?->name;
     }
 }

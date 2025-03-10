@@ -18,10 +18,21 @@ class MoonCycle
         Assert::greaterThan($daysOfACycle, 0, 'The moon cycle should have a days value.');
     }
 
+    public function getMoonCycle(): float
+    {
+        return $this->daysOfACycle;
+    }
+
+    public function getDaysOfACycle(CalendarDate $date): float
+    {
+        $totalDays = $date->getTotalDaysFromCalendarStart();
+
+        return fmod($totalDays, $this->daysOfACycle);
+    }
+
     public function getMoonStateOfDay(CalendarDate $date): MoonState
     {
-        $totalDays  = $date->getTotalDaysFromCalendarStart();
-        $dayInCycle = fmod($totalDays, $this->daysOfACycle);
+        $dayInCycle = $this->getDaysOfACycle($date);
 
         // Normalize to 0-1 range (complete cycle)
         $normalizedAge = $dayInCycle / $this->daysOfACycle;

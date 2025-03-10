@@ -80,7 +80,7 @@
                 <div id="debug-collapse-{{ conversationId ~ '-' ~ index }}" class="accordion-collapse collapse" data-bs-parent="#debug-tool-calls-{{ conversationId }}" style="">
                     <div class="accordion-body pt-0">
                         <pre>{{ call.arguments|json_encode(constant('JSON_PRETTY_PRINT')) }}</pre>
-                        <pre>{{ call.result|json_encode(constant('JSON_PRETTY_PRINT')) }}</pre>
+                        <pre>{{ call.result }}</pre>
                     </div>
                 </div>
             </div>
