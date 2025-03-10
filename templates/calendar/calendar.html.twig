@@ -17,6 +17,12 @@
                     {{ ux_icon('tabler:chevron-right') }}
                 </a>
             </div>
+
+            {# Add view navigation buttons #}
+            <div class="btn-group me-2">
+                <a href="{{ path('settings_calendar_add_days', {'days': 1}) }}" class="btn btn-outline-secondary">+ 1 Tag</a>
+                <a href="{{ path('settings_calendar_sub_days', {'days': 1}) }}" class="btn btn-outline-secondary">- 1 Tag</a>
+            </div>
         </div>
     </div>
 {% endblock %}

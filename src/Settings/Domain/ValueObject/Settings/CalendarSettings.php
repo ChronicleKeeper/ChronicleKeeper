@@ -135,4 +135,16 @@ class CalendarSettings implements JsonSerializable
     {
         return $this->currentDay;
     }
+
+    public function withCurrentDay(CurrentDay $day): self
+    {
+        return new self(
+            $this->moonCycleDays,
+            $this->isFinished,
+            $this->months,
+            $this->epochs,
+            $this->weeks,
+            $day,
+        );
+    }
 }
