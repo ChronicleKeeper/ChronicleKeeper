@@ -23,7 +23,7 @@ final class GetCurrentDateQuery implements Query
 
     public function query(QueryParameters $parameters): CalendarDate
     {
-        assert($parameters instanceof CurrentDay);
+        assert($parameters instanceof GetCurrentDate);
 
         $calendar = $this->queryService->query(new LoadCalendar());
         $settings = $this->settingsHandler->get();

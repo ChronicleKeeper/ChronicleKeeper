@@ -17,7 +17,6 @@ use PhpLlm\LlmChain\Chain\ToolBox\Attribute\AsTool;
 use Throwable;
 
 use function floor;
-use function func_get_args;
 use function strtolower;
 use function trim;
 
@@ -60,6 +59,15 @@ class CalculateDate
         int|null $month = null,
         int|null $day = null,
     ): string {
+        $debugArguments = [
+            'operation' => $operation,
+            'days' => $days,
+            'phase' => $phase,
+            'year' => $year,
+            'month' => $month,
+            'day' => $day,
+        ];
+
         try {
             $this->calendarSettingsChecker->hasValidSettings();
         } catch (CalendarConfigurationIncomplete $e) {
@@ -68,7 +76,7 @@ class CalculateDate
             $this->runtimeCollector->addFunctionDebug(
                 new FunctionDebug(
                     tool: 'calendar_date_calculator',
-                    arguments: func_get_args(),
+                    arguments: $debugArguments,
                     result: $result,
                 ),
             );
@@ -90,7 +98,7 @@ class CalculateDate
         $this->runtimeCollector->addFunctionDebug(
             new FunctionDebug(
                 tool: 'calendar_date_calculator',
-                arguments: func_get_args(),
+                arguments: $debugArguments,
                 result: $result,
             ),
         );
@@ -106,7 +114,7 @@ class CalculateDate
 
         $futureDate = $currentDate->addDays($days);
 
-        $summary  = "[DATE CALCULATION] Adding $days days to the current date:" . PHP_EOL;
+        $summary  = '[DATE CALCULATION] Adding ' . $days . ' days to the current date:' . PHP_EOL;
         $summary .= '- Current date: ' . $this->formatDate($currentDate) . PHP_EOL;
         $summary .= '- Result date: ' . $this->formatDate($futureDate) . PHP_EOL;
 
@@ -115,7 +123,7 @@ class CalculateDate
         $summary .= '- Moon phase: ' . $calendar->getMoonCycle()->getMoonStateOfDay($futureDate)->getLabel() . PHP_EOL;
         $summary .= '- Month days: ' . $calendar->getMonth($futureDate->getMonth())->days->countInYear($futureDate->getYear()) . PHP_EOL;
 
-        return $summary . ('- Weekday: ' . ($futureDate->getWeekDay()?->name ?? 'N/A') . PHP_EOL);
+        return $summary . ('- Weekday: ' . ($futureDate->getWeekDay()->name ?? 'N/A') . PHP_EOL);
     }
 
     private function subtractDays(CalendarDate $currentDate, CalendarEntity $calendar, int|null $days): string
@@ -126,7 +134,7 @@ class CalculateDate
 
         $pastDate = $currentDate->subDays($days);
 
-        $summary  = "[DATE CALCULATION] Subtracting $days days from the current date:" . PHP_EOL;
+        $summary  = '[DATE CALCULATION] Subtracting ' . $days . ' days from the current date:' . PHP_EOL;
         $summary .= '- Current date: ' . $this->formatDate($currentDate) . PHP_EOL;
         $summary .= '- Result date: ' . $this->formatDate($pastDate) . PHP_EOL;
 
@@ -135,11 +143,14 @@ class CalculateDate
         $summary .= '- Moon phase: ' . $calendar->getMoonCycle()->getMoonStateOfDay($pastDate)->getLabel() . PHP_EOL;
         $summary .= '- Month days: ' . $calendar->getMonth($pastDate->getMonth())->days->countInYear($pastDate->getYear()) . PHP_EOL;
 
-        return $summary . ('- Weekday: ' . ($pastDate->getWeekDay()?->name ?? 'N/A') . PHP_EOL);
+        return $summary . ('- Weekday: ' . ($pastDate->getWeekDay()->name ?? 'N/A') . PHP_EOL);
     }
 
-    private function daysUntilNextMoonPhase(CalendarDate $currentDate, CalendarEntity $calendar, string|null $phase): string
-    {
+    private function daysUntilNextMoonPhase(
+        CalendarDate $currentDate,
+        CalendarEntity $calendar,
+        string|null $phase,
+    ): string {
         if ($phase === null || trim($phase) === '') {
             return '[ERROR] You must specify a moon phase to calculate days until.';
         }
@@ -167,19 +178,25 @@ class CalculateDate
         }
 
         if (! $found) {
-            return "[ERROR] Could not find the specified moon phase \"$phase\". Valid phases in this calendar might be different.";
+            return '[ERROR] Could not find the specified moon phase "' . $phase
+                . '". Valid phases in this calendar might be different.';
         }
 
-        $summary  = "[MOON PHASE CALCULATION] Days until next \"$phase\":" . PHP_EOL;
+        $summary  = '[MOON PHASE CALCULATION] Days until next "' . $phase . '":' . PHP_EOL;
         $summary .= '- Current date: ' . $this->formatDate($currentDate) . PHP_EOL;
-        $summary .= "- Current moon phase: $currentPhase" . PHP_EOL;
-        $summary .= "- Days until next \"$phase\": $daysUntil" . PHP_EOL;
+        $summary .= '- Current moon phase: ' . $currentPhase . PHP_EOL;
+        $summary .= '- Days until next "' . $phase . '": ' . $daysUntil . PHP_EOL;
 
-        return $summary . ("- Date of next \"$phase\": " . $this->formatDate($targetDate) . PHP_EOL);
+        return $summary . ('- Date of next "' . $phase . '": ' . $this->formatDate($targetDate) . PHP_EOL);
     }
 
-    private function daysBetween(CalendarDate $currentDate, CalendarEntity $calendar, int|null $year, int|null $month, int|null $day): string
-    {
+    private function daysBetween(
+        CalendarDate $currentDate,
+        CalendarEntity $calendar,
+        int|null $year,
+        int|null $month,
+        int|null $day,
+    ): string {
         if ($year === null || $month === null || $day === null) {
             return '[ERROR] You must specify year, month, and day parameters for days_between operation.';
         }
@@ -193,15 +210,14 @@ class CalculateDate
             $summary  = '[DATE DIFFERENCE CALCULATION]' . PHP_EOL;
             $summary .= '- First date: ' . $this->formatDate($currentDate) . PHP_EOL;
             $summary .= '- Second date: ' . $this->formatDate($targetDate) . PHP_EOL;
-            $summary .= "- Days between: $daysDiff (including $leapDayCount leap days)" . PHP_EOL;
+            $summary .= '- Days between: $daysDiff (including ' . $leapDayCount . ' leap days)' . PHP_EOL;
 
-            // Additional context about the comparison
             if ($daysDiff > 0) {
                 $weeksCounts = floor($daysDiff / $calendar->getWeeks()->countDays());
-                $summary    .= "- This represents approximately $weeksCounts weeks in this calendar" . PHP_EOL;
+                $summary    .= '- This represents approximately ' . $weeksCounts . ' weeks in this calendar' . PHP_EOL;
 
                 $moonCycles = floor($daysDiff / $calendar->getMoonCycle()->getMoonCycle());
-                $summary   .= "- This represents approximately $moonCycles complete moon cycles" . PHP_EOL;
+                $summary   .= '- This represents approximately ' . $moonCycles . ' complete moon cycles' . PHP_EOL;
             }
 
             return $summary;
@@ -212,8 +228,8 @@ class CalculateDate
 
     private function formatDate(CalendarDate $date): string
     {
-        $weekdayName = $date->getWeekDay()?->name ?? '';
-        $dateFormat  = $weekdayName ? "$weekdayName, %d %M %Y" : '%d %M %Y';
+        $weekdayName = $date->getWeekDay()->name ?? '';
+        $dateFormat  = $weekdayName !== '' ? $weekdayName . ', %d %M %Y' : '%d %M %Y';
 
         return $date->format($dateFormat);
     }

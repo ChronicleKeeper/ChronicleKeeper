@@ -64,7 +64,7 @@ final class CalendarTest extends WebTestCase
         // -------------------- Test Assertions -------------------- //
 
         self::assertResponseIsSuccessful();
-        self::assertSelectorTextContains('h2', 'Brigid 0 after the Flood');
+        self::assertSelectorTextContains('h2', 'Brigid 0 before the Flood');
     }
 
     #[Test]

@@ -15,6 +15,7 @@ use function array_combine;
 use function array_keys;
 use function array_map;
 use function array_reduce;
+use function assert;
 use function count;
 use function ksort;
 use function range;
@@ -46,9 +47,7 @@ final class MonthCollection implements Countable
 
     private function validate(): void
     {
-        if ($this->months === []) {
-            return;
-        }
+        assert($this->months !== []); // Ensured by constructor
 
         $firstMonth = reset($this->months);
         if ($firstMonth->indexInYear !== 1) {

@@ -10,10 +10,13 @@ use function sprintf;
 
 class DayNotExistsInMonth extends InvalidArgumentException
 {
-    public function __construct(int $year, int $month, int $day)
+    public static function forDayAtSpecificDate(int $year, int $month, int $day): self
     {
-        parent::__construct(
-            sprintf('Day %d does not exist in month %d of year %d', $day, $month, $year),
-        );
+        return new self(sprintf('Day %d does not exist in month %d of year %d', $day, $month, $year));
+    }
+
+    public static function forDayGenerallyNotExistsInMonth(int $day): self
+    {
+        return new self(sprintf('Day %d does not exist in the month, in any year', $day));
     }
 }

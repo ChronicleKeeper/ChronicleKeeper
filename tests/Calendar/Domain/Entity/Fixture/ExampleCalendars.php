@@ -178,7 +178,14 @@ class ExampleCalendars
                     ],
                 ],
                 ['index' => 2, 'name' => 'Second', 'days' => 15],
-                ['index' => 3, 'name' => 'Third', 'days' => 20],
+                [
+                    'index' => 3,
+                    'name' => 'Third',
+                    'days' => 20,
+                    'leapDays' => [
+                        ['day' => 21, 'name' => 'Good Bye Year!'],
+                    ],
+                ],
             ],
             [
                 ['name' => 'AD', 'startYear' => 0],

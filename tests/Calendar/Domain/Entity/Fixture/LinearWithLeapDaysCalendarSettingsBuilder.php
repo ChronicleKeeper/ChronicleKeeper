@@ -39,7 +39,8 @@ final class LinearWithLeapDaysCalendarSettingsBuilder extends DefaultCalendarSet
 
         // Create epochs
         $this->epochs = [
-            new EpochSettings('after the Flood', 0, null),
+            new EpochSettings('before the Flood', 0, 1249),
+            new EpochSettings('after the Flood', 1250, null),
         ];
 
         // Create weeks

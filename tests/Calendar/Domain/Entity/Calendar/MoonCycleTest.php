@@ -9,6 +9,7 @@ use ChronicleKeeper\Calendar\Domain\Entity\CalendarDate;
 use ChronicleKeeper\Calendar\Domain\ValueObject\MoonState;
 use ChronicleKeeper\Test\Calendar\Domain\Entity\Fixture\ExampleCalendars;
 use Generator;
+use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Small;
@@ -20,6 +21,23 @@ use PHPUnit\Framework\TestCase;
 #[Small]
 final class MoonCycleTest extends TestCase
 {
+    #[Test]
+    public function itIsNotConstructableWithMooNCycleLowerThenOne(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The moon cycle should have a days value.');
+
+        new MoonCycle(0);
+    }
+
+    #[Test]
+    public function itIsConstructableWithMooNCycleGreaterThenOne(): void
+    {
+        $moonCycle = new MoonCycle(29);
+
+        self::assertSame(29.0, $moonCycle->getMoonCycle());
+    }
+
     #[Test]
     #[DataProvider('provideMoonStateCasesWithNonLinearCalendar')]
     public function itCanCalculateTheCurrentMoonState(CalendarDate $date, MoonState $expectedMoonState): void

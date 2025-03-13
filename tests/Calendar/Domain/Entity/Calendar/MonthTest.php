@@ -18,6 +18,17 @@ use PHPUnit\Framework\TestCase;
 final class MonthTest extends TestCase
 {
     #[Test]
+    public function itIsConstructable(): void
+    {
+        $calendar = ExampleCalendars::getFullFeatured();
+        $month    = $calendar->getMonth(1);
+
+        self::assertSame(1, $month->indexInYear);
+        self::assertSame('FirstMonth', $month->name);
+        self::assertCount(10, $month->days);
+    }
+
+    #[Test]
     #[DataProvider('provideCountDaysInYearCases')]
     public function itIsCalculationTheDaysInAYearCorrect(
         Month $month,

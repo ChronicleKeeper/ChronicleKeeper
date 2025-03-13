@@ -40,7 +40,7 @@ class CalendarDate
         $maxDaysInMonthOfATheYear = $this->currentMonth->days->countInYear($this->year);
 
         if ($this->day < 1 || $this->day > $maxDaysInMonthOfATheYear) {
-            throw new DayNotExistsInMonth($this->year, $this->month, $this->day);
+            throw DayNotExistsInMonth::forDayAtSpecificDate($this->year, $this->month, $this->day);
         }
 
         $this->formatter = new DateFormatter();

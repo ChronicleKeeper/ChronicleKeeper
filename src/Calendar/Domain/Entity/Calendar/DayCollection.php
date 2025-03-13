@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Calendar\Domain\Entity\Calendar;
 
+use ChronicleKeeper\Calendar\Domain\Exception\DayNotExistsInMonth;
 use ChronicleKeeper\Calendar\Domain\ValueObject\LeapDay;
 use ChronicleKeeper\Calendar\Domain\ValueObject\RegularDay;
 use Countable;
@@ -80,6 +81,21 @@ final class DayCollection implements Countable
             ++$numericRegularDayToDisplay;
         } while ($numericRegularDayToDisplay <= $this->amountOfRegularDays);
 
+        // Finaly add leap days that are registered after the max amount of regular days
+        foreach ($leapDays as $dayOfTheMonth => $leapDay) {
+            if ($dayOfTheMonth <= $this->amountOfRegularDays) {
+                continue;
+            }
+
+            // Ignore leap days that would lie in a gap
+            $difference = $dayOfTheMonth - count($daysInTheMonth);
+            if ($difference > 1) {
+                continue;
+            }
+
+            $daysInTheMonth[$dayOfTheMonth] = $leapDay;
+        }
+
         return $daysInTheMonth;
     }
 
@@ -100,7 +116,7 @@ final class DayCollection implements Countable
 
     public function getDay(int $day): Day
     {
-        return $this->daysInTheMonth[$day];
+        return $this->daysInTheMonth[$day] ?? throw DayNotExistsInMonth::forDayGenerallyNotExistsInMonth($day);
     }
 
     public function countInYear(int $year): int

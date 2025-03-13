@@ -52,6 +52,15 @@ class MonthCollectionTest extends TestCase
     }
 
     #[Test]
+    public function itCanCountTheMonths(): void
+    {
+        $calendar = ExampleCalendars::getOnlyRegularDays();
+        $months   = new MonthCollection($calendar->getMonths()->get(1), $calendar->getMonths()->get(2));
+
+        self::assertCount(2, $months);
+    }
+
+    #[Test]
     public function itGetsMonthByIndex(): void
     {
         $calendar = ExampleCalendars::getOnlyRegularDays();

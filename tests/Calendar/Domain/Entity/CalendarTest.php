@@ -42,6 +42,48 @@ class CalendarTest extends TestCase
         $calendar->getMonth(4);
     }
 
+    #[Test]
+    public function itCanGetTheMonthCollection(): void
+    {
+        $calendar = $this->getCalendar();
+
+        self::assertSame('FirstMonth', $calendar->getMonths()->get(1)->name);
+        self::assertSame('SecondMonth', $calendar->getMonths()->get(2)->name);
+        self::assertSame('ThirdMonth', $calendar->getMonths()->get(3)->name);
+    }
+
+    #[Test]
+    public function itCanGetTheEpochCollection(): void
+    {
+        $calendar = $this->getCalendar();
+
+        self::assertSame('after Boom', $calendar->getEpochCollection()->getEpochForYear(0)->name);
+    }
+
+    #[Test]
+    public function itCanGetTheWeeksConfiguration(): void
+    {
+        $calendar = $this->getCalendar();
+
+        self::assertSame('Day', $calendar->getWeeks()->getDays()[1]->name);
+    }
+
+    #[Test]
+    public function itCanGetTheMoonCycle(): void
+    {
+        $calendar = $this->getCalendar();
+
+        self::assertSame(30.0, $calendar->getMoonCycle()->getMoonCycle());
+    }
+
+    #[Test]
+    public function itCanGetTheConfiguration(): void
+    {
+        $calendar = $this->getCalendar();
+
+        self::assertSame(0, $calendar->getConfiguration()->beginsInYear);
+    }
+
     private function getCalendar(): Calendar
     {
         return ExampleCalendars::getFullFeatured();

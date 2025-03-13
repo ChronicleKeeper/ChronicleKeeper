@@ -68,8 +68,10 @@ final class WeekConfigurationTest extends TestCase
 
     #[Test]
     #[DataProvider('provideFirstWeekDayCases')]
-    public function itCalculatesFirstWeekDaysCorrectWithRegularDayCalendar(CalendarDate $date, string $expectedDate): void
-    {
+    public function itCalculatesFirstWeekDaysCorrectWithRegularDayCalendar(
+        CalendarDate $date,
+        string $expectedDate,
+    ): void {
         $calendarWeeks = $date->getCalendar()->getWeeks();
 
         self::assertSame($expectedDate, $calendarWeeks->getFirstDayOfWeekByDate($date)->format());
@@ -115,6 +117,11 @@ final class WeekConfigurationTest extends TestCase
 
         yield 'Leap day calendar start is able to deliver the every first weekday' => [
             new CalendarDate($calendar, 0, 1, 1),
+            '1. First 0 AD',
+        ];
+
+        yield 'Leap day calendar start is able to deliver the every first weekday even it is a leap day' => [
+            new CalendarDate($calendar, 0, 1, 3),
             '1. First 0 AD',
         ];
     }
@@ -172,6 +179,18 @@ final class WeekConfigurationTest extends TestCase
         yield 'Last day of the tenth month in the year must not be a leap day' => [
             new CalendarDate($calendar, 0, 10, 1),
             '10. Cerun 0 after the Flood',
+        ];
+
+        $calendar = ExampleCalendars::getCalendarWithLeapDayAsFirstDayOfTheYear();
+
+        yield 'Leap day calendar first week is able to deliver the ever last weekday' => [
+            new CalendarDate($calendar, 0, 1, 1),
+            '3. First 0 AD',
+        ];
+
+        yield 'Leap day calendar start is able to deliver the every first weekday even it is a leap day' => [
+            new CalendarDate($calendar, 0, 3, 21),
+            '3. First 1 AD',
         ];
     }
 
