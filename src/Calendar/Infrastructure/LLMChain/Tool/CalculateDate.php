@@ -210,7 +210,7 @@ class CalculateDate
             $summary  = '[DATE DIFFERENCE CALCULATION]' . PHP_EOL;
             $summary .= '- First date: ' . $this->formatDate($currentDate) . PHP_EOL;
             $summary .= '- Second date: ' . $this->formatDate($targetDate) . PHP_EOL;
-            $summary .= '- Days between: $daysDiff (including ' . $leapDayCount . ' leap days)' . PHP_EOL;
+            $summary .= '- Days between: ' . $daysDiff . ' (including ' . $leapDayCount . ' leap days)' . PHP_EOL;
 
             if ($daysDiff > 0) {
                 $weeksCounts = floor($daysDiff / $calendar->getWeeks()->countDays());
