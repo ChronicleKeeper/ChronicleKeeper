@@ -11,7 +11,9 @@ use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
 
 #[CoversClass(ValidWeekdayCollectionValidator::class)]
@@ -34,6 +36,31 @@ final class ValidWeekdayCollectionValidatorTest extends TestCase
     protected function tearDown(): void
     {
         unset($this->context);
+    }
+
+    #[Test]
+    public function itUtilizesTheCorrectTargets(): void
+    {
+        self::assertSame(
+            Constraint::CLASS_CONSTRAINT,
+            $this->constraint->getTargets(),
+        );
+    }
+
+    #[Test]
+    public function itUtilizesTheCorrectValidationClass(): void
+    {
+        self::assertSame(
+            ValidWeekdayCollectionValidator::class,
+            $this->constraint->validatedBy(),
+        );
+    }
+
+    #[Test]
+    public function itShouldThrowExceptionForInvalidConstraint(): void
+    {
+        $this->expectException(UnexpectedTypeException::class);
+        $this->validator->validate([], self::createStub(Constraint::class));
     }
 
     #[Test]

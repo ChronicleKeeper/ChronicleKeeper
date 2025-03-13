@@ -27,9 +27,9 @@ class ValidCalendarDateValidator extends ConstraintValidator
             throw new UnexpectedTypeException($constraint, ValidCalendarDate::class);
         }
 
-        $calendar = $this->queryService->query(new LoadCalendar());
-
         try {
+            $calendar = $this->queryService->query(new LoadCalendar());
+
             new CalendarDate(
                 $calendar,
                 $value['year'],
