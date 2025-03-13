@@ -1,0 +1,66 @@
+{% extends 'layout.html.twig' %}
+
+{% block page_title %}Einstellungen - Kalender - Teilen{% endblock %}
+
+{% block page_content %}
+<div class="container-xl">
+    <form action="{{ path('settings_calendar_import') }}" method="post" enctype="multipart/form-data">
+
+    <div class="row row-deck row-cards">
+
+        <div class="col-sm-12 col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h3 class="card-title">Kalender Export</h3>
+                    <p>
+                        Das Exportieren der Kalendereinstellungen ermöglicht es dir deine Einstellungen mit anderen zu
+                        teilen. Der Kalender ist auch Bestandteil des regulären Exportes der Einstellungen. Mit diesem
+                        Export bekommst du also die Möglichkeit die heruntegladene JSON Datei, zum Beispiel, mit deinen
+                        Mitspielern zu teilen, damit nicht jeder in die Tiefen mit den Kalendereinstellungen befassen
+                        muss.
+                    </p>
+                </div>
+                <div class="card-footer text-end">
+                    <div class="d-flex">
+                        <a href="{{ path('settings_calendar_overview') }}" class="btn btn-ghost-secondary">{{ ux_icon('tabler:cancel') }}Abbrechen</a>
+                        <a href="{{ path('settings_calendar_export') }}" class="btn btn-primary ms-auto no-loader">
+                            {{ ux_icon('tabler:download') }} Exportieren
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-12 col-md-6">
+
+            <div class="card">
+                <div class="card-body">
+                    <h3 class="card-title">Kalender Import</h3>
+                    <p>
+                        Du hast von deinem Spielleiter oder einem Mitspieler ein Datei mit Kalendereinstellungen
+                        bekommen? Dann importiere sie hier in deine Einstellungen. Sie sind nach dem Import dauerhaft
+                        Bestandteil deiner Einstellungen.
+                    </p>
+
+                    <div class="mb-3">
+                        <input type="file" name="calendar_settings_file" class="form-control" accept=".json">
+                    </div>
+
+                </div>
+                <div class="card-footer text-end">
+                    <div class="d-flex">
+                        <a href="{{ path('settings_calendar_overview') }}" class="btn btn-ghost-secondary">{{ ux_icon('tabler:cancel') }}Abbrechen</a>
+                        <button class="btn btn-primary ms-auto">{{ ux_icon('tabler:upload') }} Importieren</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+
+
+    </div>
+
+    </form>
+</div>
+{% endblock %}

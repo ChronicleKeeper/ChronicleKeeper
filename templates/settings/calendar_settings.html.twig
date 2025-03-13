@@ -2,6 +2,16 @@
 
 {% block page_title %}Einstellungen - Kalender{% endblock %}
 
+{% block page_title_actions %}
+    <div class="col-auto ms-auto d-print-none">
+        <div class="btn-list">
+            <a href="{{ path('settings_calendar_import_export') }}" class="btn d-none d-sm-inline-block" title="Kalendereinstellungen mit anderen Leuten Teilen" >
+                {{ ux_icon('tabler:package') }} Teilen
+            </a>
+        </div>
+    </div>
+{% endblock %}
+
 {% block page_content %}
 <div class="container-xl">
     <div class="card">
