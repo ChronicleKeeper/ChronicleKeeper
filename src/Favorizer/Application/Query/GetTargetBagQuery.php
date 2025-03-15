@@ -13,11 +13,11 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 use function count;
 
-final readonly class GetTargetBagQuery implements Query
+class GetTargetBagQuery implements Query
 {
     public function __construct(
-        private DenormalizerInterface $denormalizer,
-        private DatabasePlatform $databasePlatform,
+        private readonly DenormalizerInterface $denormalizer,
+        private readonly DatabasePlatform $databasePlatform,
     ) {
     }
 
