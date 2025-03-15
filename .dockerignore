@@ -45,7 +45,6 @@ vendor/
 assets/vendor/
 
 # Documentation and non-essential files
-CHANGELOG.md
 CONTRIBUTING.md
 README.md
 LICENSE
