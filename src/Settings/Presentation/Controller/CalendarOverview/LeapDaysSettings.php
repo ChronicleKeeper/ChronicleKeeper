@@ -8,7 +8,6 @@ use ChronicleKeeper\Settings\Application\SettingsHandler;
 use ChronicleKeeper\Settings\Domain\ValueObject\Settings\CalendarSettings;
 use ChronicleKeeper\Settings\Domain\ValueObject\Settings\CalendarSettings\MonthSettings;
 use ChronicleKeeper\Settings\Presentation\Form\Calendar\LeapDaysType;
-use InvalidArgumentException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -59,6 +58,6 @@ final class LeapDaysSettings extends AbstractController
             }
         }
 
-        throw new InvalidArgumentException('Month not found');
+        throw $this->createNotFoundException('Month not found');
     }
 }
