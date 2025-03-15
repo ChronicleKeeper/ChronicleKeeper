@@ -34,10 +34,7 @@ class ChangeSettings extends AbstractController
     ];
 
     public function __construct(
-        private readonly Environment $environment,
         private readonly SettingsHandler $settingsHandler,
-        private readonly RouterInterface $router,
-        private readonly FormFactoryInterface $formFactory,
     ) {
     }
 
@@ -45,10 +42,10 @@ class ChangeSettings extends AbstractController
     {
         $settings = $this->settingsHandler->get();
 
-        $form = $this->formFactory->create(
+        $form = $this->createForm(
             self::FORM_MAPPING[$section],
             $settings,
-            ['action' => $this->router->generate('settings', ['section' => $section])],
+            ['action' => $this->generateUrl('settings', ['section' => $section])],
         );
         $form->handleRequest($request);
 
@@ -57,7 +54,7 @@ class ChangeSettings extends AbstractController
 
             $this->addFlashMessage($request, Alert::SUCCESS, 'Die Einstellungen wurden gespeichert.');
 
-            return new RedirectResponse($this->router->generate('settings', ['section' => $section]));
+            return new RedirectResponse($this->generateUrl('settings', ['section' => $section]));
         }
 
         $template = $form->getConfig()->getOption('twig_view');
@@ -65,9 +62,9 @@ class ChangeSettings extends AbstractController
             throw new RuntimeException('The form does not have a corresponding "twig_view" configured.');
         }
 
-        return new Response($this->environment->render(
+        return $this->render(
             $template,
             ['settings' => $settings, 'form' => $form->createView()],
-        ));
+        );
     }
 }
