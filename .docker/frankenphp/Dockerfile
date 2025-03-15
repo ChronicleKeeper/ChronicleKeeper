@@ -3,7 +3,7 @@ FROM dunglas/frankenphp:1.4.4-php8.4 AS frankenphp_upstream
 FROM frankenphp_upstream AS chronicle_keeper_base
 
 WORKDIR /app
-VOLUME /app/var/
+# VOLUME /app/var/
 
 RUN install-php-extensions \
     @composer \
@@ -56,4 +56,6 @@ RUN set -eux; \
 	composer run-script --no-dev post-install-cmd; \
 	chmod +x bin/console; \
     php bin/console asset-map:compile; \
+    php bin/console cache:clear; \
+    php bin/console cache:warmup; \
     sync;
