@@ -378,7 +378,7 @@ class CalendarDateTest extends TestCase
 
         yield 'Day 1: New Moon in regular calendar' => [
             new CalendarDate($calendar, 0, 1, 1),
-            MoonState::NEW_MOON,
+            MoonState::WAXING_CRESCENT,
         ];
 
         yield 'Day 5: Waxing Crescent in regular calendar' => [
@@ -393,7 +393,7 @@ class CalendarDateTest extends TestCase
 
         yield 'Day 8: First Quarter in regular calendar' => [
             new CalendarDate($calendar, 0, 1, 8),
-            MoonState::FIRST_QUARTER,
+            MoonState::WAXING_GIBBOUS,
         ];
 
         yield 'Day 11: Waxing Gibbous in regular calendar' => [

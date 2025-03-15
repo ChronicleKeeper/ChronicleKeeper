@@ -37,7 +37,8 @@
                                                 </div>
                                                 {% if this.isInCurrentMonth(day) %}
                                                     <div class="ms-auto">
-                                                        <span title="{{ calendar.moonCycle.moonStateOfDay(day).label }}">{{ calendar.moonCycle.moonStateOfDay(day).icon }}</span>
+                                                        {% set currentMoonState = calendar.moonCycle.moonStateOfDay(day) %}
+                                                        <span title="{{ currentMoonState.label }}">{{ currentMoonState.icon }}</span>
                                                     </div>
                                                 {% endif %}
                                             </div>

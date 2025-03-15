@@ -8,6 +8,7 @@ use ChronicleKeeper\Calendar\Domain\Entity\CalendarDate;
 use ChronicleKeeper\Calendar\Domain\ValueObject\MoonState;
 use Webmozart\Assert\Assert;
 
+use function abs;
 use function fmod;
 
 class MoonCycle
@@ -34,20 +35,55 @@ class MoonCycle
     {
         $dayInCycle = $this->getDaysOfACycle($date);
 
-        // Normalize to 0-1 range (complete cycle)
-        $normalizedAge = $dayInCycle / $this->daysOfACycle;
+        // Calculate the specific day for each major phase
+        $newMoonDay      = 0;
+        $firstQuarterDay = $this->daysOfACycle * 0.25;
+        $fullMoonDay     = $this->daysOfACycle * 0.5;
+        $lastQuarterDay  = $this->daysOfACycle * 0.75;
 
-        // Phase boundaries based on normalized age
+        // Define tolerance (half a day on each side)
+        $tolerance = 0.5;
+
+        // Check if we're within tolerance of a specific phase
+        if ($this->isWithinTolerance($dayInCycle, $newMoonDay, $tolerance, $this->daysOfACycle)) {
+            return MoonState::NEW_MOON;
+        }
+
+        if ($this->isWithinTolerance($dayInCycle, $firstQuarterDay, $tolerance)) {
+            return MoonState::FIRST_QUARTER;
+        }
+
+        if ($this->isWithinTolerance($dayInCycle, $fullMoonDay, $tolerance)) {
+            return MoonState::FULL_MOON;
+        }
+
+        if ($this->isWithinTolerance($dayInCycle, $lastQuarterDay, $tolerance)) {
+            return MoonState::LAST_QUARTER;
+        }
+
+        // For days between major phases
         return match (true) {
-            $normalizedAge < 0.067 => MoonState::NEW_MOON,           // 0-6.7%
-            $normalizedAge < 0.217 => MoonState::WAXING_CRESCENT,    // 6.7-21.7%
-            $normalizedAge < 0.283 => MoonState::FIRST_QUARTER,      // 21.7-28.3%
-            $normalizedAge < 0.467 => MoonState::WAXING_GIBBOUS,     // 28.3-46.7%
-            $normalizedAge < 0.533 => MoonState::FULL_MOON,          // 46.7-53.3%
-            $normalizedAge < 0.717 => MoonState::WANING_GIBBOUS,     // 53.3-71.7%
-            $normalizedAge < 0.783 => MoonState::LAST_QUARTER,       // 71.7-78.3%
-            $normalizedAge < 0.933 => MoonState::WANING_CRESCENT,    // 78.3-93.3%
-            default => MoonState::NEW_MOON,                          // 93.3-100%
+            $dayInCycle < $firstQuarterDay => MoonState::WAXING_CRESCENT,
+            $dayInCycle < $fullMoonDay => MoonState::WAXING_GIBBOUS,
+            $dayInCycle < $lastQuarterDay => MoonState::WANING_GIBBOUS,
+            default => MoonState::WANING_CRESCENT,
         };
+    }
+
+    /**
+     * Check if a day is within tolerance of a target phase day
+     */
+    private function isWithinTolerance(
+        float $day,
+        float $targetDay,
+        float $tolerance,
+        float|null $cycleLength = null,
+    ): bool {
+        // Handle the wraparound case for new moon (day 0 = day cycleLength)
+        if ($cycleLength !== null && ($targetDay === 0.0 || $targetDay === $cycleLength)) {
+            return $day >= $cycleLength - $tolerance || $day < $tolerance;
+        }
+
+        return abs($day - $targetDay) < $tolerance;
     }
 }
