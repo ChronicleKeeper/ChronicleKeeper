@@ -6,12 +6,15 @@ namespace ChronicleKeeper\Test\Settings\Domain\ValueObject;
 
 use ChronicleKeeper\Settings\Domain\ValueObject\Settings;
 use ChronicleKeeper\Settings\Domain\ValueObject\Settings\Application;
-use ChronicleKeeper\Settings\Domain\ValueObject\Settings\Calendar;
+use ChronicleKeeper\Settings\Domain\ValueObject\Settings\CalendarSettings;
+use ChronicleKeeper\Settings\Domain\ValueObject\Settings\CalendarSettings\CurrentDay;
+use ChronicleKeeper\Settings\Domain\ValueObject\Settings\CalendarSettings\EpochSettings;
+use ChronicleKeeper\Settings\Domain\ValueObject\Settings\CalendarSettings\LeapDaySettings;
+use ChronicleKeeper\Settings\Domain\ValueObject\Settings\CalendarSettings\MonthSettings;
+use ChronicleKeeper\Settings\Domain\ValueObject\Settings\CalendarSettings\WeekSettings;
 use ChronicleKeeper\Settings\Domain\ValueObject\Settings\ChatbotFunctions;
 use ChronicleKeeper\Settings\Domain\ValueObject\Settings\ChatbotGeneral;
 use ChronicleKeeper\Settings\Domain\ValueObject\Settings\ChatbotTuning;
-use ChronicleKeeper\Settings\Domain\ValueObject\Settings\Holiday;
-use ChronicleKeeper\Settings\Domain\ValueObject\Settings\MoonCalendar;
 
 class SettingsBuilder
 {
@@ -19,9 +22,7 @@ class SettingsBuilder
     private ChatbotGeneral $chatbotGeneral;
     private ChatbotTuning $chatbotTuning;
     private ChatbotFunctions $chatbotFunctions;
-    private Calendar $calendar;
-    private MoonCalendar $moonCalendar;
-    private Holiday $holiday;
+    private CalendarSettings $calendarSettings;
 
     public function __construct()
     {
@@ -29,9 +30,7 @@ class SettingsBuilder
         $this->chatbotGeneral   = new ChatbotGeneral();
         $this->chatbotTuning    = new ChatbotTuning();
         $this->chatbotFunctions = new ChatbotFunctions();
-        $this->calendar         = new Calendar();
-        $this->moonCalendar     = new MoonCalendar();
-        $this->holiday          = new Holiday();
+        $this->calendarSettings = new CalendarSettings();
     }
 
     public function withApplication(Application $application): self
@@ -62,23 +61,28 @@ class SettingsBuilder
         return $this;
     }
 
-    public function withCalendar(Calendar $calendar): self
+    public function withCalendarSettings(CalendarSettings $calendarSettings): self
     {
-        $this->calendar = $calendar;
+        $this->calendarSettings = $calendarSettings;
 
         return $this;
     }
 
-    public function withMoonCalendar(MoonCalendar $moonCalendar): self
+    public function withDefaultCalendarSettings(): self
     {
-        $this->moonCalendar = $moonCalendar;
+        $leapDay = new LeapDaySettings(29, 'Leap Day', 4);
+        $month   = new MonthSettings(1, 'First Month', 31, [$leapDay]);
+        $epoch   = new EpochSettings('First Age', 0, null);
+        $week    = new WeekSettings(1, 'First Day');
 
-        return $this;
-    }
-
-    public function withHoliday(Holiday $holiday): self
-    {
-        $this->holiday = $holiday;
+        $this->calendarSettings = new CalendarSettings(
+            30,
+            true,
+            [$month],
+            [$epoch],
+            [$week],
+            new CurrentDay(1, 1, 1),
+        );
 
         return $this;
     }
@@ -90,9 +94,7 @@ class SettingsBuilder
         $settings->setChatbotGeneral($this->chatbotGeneral);
         $settings->setChatbotTuning($this->chatbotTuning);
         $settings->setChatbotFunctions($this->chatbotFunctions);
-        $settings->setCalendar($this->calendar);
-        $settings->setMoonCalendar($this->moonCalendar);
-        $settings->setHoliday($this->holiday);
+        $settings->setCalendarSettings($this->calendarSettings);
 
         return $settings;
     }

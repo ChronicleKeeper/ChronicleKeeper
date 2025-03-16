@@ -1,0 +1,93 @@
+{% set currentMonth = calendar.getMonth(viewDate.month) %}
+
+<div class="container-xl">
+    <div class="row row-cards">
+        <div class="col-12">
+            <div class="card">
+                <div class="table-responsive">
+                    <table class="table table-vcenter card-table calendar">
+                        <thead>
+                        <tr class="text-center p-5">
+                            {% set amountOfWeekDays = calendar.weeks.days|length %}
+                            {% for weekDay in calendar.weeks.days %}
+                                <th style="width: calc(100vw / {{ amountOfWeekDays }});">{{ weekDay.name }}</th>
+                            {% endfor %}
+                        </tr>
+                        </thead>
+                        <tbody>
+
+                        {% for week in this.createCalendarOfMonth(viewDate) %}
+
+                            <tr>
+                                {% for day in week %}
+                                    <td data-date="{{ day.year ~ '-' ~ day.month ~ '-' ~ day.day.dayOfTheMonth }}"
+                                        class="{{ day.isSame(currentDate) ? 'bg-primary-subtle ' }}{{ this.isInCurrentMonth(day) ? 'day-in-current-month ' }}border align-content-start"
+                                    >
+                                        <div class="day-content overflow-hidden">
+                                            <div class="d-flex mb-2">
+                                                <div>
+                                                    {% if day.year < 0 %}
+                                                    {% elseif not this.isInCurrentMonth(day) %}
+                                                        <div class="text-muted small">
+                                                            {{ day.day.label }}
+                                                        </div>
+                                                    {% else %}
+                                                        {{ day.day.label }}
+                                                    {% endif %}
+                                                </div>
+                                                {% if this.isInCurrentMonth(day) %}
+                                                    <div class="ms-auto">
+                                                        {% set currentMoonState = calendar.moonCycle.moonStateOfDay(day) %}
+                                                        <span title="{{ currentMoonState.label }}">{{ currentMoonState.icon }}</span>
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                            {% if this.isInCurrentMonth(day) %}
+                                                <div class="d-flex mt-6 align-content-end d-none">
+                                                    <div class="ms-auto">
+                                                        <span class="text-danger" title="Es gibt Veranstaltungen">{{ ux_icon('tabler:calendar') }}</span>
+                                                        <span class="text-success" title="Einträge aus der Bibliothek">{{ ux_icon('tabler:books') }}</span>
+                                                        <span class="text-danger" title="Einträge aus der Datenbank">{{ ux_icon('tabler:database') }}</span>
+                                                    </div>
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+
+                                {% endfor %}
+                            </tr>
+
+                        {% endfor %}
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        {% for leapDay in this.leapDaysWithinMonth(viewDate) %}
+            {% set leapDayDate = this.createDateFromLeapDay(leapDay, viewDate) %}
+
+            <div class="col-sm-12 col-md-6" data-date="{{ leapDayDate.year ~ '-' ~ leapDayDate.month ~ '-' ~ leapDayDate.day.dayOfTheMonth }}">
+                <div class="card{{ currentDate.same(leapDayDate) ? ' bg-primary-lt' }}">
+                    <div class="card-header">
+                        <h3 class="card-title">{{ leapDay.label }}</h3>
+                        <div class="ms-auto">
+                            <span title="{{ calendar.moonCycle.moonStateOfDay(leapDayDate).label }}">{{ calendar.moonCycle.moonStateOfDay(leapDayDate).icon }}</span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-sm-5">Zwischen</div>
+                            <div class="col-sm-7 text-muted">
+                                {% set previousDay = this.getPreviousRegularDay(leapDayDate) %}
+                                {{ previousDay is not empty ? previousDay.format : 'Calendarbeginn' }}<br />
+                                {{ this.getNextRegularDay(leapDayDate).format }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>

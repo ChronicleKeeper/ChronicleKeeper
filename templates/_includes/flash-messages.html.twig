@@ -2,9 +2,10 @@
 {% set flash_messages = app.flashes %}
 
 {% if flash_messages|length > 0 %}
+<div class="container-xl">
     {% for type, messages in flash_messages %}
         {% for message in messages %}
-            <div class="alert aleret-{{ type }} alert-dismissible" role="alert">
+            <div class="alert alert-{{ type }} alert-dismissible" role="alert">
                 <div class="d-flex">
                     <div>{{ message }}</div>
                 </div>
@@ -12,4 +13,5 @@
             </div>
         {% endfor %}
     {% endfor %}
+</div>
 {% endif %}

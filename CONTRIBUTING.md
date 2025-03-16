@@ -105,6 +105,20 @@ Each module contains the following directories:
         - Twig          # Twig extensions and components to be utilized within the templates
 ```
 
+## Import / Export with docker container
+
+Beside the Import / Export functionality within the settings of the application it could also be done
+via docker commands when working within the docker context. So you can ensure to always secure your 
+fixture data or store data from a production system and import it into your local development system.
+
+```
+# Export data from the system to a ZIP file via command
+docker compose exec php bin/console app:export --stream > my-export.zip
+
+# Import data from a ZIP file to the system via command
+cat my-export.zip | docker compose exec -T php bin/console app:import --stream -p -vvv
+```
+
 ## Documentation
 
 The documentation of the project is currently only an end user documentation in which we try to explain the usage

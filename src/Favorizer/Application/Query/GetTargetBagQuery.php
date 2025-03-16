@@ -11,18 +11,21 @@ use ChronicleKeeper\Shared\Application\Query\QueryParameters;
 use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
+use function assert;
 use function count;
 
-final readonly class GetTargetBagQuery implements Query
+final class GetTargetBagQuery implements Query
 {
     public function __construct(
-        private DenormalizerInterface $denormalizer,
-        private DatabasePlatform $databasePlatform,
+        private readonly DenormalizerInterface $denormalizer,
+        private readonly DatabasePlatform $databasePlatform,
     ) {
     }
 
     public function query(QueryParameters $parameters): TargetBag
     {
+        assert($parameters instanceof GetTargetBag);
+
         $content = $this->databasePlatform->createQueryBuilder()->createSelect()
             ->from('favorites')
             ->orderBy('title')

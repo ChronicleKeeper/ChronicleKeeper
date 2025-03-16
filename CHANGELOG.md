@@ -5,6 +5,13 @@
 **Added**
 - Database: PostgreSQL support for enhanced scalability.
 - Chat Interface: Live streaming of LLM responses to show real-time "thinking".
+- Calendar: A new navigation entry with a table calendar view can be found in the menu.
+    - Removed the old calendar settings with text-based calendar and moon cycle.
+    - Added new section for configuration of the calendar.
+    - Calendar configurations can be shared with an extra export/import functionality.
+    - The calendar can be configured with custom epochs, months, weekdays, days and moon cycle.
+    - A month can contain leap days that don't count toward weekdays and stand between other days.
+    - There are LLM functionalities that access the calendar system.
 
 **Changed**
 - Some forms now contain an improved footer with more button submit choiced.
