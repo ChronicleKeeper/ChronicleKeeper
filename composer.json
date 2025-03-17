@@ -30,7 +30,7 @@
         "league/flysystem-ziparchive": "^3.28",
         "league/html-to-markdown": "^5.1",
         "oskarstark/readable-filesize-extension": "^1.2",
-        "php-llm/llm-chain": "^0.16",
+        "php-llm/llm-chain": "^0.18",
         "phpoffice/phpword": "^1.3",
         "smalot/pdfparser": "^2.11",
         "symfony/asset": "^7.1",

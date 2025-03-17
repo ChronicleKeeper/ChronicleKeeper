@@ -12,11 +12,10 @@
                 <div class="card-body p-0">
                     <div class="accordion" id="accordion-example">
                         <div class="accordion-item">
-                            <h2 class="accordion-header" id="heading-1">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-1" aria-expanded="false">
-                                    Details zum künstlerischen Auftrag
-                                </button>
-                            </h2>
+                            <button class="accordion-header collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-1" aria-expanded="true">
+                                <div class="accordion-header-text"><h4>Details zum künstlerischen Auftrag</h4></div>
+                                <div class="accordion-header-toggle">{{ ux_icon('tabler:chevron-down', {'class': 'icon icon-1'}) }}</div>
+                            </button>
                             <div id="collapse-1" class="accordion-collapse collapse" data-bs-parent="#accordion-example" style="">
                                 <div class="accordion-body pt-0">
                                     <div class="row g-5">

@@ -51,6 +51,14 @@ class CalculateDate
     ) {
     }
 
+    /**
+     * @param string      $operation One of "add_days", "subtract_days", "days_until_next_moon_phase", "days_between".
+     * @param int|null    $days      An amount of days for addition or subtraction of days.
+     * @param string|null $phase     Which moon phase to calculate days until.
+     * @param int|null    $year      A year for the date between calculation.
+     * @param int|null    $month     A month for the date between calculation.
+     * @param int|null    $day       A day for the date between calculation.
+     */
     public function __invoke(
         string $operation,
         int|null $days = null,

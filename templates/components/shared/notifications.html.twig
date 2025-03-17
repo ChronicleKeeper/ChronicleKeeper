@@ -1,9 +1,8 @@
 <div class="container-xl" {{ attributes }}>
     {% for message in this.notifications %}
-        <div class="alert alert-{{ message.type }} alert-dismissible" role="alert">
-            <div class="d-flex">
-                <div>{{ message.message }}</div>
-            </div>
+        <div class="alert {{ message.type.class }} alert-dismissible" role="alert">
+            <div class="alert-icon">{{ ux_icon(message.type.icon, {'class': 'icon alert-icon icon-2'}) }}</div>
+            {{ message.content }}
             <a class="btn-close" data-bs-dismiss="alert" aria-label="close"></a>
         </div>
     {% endfor %}

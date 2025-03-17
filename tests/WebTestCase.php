@@ -78,7 +78,15 @@ class WebTestCase extends SymfonyWebTestCase
     {
         $this->schemaManager->dropSchema();
 
-        unset($this->databasePlatform, $this->client, $this->schemaManager);
+        unset(
+            $this->databasePlatform,
+            $this->client,
+            $this->schemaManager,
+            $this->queryService,
+            $this->bus,
+            $this->llmChainFactory,
+            $this->settingsHandler,
+        );
 
         parent::tearDown();
     }

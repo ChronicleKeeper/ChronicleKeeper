@@ -26,7 +26,7 @@ return [
         'version' => '3.2.2',
     ],
     '@hotwired/turbo' => [
-        'version' => '8.0.12',
+        'version' => '8.0.13',
     ],
     '@toast-ui/editor' => [
         'version' => '3.2.2',
@@ -35,10 +35,10 @@ return [
         'version' => '1.24.1',
     ],
     'prosemirror-view' => [
-        'version' => '1.38.0',
+        'version' => '1.38.1',
     ],
     'prosemirror-transform' => [
-        'version' => '1.10.2',
+        'version' => '1.10.3',
     ],
     'prosemirror-state' => [
         'version' => '1.4.3',
@@ -47,7 +47,7 @@ return [
         'version' => '1.2.2',
     ],
     'prosemirror-commands' => [
-        'version' => '1.6.2',
+        'version' => '1.7.0',
     ],
     'prosemirror-inputrules' => [
         'version' => '1.4.0',
@@ -65,7 +65,7 @@ return [
         'version' => '1.3.4',
     ],
     'prosemirror-view/style/prosemirror.min.css' => [
-        'version' => '1.38.0',
+        'version' => '1.38.1',
         'type' => 'css',
     ],
     '@toast-ui/editor/dist/toastui-editor.css' => [
@@ -93,7 +93,7 @@ return [
         'type' => 'css',
     ],
     '@tabler/core/dist/css/tabler.min.css' => [
-        'version' => '1.0.0',
+        'version' => '1.1.1',
         'type' => 'css',
     ],
     'bootstrap' => [

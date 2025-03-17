@@ -353,13 +353,10 @@ export default class ChatStreamController extends Controller {
             <div class="accordion" id="debug-tool-calls-${data.id}">
                 ${data.debug.map((call, index) => `
                     <div class="accordion-item">
-                        <h2 class="accordion-header" id="heading-${data.id}-${index}">
-                            <button class="accordion-button collapsed" type="button"
-                                    data-bs-toggle="collapse"
-                                    data-bs-target="#collapse-${data.id}-${index}">
-                                Aufgerufene Funktion: ${call.tool}
-                            </button>
-                        </h2>
+                          <button class="accordion-header collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-${data.id}-${index}" aria-expanded="true">
+                            <div class="accordion-header-text"><h4>Aufgerufene Funktion: ${call.tool}</h4></div>
+                            <div class="accordion-header-toggle"><svg viewBox="0 0 24 24" fill="currentColor" class="icon icon-1" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m6 9l6 6l6-6"></path></svg></div>
+                        </button>
                         <div id="collapse-${data.id}-${index}" class="accordion-collapse collapse"
                             data-bs-parent="#debug-tool-calls-${data.id}">
                             <div class="accordion-body pt-0">
@@ -398,13 +395,10 @@ export default class ChatStreamController extends Controller {
 
         const renderAccordionItem = ({type, title, items, urlPrefix}) => `
         <div class="accordion-item">
-            <h2 class="accordion-header">
-                <button class="accordion-button collapsed" type="button"
-                        data-bs-toggle="collapse"
-                        data-bs-target="#context-${type}-${data.id}">
-                    ${title}
-                </button>
-            </h2>
+            <button class="accordion-header collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#context-${type}-${data.id}" aria-expanded="true">
+                <div class="accordion-header-text"><h4>${title}</h4></div>
+                <div class="accordion-header-toggle"><svg viewBox="0 0 24 24" fill="currentColor" class="icon icon-1" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m6 9l6 6l6-6"></path></svg></div>
+            </button>
             <div id="context-${type}-${data.id}" class="accordion-collapse collapse"
                  data-bs-parent="#context-information-${data.id}">
                 <div class="accordion-body pt-0">
