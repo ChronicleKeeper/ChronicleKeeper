@@ -78,7 +78,15 @@ class WebTestCase extends SymfonyWebTestCase
     {
         $this->schemaManager->dropSchema();
 
-        unset($this->databasePlatform, $this->client, $this->schemaManager);
+        unset(
+            $this->databasePlatform, // @phpstan-ignore unset.possiblyHookedProperty
+            $this->client, // @phpstan-ignore unset.possiblyHookedProperty
+            $this->schemaManager, // @phpstan-ignore unset.possiblyHookedProperty
+            $this->queryService, // @phpstan-ignore unset.possiblyHookedProperty
+            $this->bus, // @phpstan-ignore unset.possiblyHookedProperty
+            $this->llmChainFactory, // @phpstan-ignore unset.possiblyHookedProperty
+            $this->settingsHandler, // @phpstan-ignore unset.possiblyHookedProperty
+        );
 
         parent::tearDown();
     }

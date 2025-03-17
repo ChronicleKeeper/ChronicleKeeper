@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace ChronicleKeeper\Shared\Infrastructure\LLMChain;
 
 use ChronicleKeeper\Settings\Application\SettingsHandler;
-use PhpLlm\LlmChain\Chain\ToolBox\ToolAnalyzer;
 use PhpLlm\LlmChain\Chain\ToolBox\ToolBox;
 use PhpLlm\LlmChain\Chain\ToolBox\ToolBoxInterface;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
@@ -33,7 +32,7 @@ class ToolboxFactory
     {
         return new SettingsToolBox(
             $this->settingsHandler,
-            new ToolBox(new ToolAnalyzer(), $this->tools),
+            ToolBox::create(...$this->tools),
         );
     }
 }
