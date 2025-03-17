@@ -19,7 +19,7 @@
             <div class="col-6">
                 <div class="card">
                     <div class="card-body">
-                        <div class="alert alert-info">
+                        <div class="alert alert-info alert-important">
                             Wähle bitte aus wo die Inhalte das Verzeichnis verschoben werden sollen, wenn du sie erhalten
                             möchtest bevor das Verzeichnis gelöscht wird.
                         </div>
@@ -37,10 +37,12 @@
             <div class="col-6">
                 <div class="card">
                     <div class="card-body">
-                        <div class="alert alert-danger">
-                            <strong>Achtung</strong> - Alle Inhalte, die in diesem Verzeichnis liegen werden gelöscht, wenn du dieses
-                            hier bestätigst. Gehe bitte sicher, dass du das wirklicht tun möchtest. Verlorene Inhalte
-                            können nicht wiederhergestellt werden außer du hast eine Sicherung.
+                        <div class="alert alert-danger alert-important">
+                            <div>
+                                <strong>Achtung</strong> - Alle Inhalte, die in diesem Verzeichnis liegen werden gelöscht, wenn du dieses
+                                hier bestätigst. Gehe bitte sicher, dass du das wirklicht tun möchtest. Verlorene Inhalte
+                                können nicht wiederhergestellt werden außer du hast eine Sicherung.
+                            </div>
                         </div>
                         {{ form_row(form.confirmDeleteAll) }}
                     </div>

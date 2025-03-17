@@ -5,10 +5,12 @@
 <div class="container-xl">
     {% for type, messages in flash_messages %}
         {% for message in messages %}
-            <div class="alert alert-{{ type }} alert-dismissible" role="alert">
-                <div class="d-flex">
-                    <div>{{ message }}</div>
-                </div>
+
+            {% set typeEnmum = type|enum('ChronicleKeeper\\Shared\\Presentation\\FlashMessages\\Alert') %}
+
+            <div class="alert {{ typeEnmum.class }} alert-dismissible" role="alert">
+                <div class="alert-icon">{{ ux_icon(typeEnmum.icon, {'class': 'icon alert-icon icon-2'}) }}</div>
+                {{ message }}
                 <a class="btn-close" data-bs-dismiss="alert" aria-label="close"></a>
             </div>
         {% endfor %}

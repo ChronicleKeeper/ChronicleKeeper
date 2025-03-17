@@ -14,20 +14,30 @@ enum Alert: string
     public function getClass(): string
     {
         return match ($this) {
-            Alert::SUCCESS => 'alert-success',
-            Alert::WARNING => 'alert-warning',
-            Alert::DANGER => 'alert-danger',
-            Alert::INFO => 'alert-info',
+            self::SUCCESS => 'alert-success',
+            self::WARNING => 'alert-warning',
+            self::DANGER => 'alert-danger',
+            self::INFO => 'alert-info',
+        };
+    }
+
+    public function getIcon(): string
+    {
+        return match ($this) {
+            self::SUCCESS => 'tabler:check',
+            self::WARNING => 'tabler:alert-triangle',
+            self::DANGER => 'tabler:alert-circle',
+            self::INFO => 'tabler:info-circle',
         };
     }
 
     public function getIconClass(): string
     {
         return match ($this) {
-            Alert::SUCCESS => 'fa-solid fa-circle-check',
-            Alert::WARNING => 'fa-solid fa-triangle-exclamation',
-            Alert::DANGER => 'fa-solid fa-circle-exclamation',
-            Alert::INFO => 'fa-solid fa-circle-info',
+            self::SUCCESS => 'fa-solid fa-circle-check',
+            self::WARNING => 'fa-solid fa-triangle-exclamation',
+            self::DANGER => 'fa-solid fa-circle-exclamation',
+            self::INFO => 'fa-solid fa-circle-info',
         };
     }
 }
