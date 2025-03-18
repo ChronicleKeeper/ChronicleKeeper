@@ -68,8 +68,16 @@
                                             <td>{{ currentDay is empty ? 'Keine Einstellung vorhanden (Standard: 0-1-1)' : currentDay.year ~ '-' ~ currentDay.month ~ '-' ~ currentDay.day }}</td>
                                         </tr>
                                         <tr>
+                                            <td>Name des Mondes</td>
+                                            <td>{{ calendar_settings.moonName }}</td>
+                                        </tr>
+                                        <tr>
                                             <td>Mondzyklus</td>
                                             <td>{{ calendar_settings.moonCycleDays }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Offset des Mondzyklus</td>
+                                            <td>{{ calendar_settings.moonCycleOffset }}</td>
                                         </tr>
                                     </tbody>
                                 </table>

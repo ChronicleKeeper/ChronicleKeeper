@@ -8,6 +8,7 @@ includes:
 
 parameters:
     level: 8
+    phpVersion: 80300
     paths:
         - public/index.php
         - src

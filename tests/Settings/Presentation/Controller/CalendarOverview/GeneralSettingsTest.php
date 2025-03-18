@@ -51,7 +51,9 @@ final class GeneralSettingsTest extends WebTestCase
         self::assertFormValue('form[name="general"]', 'general[current_day][year]', '1');
         self::assertFormValue('form[name="general"]', 'general[current_day][month]', '1');
         self::assertFormValue('form[name="general"]', 'general[current_day][day]', '1');
+        self::assertFormValue('form[name="general"]', 'general[moonName]', 'Mond');
         self::assertFormValue('form[name="general"]', 'general[moonCycleDays]', '30');
+        self::assertFormValue('form[name="general"]', 'general[moonCycleOffset]', '0');
     }
 
     #[Test]
@@ -68,7 +70,9 @@ final class GeneralSettingsTest extends WebTestCase
                     'month' => 3,
                     'day' => 4,
                 ],
+                'moonName' => 'My Moon',
                 'moonCycleDays' => 12,
+                'moonCycleOffset' => 2.5,
             ],
         ]);
 
@@ -80,7 +84,9 @@ final class GeneralSettingsTest extends WebTestCase
         self::assertSame(12, $calendarSettings->getCurrentDay()?->getYear());
         self::assertSame(3, $calendarSettings->getCurrentDay()->getMonth());
         self::assertSame(4, $calendarSettings->getCurrentDay()->getDay());
+        self::assertSame('My Moon', $calendarSettings->getMoonName());
         self::assertSame(12.0, $calendarSettings->getMoonCycleDays());
+        self::assertSame(2.5, $calendarSettings->getMoonCycleOffset());
     }
 
     #[Test]
@@ -93,7 +99,9 @@ final class GeneralSettingsTest extends WebTestCase
                     'month' => 24,
                     'day' => 16,
                 ],
+                'moonName' => 'My Moon',
                 'moonCycleDays' => 12,
+                'moonCycleOffset' => 2.5,
             ],
         ]);
 

@@ -22,7 +22,7 @@ use PHPUnit\Framework\TestCase;
 final class MoonCycleTest extends TestCase
 {
     #[Test]
-    public function itIsNotConstructableWithMooNCycleLowerThenOne(): void
+    public function itIsNotConstructableWithMoonCycleLowerThenOne(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The moon cycle should have a days value.');
@@ -31,11 +31,21 @@ final class MoonCycleTest extends TestCase
     }
 
     #[Test]
-    public function itIsConstructableWithMooNCycleGreaterThenOne(): void
+    public function itIsNotConstructableWithMoonCycleOffsetLowerThenZero(): void
     {
-        $moonCycle = new MoonCycle(29);
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The moon cycle should have a days value.');
+
+        new MoonCycle(1, -1);
+    }
+
+    #[Test]
+    public function itIsConstructableWithValidValues(): void
+    {
+        $moonCycle = new MoonCycle(29, 12);
 
         self::assertSame(29.0, $moonCycle->getMoonCycle());
+        self::assertSame(12.0, $moonCycle->getMoonCycleOffset());
     }
 
     #[Test]
@@ -107,6 +117,13 @@ final class MoonCycleTest extends TestCase
         yield 'Day 36: First Quarter' => [
             new CalendarDate($calendar, 0, 2, 6),
             MoonState::FIRST_QUARTER,
+        ];
+
+        $calendar = ExampleCalendars::getLinearWithLeapDays(14);
+
+        yield 'Offset Moon - Day 1: Full Moon' => [
+            new CalendarDate($calendar, 0, 1, 1),
+            MoonState::FULL_MOON,
         ];
     }
 }

@@ -29,7 +29,7 @@ class ExampleCalendars
         );
     }
 
-    public static function getOnlyRegularDays(): Calendar
+    public static function getOnlyRegularDays(float $moonCycleOffset = 0): Calendar
     {
         return new Calendar(
             new Configuration(beginsInYear: 0),
@@ -59,11 +59,11 @@ class ExampleCalendars
                 ['index' => 6, 'name' => 'Saturday'],
                 ['index' => 7, 'name' => 'Sunday'],
             ],
-            new MoonCycle(29.5),
+            new MoonCycle(29.5, $moonCycleOffset),
         );
     }
 
-    public static function getLinearWithLeapDays(): Calendar
+    public static function getLinearWithLeapDays(float $moonCycleOffset = 0): Calendar
     {
         return new Calendar(
             new Configuration(beginsInYear: 0),
@@ -160,7 +160,7 @@ class ExampleCalendars
                 ['index' => 9, 'name' => 'Ninthday'],
                 ['index' => 10, 'name' => 'Tenthday'],
             ],
-            new MoonCycle(30),
+            new MoonCycle(30, $moonCycleOffset),
         );
     }
 

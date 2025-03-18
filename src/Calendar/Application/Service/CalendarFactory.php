@@ -26,7 +26,7 @@ final class CalendarFactory
         $weekDaysData = $this->transformWeekDaysData($settings->getWeeks());
 
         // Create moon cycle
-        $moonCycle = new MoonCycle($settings->getMoonCycleDays());
+        $moonCycle = new MoonCycle($settings->getMoonCycleDays(), $settings->getMoonCycleOffset());
 
         // Create configuration
         $configuration = $this->createConfiguration();
