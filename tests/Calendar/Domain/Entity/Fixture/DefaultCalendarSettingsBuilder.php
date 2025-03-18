@@ -21,15 +21,20 @@ abstract class DefaultCalendarSettingsBuilder
     /** @var array<WeekSettings> */
     protected array $weeks = [];
 
-    protected float $moonCycleDays = 30;
-    protected bool $isFinished     = true;
+    protected string $moonName       = 'Moon';
+    protected float $moonCycleDays   = 30;
+    protected float $moonCycleOffset = 0;
+
+    protected bool $isFinished = true;
 
     protected CurrentDay|null $currentDay = null;
 
     public function build(): CalendarSettings
     {
         return new CalendarSettings(
+            $this->moonName,
             $this->moonCycleDays,
+            $this->moonCycleOffset,
             $this->isFinished,
             $this->months,
             $this->epochs,

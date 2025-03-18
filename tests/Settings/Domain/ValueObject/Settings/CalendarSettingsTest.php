@@ -32,7 +32,13 @@ final class CalendarSettingsTest extends TestCase
     public function itConstructsFromArray(): void
     {
         $data = [
-            'moon_cycle_days' => 301,
+            'moons' => [
+                [
+                    'moon_name' => 'Moon',
+                    'moon_cycle_days' => 35,
+                    'moon_cycle_offset' => 10.2,
+                ],
+            ],
             'is_finished' => true,
             'months' => [
                 [
@@ -74,7 +80,9 @@ final class CalendarSettingsTest extends TestCase
         self::assertCount(1, $settings->getEpochs());
         self::assertCount(1, $settings->getWeeks());
 
-        self::assertSame(301.0, $settings->getMoonCycleDays());
+        self::assertSame('Moon', $settings->getMoonName());
+        self::assertSame(35.0, $settings->getMoonCycleDays());
+        self::assertSame(10.2, $settings->getMoonCycleOffset());
         self::assertTrue($settings->isFinished());
 
         $currentDay = $settings->getCurrentDay();
@@ -88,7 +96,13 @@ final class CalendarSettingsTest extends TestCase
     public function itConstructsFromArrayWithoutCurrentDay(): void
     {
         $data = [
-            'moon_cycle_days' => 301,
+            'moons' => [
+                [
+                    'moon_name' => 'Moon',
+                    'moon_cycle_days' => 35,
+                    'moon_cycle_offset' => 10.2,
+                ],
+            ],
             'is_finished' => true,
             'months' => [
                 [
@@ -125,10 +139,25 @@ final class CalendarSettingsTest extends TestCase
         $week       = new WeekSettings(1, 'Monday');
         $currentDay = new CurrentDay(1262, 1, 21);
 
-        $settings = new CalendarSettings(301.0, true, [$month], [$epoch], [$week], $currentDay);
+        $settings = new CalendarSettings(
+            'Moon',
+            301.0,
+            10.2,
+            true,
+            [$month],
+            [$epoch],
+            [$week],
+            $currentDay,
+        );
 
         $expected = [
-            'moon_cycle_days' => 301.0,
+            'moons' => [
+                [
+                    'moon_name' => 'Moon',
+                    'moon_cycle_days' => 301.0,
+                    'moon_cycle_offset' => 10.2,
+                ],
+            ],
             'is_finished' => true,
             'months' => [
                 [
@@ -175,10 +204,24 @@ final class CalendarSettingsTest extends TestCase
         $epoch   = new EpochSettings('First Age', 1, 100);
         $week    = new WeekSettings(1, 'Monday');
 
-        $settings = new CalendarSettings(301.0, true, [$month], [$epoch], [$week]);
+        $settings = new CalendarSettings(
+            'Moon',
+            301.0,
+            10.2,
+            true,
+            [$month],
+            [$epoch],
+            [$week],
+        );
 
         $expected = [
-            'moon_cycle_days' => 301.0,
+            'moons' => [
+                [
+                    'moon_name' => 'Moon',
+                    'moon_cycle_days' => 301.0,
+                    'moon_cycle_offset' => 10.2,
+                ],
+            ],
             'is_finished' => true,
             'months' => [
                 [
@@ -222,10 +265,25 @@ final class CalendarSettingsTest extends TestCase
         $week       = new WeekSettings(1, 'Monday');
         $currentDay = new CurrentDay(1262, 1, 21);
 
-        $settings = new CalendarSettings(35, false, [$month], [$epoch], [$week], $currentDay);
+        $settings = new CalendarSettings(
+            'Moon',
+            35,
+            10.2,
+            false,
+            [$month],
+            [$epoch],
+            [$week],
+            $currentDay,
+        );
 
         $expected = [
-            'moon_cycle_days' => 35,
+            'moons' => [
+                [
+                    'moon_name' => 'Moon',
+                    'moon_cycle_days' => 35,
+                    'moon_cycle_offset' => 10.2,
+                ],
+            ],
             'is_finished' => false,
             'months' => [
                 [

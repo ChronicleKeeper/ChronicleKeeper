@@ -10,13 +10,19 @@ use ChronicleKeeper\Settings\Domain\ValueObject\Settings\CalendarSettings\MonthS
 use ChronicleKeeper\Settings\Domain\ValueObject\Settings\CalendarSettings\WeekSettings;
 use JsonSerializable;
 
+use function count;
+
 /**
  * @phpstan-import-type MonthSettingsArray from MonthSettings
  * @phpstan-import-type EpochSettingsArray from EpochSettings
  * @phpstan-import-type WeekSettingsArray from WeekSettings
  * @phpstan-import-type CurrentDayArray from CurrentDay
  * @phpstan-type CalendarSettingsArray = array{
- *     moon_cycle_days?: float,
+ *     moons: list<array{
+ *           moon_name: string,
+ *           moon_cycle_days: float,
+ *           moon_cycle_offset: float,
+ *     }>,
  *     is_finished?: bool,
  *     months: array<MonthSettingsArray>,
  *     epochs: array<EpochSettingsArray>,
@@ -32,7 +38,9 @@ class CalendarSettings implements JsonSerializable
      * @param array<WeekSettings>  $weeks
      */
     public function __construct(
+        private readonly string $moonName = 'Mond',
         private readonly float $moonCycleDays = 30,
+        private readonly float $moonCycleOffset = 0,
         private readonly bool $isFinished = false,
         private readonly array $months = [],
         private readonly array $epochs = [],
@@ -59,8 +67,21 @@ class CalendarSettings implements JsonSerializable
             $weeks[] = WeekSettings::fromArray($weekData);
         }
 
+        if (count($array['moons']) > 0) {
+            $moon            = $array['moons'][0];
+            $moonName        = $moon['moon_name'];
+            $moonCycleDays   = $moon['moon_cycle_days'];
+            $moonCycleOffset = $moon['moon_cycle_offset'];
+        } else {
+            $moonName        = 'Mond';
+            $moonCycleDays   = 30;
+            $moonCycleOffset = 0;
+        }
+
         return new self(
-            $array['moon_cycle_days'] ?? 30,
+            $moonName,
+            $moonCycleDays,
+            $moonCycleOffset,
             $array['is_finished'] ?? false,
             $months,
             $epochs,
@@ -88,7 +109,13 @@ class CalendarSettings implements JsonSerializable
         }
 
         return [
-            'moon_cycle_days' => $this->moonCycleDays,
+            'moons' => [
+                [
+                    'moon_name' => $this->moonName,
+                    'moon_cycle_days' => $this->moonCycleDays,
+                    'moon_cycle_offset' => $this->moonCycleOffset,
+                ],
+            ],
             'is_finished' => $this->isFinished,
             'months' => $months,
             'epochs' => $epochs,
@@ -111,6 +138,16 @@ class CalendarSettings implements JsonSerializable
     public function getMoonCycleDays(): float
     {
         return $this->moonCycleDays;
+    }
+
+    public function getMoonName(): string
+    {
+        return $this->moonName;
+    }
+
+    public function getMoonCycleOffset(): float
+    {
+        return $this->moonCycleOffset;
     }
 
     /** @return array<MonthSettings> */
@@ -139,7 +176,9 @@ class CalendarSettings implements JsonSerializable
     public function withCurrentDay(CurrentDay $day): self
     {
         return new self(
+            $this->moonName,
             $this->moonCycleDays,
+            $this->moonCycleOffset,
             $this->isFinished,
             $this->months,
             $this->epochs,

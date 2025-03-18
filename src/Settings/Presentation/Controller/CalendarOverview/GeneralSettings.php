@@ -24,12 +24,15 @@ final class GeneralSettings extends AbstractController
         $settings            = $this->settingsHandler->get();
         $calendarSettings    = $settings->getCalendarSettings();
         $allCalendarSettings = $calendarSettings->toArray();
+        $moonsSettings       = $allCalendarSettings['moons'];
 
         $form     = $this->createForm(
             GeneralType::class,
             $data = [
-                'moonCycleDays' => $allCalendarSettings['moon_cycle_days'] ?? 30,
-                'current_day'   => $allCalendarSettings['current_day'] ?? null,
+                'moonName' => $moonsSettings[0]['moon_name'] ?? 'Mond',
+                'moonCycleDays' => $moonsSettings[0]['moon_cycle_days'] ?? 30,
+                'moonCycleOffset' => $moonsSettings[0]['moon_cycle_offset'] ?? 0,
+                'current_day' => $allCalendarSettings['current_day'] ?? null,
             ],
         );
 
@@ -39,8 +42,15 @@ final class GeneralSettings extends AbstractController
             $data = $form->getData();
 
             // Overwrite Settings
-            $allCalendarSettings['moon_cycle_days'] = $data['moonCycleDays'];
-            $allCalendarSettings['current_day']     = $data['current_day'];
+            $allCalendarSettings['moons'] = [
+                [
+                    'moon_name' => $data['moonName'],
+                    'moon_cycle_days' => $data['moonCycleDays'],
+                    'moon_cycle_offset' => $data['moonCycleOffset'],
+                ],
+            ];
+
+            $allCalendarSettings['current_day'] = $data['current_day'];
 
             $settings->setCalendarSettings(CalendarSettings::fromArray($allCalendarSettings));
 
