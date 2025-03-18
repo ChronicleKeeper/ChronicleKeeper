@@ -124,10 +124,51 @@ final class CalendarSettingsTest extends TestCase
                     'name' => 'Monday',
                 ],
             ],
+
         ];
 
         $settings = CalendarSettings::fromArray($data);
         self::assertNull($settings->getCurrentDay());
+    }
+
+    #[Test]
+    public function itConstructsFromArrayWithoutMoons(): void
+    {
+        $data = [
+            'moons' => [],
+            'is_finished' => true,
+            'months' => [
+                [
+                    'index' => 1,
+                    'name' => 'January',
+                    'days' => 31,
+                ],
+            ],
+            'epochs' => [
+                [
+                    'name' => 'First Age',
+                    'start_year' => 1,
+                    'end_year' => 100,
+                ],
+            ],
+            'weeks' => [
+                [
+                    'index' => 1,
+                    'name' => 'Monday',
+                ],
+            ],
+            'current_day' => [
+                'year' => 1262,
+                'month' => 1,
+                'day' => 21,
+            ],
+        ];
+
+        $settings = CalendarSettings::fromArray($data);
+
+        self::assertSame('Mond', $settings->getMoonName());
+        self::assertSame(30.0, $settings->getMoonCycleDays());
+        self::assertSame(0.0, $settings->getMoonCycleOffset());
     }
 
     #[Test]

@@ -15,8 +15,10 @@ class MoonCycle
 {
     public function __construct(
         private readonly float $daysOfACycle,
+        private readonly float $moonCycleOffset = 0,
     ) {
         Assert::greaterThan($daysOfACycle, 0, 'The moon cycle should have a days value.');
+        Assert::greaterThanEq($moonCycleOffset, 0, 'The moon cycle should have a days value.');
     }
 
     public function getMoonCycle(): float
@@ -24,11 +26,17 @@ class MoonCycle
         return $this->daysOfACycle;
     }
 
+    public function getMoonCycleOffset(): float
+    {
+        return $this->moonCycleOffset;
+    }
+
     public function getDaysOfACycle(CalendarDate $date): float
     {
-        $totalDays = $date->getTotalDaysFromCalendarStart();
+        $totalDays    = $date->getTotalDaysFromCalendarStart();
+        $adjustedDays = $totalDays + $this->moonCycleOffset;
 
-        return fmod($totalDays, $this->daysOfACycle);
+        return fmod($adjustedDays, $this->daysOfACycle);
     }
 
     public function getMoonStateOfDay(CalendarDate $date): MoonState

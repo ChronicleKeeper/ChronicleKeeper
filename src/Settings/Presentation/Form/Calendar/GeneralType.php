@@ -44,7 +44,7 @@ final class GeneralType extends AbstractType
             NumberType::class,
             [
                 'label' => 'Offset des Mondzyklus in Tagen',
-                'help' => 'Anpassung des Mondzyklus um einige Tage, eine Gleitkommazahl ist erlaubt.',
+                'help' => 'Verschiebt den Mond um x.y Tage vorwärts im Zyklus für den gesamten Kalender.',
                 'empty_data' => 0.0,
                 'html5' => true,
                 'constraints' => [new NotNull(), new GreaterThanOrEqual(0)],
