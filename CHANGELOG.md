@@ -12,6 +12,7 @@
     - The calendar can be configured with custom epochs, months, weekdays, days and moon cycle.
     - A month can contain leap days that don't count toward weekdays and stand between other days.
     - There are LLM functionalities that access the calendar system.
+- Added user documentation link to footer
 
 **Changed**
 - Some forms now contain an improved footer with more button submit choiced.
