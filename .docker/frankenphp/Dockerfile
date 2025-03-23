@@ -38,6 +38,8 @@ CMD [ "frankenphp", "run", "--config", "/etc/caddy/Caddyfile", "--watch" ]
 
 FROM chronicle_keeper_base AS chronicle_keeper_prod
 
+COPY --link ./.docker/frankenphp/conf.d/app.prod.ini $PHP_INI_DIR/app.conf.d/
+
 ENV APP_ENV=prod
 ENV FRANKENPHP_CONFIG=""
 ENV BASIC_AUTH_USER=""
