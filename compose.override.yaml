@@ -3,7 +3,6 @@ services:
     build:
       context: .
       target: chronicle_keeper_dev
-    user: "${UID:-1000}:${GID:-1000}"
     volumes:
       - ./:/app
     tty: true
