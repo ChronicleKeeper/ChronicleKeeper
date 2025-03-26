@@ -12,6 +12,8 @@ if [ "$1" = 'frankenphp' ] || [ "$1" = 'php' ] || [ "$1" = 'bin/console' ]; then
 
         # For dev and prod environments, initialize the database if needed
         if [ "$APP_ENV" != "test" ]; then
+            echo "Waiting for database to be available...";
+            sleep 10; # Make sure the database is available
             php bin/console app:db:init --force -vvv
         fi
     fi
