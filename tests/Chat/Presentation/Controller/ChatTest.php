@@ -27,8 +27,6 @@ use Symfony\Component\HttpFoundation\Request;
 
 use function assert;
 use function json_encode;
-use function ob_get_clean;
-use function ob_start;
 
 use const JSON_THROW_ON_ERROR;
 
@@ -143,9 +141,10 @@ class ChatTest extends WebTestCase
     #[Test]
     public function itWillStreamAMessageResponseCorrectlyWithEmptyResponse(): void
     {
-        ob_start();
         $this->client->request(Request::METHOD_GET, '/chat/stream/message?message=Hello&conversation=');
-        $response = (string) ob_get_clean();
+        self::assertTrue($this->client->getResponse()->isSuccessful());
+
+        $response = $this->client->getInternalResponse()->getContent();
 
         self::assertResponseIsSuccessful();
         self::assertStringContainsString('data: {"type":"complete"', $response);
@@ -159,9 +158,10 @@ class ChatTest extends WebTestCase
             new StreamResponse($this->createGeneratorForStreamedResponse()),
         );
 
-        ob_start();
         $this->client->request(Request::METHOD_GET, '/chat/stream/message?message=Hello&conversation=');
-        $response = (string) ob_get_clean();
+        self::assertTrue($this->client->getResponse()->isSuccessful());
+
+        $response = $this->client->getInternalResponse()->getContent();
 
         self::assertResponseIsSuccessful();
         self::assertStringContainsString('data: {"type":"chunk","chunk":"Hello World"}', $response);

@@ -34,6 +34,7 @@ use Symfony\Component\Routing\Requirement\Requirement;
 use function assert;
 use function flush;
 use function json_encode;
+use function ob_end_flush;
 use function ob_flush;
 use function ob_start;
 
@@ -198,6 +199,8 @@ class Chat extends AbstractController
             } else {
                 $this->bus->dispatch(new StoreConversation($conversation));
             }
+
+            ob_end_flush();
         }, Response::HTTP_OK, [
             'Content-Type' => 'text/event-stream',
             'Cache-Control' => 'no-cache',
