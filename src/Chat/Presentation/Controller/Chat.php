@@ -20,8 +20,9 @@ use ChronicleKeeper\Library\Infrastructure\LLMChain\Tool\ImageSearch;
 use ChronicleKeeper\Settings\Application\SettingsHandler;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
 use ChronicleKeeper\Shared\Infrastructure\LLMChain\LLMChainFactory;
+use PhpLlm\LlmChain\Chain\ToolBox\StreamResponse as ToolboxStreamResponse;
 use PhpLlm\LlmChain\Model\Message\Message;
-use PhpLlm\LlmChain\Model\Response\StreamResponse;
+use PhpLlm\LlmChain\Model\Response\StreamResponse as LLMStreamResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -33,7 +34,9 @@ use Symfony\Component\Routing\Requirement\Requirement;
 use function assert;
 use function flush;
 use function json_encode;
+use function ob_end_flush;
 use function ob_flush;
+use function ob_start;
 
 use const JSON_THROW_ON_ERROR;
 
@@ -111,6 +114,7 @@ class Chat extends AbstractController
         assert($conversation instanceof Conversation);
 
         return new StreamedResponse(function () use ($message, $isTemporary, $conversation): void {
+            ob_start();
             echo ":\n\n";
             ob_flush();
             flush();
@@ -130,7 +134,7 @@ class Chat extends AbstractController
                     'stream' => true,
                 ],
             );
-            assert($response instanceof StreamResponse);
+            assert($response instanceof LLMStreamResponse || $response instanceof ToolboxStreamResponse);
 
             $fullResponse = '';
             foreach ($response->getContent() as $chunk) {
@@ -195,6 +199,8 @@ class Chat extends AbstractController
             } else {
                 $this->bus->dispatch(new StoreConversation($conversation));
             }
+
+            ob_end_flush();
         }, Response::HTTP_OK, [
             'Content-Type' => 'text/event-stream',
             'Cache-Control' => 'no-cache',
