@@ -63,6 +63,10 @@
                                     </thead>
                                     <tbody>
                                         <tr>
+                                            <td>Erstes Jahr des Kalenders</td>
+                                            <td>{{ calendar_settings.beginsInYear }}</td>
+                                        </tr>
+                                        <tr>
                                             <td>Aktuelles Datum (Heute)</td>
                                             {% set currentDay = calendar_settings.currentDay %}
                                             <td>{{ currentDay is empty ? 'Keine Einstellung vorhanden (Standard: 0-1-1)' : currentDay.year ~ '-' ~ currentDay.month ~ '-' ~ currentDay.day }}</td>

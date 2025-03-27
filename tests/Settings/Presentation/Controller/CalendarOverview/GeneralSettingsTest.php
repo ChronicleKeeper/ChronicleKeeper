@@ -71,6 +71,7 @@ final class GeneralSettingsTest extends WebTestCase
                     'day' => 4,
                 ],
                 'moonName' => 'My Moon',
+                'calendarBeginsInYear' => 1,
                 'moonCycleDays' => 12,
                 'moonCycleOffset' => 2.5,
             ],

@@ -18,6 +18,15 @@ final class GeneralType extends AbstractType
     /** @inheritDoc */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $builder->add(
+            'calendarBeginsInYear',
+            IntegerType::class,
+            [
+                'label' => 'Erstes Jahr des Kalenders',
+                'constraints' => [new NotNull(), new GreaterThanOrEqual(0)],
+            ],
+        );
+
         $builder->add('current_day', CurrentDayType::class);
 
         $builder->add(

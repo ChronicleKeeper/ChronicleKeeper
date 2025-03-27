@@ -21,6 +21,7 @@ abstract class DefaultCalendarSettingsBuilder
     /** @var array<WeekSettings> */
     protected array $weeks = [];
 
+    protected int $beginsInYear      = 0;
     protected string $moonName       = 'Moon';
     protected float $moonCycleDays   = 30;
     protected float $moonCycleOffset = 0;
@@ -29,9 +30,17 @@ abstract class DefaultCalendarSettingsBuilder
 
     protected CurrentDay|null $currentDay = null;
 
+    public function withBeginsInYear(int $beginsInYear): self
+    {
+        $this->beginsInYear = $beginsInYear;
+
+        return $this;
+    }
+
     public function build(): CalendarSettings
     {
         return new CalendarSettings(
+            $this->beginsInYear,
             $this->moonName,
             $this->moonCycleDays,
             $this->moonCycleOffset,

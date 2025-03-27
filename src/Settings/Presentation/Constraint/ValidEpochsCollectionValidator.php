@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Settings\Presentation\Constraint;
 
+use ChronicleKeeper\Settings\Application\SettingsHandler;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
@@ -20,6 +21,10 @@ use function sprintf;
  */
 class ValidEpochsCollectionValidator extends ConstraintValidator
 {
+    public function __construct(private readonly SettingsHandler $settingsHandler)
+    {
+    }
+
     public function validate(mixed $value, Constraint $constraint): void
     {
         if (! $constraint instanceof ValidEpochsCollection) {
@@ -39,9 +44,11 @@ class ValidEpochsCollectionValidator extends ConstraintValidator
             return;
         }
 
-        // Check first epoch starts with year 0
-        if ($epochs[0]['start_year'] !== 0) {
-            $this->context->buildViolation($constraint->startsWithZeroMessage)
+        // Check first epoch starts with year official calendar start
+        $startsInYear = $this->settingsHandler->get()->getCalendarSettings()->getBeginsInYear();
+        if ($epochs[0]['start_year'] !== $startsInYear) {
+            $this->context->buildViolation($constraint->startsWithCalendarBeginMessage)
+                ->setParameter('{{ calendarBeginsInYear }}', (string) $startsInYear)
                 ->atPath('epochs[0].start_year')
                 ->addViolation();
         }
