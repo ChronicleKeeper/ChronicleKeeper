@@ -39,6 +39,7 @@ final class CalendarSettingsTest extends TestCase
                     'moon_cycle_offset' => 10.2,
                 ],
             ],
+            'begins_in_year' => 0,
             'is_finished' => true,
             'months' => [
                 [
@@ -103,6 +104,7 @@ final class CalendarSettingsTest extends TestCase
                     'moon_cycle_offset' => 10.2,
                 ],
             ],
+            'begins_in_year' => 0,
             'is_finished' => true,
             'months' => [
                 [
@@ -136,6 +138,7 @@ final class CalendarSettingsTest extends TestCase
     {
         $data = [
             'moons' => [],
+            'begins_in_year' => 0,
             'is_finished' => true,
             'months' => [
                 [
@@ -181,6 +184,7 @@ final class CalendarSettingsTest extends TestCase
         $currentDay = new CurrentDay(1262, 1, 21);
 
         $settings = new CalendarSettings(
+            2,
             'Moon',
             301.0,
             10.2,
@@ -199,6 +203,7 @@ final class CalendarSettingsTest extends TestCase
                     'moon_cycle_offset' => 10.2,
                 ],
             ],
+            'begins_in_year' => 2,
             'is_finished' => true,
             'months' => [
                 [
@@ -246,6 +251,7 @@ final class CalendarSettingsTest extends TestCase
         $week    = new WeekSettings(1, 'Monday');
 
         $settings = new CalendarSettings(
+            1,
             'Moon',
             301.0,
             10.2,
@@ -263,6 +269,7 @@ final class CalendarSettingsTest extends TestCase
                     'moon_cycle_offset' => 10.2,
                 ],
             ],
+            'begins_in_year' => 1,
             'is_finished' => true,
             'months' => [
                 [
@@ -307,6 +314,7 @@ final class CalendarSettingsTest extends TestCase
         $currentDay = new CurrentDay(1262, 1, 21);
 
         $settings = new CalendarSettings(
+            0,
             'Moon',
             35,
             10.2,
@@ -325,6 +333,7 @@ final class CalendarSettingsTest extends TestCase
                     'moon_cycle_offset' => 10.2,
                 ],
             ],
+            'begins_in_year' => 0,
             'is_finished' => false,
             'months' => [
                 [
