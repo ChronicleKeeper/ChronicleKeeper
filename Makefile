@@ -39,6 +39,10 @@ else
 	docker compose --profile dev down
 endif
 
+reset: ## Reset the environment and deletes the linked containers
+	rm -rf var/settings.json var/data/* var/cache/* var/log/* var/tmp/*
+	docker compose --profile all down -v
+
 test-all: ## Run tests with both databases
 	make test DB=sqlite
 	make test DB=pgsql
