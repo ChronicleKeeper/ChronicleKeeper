@@ -16,6 +16,14 @@ export default class extends Controller {
         this.availableRelations = JSON.parse(this.element.dataset.relations);
 
         this.element.addEventListener('autocomplete:pre-connect', this._onPreConnect);
+
+        // Because of some change ... there need to be the form-select manually added again
+        setTimeout(() => {
+            const wrappers = document.querySelectorAll('.ts-wrapper');
+            wrappers.forEach(element => {
+                element.classList.add('form-select');
+            });
+        }, 100);
     }
 
     disconnect() {
