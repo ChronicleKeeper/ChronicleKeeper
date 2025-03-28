@@ -1,0 +1,58 @@
+
+:root {
+    --ts-pr-clear-button: 0rem;
+    --ts-pr-caret: 0rem;
+}
+
+.ts-input {
+    color: inherit;
+}
+
+.ts-control {
+    color: inherit;
+}
+.ts-control .dropdown-menu {
+    width: 100%;
+    height: auto;
+}
+
+.ts-wrapper .form-control,
+.ts-wrapper .form-select, .ts-wrapper.form-control, .ts-wrapper.form-select {
+    box-shadow: var(--tblr-box-shadow-input);
+}
+.ts-wrapper.is-invalid .ts-control, .ts-wrapper.is-valid .ts-control {
+    --ts-pr-clear-button: 1.5rem;
+}
+
+.ts-dropdown {
+    background: var(--tblr-bg-surface);
+    color: var(--tblr-body-color);
+    box-shadow: var(--tblr-box-shadow-dropdown);
+    z-index: 1000;
+}
+.ts-dropdown .option {
+    padding: 0.5rem 0.75rem;
+}
+
+.ts-control,
+.ts-control input {
+    color: var(--tblr-body-color);
+}
+
+.ts-control input::placeholder {
+    color: #8a97ab;
+}
+
+.ts-wrapper.multi .ts-control > div,
+.ts-wrapper.multi.disabled .ts-control > div {
+    background: var(--tblr-bg-surface-secondary);
+    border: 1px solid var(--tblr-border-color);
+    color: var(--tblr-body-color);
+}
+
+.ts-wrapper.disabled .ts-control {
+    opacity: 1;
+}
+.ts-wrapper.disabled .ts-control > div.item {
+    color: var(--tblr-gray-500);
+}
