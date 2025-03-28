@@ -26,8 +26,10 @@ class DeleteWorldItemHandler
             // Delete Relations, Images, Documents and Conversations
             $this->databasePlatform->createQueryBuilder()->createDelete()
                 ->from('world_item_relations')
-                ->where('source_world_item_id', '=', $command->item->getId())
-                ->orWhere([['target_world_item_id', '=', $command->item->getId()]])
+                ->orWhere([
+                    ['source_world_item_id', '=', $command->item->getId()],
+                    ['target_world_item_id', '=', $command->item->getId()],
+                ])
                 ->execute();
 
             $this->databasePlatform->createQueryBuilder()->createDelete()
