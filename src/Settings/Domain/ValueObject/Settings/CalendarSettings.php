@@ -81,7 +81,7 @@ class CalendarSettings implements JsonSerializable
         }
 
         return new self(
-            $array['begins_in_year'],
+            $array['begins_in_year'] ?? 0, // @phpstan-ignore nullCoalesce.offset
             $moonName,
             $moonCycleDays,
             $moonCycleOffset,

@@ -9,6 +9,7 @@ use ChronicleKeeper\Settings\Application\Service\ImportSettings;
 use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
 use League\Flysystem\FileAttributes;
 use League\Flysystem\Filesystem;
+use PDOException;
 use Psr\Log\LoggerInterface;
 
 use function array_key_exists;
@@ -69,15 +70,22 @@ final readonly class WorldImport implements SingleImport
                 continue;
             }
 
-            $this->databasePlatform->createQueryBuilder()->createInsert()
-                ->asReplace()
-                ->insert('world_item_relations')
-                ->values([
-                    'source_world_item_id' => $content['id'],
-                    'target_world_item_id' => $relation['toItem'],
-                    'relation_type' => $relation['relationType'],
-                ])
-                ->execute();
+            try {
+                $this->databasePlatform->createQueryBuilder()->createInsert()
+                    ->onConflict(['source_world_item_id', 'target_world_item_id'])
+                    ->insert('world_item_relations')
+                    ->values([
+                        'source_world_item_id' => $content['id'],
+                        'target_world_item_id' => $relation['toItem'],
+                        'relation_type' => $relation['relationType'],
+                    ])
+                    ->execute();
+            } catch (PDOException) {
+                /**
+                 * Fine... can currently fail because maybe the target is not existing but as both sides
+                 * are in the export the import will succeed with the other side.
+                 */
+            }
         }
     }
 
