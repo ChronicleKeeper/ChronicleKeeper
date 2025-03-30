@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Test\Settings\Presentation\Constraint;
 
+use ChronicleKeeper\Settings\Application\SettingsHandler;
 use ChronicleKeeper\Settings\Presentation\Constraint\ValidEpochsCollection;
 use ChronicleKeeper\Settings\Presentation\Constraint\ValidEpochsCollectionValidator;
+use ChronicleKeeper\Test\Settings\Domain\ValueObject\SettingsBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\Attributes\Test;
@@ -21,21 +23,27 @@ use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
 #[Small]
 final class ValidEpochsCollectionValidatorTest extends TestCase
 {
+    private SettingsHandler&MockObject $settingsHandler;
     private ExecutionContextInterface&MockObject $context;
     private ValidEpochsCollectionValidator $validator;
     private ValidEpochsCollection $constraint;
 
     protected function setUp(): void
     {
+        $settings = (new SettingsBuilder())->build();
+
+        $this->settingsHandler = $this->createMock(SettingsHandler::class);
+        $this->settingsHandler->method('get')->willReturn($settings);
+
         $this->context   = $this->createMock(ExecutionContextInterface::class);
-        $this->validator = new ValidEpochsCollectionValidator();
+        $this->validator = new ValidEpochsCollectionValidator($this->settingsHandler);
         $this->validator->initialize($this->context);
         $this->constraint = new ValidEpochsCollection();
     }
 
     protected function tearDown(): void
     {
-        unset($this->context, $this->validator, $this->constraint);
+        unset($this->settingsHandler, $this->context, $this->validator, $this->constraint);
     }
 
     #[Test]
@@ -127,8 +135,16 @@ final class ValidEpochsCollectionValidatorTest extends TestCase
         $violationBuilder = $this->createMock(ConstraintViolationBuilderInterface::class);
         $this->context->expects($this->once())
             ->method('buildViolation')
-            ->with($this->constraint->startsWithZeroMessage)
+            ->with($this->constraint->startsWithCalendarBeginMessage)
             ->willReturn($violationBuilder);
+        $violationBuilder->expects($this->once())
+            ->method('setParameter')
+            ->willReturnCallback(static function ($name, $value) use ($violationBuilder) {
+                self::assertSame('{{ calendarBeginsInYear }}', $name);
+                self::assertSame('0', $value);
+
+                return $violationBuilder;
+            });
         $violationBuilder->expects($this->once())->method('atPath')->with('epochs[0].start_year')->willReturnSelf();
         $violationBuilder->expects($this->once())->method('addViolation');
 

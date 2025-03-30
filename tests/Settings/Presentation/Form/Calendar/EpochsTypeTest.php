@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Test\Settings\Presentation\Form\Calendar;
 
+use ChronicleKeeper\Settings\Application\SettingsHandler;
 use ChronicleKeeper\Settings\Presentation\Constraint\ValidEpochsCollection;
 use ChronicleKeeper\Settings\Presentation\Constraint\ValidEpochsCollectionValidator;
 use ChronicleKeeper\Settings\Presentation\Form\Calendar\EpochsType;
@@ -15,6 +16,9 @@ use PHPUnit\Framework\Attributes\Test;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Test\TypeTestCase;
+use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\ConstraintValidatorFactory;
+use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\Validation;
 
 #[CoversClass(EpochsType::class)]
@@ -30,12 +34,39 @@ final class EpochsTypeTest extends TypeTestCase
     {
         $epochType = new EpochType();
 
+        // Create mock for SettingsHandler
+        $settingsHandler = $this->createMock(SettingsHandler::class);
+
+        // Configure validator with custom constraint validator factory
+        $validator = Validation::createValidatorBuilder()
+            ->addMethodMapping('loadValidatorMetadata')
+            ->setConstraintValidatorFactory(
+                new class ($settingsHandler) extends ConstraintValidatorFactory {
+                    public function __construct(private readonly SettingsHandler $settingsHandler)
+                    {
+                        parent::__construct();
+                    }
+
+                    public function getInstance(Constraint $constraint): ConstraintValidatorInterface
+                    {
+                        $className = $constraint->validatedBy();
+
+                        if ($className === ValidEpochsCollectionValidator::class) {
+                            return new ValidEpochsCollectionValidator($this->settingsHandler);
+                        }
+
+                        return parent::getInstance($constraint);
+                    }
+                },
+            )
+            ->getValidator();
+
         return [
             new PreloadedExtension(
                 [EpochType::class => $epochType],
                 [],
             ),
-            new ValidatorExtension(Validation::createValidator()),
+            new ValidatorExtension($validator),
         ];
     }
 

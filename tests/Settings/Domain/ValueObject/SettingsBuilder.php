@@ -76,6 +76,7 @@ class SettingsBuilder
         $week    = new WeekSettings(1, 'First Day');
 
         $this->calendarSettings = new CalendarSettings(
+            0,
             'Mond',
             30,
             0.0,

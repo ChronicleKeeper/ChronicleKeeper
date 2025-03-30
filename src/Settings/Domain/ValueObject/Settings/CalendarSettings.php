@@ -23,6 +23,7 @@ use function count;
  *           moon_cycle_days: float,
  *           moon_cycle_offset: float,
  *     }>,
+ *     begins_in_year: int,
  *     is_finished?: bool,
  *     months: array<MonthSettingsArray>,
  *     epochs: array<EpochSettingsArray>,
@@ -38,6 +39,7 @@ class CalendarSettings implements JsonSerializable
      * @param array<WeekSettings>  $weeks
      */
     public function __construct(
+        private readonly int $beginsInYear = 0,
         private readonly string $moonName = 'Mond',
         private readonly float $moonCycleDays = 30,
         private readonly float $moonCycleOffset = 0,
@@ -79,6 +81,7 @@ class CalendarSettings implements JsonSerializable
         }
 
         return new self(
+            $array['begins_in_year'],
             $moonName,
             $moonCycleDays,
             $moonCycleOffset,
@@ -116,6 +119,7 @@ class CalendarSettings implements JsonSerializable
                     'moon_cycle_offset' => $this->moonCycleOffset,
                 ],
             ],
+            'begins_in_year' => $this->beginsInYear,
             'is_finished' => $this->isFinished,
             'months' => $months,
             'epochs' => $epochs,
@@ -133,6 +137,11 @@ class CalendarSettings implements JsonSerializable
     public function isFinished(): bool
     {
         return $this->isFinished;
+    }
+
+    public function getBeginsInYear(): int
+    {
+        return $this->beginsInYear;
     }
 
     public function getMoonCycleDays(): float
@@ -176,6 +185,7 @@ class CalendarSettings implements JsonSerializable
     public function withCurrentDay(CurrentDay $day): self
     {
         return new self(
+            $this->beginsInYear,
             $this->moonName,
             $this->moonCycleDays,
             $this->moonCycleOffset,

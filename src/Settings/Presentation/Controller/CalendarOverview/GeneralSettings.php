@@ -33,6 +33,7 @@ final class GeneralSettings extends AbstractController
                 'moonCycleDays' => $moonsSettings[0]['moon_cycle_days'] ?? 30,
                 'moonCycleOffset' => $moonsSettings[0]['moon_cycle_offset'] ?? 0,
                 'current_day' => $allCalendarSettings['current_day'] ?? null,
+                'calendarBeginsInYear' => $allCalendarSettings['begins_in_year'] ?? 0, // @phpstan-ignore nullCoalesce.offset
             ],
         );
 
@@ -50,7 +51,8 @@ final class GeneralSettings extends AbstractController
                 ],
             ];
 
-            $allCalendarSettings['current_day'] = $data['current_day'];
+            $allCalendarSettings['current_day']    = $data['current_day'];
+            $allCalendarSettings['begins_in_year'] = $data['calendarBeginsInYear'];
 
             $settings->setCalendarSettings(CalendarSettings::fromArray($allCalendarSettings));
 

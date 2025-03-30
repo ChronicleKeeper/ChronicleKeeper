@@ -29,7 +29,7 @@ final class CalendarFactory
         $moonCycle = new MoonCycle($settings->getMoonCycleDays(), $settings->getMoonCycleOffset());
 
         // Create configuration
-        $configuration = $this->createConfiguration();
+        $configuration = $this->createConfiguration($settings);
 
         return new Calendar(
             $configuration,
@@ -123,10 +123,8 @@ final class CalendarFactory
         return $result;
     }
 
-    private function createConfiguration(): Configuration
+    private function createConfiguration(CalendarSettings $settings): Configuration
     {
-        // Default configuration values
-        // You might want to adjust these or make them configurable in settings
-        return new Configuration(beginsInYear: 0);
+        return new Configuration(beginsInYear: $settings->getBeginsInYear());
     }
 }
