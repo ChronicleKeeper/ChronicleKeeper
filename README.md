@@ -2,66 +2,83 @@
     <a href="https://github.com/ChronicleKeeper/ChronicleKeeper">
         <img 
             src="https://raw.githubusercontent.com/ChronicleKeeper/ChronicleKeeper/main/assets/images/logo.png" 
-            alt="Chronicle Keeper - Rollenspiel Chatbot - Wissenbewahrer" 
+            alt="Chronicle Keeper - Roleplaying Chatbot - Knowledge Keeper" 
             width="300"
         >
     </a>
 </p>
 
-## Der Chronicle Keeper
+<p align="center">
+  <a href="https://chroniclekeeper.github.io/docs/"><img src="https://img.shields.io/badge/docs-read%20now-blue?style=for-the-badge" alt="Documentation"></a>
+  <a href="https://codecov.io/gh/ChronicleKeeper/ChronicleKeeper" ><img alt="Codecov" src="https://img.shields.io/codecov/c/gh/ChronicleKeeper/ChronicleKeeper?style=for-the-badge"></a>
+  <img alt="GitHub Release" src="https://img.shields.io/github/v/release/ChronicleKeeper/ChronicleKeeper?style=for-the-badge">
+  <a href="https://github.com/ChronicleKeeper/ChronicleKeeper/blob/main/LICENSE"><img src="https://img.shields.io/github/license/ChronicleKeeper/ChronicleKeeper?style=for-the-badge" alt="License"></a>
+</p>
 
-Der Chronicle Keeper ist ein mächtiger Begleiter, der speziell für die Welt der Rollenspiele erschaffen wurde. Er dient als 
-Hüter des Wissens und als weiser Berater, der dir hilft, Dokumente und Bilder effizient zu verwalten und zu organisieren. 
-Mit der Integration von ChatGPT kannst du deine gesammelten Schätze interaktiv und durch magische System-Prompts 
-abfragbar machen.
+## The Chronicle Keeper
 
-Mit der Hilfe des Chronicle Keeper kannst du die epische Reise deines Charakters begleiten und deine eigene Rollenspielwelt 
-als Spielleiter mühelos durchsuchbar und erweiterbar gestalten. Der Chronicle Keeper steht jedem Abenteurer als treuer
-Gefährte zur Seite.
+Chronicle Keeper is a comprehensive companion for role-players, designed to help you develop and navigate fantasy worlds. Whether you're a dungeon master or a player, Chronicle Keeper assists you in tracking the development within your world, organizing knowledge, and enhancing your storytelling experience.
 
-**Eine kleine Auswahl der Magie des Chronicle Keepers:**
+With the integrated chatbot powered by ChatGPT, you can further develop your world or characters based on existing knowledge or create entirely new elements. Chronicle Keeper brings your world just a question away from your imagination.
 
-- ChatGPT Integration: Mach deine Dokumente interaktiv und abfragbar durch System-Prompts.
-- Document Management: Verwalte und organisiere Dokumente und Bilder effizient für Kontextwissen in Gesprächen mit ChatGPT.
-- PHPDesktop Support: Führe die Anwendung als Desktop-Applikation für Windows aus.
-- Export / Import: Exportiere deine Daten, um sie wieder zu importieren, weiterzugeben oder zu sichern.
-- Umfangreiche Konfiguration zum Verhalten des Chronicle Keeper im Gespräch.
-- Konfigurierbare Kalender mit Feiertagen und Mondzyklen, unabhängig vom realen Kalender und dem realen Zeitablauf.
-- Bildgenerierung mit DALL-E 3 und dem bestehenden Kontextwissen aus der Bibliothek in einem Zwei-Schritt-Verfahren.
+## Features
 
-## Windows-Installation
+**Chronicle Keeper's capabilities include:**
 
-Voraussetzungen:
+- **Library Management**: Organize documents, images, conversations, and more in an easily accessible system
+- **World Reference**: Quick access to information about connections between elements in your world
+- **Custom Calendar**: Configure a calendar for your world independent from real-world timekeeping
+- **AI Image Generation**: Create illustrations for your characters and world based on your existing knowledge
+- **Interactive Chat**: Make all your world knowledge interactive through conversations with the keeper
+- **Data Portability**: Export and import your data for backups, sharing, or migration
 
-- Windows 10 oder höher
+
+## Setup
+
+### Requirements
+
+- Docker Environment
 - [OpenAI API Key](https://platform.openai.com/api-keys)
-- Mutige Helden auf einer Reise durch eine aufregende Welt
+- Brave heroes on a journey through an exciting world
 
-Um den Chronicle Keeper in deiner Runde zu nutzen, musst du keine Taverne aufsuchen oder einen Dungeon durchforsten.
-Lade die ZIP-Datei des [aktuellsten Releases](https://github.com/ChronicleKeeper/ChronicleKeeper/releases/latest) herunter.
-Diese enthält die vollständige Desktop-Variante.
+### Installation
 
-Nach dem Entpacken des Verzeichnisses kannst du einfach loslegen und den Chronicle Keeper starten. Es wird dich ein kleiner
-Willkommensbildschirm anlachen mit weiteren Hinweisen. Du kannst hier entweder zum Import eines bestehenden Archivs
-aus einer vorherigen Version wechseln oder direkt in die Konfiguration weitergeleitet werden, um einen
-[OpenAI API Key](https://platform.openai.com/api-keys) einzutragen.
+```bash
+# Clone the repository
+git clone https://github.com/ChronicleKeeper/ChronicleKeeper.git
+cd ChronicleKeeper
 
-## Anwenderdokumentation
+# Start the container 
+docker compose -f compose.yaml -f compose.prod.yaml build
+HTTP_PORT=8080 HTTPS_PORT=8081 docker compose -f compose.yaml -f compose.prod.yaml up
 
-Eine ausführliche Dokumentation findest du unter [https://chroniclekeeper.github.io/docs/](https://chroniclekeeper.github.io/docs/).
+# Access the application
+open https://localhost:8081
+```
+
+### Importing Data
+If you have an existing export file:
+
+```bash
+cat your-export-file.zip | docker compose exec -T php bin/console app:import --stream -ps -vvv
+```
+
+## Getting Started
+
+1. After installation, go to the settings page and input your OpenAI API Key
+2. Start adding content through the Library interface
+3. Try asking questions to the keeper about your world
+4. Explore the documentation for advanced features
+
+## User Documentation
+
+Detailed documentation can be found at [https://chroniclekeeper.github.io/docs/](https://chroniclekeeper.github.io/docs/).
 
 ## Contributions
 
-Siehe [CONTRIBUTING.md](CONTRIBUTING.md) für weitere Informationen zur Mitwirkung und ein wenig Entwicklerdokumentation.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for more information on contributing and developer documentation.
 
 ## License
 
-**Chronicle Keeper** © 2025+, Denis Zunke. Dieses Projekt ist unter der MIT-Lizenz lizenziert, 
-siehe [LICENSE](LICENSE) für den vollständigen Lizenztext.
-
-> GitHub [@dzunke](https://github.com/DZunke) &nbsp;&middot;&nbsp;
-> Twitter [@DZunke](https://twitter.com/DZunke)
-
-> Supported by &nbsp;&middot;&nbsp;
-> [PHPDesktop](https://github.com/cztomczak/phpdesktop)&nbsp;&middot;&nbsp;
-> [Tabler](https://tabler.io)
+**Chronicle Keeper** © 2025+, Denis Zunke. This project is licensed under the MIT License,
+see [LICENSE](LICENSE) for the full license text.
