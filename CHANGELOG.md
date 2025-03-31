@@ -29,6 +29,9 @@
 - Favorites now properly track renamed entries.
 - Add missing hamburger menu for small displays.
 
+**Removed**
+- PHPDesktop release is given up because of poor local performance with larger application
+
 ## [alpha-0.7] - Moving Forward
 
 **Added**
