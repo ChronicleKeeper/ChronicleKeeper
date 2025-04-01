@@ -52,10 +52,6 @@ LICENSE
 # Development tools configuration
 .makefile/
 
-# Database
-*.sqlite
-*.sqlite3
-
 # Temporary files
 *.cache
 *.log

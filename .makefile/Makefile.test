@@ -1,9 +1,6 @@
 SHELL := /bin/bash
 .PHONY: *
 
-# Test configuration
-PGSQL_TEST_DSN = "pgsql:host=127.0.0.1;port=5433;dbname=chronicle-keeper-test;user=app;password=app"
-
 # Helper function to check if test container is running
 check-test-containers:
 	@if ! docker compose ps --status running | grep -q "postgres_test"; then \
@@ -14,16 +11,10 @@ check-test-containers:
 	fi
 
 test: setup-test-env ## Run tests with configured database
-ifeq ($(DB),sqlite)
-	APP_ENV=test $(SQLITE_PHP) bin/console cache:clear
-	APP_ENV=test $(SQLITE_PHP) bin/console app:db:drop -f
-	$(SQLITE_PHP) vendor/bin/phpunit --colors --exclude-group=pgsql
-else
 	$(MAKE) check-test-containers
-	$(PGSQL_PHP) bin/console cache:clear --env=test
-	$(PGSQL_PHP) bin/console app:db:drop -f --env=test
-	docker compose exec -e APP_ENV=test php  vendor/bin/phpunit --colors --exclude-group=sqlite
-endif
+	$(PHP) bin/console cache:clear --env=test
+	$(PHP) bin/console app:db:drop -f --env=test
+	docker compose exec -e APP_ENV=test php vendor/bin/phpunit --colors
 
 coverage: setup-test-env ## Generate test coverage report
-	XDEBUG_MODE=coverage $(PHP) vendor/bin/phpunit --coverage-html=coverage --coverage-clover=coverage.xml --exclude-group=pgsql
+	XDEBUG_MODE=coverage $(PHP) vendor/bin/phpunit --coverage-html=coverage --coverage-clover=coverage.xml
