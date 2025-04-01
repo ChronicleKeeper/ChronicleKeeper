@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace ChronicleKeeper\Shared\Infrastructure\Database\Schema;
 
 use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
-use ChronicleKeeper\Shared\Infrastructure\Database\PgSql\PgSqlDatabasePlatform;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
@@ -13,8 +12,6 @@ use Symfony\Component\DependencyInjection\Attribute\Lazy;
 use Throwable;
 
 use function array_column;
-use function array_filter;
-use function array_values;
 use function in_array;
 use function iterator_to_array;
 use function usort;
@@ -76,48 +73,12 @@ class SchemaManager
     /** @return array<int, string> */
     public function getTables(): array
     {
-        if ($this->platform instanceof PgSqlDatabasePlatform) {
-            $tables = $this->platform->fetch('SELECT tablename FROM pg_tables WHERE schemaname = :schema', ['schema' => 'public']);
+        $tables = $this->platform->fetch('SELECT tablename FROM pg_tables WHERE schemaname = :schema', ['schema' => 'public']);
 
-            return array_column($tables, 'tablename');
-        }
-
-        $tables = array_column(
-            $this->platform->fetch("SELECT name FROM sqlite_master WHERE type='table'"),
-            'name',
-        );
-
-        return array_values(array_filter(
-            $tables,
-            static fn (string $table) => $table !== 'sqlite_sequence',
-        ));
+        return array_column($tables, 'tablename');
     }
 
     public function dropSchema(): void
-    {
-        if ($this->platform instanceof PgSqlDatabasePlatform) {
-            $this->dropSchemaPgSql();
-
-            return;
-        }
-
-        try {
-            $this->platform->beginTransaction();
-
-            $tables = $this->getTables();
-            foreach ($tables as $table) {
-                $this->platform->executeRaw('DROP TABLE IF EXISTS ' . $table);
-            }
-
-            $this->platform->commit();
-        } catch (Throwable $e) {
-            $this->platform->rollback();
-
-            throw $e;
-        }
-    }
-
-    private function dropSchemaPgSql(): void
     {
         try {
             $this->platform->beginTransaction();

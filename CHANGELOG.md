@@ -1,5 +1,11 @@
 # Changelog
 
+## [alpha-0.9] - Clouds need to have a form
+
+**Removed**
+
+- Database: Sqlite support is removed, only PostgreSQL is supported.
+
 ## [alpha-0.8] - Steps to the cloud
 
 **Added**

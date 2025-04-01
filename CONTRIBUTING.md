@@ -12,10 +12,8 @@ The first step is to fork the repository to have it at your namespace and to be 
 git clone git@github.com:yourusername/ChronicleKeeper.git
 cd ChronicleKeeper
 
-# Start the development environment of your choice
-make dev DB=sqlite     # For SQLite development
-# OR
-make dev DB=pgsql      # For PostgreSQL development
+# Start the development environment
+make dev
 
 # After first start you need to initially setup your database
 make setup-database
@@ -28,21 +26,14 @@ That's it. You are ready to go. Based on the setup you now can open your browser
 ### Running Tests
 
 ```bash
-# Run all tests (both SQLite and PostgreSQL)
-make test-all
-
-# Run SQLite tests only
-make test DB=sqlite
-
-# Run PostgreSQL tests only
-make test DB=pgsql
+# Run all tests
+make tests
 
 # Generate coverage report
 make coverage
 ```
 
 ### Existing Test Groups
-- `sqlite`: SQLite-specific tests
 - `pgsql`: PostgreSQL-specific tests
 - `large`: All tests containing database usage
 - `small`: Database agnostic tests

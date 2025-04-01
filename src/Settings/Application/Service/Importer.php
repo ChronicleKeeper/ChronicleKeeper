@@ -37,7 +37,7 @@ class Importer
         $versionOfArchive = $this->version->parseToNumericVersion($filesystem->read('VERSION'));
 
         /**
-         * If version is not 0.6 we can not import as we are in progress to migrate from filesystem to SQLite.
+         * If version is not 0.6 we can not import as we are in progress to migrate from filesystem to Database.
          * So the version 0.6 is required version to import from. This will also stop newer versions from being
          * imported.
          */

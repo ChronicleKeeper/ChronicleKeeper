@@ -2,17 +2,17 @@ SHELL := /bin/bash
 .PHONY: *
 
 # Environment handling
-setup-env = @if [ ! -f .env.$(1).$(DB) ]; then \
-		echo "Error: .env.$(1).$(DB) not found"; \
+setup-env = @if [ ! -f .env.$(1).dist ]; then \
+		echo "Error: .env.$(1).dist not found"; \
 		exit 1; \
 	fi; \
-	cp .env.$(1).$(DB) .env;
+	cp .env.$(1).dist .env;
 
-setup-test-env = @if [ ! -f .env.$(1).$(DB) ]; then \
-		echo "Error: .env.$(1).$(DB) not found"; \
+setup-test-env = @if [ ! -f .env.$(1).dist ]; then \
+		echo "Error: .env.$(1).dist not found"; \
 		exit 1; \
 	fi; \
-	cp .env.$(1).$(DB) .env.test;
+	cp .env.$(1).dist .env.test;
 
 setup-dev-env: ## Setup development environment
 	$(call setup-env,dev)
@@ -21,8 +21,4 @@ setup-test-env: ## Setup test environment
 	$(call setup-test-env,test)
 
 setup-database: ## setup the database
-ifeq ($(DB),sqlite)
-	$(SQLITE_PHP) bin/console app:db:init --force -vvv
-else
-	 $(PGSQL_PHP) bin/console app:db:init --force -vvv
-endif
+	 $(PHP) bin/console app:db:init --force -vvv
