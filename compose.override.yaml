@@ -3,6 +3,13 @@ services:
     build:
       context: .
       target: chronicle_keeper_dev
+    restart: "no"
     volumes:
       - ./:/app
     tty: true
+
+  database:
+    restart: "no"
+
+  database_test:
+    restart: "no"
