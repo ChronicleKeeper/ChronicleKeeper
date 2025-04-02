@@ -6,7 +6,7 @@ namespace ChronicleKeeper\Shared;
 
 use ChronicleKeeper\Shared\Infrastructure\DependencyInjection\DatabasePlatformCompilerPass;
 use Override;
-use PhpLlm\LlmChain\Chain\ToolBox\Attribute\AsTool;
+use PhpLlm\LlmChain\Chain\Toolbox\Attribute\AsTool;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;

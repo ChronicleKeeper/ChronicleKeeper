@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "33ffc70bb876a832cf5847e4e5592f2d",
+    "content-hash": "ede78fec4ddc05e070cd493bf4a39257",
     "packages": [
         {
             "name": "composer/semver",
@@ -1080,16 +1080,16 @@
         },
         {
             "name": "php-llm/llm-chain",
-            "version": "0.18.0",
+            "version": "0.19.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-llm/llm-chain.git",
-                "reference": "6a5dbe767ed05512cd82cf7cab2d2f14aed5ef3c"
+                "reference": "a588afeff45d0369161180c2555d608cb1a2ad81"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-llm/llm-chain/zipball/6a5dbe767ed05512cd82cf7cab2d2f14aed5ef3c",
-                "reference": "6a5dbe767ed05512cd82cf7cab2d2f14aed5ef3c",
+                "url": "https://api.github.com/repos/php-llm/llm-chain/zipball/a588afeff45d0369161180c2555d608cb1a2ad81",
+                "reference": "a588afeff45d0369161180c2555d608cb1a2ad81",
                 "shasum": ""
             },
             "require": {
@@ -1159,9 +1159,9 @@
             "description": "A slim PHP component with tooling around LLMs.",
             "support": {
                 "issues": "https://github.com/php-llm/llm-chain/issues",
-                "source": "https://github.com/php-llm/llm-chain/tree/0.18.0"
+                "source": "https://github.com/php-llm/llm-chain/tree/0.19.0"
             },
-            "time": "2025-03-13T23:29:22+00:00"
+            "time": "2025-03-20T21:45:05+00:00"
         },
         {
             "name": "phpdocumentor/reflection-common",

@@ -13,7 +13,7 @@ use ChronicleKeeper\Calendar\Domain\Entity\CalendarDate;
 use ChronicleKeeper\Chat\Domain\ValueObject\FunctionDebug;
 use ChronicleKeeper\Chat\Infrastructure\LLMChain\RuntimeCollector;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
-use PhpLlm\LlmChain\Chain\ToolBox\Attribute\AsTool;
+use PhpLlm\LlmChain\Chain\Toolbox\Attribute\AsTool;
 use Throwable;
 
 use function floor;

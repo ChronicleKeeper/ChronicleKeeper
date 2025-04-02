@@ -20,7 +20,7 @@ use ChronicleKeeper\Library\Infrastructure\LLMChain\Tool\ImageSearch;
 use ChronicleKeeper\Settings\Application\SettingsHandler;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
 use ChronicleKeeper\Shared\Infrastructure\LLMChain\LLMChainFactory;
-use PhpLlm\LlmChain\Chain\ToolBox\StreamResponse as ToolboxStreamResponse;
+use PhpLlm\LlmChain\Chain\Toolbox\StreamResponse as ToolboxStreamResponse;
 use PhpLlm\LlmChain\Model\Message\Message;
 use PhpLlm\LlmChain\Model\Response\StreamResponse as LLMStreamResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;

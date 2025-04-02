@@ -12,7 +12,7 @@ use ChronicleKeeper\Document\Domain\Entity\Document;
 use ChronicleKeeper\Settings\Application\SettingsHandler;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
 use ChronicleKeeper\Shared\Infrastructure\LLMChain\EmbeddingCalculator;
-use PhpLlm\LlmChain\Chain\ToolBox\Attribute\AsTool;
+use PhpLlm\LlmChain\Chain\Toolbox\Attribute\AsTool;
 
 use function count;
 

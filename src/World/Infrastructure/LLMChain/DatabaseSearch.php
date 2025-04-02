@@ -11,7 +11,7 @@ use ChronicleKeeper\World\Application\Query\FindRelationsOfItem;
 use ChronicleKeeper\World\Application\Query\SearchWorldItems;
 use ChronicleKeeper\World\Domain\Entity\Item;
 use ChronicleKeeper\World\Domain\ValueObject\Relation;
-use PhpLlm\LlmChain\Chain\ToolBox\Attribute\AsTool;
+use PhpLlm\LlmChain\Chain\Toolbox\Attribute\AsTool;
 use Symfony\Component\String\AbstractString;
 
 use function array_map;

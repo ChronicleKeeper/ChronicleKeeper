@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Test\Shared\Infrastructure\LLMChain\Stub;
 
-use PhpLlm\LlmChain\Chain\ToolBox\Attribute\AsTool;
+use PhpLlm\LlmChain\Chain\Toolbox\Attribute\AsTool;
 
 #[AsTool('ExampleTool', 'This is an example tool.')]
 class ExampleTool

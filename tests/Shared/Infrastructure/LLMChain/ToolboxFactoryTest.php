@@ -6,7 +6,7 @@ namespace ChronicleKeeper\Test\Shared\Infrastructure\LLMChain;
 
 use ArrayIterator;
 use ChronicleKeeper\Settings\Application\SettingsHandler;
-use ChronicleKeeper\Shared\Infrastructure\LLMChain\SettingsToolBox;
+use ChronicleKeeper\Shared\Infrastructure\LLMChain\SettingsToolbox;
 use ChronicleKeeper\Shared\Infrastructure\LLMChain\ToolboxFactory;
 use ChronicleKeeper\Test\Shared\Infrastructure\LLMChain\Stub\ExampleTool;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -16,7 +16,7 @@ use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(ToolboxFactory::class)]
-#[UsesClass(SettingsToolBox::class)]
+#[UsesClass(SettingsToolbox::class)]
 #[Small]
 class ToolboxFactoryTest extends TestCase
 {

@@ -7,7 +7,7 @@ namespace ChronicleKeeper\Settings\Presentation\Form;
 use ChronicleKeeper\Settings\Domain\ValueObject\Settings;
 use ChronicleKeeper\Settings\Domain\ValueObject\Settings\ChatbotFunctions;
 use ChronicleKeeper\Shared\Infrastructure\LLMChain\ToolboxFactory;
-use PhpLlm\LlmChain\Chain\ToolBox\Metadata;
+use PhpLlm\LlmChain\Chain\Toolbox\Metadata;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\DataMapperInterface;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;

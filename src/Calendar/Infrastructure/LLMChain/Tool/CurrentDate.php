@@ -15,7 +15,7 @@ use ChronicleKeeper\Calendar\Domain\ValueObject\LeapDay;
 use ChronicleKeeper\Chat\Domain\ValueObject\FunctionDebug;
 use ChronicleKeeper\Chat\Infrastructure\LLMChain\RuntimeCollector;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
-use PhpLlm\LlmChain\Chain\ToolBox\Attribute\AsTool;
+use PhpLlm\LlmChain\Chain\Toolbox\Attribute\AsTool;
 
 use function array_map;
 use function implode;
