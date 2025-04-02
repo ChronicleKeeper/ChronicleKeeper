@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace ChronicleKeeper\Shared\Infrastructure\LLMChain;
 
 use ChronicleKeeper\Settings\Application\SettingsHandler;
-use PhpLlm\LlmChain\Chain\ToolBox\ToolBox;
-use PhpLlm\LlmChain\Chain\ToolBox\ToolBoxInterface;
+use PhpLlm\LlmChain\Chain\Toolbox\Toolbox;
+use PhpLlm\LlmChain\Chain\Toolbox\ToolboxInterface;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\DependencyInjection\Attribute\Lazy;
 use Traversable;
@@ -28,11 +28,11 @@ class ToolboxFactory
         $this->tools = $tools instanceof Traversable ? iterator_to_array($tools) : $tools;
     }
 
-    public function create(): ToolBoxInterface
+    public function create(): ToolboxInterface
     {
-        return new SettingsToolBox(
+        return new SettingsToolbox(
             $this->settingsHandler,
-            ToolBox::create(...$this->tools),
+            Toolbox::create(...$this->tools),
         );
     }
 }

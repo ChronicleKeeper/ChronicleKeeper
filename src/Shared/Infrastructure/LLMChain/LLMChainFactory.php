@@ -12,7 +12,7 @@ use PhpLlm\LlmChain\Bridge\OpenAI\GPT;
 use PhpLlm\LlmChain\Bridge\OpenAI\GPT\ModelClient as GPTModelClient;
 use PhpLlm\LlmChain\Bridge\OpenAI\GPT\ResponseConverter as GPTResponseConverter;
 use PhpLlm\LlmChain\Chain;
-use PhpLlm\LlmChain\Chain\ToolBox\ChainProcessor;
+use PhpLlm\LlmChain\Chain\Toolbox\ChainProcessor;
 use PhpLlm\LlmChain\ChainInterface;
 use PhpLlm\LlmChain\Platform;
 use PhpLlm\LlmChain\PlatformInterface;

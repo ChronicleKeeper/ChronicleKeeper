@@ -5,17 +5,17 @@ declare(strict_types=1);
 namespace ChronicleKeeper\Shared\Infrastructure\LLMChain;
 
 use ChronicleKeeper\Settings\Application\SettingsHandler;
-use PhpLlm\LlmChain\Chain\ToolBox\Metadata;
-use PhpLlm\LlmChain\Chain\ToolBox\ToolBoxInterface;
+use PhpLlm\LlmChain\Chain\Toolbox\Metadata;
+use PhpLlm\LlmChain\Chain\Toolbox\ToolboxInterface;
 use PhpLlm\LlmChain\Model\Response\ToolCall;
 
 use function array_key_exists;
 
-class SettingsToolBox implements ToolBoxInterface
+class SettingsToolbox implements ToolboxInterface
 {
     public function __construct(
         private readonly SettingsHandler $settingsHandler,
-        private readonly ToolBoxInterface $llmToolBox,
+        private readonly ToolboxInterface $llmToolBox,
     ) {
     }
 
@@ -36,10 +36,9 @@ class SettingsToolBox implements ToolBoxInterface
             }
 
             $toolMap[$index] = new Metadata(
-                $tool->className,
+                $tool->reference,
                 $tool->name,
                 $descriptions[$tool->name],
-                $tool->method,
                 $tool->parameters,
             );
         }
