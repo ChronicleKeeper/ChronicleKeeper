@@ -5,6 +5,7 @@
 **Fixed**
 
 - Fixed embedding calculation for empty document or image contents by ignoring them.
+- Validation errors for image and document description were not shown in the UI.
 
 **Removed**
 
