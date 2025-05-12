@@ -20,9 +20,10 @@
                 <a href="{{ path('library_directory_create', {'parentDirectory': currentDirectory.id }) }}" class="dropdown-item">
                     {{ ux_icon('tabler:folder-plus', {'class': 'icon dropdown-item-icon icon-tabler'}) }}Neues Verzeichnis
                 </a>
-                <a href="{{ path('update_search_index') }}" class="dropdown-item">
+                <!-- Please do not use the following functionality, it is obsolete. -->
+                <!-- <a href="{{ path('update_search_index') }}" class="dropdown-item">
                     {{ ux_icon('tabler:reload', {'class': 'icon dropdown-item-icon icon-tabler'}) }}Chat Refresh
-                </a>
+                </a> -->
             </div>
         </div>
     </div>

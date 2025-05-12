@@ -11,6 +11,7 @@ use ChronicleKeeper\Document\Infrastructure\VectorStorage\LibraryDocumentUpdater
 use ChronicleKeeper\Shared\Application\Query\QueryParameters;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
 use ChronicleKeeper\Shared\Infrastructure\LLMChain\EmbeddingCalculator;
+use ChronicleKeeper\Shared\Infrastructure\LLMChain\Exception\EmbeddingCalculationFailed;
 use ChronicleKeeper\Test\Document\Domain\Entity\DocumentBuilder;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -140,6 +141,89 @@ class LibraryDocumentUpdaterTest extends TestCase
 
         $updater = new LibraryDocumentUpdater(new NullLogger(), $embeddingCalculator, $queryService, $bus);
         $updater->updateAll();
+    }
+
+    #[Test]
+    public function itCanHandleDocumentsWithoutAnyContent(): void
+    {
+        $document = (new DocumentBuilder())
+            ->withId('8a998dc1-31bc-4903-8e60-6ad3232f819b')
+            ->withContent('')
+            ->build();
+
+        $queryService = $this->createMock(QueryService::class);
+        $queryService->expects($this->once())
+            ->method('query')
+            ->willReturnCallback(
+                static function (QueryParameters $query) use ($document) {
+                    if ($query instanceof FindAllDocuments) {
+                        return [$document];
+                    }
+
+                    throw new InvalidArgumentException('Unexpected query');
+                },
+            );
+
+        $embeddingCalculator = $this->createMock(EmbeddingCalculator::class);
+        $embeddingCalculator->expects($this->never())->method('getSingleEmbedding');
+        $embeddingCalculator->expects($this->never())->method('getMultipleEmbeddings')->willReturn([]);
+        $embeddingCalculator->expects($this->once())->method('createTextChunks')->willReturn([]);
+
+        $bus = $this->createMock(MessageBusInterface::class);
+        $bus->expects($this->once())
+            ->method('dispatch')
+            ->willReturnCallback(
+                static function (object $command) use ($document) {
+                    if ($command instanceof DeleteDocumentVectors) {
+                        self::assertSame($document->getId(), $command->documentId);
+                    }
+
+                    return new Envelope($command);
+                },
+            );
+
+        $updater = new LibraryDocumentUpdater(new NullLogger(), $embeddingCalculator, $queryService, $bus);
+        $updater->updateAll();
+    }
+
+    #[Test]
+    public function itIsCatchingAnEmbeddingExceptionAnDoesNothing(): void
+    {
+        $queryService = $this->createMock(QueryService::class);
+        $queryService->expects($this->once())
+            ->method('query')
+            ->willReturnCallback(
+                static function (QueryParameters $query) {
+                    if ($query instanceof FindAllDocuments) {
+                        return [(new DocumentBuilder())->withContent('Foo Bar Baz')->build()];
+                    }
+
+                    throw new InvalidArgumentException('Unexpected query ' . $query::class);
+                },
+            );
+
+        $embeddingCalculator = $this->createMock(EmbeddingCalculator::class);
+        $embeddingCalculator->expects($this->once())->method('createTextChunks')->willReturn(['Foo']);
+        $embeddingCalculator->expects($this->once())->method('getMultipleEmbeddings')
+            ->willThrowException(new EmbeddingCalculationFailed());
+
+        $busInvoker = $this->once();
+
+        $bus = $this->createMock(MessageBusInterface::class);
+        $bus->expects($busInvoker)
+            ->method('dispatch')
+            ->willReturnCallback(
+                static function (StoreDocumentVectors|DeleteDocumentVectors $command) use ($busInvoker) {
+                    if ($busInvoker->numberOfInvocations() === 1) {
+                        self::assertInstanceOf(DeleteDocumentVectors::class, $command);
+                    }
+
+                    return new Envelope($command);
+                },
+            );
+
+        $updater = new LibraryDocumentUpdater(new NullLogger(), $embeddingCalculator, $queryService, $bus);
+        $updater->updateAll(1);
     }
 
     #[Test]

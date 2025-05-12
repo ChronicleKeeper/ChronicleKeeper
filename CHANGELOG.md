@@ -2,9 +2,14 @@
 
 ## [alpha-0.9] - Clouds need to have a form
 
+**Fixed**
+
+- Fixed embedding calculation for empty document or image contents by ignoring them.
+
 **Removed**
 
 - Database: Sqlite support is removed, only PostgreSQL is supported.
+- Removed the Cache Refresh function from the library header as content is updated on every change.
 
 ## [alpha-0.8] - Steps to the cloud
 

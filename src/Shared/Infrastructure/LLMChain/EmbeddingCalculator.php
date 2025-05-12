@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Shared\Infrastructure\LLMChain;
 
+use ChronicleKeeper\Shared\Infrastructure\LLMChain\Exception\EmbeddingCalculationFailed;
 use PhpLlm\LlmChain\Bridge\OpenAI\Embeddings;
 use PhpLlm\LlmChain\Document\Vector;
+use Symfony\Component\HttpClient\Exception\ClientException;
 
+use function array_filter;
 use function array_map;
 use function assert;
 use function is_array;
@@ -43,8 +46,13 @@ class EmbeddingCalculator
     {
         $platform = $this->chainFactory->createPlatform();
 
-        /** @var list<Vector> $response */
-        $response = $platform->request(new Embeddings(), $texts)->getContent();
+        try {
+            /** @var list<Vector> $response */
+            $response = $platform->request(new Embeddings(), $texts)->getContent();
+        } catch (ClientException $e) {
+            // The request contained a bad content, so log knowledge about the falsy content
+            throw new EmbeddingCalculationFailed($e);
+        }
 
         /** @var list<list<float>> $embeddings */
         $embeddings = array_map(
@@ -77,6 +85,7 @@ class EmbeddingCalculator
             $contentChunks[] = $vectorContent;
         } while ($content !== '');
 
-        return $contentChunks;
+        // In the end filter empty chunks and return the array
+        return array_filter($contentChunks, static fn (string $chunk): bool => $chunk !== ''); // @phpstan-ignore return.type
     }
 }

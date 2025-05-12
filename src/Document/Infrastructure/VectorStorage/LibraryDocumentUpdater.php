@@ -11,6 +11,7 @@ use ChronicleKeeper\Document\Domain\Entity\Document;
 use ChronicleKeeper\Document\Domain\Entity\VectorDocument;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
 use ChronicleKeeper\Shared\Infrastructure\LLMChain\EmbeddingCalculator;
+use ChronicleKeeper\Shared\Infrastructure\LLMChain\Exception\EmbeddingCalculationFailed;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
 
@@ -68,8 +69,24 @@ class LibraryDocumentUpdater
     ): array {
         // Calculate Content Chunks
         $contentChunks = $this->embeddingCalculator->createTextChunks($document->getContent(), $contentLength);
-        // Calculate vectors from the chunks
-        $vectors = $this->embeddingCalculator->getMultipleEmbeddings($contentChunks);
+
+        if (count($contentChunks) === 0) {
+            return [];
+        }
+
+        try {
+            $vectors = $this->embeddingCalculator->getMultipleEmbeddings($contentChunks);
+        } catch (EmbeddingCalculationFailed $e) {
+            $this->logger->error(
+                'The creation of embedding chunks for document "{document}" failed.',
+                [
+                    'message' => $e->getMessage(),
+                    'document' => $document->getId(),
+                ],
+            );
+
+            return [];
+        }
 
         $vectorDocuments = [];
         foreach ($contentChunks as $index => $chunk) {
