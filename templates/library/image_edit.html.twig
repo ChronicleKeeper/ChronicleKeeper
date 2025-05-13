@@ -29,6 +29,7 @@
                             <div class="col-12">
                                 <label for="description" class="form-label">Beschreibung</label>
                                 <twig:markdownEditor name="image[description]" content="{{ image.description }}" />
+                                {{ form_errors(form.description) }}
                             </div>
                         </div>
                     </div>

@@ -26,6 +26,7 @@
                             <div class="col-12">
                                 {{ form_label(form.content) }}
                                 <twig:markdownEditor rows="10" name="document[content]" content="{{ form.content.vars.value }}" />
+                                {{ form_errors(form.content) }}
                             </div>
                         </div>
                     </div>

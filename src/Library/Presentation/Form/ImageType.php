@@ -57,6 +57,7 @@ class ImageType extends AbstractType implements DataMapperInterface
                 'translation_domain' => false,
                 'required' => false,
                 'empty_data' => '',
+                'constraints' => [new NotBlank()],
             ],
         );
     }

@@ -55,6 +55,7 @@ class DocumentType extends AbstractType implements DataMapperInterface
                 'label' => 'Inhalt',
                 'required' => true,
                 'constraints' => [new NotBlank()],
+                'empty_data' => '',
             ],
         );
     }
@@ -109,7 +110,7 @@ class DocumentType extends AbstractType implements DataMapperInterface
             $viewData->rename($title);
         }
 
-        $content = $forms['content']->getData();
+        $content = (string) $forms['content']->getData();
         if ($content === $viewData->getContent()) {
             return;
         }
