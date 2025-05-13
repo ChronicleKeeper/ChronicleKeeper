@@ -44,6 +44,22 @@ class RuntimeCollectorTest extends TestCase
     }
 
     #[Test]
+    public function itGiveByTitleSortedReferences(): void
+    {
+        $collector = new RuntimeCollector(self::createStub(SettingsHandler::class));
+        $collector->addReference(new Reference('id1', 'foo', 'title2'));
+        $collector->addReference(new Reference('id2', 'foo', 'title1'));
+        $collector->addReference(new Reference('id3', 'foo', 'title3'));
+
+        $references = $collector->flushReferenceByType('foo');
+
+        self::assertCount(3, $references);
+        self::assertSame('title1', $references[0]->title);
+        self::assertSame('title2', $references[1]->title);
+        self::assertSame('title3', $references[2]->title);
+    }
+
+    #[Test]
     public function itCanFlushAllToolCalls(): void
     {
         $collector = $this->createRuntimeCollectorWithEnabledDebug();

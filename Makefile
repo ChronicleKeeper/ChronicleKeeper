@@ -31,5 +31,5 @@ reset: ## Reset the environment and deletes the linked containers
 qa: lint-php check-cs static-analysis ## Run all QA tools
 
 # Build commands
-build: qa test-all ## Run full build suite
+build: qa test ## Run full build suite
 

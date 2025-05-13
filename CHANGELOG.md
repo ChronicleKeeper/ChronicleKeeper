@@ -1,6 +1,10 @@
 # Changelog
 
-## [alpha-0.9] - Clouds need to have a form
+## [alpha-0.9]
+
+**Changed**
+
+- Return to delivering full found documents as context to the chatbot.
 
 **Fixed**
 

@@ -10,6 +10,7 @@ use ChronicleKeeper\Settings\Application\SettingsHandler;
 
 use function array_filter;
 use function array_values;
+use function usort;
 
 class RuntimeCollector
 {
@@ -26,6 +27,9 @@ class RuntimeCollector
     public function addReference(Reference $reference): void
     {
         $this->references[] = $reference;
+
+        // Sort the references by title
+        usort($this->references, static fn (Reference $a, Reference $b) => $a->title <=> $b->title);
     }
 
     public function addFunctionDebug(FunctionDebug $functionDebug): void
