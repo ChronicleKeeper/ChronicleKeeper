@@ -11,7 +11,7 @@ use ChronicleKeeper\Settings\Application\Service\Exporter\ExportSettings;
 use ChronicleKeeper\Settings\Application\Service\Exporter\SingleExport;
 use ChronicleKeeper\Settings\Application\Service\Exporter\Type;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
-use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
+use Doctrine\DBAL\Connection;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 use ZipArchive;
@@ -26,7 +26,7 @@ final readonly class VectorStorageDocumentsExporter implements SingleExport
     public function __construct(
         private QueryService $queryService,
         private SerializerInterface $serializer,
-        private DatabasePlatform $databasePlatform,
+        private Connection $connection,
         private LoggerInterface $logger,
     ) {
     }
@@ -42,13 +42,13 @@ final readonly class VectorStorageDocumentsExporter implements SingleExport
         }
 
         foreach ($documents as $document) {
-            $embeddingsOfDocument = $this->databasePlatform->createQueryBuilder()
-                ->createSelect()
-                ->select('document_id', 'content', 'vectorContentHash')
-                ->vectorToJson('embedding', 'embedding')
+            $embeddingsQuery = $this->connection->createQueryBuilder()
+                ->select('document_id', 'content', 'vectorContentHash', 'JSON(embedding) as embedding')
                 ->from('documents_vectors')
-                ->where('document_id', '=', $document->getId())
-                ->fetchAll();
+                ->where('document_id = :documentId')
+                ->setParameter('documentId', $document->getId());
+
+            $embeddingsOfDocument = $embeddingsQuery->executeQuery()->fetchAllAssociative();
 
             if (count($embeddingsOfDocument) === 0) {
                 $this->logger->debug(

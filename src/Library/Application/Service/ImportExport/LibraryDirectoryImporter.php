@@ -7,7 +7,7 @@ namespace ChronicleKeeper\Library\Application\Service\ImportExport;
 use ChronicleKeeper\Library\Domain\RootDirectory;
 use ChronicleKeeper\Settings\Application\Service\Importer\SingleImport;
 use ChronicleKeeper\Settings\Application\Service\ImportSettings;
-use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
+use Doctrine\DBAL\Connection;
 use League\Flysystem\FileAttributes;
 use League\Flysystem\Filesystem;
 use Psr\Log\LoggerInterface;
@@ -20,7 +20,7 @@ use const JSON_THROW_ON_ERROR;
 final readonly class LibraryDirectoryImporter implements SingleImport
 {
     public function __construct(
-        private DatabasePlatform $databasePlatform,
+        private Connection $connection,
         private LoggerInterface $logger,
     ) {
     }
@@ -38,7 +38,7 @@ final readonly class LibraryDirectoryImporter implements SingleImport
         $content = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
         foreach ($content['data'] as $directoryArray) {
             if ($directoryArray['id'] === RootDirectory::ID) {
-                // The root directoy should not be part of the import, but when it is there we ignore it
+                // The root directory should not be part of the import, but when it is there we ignore it
                 continue;
             }
 
@@ -51,15 +51,34 @@ final readonly class LibraryDirectoryImporter implements SingleImport
                 continue;
             }
 
-            $this->databasePlatform->createQueryBuilder()->createInsert()
-                ->asReplace()
-                ->insert('directories')
-                ->values([
-                    'id' => $directoryArray['id'],
-                    'title' => $directoryArray['title'],
-                    'parent' => $directoryArray['parent'],
-                ])
-                ->execute();
+            // Upsert using explicit check
+            if ($this->hasDirectory($directoryArray['id'])) {
+                $this->connection->createQueryBuilder()
+                    ->update('directories')
+                    ->set('title', ':title')
+                    ->set('parent', ':parent')
+                    ->where('id = :id')
+                    ->setParameters([
+                        'id' => $directoryArray['id'],
+                        'title' => $directoryArray['title'],
+                        'parent' => $directoryArray['parent'],
+                    ])
+                    ->executeStatement();
+            } else {
+                $this->connection->createQueryBuilder()
+                    ->insert('directories')
+                    ->values([
+                        'id' => ':id',
+                        'title' => ':title',
+                        'parent' => ':parent',
+                    ])
+                    ->setParameters([
+                        'id' => $directoryArray['id'],
+                        'title' => $directoryArray['title'],
+                        'parent' => $directoryArray['parent'],
+                    ])
+                    ->executeStatement();
+            }
 
             $this->logger->debug('Imported directory', ['id' => $directoryArray['id']]);
         }
@@ -83,15 +102,34 @@ final readonly class LibraryDirectoryImporter implements SingleImport
                 continue;
             }
 
-            $this->databasePlatform->createQueryBuilder()->createInsert()
-                ->asReplace()
-                ->insert('directories')
-                ->values([
-                    'id' => $content['id'],
-                    'title' => $content['title'],
-                    'parent' => $content['parent'],
-                ])
-                ->execute();
+            // Upsert using explicit check
+            if ($this->hasDirectory($content['id'])) {
+                $this->connection->createQueryBuilder()
+                    ->update('directories')
+                    ->set('title', ':title')
+                    ->set('parent', ':parent')
+                    ->where('id = :id')
+                    ->setParameters([
+                        'id' => $content['id'],
+                        'title' => $content['title'],
+                        'parent' => $content['parent'],
+                    ])
+                    ->executeStatement();
+            } else {
+                $this->connection->createQueryBuilder()
+                    ->insert('directories')
+                    ->values([
+                        'id' => ':id',
+                        'title' => ':title',
+                        'parent' => ':parent',
+                    ])
+                    ->setParameters([
+                        'id' => $content['id'],
+                        'title' => $content['title'],
+                        'parent' => $content['parent'],
+                    ])
+                    ->executeStatement();
+            }
 
             $this->logger->debug('Imported directory from old format', ['id' => $content['id']]);
         }
@@ -99,10 +137,14 @@ final readonly class LibraryDirectoryImporter implements SingleImport
 
     private function hasDirectory(string $id): bool
     {
-        return $this->databasePlatform->createQueryBuilder()->createSelect()
+        $result = $this->connection->createQueryBuilder()
             ->select('id')
             ->from('directories')
-            ->where('id', '=', $id)
-            ->fetchOneOrNull() !== null;
+            ->where('id = :id')
+            ->setParameter('id', $id)
+            ->executeQuery()
+            ->fetchOne();
+
+        return $result !== false;
     }
 }

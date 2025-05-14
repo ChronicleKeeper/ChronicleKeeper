@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Document\Infrastructure\Database\Schema;
 
-use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
 use ChronicleKeeper\Shared\Infrastructure\Database\Schema\DefaultSchemaProvider;
+use Doctrine\DBAL\Connection;
 use Override;
 
 final class DocumentProvider extends DefaultSchemaProvider
@@ -16,10 +16,15 @@ final class DocumentProvider extends DefaultSchemaProvider
         return 10;
     }
 
-    public function createSchema(DatabasePlatform $platform): void
+    /**
+     * Creates database schema for documents
+     */
+    #[Override]
+    public function createSchema(Connection $connection): void
     {
-        $platform->executeRaw(<<<'SQL'
-            CREATE TABLE documents (
+        // Create documents table
+        $connection->executeStatement(<<<'SQL'
+            CREATE TABLE IF NOT EXISTS documents (
                 id TEXT PRIMARY KEY,
                 title TEXT NOT NULL,
                 content TEXT NOT NULL,
@@ -28,13 +33,15 @@ final class DocumentProvider extends DefaultSchemaProvider
             );
         SQL);
 
-        $platform->executeRaw(<<<'SQL'
-            CREATE INDEX idx_documents_directory
+        // Create index on directory for faster lookups
+        $connection->executeStatement(<<<'SQL'
+            CREATE INDEX IF NOT EXISTS idx_documents_directory
             ON documents (directory);
         SQL);
 
-        $platform->executeRaw(<<<'SQL'
-            CREATE INDEX idx_documents_last_updated
+        // Create index on last_updated for time-based queries
+        $connection->executeStatement(<<<'SQL'
+            CREATE INDEX IF NOT EXISTS idx_documents_last_updated
             ON documents (last_updated);
         SQL);
     }

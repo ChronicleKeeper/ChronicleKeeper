@@ -46,7 +46,12 @@ class WorldItemCreateTest extends WebTestCase
         self::assertResponseRedirects('/world');
 
         // Check the new document is stored
-        $items = $this->databasePlatform->fetch('SELECT * FROM world_items');
+        $items = $this->connection->createQueryBuilder()
+            ->select('*')
+            ->from('world_items')
+            ->executeQuery()
+            ->fetchAllAssociative();
+
         self::assertCount(1, $items);
 
         $this->client->followRedirect();

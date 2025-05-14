@@ -4,29 +4,33 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Chat\Infrastructure\Database\Schema;
 
-use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
 use ChronicleKeeper\Shared\Infrastructure\Database\Schema\DefaultSchemaProvider;
+use Doctrine\DBAL\Connection;
+use Override;
 
 final class ConversationProvider extends DefaultSchemaProvider
 {
-    public function createSchema(DatabasePlatform $platform): void
+    #[Override]
+    public function createSchema(Connection $connection): void
     {
-        // TODO: Store a timestamp of the last update ... and use it to sort in FindLatestConversationsQuery
-        $platform->executeRaw(<<<'SQL'
-            CREATE TABLE conversations (
+        // Create conversations table
+        $connection->executeStatement(<<<'SQL'
+            CREATE TABLE IF NOT EXISTS conversations (
                 id TEXT PRIMARY KEY,
                 title TEXT NOT NULL,
                 directory TEXT NOT NULL
             );
         SQL);
 
-        $platform->executeRaw(<<<'SQL'
-            CREATE INDEX idx_conversation_directory
+        // Create index on directory for faster lookups
+        $connection->executeStatement(<<<'SQL'
+            CREATE INDEX IF NOT EXISTS idx_conversation_directory
             ON conversations (directory);
         SQL);
 
-        $platform->executeRaw(<<<'SQL'
-            CREATE TABLE conversation_settings (
+        // Create conversation_settings table
+        $connection->executeStatement(<<<'SQL'
+            CREATE TABLE IF NOT EXISTS conversation_settings (
                 conversation_id TEXT PRIMARY KEY,
                 version TEXT NOT NULL,
                 temperature FLOAT NOT NULL,
@@ -36,13 +40,15 @@ final class ConversationProvider extends DefaultSchemaProvider
             );
         SQL);
 
-        $platform->executeRaw(<<<'SQL'
-            CREATE INDEX idx_conversation_settings_conversation_id
+        // Create index on conversation_id for faster lookups
+        $connection->executeStatement(<<<'SQL'
+            CREATE INDEX IF NOT EXISTS idx_conversation_settings_conversation_id
             ON conversation_settings (conversation_id);
         SQL);
 
-        $platform->executeRaw(<<<'SQL'
-            CREATE TABLE conversation_messages (
+        // Create conversation_messages table
+        $connection->executeStatement(<<<'SQL'
+            CREATE TABLE IF NOT EXISTS conversation_messages (
                 id TEXT PRIMARY KEY,
                 conversation_id TEXT NOT NULL,
                 role TEXT NOT NULL,
@@ -53,8 +59,9 @@ final class ConversationProvider extends DefaultSchemaProvider
             );
         SQL);
 
-        $platform->executeRaw(<<<'SQL'
-            CREATE INDEX idx_messages_conversation_id
+        // Create index on conversation_id for faster lookups
+        $connection->executeStatement(<<<'SQL'
+            CREATE INDEX IF NOT EXISTS idx_messages_conversation_id
             ON conversation_messages (conversation_id);
         SQL);
     }

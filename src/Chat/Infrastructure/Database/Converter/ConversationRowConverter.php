@@ -7,7 +7,7 @@ namespace ChronicleKeeper\Chat\Infrastructure\Database\Converter;
 use ChronicleKeeper\Chat\Domain\Entity\Conversation;
 use ChronicleKeeper\Chat\Domain\ValueObject\Settings;
 use ChronicleKeeper\Shared\Infrastructure\Database\Converter\RowConverter;
-use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
+use Doctrine\DBAL\Connection;
 
 use function json_decode;
 
@@ -16,7 +16,7 @@ use const JSON_THROW_ON_ERROR;
 class ConversationRowConverter implements RowConverter
 {
     public function __construct(
-        private readonly DatabasePlatform $databasePlatform,
+        private readonly Connection $connection,
     ) {
     }
 
@@ -28,12 +28,15 @@ class ConversationRowConverter implements RowConverter
     /** @inheritDoc */
     public function convert(array $data): array
     {
-        $settings = $this->databasePlatform->createQueryBuilder()->createSelect()
+        $settings = $this->connection->createQueryBuilder()
+            ->select('*')
             ->from('conversation_settings')
-            ->where('conversation_id', '=', $data['id'])
-            ->fetchOneOrNull();
+            ->where('conversation_id = :conversationId')
+            ->setParameter('conversationId', $data['id'])
+            ->executeQuery()
+            ->fetchAssociative();
 
-        if ($settings === null) {
+        if ($settings === false) {
             $settings = (new Settings())->jsonSerialize();
         }
 
@@ -50,10 +53,13 @@ class ConversationRowConverter implements RowConverter
             'messages' => [],
         ];
 
-        $rawMessages = $this->databasePlatform->createQueryBuilder()->createSelect()
+        $rawMessages = $this->connection->createQueryBuilder()
+            ->select('*')
             ->from('conversation_messages')
-            ->where('conversation_id', '=', $data['id'])
-            ->fetchAll();
+            ->where('conversation_id = :conversationId')
+            ->setParameter('conversationId', $data['id'])
+            ->executeQuery()
+            ->fetchAllAssociative();
 
         foreach ($rawMessages as $rawMessage) {
             $conversation['messages'][] = [

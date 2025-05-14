@@ -17,7 +17,7 @@ class DocumentProviderTest extends SchemaProviderTestCase
     #[Test]
     public function itCreatesTheSchema(): void
     {
-        (new DocumentProvider())->createSchema($this->databasePlatform);
+        (new DocumentProvider())->createSchema($this->connection);
 
         $tables = $this->schemaManager->getTables();
 

@@ -29,16 +29,13 @@ class DocumentDeletionTest extends WebTestCase
 
         $this->fixtureDocument = (new DocumentBuilder())->build();
 
-        $this->databasePlatform->createQueryBuilder()->createInsert()
-            ->insert('documents')
-            ->values([
-                'id'          => $this->fixtureDocument->getId(),
-                'title'       => $this->fixtureDocument->getTitle(),
-                'content'     => $this->fixtureDocument->getContent(),
-                'directory'   => $this->fixtureDocument->getDirectory()->getId(),
-                'last_updated' => $this->fixtureDocument->getUpdatedAt()->format('Y-m-d H:i:s'),
-            ])
-            ->execute();
+        $this->connection->insert('documents', [
+            'id' => $this->fixtureDocument->getId(),
+            'title' => $this->fixtureDocument->getTitle(),
+            'content' => $this->fixtureDocument->getContent(),
+            'directory' => $this->fixtureDocument->getDirectory()->getId(),
+            'last_updated' => $this->fixtureDocument->getUpdatedAt()->format('Y-m-d H:i:s'),
+        ]);
     }
 
     #[Override]
@@ -74,19 +71,22 @@ class DocumentDeletionTest extends WebTestCase
         self::assertResponseRedirects('/library');
 
         // Get the document from database
-        $document = $this->databasePlatform->createQueryBuilder()->createSelect()
+        $queryBuilder = $this->connection->createQueryBuilder();
+        $document     = $queryBuilder
             ->select('*')
             ->from('documents')
-            ->where('id', '=', $this->fixtureDocument->getId())
-            ->fetchOneOrNull();
+            ->where('id = :id')
+            ->setParameter('id', $this->fixtureDocument->getId())
+            ->executeQuery()
+            ->fetchAssociative();
 
-        self::assertNotNull($document);
+        self::assertIsArray($document);
     }
 
     #[Test]
     public function itWillRedirectToLibraryAfterDeletion(): void
     {
-        // Execute deletion without confirmation
+        // Execute deletion with confirmation
         $this->client->request(
             Request::METHOD_GET,
             '/library/document/' . $this->fixtureDocument->getId() . '/delete?confirm=1',
@@ -95,12 +95,15 @@ class DocumentDeletionTest extends WebTestCase
         self::assertResponseRedirects('/library');
 
         // Get the document from database
-        $document = $this->databasePlatform->createQueryBuilder()->createSelect()
+        $queryBuilder = $this->connection->createQueryBuilder();
+        $document     = $queryBuilder
             ->select('*')
             ->from('documents')
-            ->where('id', '=', $this->fixtureDocument->getId())
-            ->fetchOneOrNull();
+            ->where('id = :id')
+            ->setParameter('id', $this->fixtureDocument->getId())
+            ->executeQuery()
+            ->fetchAssociative();
 
-        self::assertNull($document);
+        self::assertFalse($document);
     }
 }

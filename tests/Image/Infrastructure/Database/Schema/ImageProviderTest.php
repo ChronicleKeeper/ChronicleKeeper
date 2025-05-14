@@ -17,7 +17,7 @@ class ImageProviderTest extends SchemaProviderTestCase
     #[Test]
     public function itCreatesTheSchema(): void
     {
-        (new ImageProvider())->createSchema($this->databasePlatform);
+        (new ImageProvider())->createSchema($this->connection);
 
         $tables = $this->schemaManager->getTables();
 

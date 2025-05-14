@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Library\Infrastructure\Database\Schema;
 
-use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
 use ChronicleKeeper\Shared\Infrastructure\Database\Schema\DefaultSchemaProvider;
+use Doctrine\DBAL\Connection;
 use Override;
 
 final class DirectoryProvider extends DefaultSchemaProvider
@@ -16,18 +16,21 @@ final class DirectoryProvider extends DefaultSchemaProvider
         return 0;
     }
 
-    public function createSchema(DatabasePlatform $platform): void
+    #[Override]
+    public function createSchema(Connection $connection): void
     {
-        $platform->executeRaw(<<<'SQL'
-            CREATE TABLE directories (
+        // Create directories table
+        $connection->executeStatement(<<<'SQL'
+            CREATE TABLE IF NOT EXISTS directories (
                 id TEXT PRIMARY KEY,
                 title TEXT NOT NULL,
                 parent TEXT NOT NULL
             );
         SQL);
 
-        $platform->executeRaw(<<<'SQL'
-            CREATE INDEX idx_directories_parent
+        // Create index on parent for faster lookups
+        $connection->executeStatement(<<<'SQL'
+            CREATE INDEX IF NOT EXISTS idx_directories_parent
             ON directories (parent);
         SQL);
     }

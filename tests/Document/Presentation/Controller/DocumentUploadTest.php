@@ -81,8 +81,13 @@ class DocumentUploadTest extends WebTestCase
             server: ['CONTENT_TYPE' => 'multipart/form-data'],
         );
 
-        // Check the new document is stored
-        $documents = $this->databasePlatform->fetch('SELECT * FROM documents');
+        // Check the new document is stored using Doctrine DBAL
+        $documents = $this->connection->createQueryBuilder()
+            ->select('*')
+            ->from('documents')
+            ->executeQuery()
+            ->fetchAllAssociative();
+
         self::assertCount(1, $documents);
         self::assertResponseRedirects('/library');
     }

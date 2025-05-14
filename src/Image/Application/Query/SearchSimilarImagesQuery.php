@@ -8,14 +8,15 @@ use ChronicleKeeper\Image\Domain\Entity\Image;
 use ChronicleKeeper\Shared\Application\Query\Query;
 use ChronicleKeeper\Shared\Application\Query\QueryParameters;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
-use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
+use Doctrine\DBAL\Connection;
 
 use function assert;
+use function implode;
 
 class SearchSimilarImagesQuery implements Query
 {
     public function __construct(
-        private readonly DatabasePlatform $databasePlatform,
+        private readonly Connection $connection,
         private readonly QueryService $queryService,
     ) {
     }
@@ -25,18 +26,17 @@ class SearchSimilarImagesQuery implements Query
     {
         assert($parameters instanceof SearchSimilarImages);
 
-        $foundVectors = $this->databasePlatform->createQueryBuilder()->createSelect()
-            ->select('image_id', 'content')
-            ->from('images_vectors')
-            ->withVectorSearch(
-                'embedding',
-                $parameters->searchedVectors,
-                'distance',
-                $parameters->maxDistance,
-            )
-            ->limit($parameters->maxResults)
+        // Using PostgreSQL vector search with pgvector extension
+        $queryBuilder = $this->connection->createQueryBuilder()
+            ->select('iv.image_id', 'iv.content', 'iv.embedding <=> :searchVector as distance')
+            ->from('images_vectors', 'iv')
+            ->where('iv.embedding <=> :searchVector <= :maxDistance')
+            ->setParameter('searchVector', '[' . implode(',', $parameters->searchedVectors) . ']')
+            ->setParameter('maxDistance', $parameters->maxDistance)
             ->orderBy('distance')
-            ->fetchAll();
+            ->setMaxResults($parameters->maxResults);
+
+        $foundVectors = $queryBuilder->executeQuery()->fetchAllAssociative();
 
         $results = [];
         foreach ($foundVectors as $vector) {

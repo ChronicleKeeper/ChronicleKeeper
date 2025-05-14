@@ -17,7 +17,7 @@ class DirectoryProviderTest extends SchemaProviderTestCase
     #[Test]
     public function itCreatesTheSchema(): void
     {
-        (new DirectoryProvider())->createSchema($this->databasePlatform);
+        (new DirectoryProvider())->createSchema($this->connection);
 
         $tables = $this->schemaManager->getTables();
 

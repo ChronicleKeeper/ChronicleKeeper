@@ -9,8 +9,6 @@ use ChronicleKeeper\Favorizer\Application\Event\ImportPruner;
 use ChronicleKeeper\Favorizer\Domain\TargetBag;
 use ChronicleKeeper\Favorizer\Domain\ValueObject\LibraryDocumentTarget;
 use ChronicleKeeper\Favorizer\Domain\ValueObject\LibraryImageTarget;
-use ChronicleKeeper\Settings\Application\Service\ImportSettings;
-use ChronicleKeeper\Settings\Domain\Event\ExecuteImportPruning;
 use ChronicleKeeper\Test\Shared\Infrastructure\Database\DatabaseTestCase;
 use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -57,7 +55,7 @@ class ImportPrunerTest extends DatabaseTestCase
 
         // ------------------- The test execution -------------------
 
-        ($this->importPruner)(new ExecuteImportPruning(new ImportSettings()));
+        ($this->importPruner)();
 
         // ------------------- The test assertions -------------------
 

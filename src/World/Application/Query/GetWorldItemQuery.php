@@ -10,11 +10,11 @@ use ChronicleKeeper\Image\Application\Query\GetImage;
 use ChronicleKeeper\Shared\Application\Query\Query;
 use ChronicleKeeper\Shared\Application\Query\QueryParameters;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
-use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
 use ChronicleKeeper\World\Domain\Entity\Item;
 use ChronicleKeeper\World\Domain\ValueObject\ConversationReference;
 use ChronicleKeeper\World\Domain\ValueObject\DocumentReference;
 use ChronicleKeeper\World\Domain\ValueObject\ImageReference;
+use Doctrine\DBAL\Connection;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Throwable;
 
@@ -24,7 +24,7 @@ class GetWorldItemQuery implements Query
 {
     public function __construct(
         private readonly DenormalizerInterface $denormalizer,
-        private readonly DatabasePlatform $databasePlatform,
+        private readonly Connection $connection,
         private readonly QueryService $queryService,
     ) {
     }
@@ -33,13 +33,15 @@ class GetWorldItemQuery implements Query
     {
         assert($parameters instanceof GetWorldItem);
 
-        $document = $this->databasePlatform->createQueryBuilder()->createSelect()
-            ->select('id', 'type', 'name', 'short_description as "shortDescription"')
+        $itemData = $this->connection->createQueryBuilder()
+            ->select('id', 'type', 'name', 'short_description AS "shortDescription"')
             ->from('world_items')
-            ->where('id', '=', $parameters->id)
-            ->fetchOne();
+            ->where('id = :id')
+            ->setParameter('id', $parameters->id)
+            ->executeQuery()
+            ->fetchAssociative();
 
-        $item = $this->denormalizer->denormalize($document, Item::class);
+        $item = $this->denormalizer->denormalize($itemData, Item::class);
         $this->addDocumentReferences($item);
         $this->addImageReferences($item);
         $this->addConversationReferences($item);
@@ -49,18 +51,20 @@ class GetWorldItemQuery implements Query
 
     private function addDocumentReferences(Item $item): void
     {
-        $documentReferences = $this->databasePlatform->createQueryBuilder()->createSelect()
+        $documentReferences = $this->connection->createQueryBuilder()
             ->select('document_id')
             ->from('world_item_documents')
-            ->where('world_item_id', '=', $item->getId())
-            ->fetchAll();
+            ->where('world_item_id = :itemId')
+            ->setParameter('itemId', $item->getId())
+            ->executeQuery()
+            ->fetchAllAssociative();
 
         foreach ($documentReferences as $documentReference) {
             try {
                 $document = $this->queryService->query(new GetDocument($documentReference['document_id']));
                 $item->addMediaReference(new DocumentReference($item, $document));
             } catch (Throwable) {
-                // It is aceptable if a reference is defect ...
+                // It is acceptable if a reference is defect ...
                 continue;
             }
         }
@@ -68,18 +72,20 @@ class GetWorldItemQuery implements Query
 
     private function addImageReferences(Item $item): void
     {
-        $imageReferences = $this->databasePlatform->createQueryBuilder()->createSelect()
+        $imageReferences = $this->connection->createQueryBuilder()
             ->select('image_id')
             ->from('world_item_images')
-            ->where('world_item_id', '=', $item->getId())
-            ->fetchAll();
+            ->where('world_item_id = :itemId')
+            ->setParameter('itemId', $item->getId())
+            ->executeQuery()
+            ->fetchAllAssociative();
 
         foreach ($imageReferences as $imageReference) {
             try {
                 $image = $this->queryService->query(new GetImage($imageReference['image_id']));
                 $item->addMediaReference(new ImageReference($item, $image));
             } catch (Throwable) {
-                // It is aceptable if a reference is defect ...
+                // It is acceptable if a reference is defect ...
                 continue;
             }
         }
@@ -87,11 +93,13 @@ class GetWorldItemQuery implements Query
 
     private function addConversationReferences(Item $item): void
     {
-        $conversationReferences = $this->databasePlatform->createQueryBuilder()->createSelect()
+        $conversationReferences = $this->connection->createQueryBuilder()
             ->select('conversation_id')
             ->from('world_item_conversations')
-            ->where('world_item_id', '=', $item->getId())
-            ->fetchAll();
+            ->where('world_item_id = :itemId')
+            ->setParameter('itemId', $item->getId())
+            ->executeQuery()
+            ->fetchAllAssociative();
 
         foreach ($conversationReferences as $conversationReference) {
             try {
@@ -102,7 +110,7 @@ class GetWorldItemQuery implements Query
                 );
                 $item->addMediaReference(new ConversationReference($item, $conversation));
             } catch (Throwable) {
-                // It is aceptable if a reference is defect ...
+                // It is acceptable if a reference is defect ...
                 continue;
             }
         }

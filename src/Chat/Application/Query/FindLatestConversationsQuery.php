@@ -8,7 +8,7 @@ use ChronicleKeeper\Chat\Domain\Entity\Conversation;
 use ChronicleKeeper\Shared\Application\Query\Query;
 use ChronicleKeeper\Shared\Application\Query\QueryParameters;
 use ChronicleKeeper\Shared\Infrastructure\Database\Converter\DatabaseRowConverter;
-use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
+use Doctrine\DBAL\Connection;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 use function assert;
@@ -17,7 +17,7 @@ class FindLatestConversationsQuery implements Query
 {
     public function __construct(
         private readonly DenormalizerInterface $denormalizer,
-        private readonly DatabasePlatform $databasePlatform,
+        private readonly Connection $dbal,
         private readonly DatabaseRowConverter $databaseRowConverter,
     ) {
     }
@@ -27,11 +27,13 @@ class FindLatestConversationsQuery implements Query
     {
         assert($parameters instanceof FindLatestConversationsParameters);
 
-        $data = $this->databasePlatform->createQueryBuilder()->createSelect()
+        $data = $this->dbal->createQueryBuilder()
+            ->select('*')
             ->from('conversations')
             ->orderBy('title')
-            ->limit($parameters->maxEntries)
-            ->fetchAll();
+            ->setMaxResults($parameters->maxEntries)
+            ->executeQuery()
+            ->fetchAllAssociative();
 
         $conversations = [];
         foreach ($data as $conversation) {

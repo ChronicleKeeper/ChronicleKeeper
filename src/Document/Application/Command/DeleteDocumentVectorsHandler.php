@@ -4,22 +4,23 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Document\Application\Command;
 
-use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
+use Doctrine\DBAL\Connection;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler]
 class DeleteDocumentVectorsHandler
 {
     public function __construct(
-        private readonly DatabasePlatform $platform,
+        private readonly Connection $connection,
     ) {
     }
 
     public function __invoke(DeleteDocumentVectors $command): void
     {
-        $this->platform->createQueryBuilder()->createDelete()
-            ->from('documents_vectors')
-            ->where('document_id', '=', $command->documentId)
-            ->execute();
+        $this->connection->createQueryBuilder()
+            ->delete('documents_vectors')
+            ->where('document_id = :documentId')
+            ->setParameter('documentId', $command->documentId)
+            ->executeStatement();
     }
 }

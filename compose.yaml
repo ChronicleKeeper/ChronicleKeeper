@@ -9,6 +9,7 @@ services:
       SERVER_NAME: ${SERVER_NAME:-localhost}, php:80
       DATABASE_TYPE: PgSql
       DATABASE_CONNECTION: pgsql:host=${POSTGRES_HOST:-database};port=${POSTGRES_PORT:-5432};dbname=${POSTGRES_DB:-chronicle-keeper};user=${POSTGRES_USER:-app};password=${POSTGRES_PASSWORD:-app}
+      DATABASE_URL: pgsql://${POSTGRES_USER:-${POSTGRES_PASSWORD:-app}}:app@${POSTGRES_HOST:-database}:${POSTGRES_PORT:-5432}/${POSTGRES_DB:-chronicle-keeper}?serverVersion=15&charset=utf8
     ports:
       # HTTP
       - target: 80
