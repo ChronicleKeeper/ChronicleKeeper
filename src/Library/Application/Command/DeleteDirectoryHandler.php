@@ -14,8 +14,8 @@ use ChronicleKeeper\Library\Application\Query\FindDirectoriesByParent;
 use ChronicleKeeper\Library\Domain\Entity\Directory;
 use ChronicleKeeper\Library\Domain\Event\DirectoryDeleted;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
-use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
 use ChronicleKeeper\Shared\Infrastructure\Messenger\MessageEventResult;
+use Doctrine\DBAL\Connection;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Messenger\MessageBusInterface;
 
@@ -23,7 +23,7 @@ use Symfony\Component\Messenger\MessageBusInterface;
 class DeleteDirectoryHandler
 {
     public function __construct(
-        private readonly DatabasePlatform $platform,
+        private readonly Connection $connection,
         private readonly MessageBusInterface $bus,
         private readonly QueryService $queryService,
     ) {
@@ -33,29 +33,34 @@ class DeleteDirectoryHandler
     {
         $this->thePurge($command->directory);
 
-        $this->platform->createQueryBuilder()->createDelete()
-            ->from('directories')
-            ->where('id', '=', $command->directory->getId())
-            ->execute();
+        $this->connection->createQueryBuilder()
+            ->delete('directories')
+            ->where('id = :id')
+            ->setParameter('id', $command->directory->getId())
+            ->executeStatement();
 
         return new MessageEventResult([new DirectoryDeleted($command->directory)]);
     }
 
     private function thePurge(Directory $sourceDirectory): void
     {
+        // Delete subdirectories recursively
         foreach ($this->queryService->query(new FindDirectoriesByParent($sourceDirectory->getId())) as $directory) {
             $this->thePurge($directory);
             $this->bus->dispatch(new DeleteDirectory($directory));
         }
 
+        // Delete associated documents
         foreach ($this->queryService->query(new FindDocumentsByDirectory($sourceDirectory->getId())) as $document) {
             $this->bus->dispatch(new DeleteDocument($document));
         }
 
+        // Delete associated images
         foreach ($this->queryService->query(new FindImagesByDirectory($sourceDirectory->getId())) as $image) {
             $this->bus->dispatch(new DeleteImage($image));
         }
 
+        // Delete associated conversations
         foreach ($this->queryService->query(new FindConversationsByDirectoryParameters($sourceDirectory)) as $conversation) {
             $this->bus->dispatch(new DeleteConversation($conversation));
         }

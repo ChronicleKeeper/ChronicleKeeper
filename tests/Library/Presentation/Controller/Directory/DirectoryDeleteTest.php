@@ -27,6 +27,8 @@ use PHPUnit\Framework\Attributes\Test;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+use function is_array;
+
 #[CoversClass(DirectoryDelete::class)]
 #[CoversClass(DeleteDirectory::class)]
 #[CoversClass(DeleteDirectoryHandler::class)]
@@ -119,35 +121,45 @@ final class DirectoryDeleteTest extends WebTestCase
         self::assertResponseRedirects('/library');
 
         // Check that the data that was there is removed
-        $queryBuilderFactory = $this->databasePlatform->createQueryBuilder();
-
-        self::assertNull(
-            $queryBuilderFactory->createSelect()
+        $directoryResult = $this->connection->createQueryBuilder()
+            ->select('*')
             ->from('directories')
-            ->where('id', '=', $directory->getId())
-            ->fetchOneOrNull(),
-        );
+            ->where('id = :id')
+            ->setParameter('id', $directory->getId())
+            ->executeQuery()
+            ->fetchAssociative();
 
-        self::assertNull(
-            $queryBuilderFactory->createSelect()
+        self::assertFalse($directoryResult);
+
+        $imageResult = $this->connection->createQueryBuilder()
+            ->select('*')
             ->from('images')
-            ->where('directory', '=', $directory->getId())
-            ->fetchOneOrNull(),
-        );
+            ->where('directory = :directory')
+            ->setParameter('directory', $directory->getId())
+            ->executeQuery()
+            ->fetchAssociative();
 
-        self::assertNull(
-            $queryBuilderFactory->createSelect()
+        self::assertFalse($imageResult);
+
+        $documentResult = $this->connection->createQueryBuilder()
+            ->select('*')
             ->from('documents')
-            ->where('directory', '=', $directory->getId())
-            ->fetchOneOrNull(),
-        );
+            ->where('directory = :directory')
+            ->setParameter('directory', $directory->getId())
+            ->executeQuery()
+            ->fetchAssociative();
 
-        self::assertNull(
-            $queryBuilderFactory->createSelect()
+        self::assertFalse($documentResult);
+
+        $conversationResult = $this->connection->createQueryBuilder()
+            ->select('*')
             ->from('conversations')
-            ->where('directory', '=', $directory->getId())
-            ->fetchOneOrNull(),
-        );
+            ->where('directory = :directory')
+            ->setParameter('directory', $directory->getId())
+            ->executeQuery()
+            ->fetchAssociative();
+
+        self::assertFalse($conversationResult);
     }
 
     #[Test]
@@ -191,41 +203,54 @@ final class DirectoryDeleteTest extends WebTestCase
         self::assertResponseRedirects('/library/' . $targetDirectory->getId());
 
         // Check that the data that was there is removed or changed
-        $queryBuilderFactory = $this->databasePlatform->createQueryBuilder();
-
-        self::assertNull(
-            $queryBuilderFactory->createSelect()
+        $directoryResult = $this->connection->createQueryBuilder()
+            ->select('*')
             ->from('directories')
-            ->where('id', '=', $directory->getId())
-            ->fetchOneOrNull(),
-        );
+            ->where('id = :id')
+            ->setParameter('id', $directory->getId())
+            ->executeQuery()
+            ->fetchAssociative();
 
-        self::assertNotNull(
-            $queryBuilderFactory->createSelect()
+        self::assertFalse($directoryResult);
+
+        $imageResult = $this->connection->createQueryBuilder()
+            ->select('*')
             ->from('images')
-            ->where('directory', '=', $targetDirectory->getId())
-            ->fetchOneOrNull(),
-        );
+            ->where('directory = :directory')
+            ->setParameter('directory', $targetDirectory->getId())
+            ->executeQuery()
+            ->fetchAssociative();
 
-        self::assertNotNull(
-            $queryBuilderFactory->createSelect()
+        self::assertTrue(is_array($imageResult));
+
+        $documentResult = $this->connection->createQueryBuilder()
+            ->select('*')
             ->from('documents')
-            ->where('directory', '=', $targetDirectory->getId())
-            ->fetchOneOrNull(),
-        );
+            ->where('directory = :directory')
+            ->setParameter('directory', $targetDirectory->getId())
+            ->executeQuery()
+            ->fetchAssociative();
 
-        self::assertNotNull(
-            $queryBuilderFactory->createSelect()
+        self::assertTrue(is_array($documentResult));
+
+        $conversationResult = $this->connection->createQueryBuilder()
+            ->select('*')
             ->from('conversations')
-            ->where('directory', '=', $targetDirectory->getId())
-            ->fetchOneOrNull(),
-        );
+            ->where('directory = :directory')
+            ->setParameter('directory', $targetDirectory->getId())
+            ->executeQuery()
+            ->fetchAssociative();
 
-        self::assertNotNull(
-            $queryBuilderFactory->createSelect()
+        self::assertTrue(is_array($conversationResult));
+
+        $subDirectoryResult = $this->connection->createQueryBuilder()
+            ->select('*')
             ->from('directories')
-            ->where('parent', '=', $targetDirectory->getId())
-            ->fetchOneOrNull(),
-        );
+            ->where('parent = :parent')
+            ->setParameter('parent', $targetDirectory->getId())
+            ->executeQuery()
+            ->fetchAssociative();
+
+        self::assertTrue(is_array($subDirectoryResult));
     }
 }

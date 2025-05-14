@@ -43,15 +43,35 @@ class WorldItemListingTest extends WebTestCase
             ->withType(ItemType::COUNTRY)
             ->build();
 
-        $this->databasePlatform->createQueryBuilder()->createInsert()
-            ->insert('world_items')
-            ->values([
+        // Check if item already exists
+        $existingItem = $this->connection->createQueryBuilder()
+            ->select('id')
+            ->from('world_items')
+            ->where('id = :id')
+            ->setParameter('id', $this->item->getId())
+            ->executeQuery()
+            ->fetchAssociative();
+
+        if ($existingItem !== false) {
+            // Update existing item
+            $this->connection->update(
+                'world_items',
+                [
+                    'name' => $this->item->getName(),
+                    'type' => $this->item->getType()->value,
+                    'short_description' => $this->item->getShortDescription(),
+                ],
+                ['id' => $this->item->getId()],
+            );
+        } else {
+            // Insert new item
+            $this->connection->insert('world_items', [
                 'id' => $this->item->getId(),
                 'name' => $this->item->getName(),
                 'type' => $this->item->getType()->value,
                 'short_description' => $this->item->getShortDescription(),
-            ])
-            ->execute();
+            ]);
+        }
     }
 
     #[Override]

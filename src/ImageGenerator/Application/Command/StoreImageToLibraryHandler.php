@@ -11,18 +11,18 @@ use ChronicleKeeper\ImageGenerator\Application\Query\GetImageOfGeneratorRequest;
 use ChronicleKeeper\ImageGenerator\Domain\Entity\GeneratorRequest;
 use ChronicleKeeper\ImageGenerator\Domain\Entity\GeneratorResult;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
-use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
+use Doctrine\DBAL\Connection;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Messenger\MessageBusInterface;
 
 use function assert;
 
 #[AsMessageHandler]
-class StoreImageToLibraryHandler
+final class StoreImageToLibraryHandler
 {
     public function __construct(
         private readonly QueryService $queryService,
-        private readonly DatabasePlatform $platform,
+        private readonly Connection $connection,
         private readonly MessageBusInterface $bus,
     ) {
     }
@@ -46,11 +46,19 @@ class StoreImageToLibraryHandler
         );
 
         $this->bus->dispatch(new StoreImage($image));
+        $this->updateGeneratorResult($request->imageId, $image->getId());
+    }
 
-        $this->platform->createQueryBuilder()->createUpdate()
+    private function updateGeneratorResult(string $generatorResultId, string $imageId): void
+    {
+        $this->connection->createQueryBuilder()
             ->update('generator_results')
-            ->set(['image' => $image->getId()])
-            ->where('id', '=', $request->imageId)
-            ->execute();
+            ->set('image', ':imageId')
+            ->where('id = :generatorResultId')
+            ->setParameters([
+                'imageId' => $imageId,
+                'generatorResultId' => $generatorResultId,
+            ])
+            ->executeStatement();
     }
 }

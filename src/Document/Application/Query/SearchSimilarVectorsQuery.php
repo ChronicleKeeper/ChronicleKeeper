@@ -8,14 +8,16 @@ use ChronicleKeeper\Document\Domain\Entity\Document;
 use ChronicleKeeper\Shared\Application\Query\Query;
 use ChronicleKeeper\Shared\Application\Query\QueryParameters;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
-use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\ParameterType;
 
 use function assert;
+use function implode;
 
 class SearchSimilarVectorsQuery implements Query
 {
     public function __construct(
-        private readonly DatabasePlatform $databasePlatform,
+        private readonly Connection $connection,
         private readonly QueryService $queryService,
     ) {
     }
@@ -25,18 +27,21 @@ class SearchSimilarVectorsQuery implements Query
     {
         assert($parameters instanceof SearchSimilarVectors);
 
-        $foundVectors = $this->databasePlatform->createQueryBuilder()->createSelect()
-            ->select('document_id', 'content')
-            ->from('documents_vectors')
-            ->withVectorSearch(
-                'embedding',
-                $parameters->searchedVectors,
-                'distance',
-                $parameters->maxDistance,
-            )
-            ->limit($parameters->maxResults)
-            ->orderBy('distance')
-            ->fetchAll();
+        $vectorString = '[' . implode(',', $parameters->searchedVectors) . ']';
+
+        $sql = 'SELECT document_id, content,
+                   (embedding <-> :vector) as distance
+                FROM documents_vectors
+                WHERE (embedding <-> :vector) < :maxDistance
+                ORDER BY distance
+                LIMIT :maxResults';
+
+        $stmt = $this->connection->prepare($sql);
+        $stmt->bindValue('vector', $vectorString);
+        $stmt->bindValue('maxDistance', $parameters->maxDistance);
+        $stmt->bindValue('maxResults', $parameters->maxResults, ParameterType::INTEGER);
+
+        $foundVectors = $stmt->executeQuery()->fetchAllAssociative();
 
         $results = [];
         foreach ($foundVectors as $vector) {

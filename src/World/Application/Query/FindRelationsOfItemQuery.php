@@ -7,16 +7,16 @@ namespace ChronicleKeeper\World\Application\Query;
 use ChronicleKeeper\Shared\Application\Query\Query;
 use ChronicleKeeper\Shared\Application\Query\QueryParameters;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
-use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
 use ChronicleKeeper\World\Domain\Entity\Item;
 use ChronicleKeeper\World\Domain\ValueObject\Relation;
+use Doctrine\DBAL\Connection;
 
 use function assert;
 
 class FindRelationsOfItemQuery implements Query
 {
     public function __construct(
-        private readonly DatabasePlatform $platform,
+        private readonly Connection $connection,
         private readonly QueryService $queryService,
     ) {
     }
@@ -28,15 +28,25 @@ class FindRelationsOfItemQuery implements Query
 
         $fromItem = $parameters->itemid;
 
-        $rawRelations = $this->platform->createQueryBuilder()->createSelect()
+        $queryBuilder = $this->connection->createQueryBuilder();
+        $expr         = $queryBuilder->expr();
+
+        $rawRelations = $queryBuilder
             ->select(
                 'source_world_item_id as from_item',
                 'target_world_item_id as to_item',
-                'relation_type as relation_type',
+                'relation_type',
             )
             ->from('world_item_relations')
-            ->orWhere([['source_world_item_id', '=', $fromItem], ['target_world_item_id', '=', $fromItem]])
-            ->fetchAll();
+            ->where(
+                $expr->or(
+                    $expr->eq('source_world_item_id', ':item_id'),
+                    $expr->eq('target_world_item_id', ':item_id'),
+                ),
+            )
+            ->setParameter('item_id', $fromItem)
+            ->executeQuery()
+            ->fetchAllAssociative();
 
         $relations = [];
         foreach ($rawRelations as $relation) {

@@ -8,7 +8,7 @@ use ChronicleKeeper\Chat\Domain\Entity\Conversation;
 use ChronicleKeeper\Shared\Application\Query\Query;
 use ChronicleKeeper\Shared\Application\Query\QueryParameters;
 use ChronicleKeeper\Shared\Infrastructure\Database\Converter\DatabaseRowConverter;
-use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
+use Doctrine\DBAL\Connection;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 use function assert;
@@ -17,8 +17,8 @@ class FindConversationsByDirectoryQuery implements Query
 {
     public function __construct(
         private readonly DenormalizerInterface $denormalizer,
-        private readonly DatabasePlatform $databasePlatform,
         private readonly DatabaseRowConverter $databaseRowConverter,
+        private readonly Connection $connection,
     ) {
     }
 
@@ -27,11 +27,13 @@ class FindConversationsByDirectoryQuery implements Query
     {
         assert($parameters instanceof FindConversationsByDirectoryParameters);
 
-        $data = $this->databasePlatform->createQueryBuilder()->createSelect()
+        $data = $this->connection->createQueryBuilder()
+            ->select('*')
             ->from('conversations')
-            ->where('directory', '=', $parameters->directory->getId())
+            ->where('directory = :directory')
+            ->setParameter('directory', $parameters->directory->getId())
             ->orderBy('title')
-            ->fetchAll();
+            ->fetchAllAssociative();
 
         $conversations = [];
         foreach ($data as $conversation) {

@@ -73,13 +73,14 @@ final class ImageDeletionTest extends WebTestCase
             'Das Bild "Default Title" wurde erfolgreich gelöscht.',
         );
 
-        self::assertNull(
-            $this->databasePlatform
-                ->createQueryBuilder()
-                ->createSelect()
-                ->from('images')
-                ->where('id', '=', $image->getId())
-                ->fetchOneOrNull(),
-        );
+        $result = $this->connection->createQueryBuilder()
+            ->select('id')
+            ->from('images')
+            ->where('id = :id')
+            ->setParameter('id', $image->getId())
+            ->executeQuery()
+            ->fetchAssociative();
+
+        self::assertFalse($result);
     }
 }

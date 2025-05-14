@@ -7,7 +7,7 @@ namespace ChronicleKeeper\Document\Application\Query;
 use ChronicleKeeper\Document\Domain\Entity\Document;
 use ChronicleKeeper\Shared\Application\Query\Query;
 use ChronicleKeeper\Shared\Application\Query\QueryParameters;
-use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
+use Doctrine\DBAL\Connection;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 use function assert;
@@ -16,7 +16,7 @@ class GetDocumentQuery implements Query
 {
     public function __construct(
         private readonly DenormalizerInterface $denormalizer,
-        private readonly DatabasePlatform $databasePlatform,
+        private readonly Connection $connection,
     ) {
     }
 
@@ -24,10 +24,13 @@ class GetDocumentQuery implements Query
     {
         assert($parameters instanceof GetDocument);
 
-        $document = $this->databasePlatform->createQueryBuilder()->createSelect()
+        $document = $this->connection->createQueryBuilder()
+            ->select('*')
             ->from('documents')
-            ->where('id', '=', $parameters->id)
-            ->fetchOne();
+            ->where('id = :id')
+            ->setParameter('id', $parameters->id)
+            ->executeQuery()
+            ->fetchAssociative();
 
         return $this->denormalizer->denormalize($document, Document::class);
     }

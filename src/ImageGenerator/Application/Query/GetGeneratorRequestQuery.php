@@ -7,7 +7,7 @@ namespace ChronicleKeeper\ImageGenerator\Application\Query;
 use ChronicleKeeper\ImageGenerator\Domain\Entity\GeneratorRequest;
 use ChronicleKeeper\Shared\Application\Query\Query;
 use ChronicleKeeper\Shared\Application\Query\QueryParameters;
-use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
+use Doctrine\DBAL\Connection;
 use InvalidArgumentException;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
@@ -21,7 +21,7 @@ final readonly class GetGeneratorRequestQuery implements Query
 {
     public function __construct(
         private DenormalizerInterface $denormalizer,
-        private DatabasePlatform $platform,
+        private Connection $connection,
     ) {
     }
 
@@ -29,10 +29,7 @@ final readonly class GetGeneratorRequestQuery implements Query
     {
         assert($parameters instanceof GetGeneratorRequest);
 
-        $request = $this->platform->createQueryBuilder()->createSelect()
-            ->from('generator_requests')
-            ->where('id', '=', $parameters->id)
-            ->fetchOneOrNull();
+        $request = $this->fetchGeneratorRequest($parameters->id);
 
         if ($request === null) {
             throw new InvalidArgumentException(sprintf(
@@ -41,6 +38,26 @@ final readonly class GetGeneratorRequestQuery implements Query
             ));
         }
 
+        return $this->hydrateResult($request);
+    }
+
+    /** @return array<string, mixed>|null */
+    private function fetchGeneratorRequest(string $id): array|null
+    {
+        $result = $this->connection->createQueryBuilder()
+            ->select('*')
+            ->from('generator_requests')
+            ->where('id = :id')
+            ->setParameter('id', $id)
+            ->executeQuery()
+            ->fetchAssociative();
+
+        return $result === false ? null : $result;
+    }
+
+    /** @param array<string, mixed> $request */
+    private function hydrateResult(array $request): GeneratorRequest
+    {
         $request['userInput'] = json_decode(
             (string) $request['userInput'],
             true,

@@ -6,10 +6,10 @@ namespace ChronicleKeeper\Test;
 
 use ChronicleKeeper\Settings\Application\SettingsHandler;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
-use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
 use ChronicleKeeper\Shared\Infrastructure\Database\Schema\SchemaManager;
 use ChronicleKeeper\Shared\Infrastructure\LLMChain\LLMChainFactory;
 use ChronicleKeeper\Test\Shared\Infrastructure\LLMChain\LLMChainFactoryDouble;
+use Doctrine\DBAL\Connection;
 use Override;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase as SymfonyWebTestCase;
@@ -20,21 +20,16 @@ use function assert;
 class WebTestCase extends SymfonyWebTestCase
 {
     protected KernelBrowser $client;
-    protected DatabasePlatform $databasePlatform;
     protected QueryService $queryService;
     protected MessageBusInterface $bus;
     protected SchemaManager $schemaManager;
     protected LLMChainFactoryDouble $llmChainFactory;
     protected SettingsHandler $settingsHandler;
+    protected Connection $connection;
 
     protected function setUp(): void
     {
         $this->client = static::createClient();
-
-        $databasePlatform = self::getContainer()->get(DatabasePlatform::class);
-        assert($databasePlatform instanceof DatabasePlatform);
-
-        $this->databasePlatform = $databasePlatform;
 
         $schemaManager = self::getContainer()->get(SchemaManager::class);
         assert($schemaManager instanceof SchemaManager);
@@ -61,7 +56,12 @@ class WebTestCase extends SymfonyWebTestCase
 
         $this->settingsHandler = $settingsHandler;
 
-        if (! self::willSetupSchema()) {
+        $connection = $this->client->getContainer()->get('doctrine.dbal.default_connection');
+        assert($connection instanceof Connection);
+
+        $this->connection = $connection;
+
+        if (! static::willSetupSchema()) {
             return;
         }
 
@@ -79,7 +79,7 @@ class WebTestCase extends SymfonyWebTestCase
         $this->schemaManager->dropSchema();
 
         unset(
-            $this->databasePlatform,
+            $this->connection,
             $this->client,
             $this->schemaManager,
             $this->queryService,

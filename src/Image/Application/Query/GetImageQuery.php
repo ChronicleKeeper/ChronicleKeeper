@@ -7,7 +7,7 @@ namespace ChronicleKeeper\Image\Application\Query;
 use ChronicleKeeper\Image\Domain\Entity\Image;
 use ChronicleKeeper\Shared\Application\Query\Query;
 use ChronicleKeeper\Shared\Application\Query\QueryParameters;
-use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
+use Doctrine\DBAL\Connection;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 use function assert;
@@ -15,7 +15,7 @@ use function assert;
 class GetImageQuery implements Query
 {
     public function __construct(
-        private readonly DatabasePlatform $databasePlatform,
+        private readonly Connection $connection,
         private readonly DenormalizerInterface $denormalizer,
     ) {
     }
@@ -24,10 +24,13 @@ class GetImageQuery implements Query
     {
         assert($parameters instanceof GetImage);
 
-        $image = $this->databasePlatform->createQueryBuilder()->createSelect()
+        $image = $this->connection->createQueryBuilder()
+            ->select('*')
             ->from('images')
-            ->where('id', '=', $parameters->id)
-            ->fetchOne();
+            ->where('id = :id')
+            ->setParameter('id', $parameters->id)
+            ->executeQuery()
+            ->fetchAssociative();
 
         return $this->denormalizer->denormalize($image, Image::class);
     }

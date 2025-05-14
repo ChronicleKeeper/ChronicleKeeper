@@ -6,23 +6,24 @@ namespace ChronicleKeeper\World\Application\Service\ImportExport;
 
 use ChronicleKeeper\Settings\Application\Service\Importer\SingleImport;
 use ChronicleKeeper\Settings\Application\Service\ImportSettings;
-use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Exception;
 use League\Flysystem\FileAttributes;
 use League\Flysystem\Filesystem;
-use PDOException;
 use Psr\Log\LoggerInterface;
 
 use function array_key_exists;
 use function assert;
 use function is_string;
 use function json_decode;
+use function str_replace;
 
 use const JSON_THROW_ON_ERROR;
 
 final readonly class WorldImport implements SingleImport
 {
     public function __construct(
-        private DatabasePlatform $databasePlatform,
+        private Connection $connection,
         private LoggerInterface $logger,
     ) {
     }
@@ -48,16 +49,38 @@ final readonly class WorldImport implements SingleImport
             return;
         }
 
-        $this->databasePlatform->createQueryBuilder()->createInsert()
-            ->asReplace()
-            ->insert('world_items')
-            ->values([
-                'id' => $content['id'],
-                'type' => $content['type'],
-                'name' => $content['name'],
-                'short_description' => $content['shortDescription'],
-            ])
-            ->execute();
+        // Upsert with explicit check
+        if ($this->hasWorldItem($content['id'])) {
+            $this->connection->createQueryBuilder()
+                ->update('world_items')
+                ->set('type', ':type')
+                ->set('name', ':name')
+                ->set('short_description', ':short_description')
+                ->where('id = :id')
+                ->setParameters([
+                    'id' => $content['id'],
+                    'type' => $content['type'],
+                    'name' => $content['name'],
+                    'short_description' => $content['shortDescription'],
+                ])
+                ->executeStatement();
+        } else {
+            $this->connection->createQueryBuilder()
+                ->insert('world_items')
+                ->values([
+                    'id' => ':id',
+                    'type' => ':type',
+                    'name' => ':name',
+                    'short_description' => ':short_description',
+                ])
+                ->setParameters([
+                    'id' => $content['id'],
+                    'type' => $content['type'],
+                    'name' => $content['name'],
+                    'short_description' => $content['shortDescription'],
+                ])
+                ->executeStatement();
+        }
 
         foreach ($content['mediaReferences'] as $mediaReference) {
             assert(array_key_exists('type', $mediaReference));
@@ -71,16 +94,34 @@ final readonly class WorldImport implements SingleImport
             }
 
             try {
-                $this->databasePlatform->createQueryBuilder()->createInsert()
-                    ->onConflict(['source_world_item_id', 'target_world_item_id'])
-                    ->insert('world_item_relations')
-                    ->values([
-                        'source_world_item_id' => $content['id'],
-                        'target_world_item_id' => $relation['toItem'],
-                        'relation_type' => $relation['relationType'],
-                    ])
-                    ->execute();
-            } catch (PDOException) {
+                if ($this->hasRelation($content['id'], $relation['toItem'], $relation['relationType'])) {
+                    $this->connection->createQueryBuilder()
+                        ->update('world_item_relations')
+                        ->set('relation_type', ':relation_type')
+                        ->where('source_world_item_id = :source_id')
+                        ->andWhere('target_world_item_id = :target_id')
+                        ->setParameters([
+                            'relation_type' => $relation['relationType'],
+                            'source_id' => $content['id'],
+                            'target_id' => $relation['toItem'],
+                        ])
+                        ->executeStatement();
+                } else {
+                    $this->connection->createQueryBuilder()
+                        ->insert('world_item_relations')
+                        ->values([
+                            'source_world_item_id' => ':source_id',
+                            'target_world_item_id' => ':target_id',
+                            'relation_type' => ':relation_type',
+                        ])
+                        ->setParameters([
+                            'source_id' => $content['id'],
+                            'target_id' => $relation['toItem'],
+                            'relation_type' => $relation['relationType'],
+                        ])
+                        ->executeStatement();
+                }
+            } catch (Exception) {
                 /**
                  * Fine... can currently fail because maybe the target is not existing but as both sides
                  * are in the export the import will succeed with the other side.
@@ -91,25 +132,56 @@ final readonly class WorldImport implements SingleImport
 
     private function relationExists(string $fromItem, string $toItem, string $relationType): bool
     {
-        $fromItemToItem = $this->databasePlatform->createQueryBuilder()->createSelect()
+        $fromItemToItem = (bool) $this->connection->createQueryBuilder()
             ->select('COUNT(*) as count')
             ->from('world_item_relations')
-            ->where('source_world_item_id', '=', $fromItem)
-            ->where('target_world_item_id', '=', $toItem)
-            ->where('relation_type', '=', $relationType)
-            ->fetchOne()['count'] > 0;
+            ->where('source_world_item_id = :source_id')
+            ->andWhere('target_world_item_id = :target_id')
+            ->andWhere('relation_type = :relation_type')
+            ->setParameters([
+                'source_id' => $fromItem,
+                'target_id' => $toItem,
+                'relation_type' => $relationType,
+            ])
+            ->executeQuery()
+            ->fetchOne();
 
         if ($fromItemToItem) {
             return true;
         }
 
-        return $this->databasePlatform->createQueryBuilder()->createSelect()
+        return (bool) $this->connection->createQueryBuilder()
             ->select('COUNT(*) as count')
             ->from('world_item_relations')
-            ->where('source_world_item_id', '=', $toItem)
-            ->where('target_world_item_id', '=', $fromItem)
-            ->where('relation_type', '=', $relationType)
-            ->fetchOne()['count'] > 0;
+            ->where('source_world_item_id = :source_id')
+            ->andWhere('target_world_item_id = :target_id')
+            ->andWhere('relation_type = :relation_type')
+            ->setParameters([
+                'source_id' => $toItem,
+                'target_id' => $fromItem,
+                'relation_type' => $relationType,
+            ])
+            ->executeQuery()
+            ->fetchOne();
+    }
+
+    private function hasRelation(string $fromItem, string $toItem, string $relationType): bool
+    {
+        $result = $this->connection->createQueryBuilder()
+            ->select('source_world_item_id')
+            ->from('world_item_relations')
+            ->where('source_world_item_id = :source_id')
+            ->andWhere('target_world_item_id = :target_id')
+            ->andWhere('relation_type = :relation_type')
+            ->setParameters([
+                'source_id' => $fromItem,
+                'target_id' => $toItem,
+                'relation_type' => $relationType,
+            ])
+            ->executeQuery()
+            ->fetchOne();
+
+        return $result !== false;
     }
 
     /** @param array<string, mixed> $mediaReference */
@@ -118,29 +190,27 @@ final readonly class WorldImport implements SingleImport
         assert(array_key_exists('type', $mediaReference) && is_string($mediaReference['type']));
 
         if ($mediaReference['type'] === 'document') {
-            $params = ['world_item_id' => $itemId, 'document_id' => $mediaReference['document_id']];
-
-            $this->databasePlatform->createQueryBuilder()->createInsert()
-                ->asReplace()
-                ->insert('world_item_documents')
-                ->values($params)
-                ->execute();
-
-            $this->logger->debug('Imported document media reference.', ['item_id' => $itemId] + $params);
+            $this->upsertMediaReference(
+                'world_item_documents',
+                [
+                    'world_item_id' => $itemId,
+                    'document_id' => $mediaReference['document_id'],
+                ],
+                'Imported document media reference.',
+            );
 
             return;
         }
 
         if ($mediaReference['type'] === 'image') {
-            $params = ['world_item_id' => $itemId, 'image_id' => $mediaReference['image_id']];
-
-            $this->databasePlatform->createQueryBuilder()->createInsert()
-                ->asReplace()
-                ->insert('world_item_images')
-                ->values($params)
-                ->execute();
-
-            $this->logger->debug('Imported image media reference.', ['world_item_id' => $itemId] + $params);
+            $this->upsertMediaReference(
+                'world_item_images',
+                [
+                    'world_item_id' => $itemId,
+                    'image_id' => $mediaReference['image_id'],
+                ],
+                'Imported image media reference.',
+            );
 
             return;
         }
@@ -149,22 +219,86 @@ final readonly class WorldImport implements SingleImport
             return;
         }
 
-        $params = ['world_item_id' => $itemId, 'conversation_id' => $mediaReference['conversation_id']];
+        $this->upsertMediaReference(
+            'world_item_conversations',
+            [
+                'world_item_id' => $itemId,
+                'conversation_id' => $mediaReference['conversation_id'],
+            ],
+            'Imported conversation media reference.',
+        );
+    }
 
-        $this->databasePlatform->createQueryBuilder()->createInsert()
-            ->asReplace()
-            ->insert('world_item_conversations')
-            ->values($params)
-            ->execute();
+    /** @param array<string, string> $params */
+    private function upsertMediaReference(string $table, array $params, string $logMessage): void
+    {
+        // Check if reference exists
+        $qb = $this->connection->createQueryBuilder()
+            ->select('1')
+            ->from($table);
 
-        $this->logger->debug('Imported conversation media reference.', ['world_item_id' => $itemId] + $params);
+        $paramPositions = [];
+        foreach ($params as $key => $value) {
+            $paramName = str_replace('_', '', $key);
+            $qb->andWhere($key . ' = :' . $paramName);
+            $paramPositions[$paramName] = $value;
+        }
+
+        $exists = $qb->setParameters($paramPositions)
+            ->executeQuery()
+            ->fetchOne();
+
+        $namedParams = [];
+        foreach ($params as $key => $value) {
+            $namedParams[':' . $key] = $value;
+        }
+
+        if ($exists !== false) {
+            // If exists, update
+            $qb = $this->connection->createQueryBuilder()
+                ->update($table);
+
+            $whereAdded = false;
+            foreach ($params as $key => $value) {
+                if (! $whereAdded) {
+                    $qb->where($key . ' = :' . $key);
+                    $whereAdded = true;
+                } else {
+                    $qb->andWhere($key . ' = :' . $key);
+                }
+
+                $qb->setParameter($key, $value);
+            }
+
+            $qb->executeStatement();
+        } else {
+            // If not, insert
+            $qb = $this->connection->createQueryBuilder()
+                ->insert($table);
+
+            $columnValues = [];
+            foreach ($params as $key => $value) {
+                $columnValues[$key] = ':' . $key;
+                $qb->setParameter($key, $value);
+            }
+
+            $qb->values($columnValues)
+                ->executeStatement();
+        }
+
+        $this->logger->debug($logMessage, $params);
     }
 
     private function hasWorldItem(string $id): bool
     {
-        return $this->databasePlatform->createQueryBuilder()->createSelect()
+        $result = $this->connection->createQueryBuilder()
+            ->select('id')
             ->from('world_items')
-            ->where('id', '=', $id)
-            ->fetchOneOrNull() !== null;
+            ->where('id = :id')
+            ->setParameter('id', $id)
+            ->executeQuery()
+            ->fetchOne();
+
+        return $result !== false;
     }
 }

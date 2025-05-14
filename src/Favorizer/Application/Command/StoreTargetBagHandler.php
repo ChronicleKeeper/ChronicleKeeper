@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Favorizer\Application\Command;
 
-use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
+use Doctrine\DBAL\Connection;
 use ReflectionClass;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
@@ -12,25 +12,30 @@ use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 class StoreTargetBagHandler
 {
     public function __construct(
-        private readonly DatabasePlatform $databasePlatform,
+        private readonly Connection $connection,
     ) {
     }
 
     public function __invoke(StoreTargetBag $command): void
     {
         // Clear all existing favorites
-        $this->databasePlatform->createQueryBuilder()->createDelete()->from('favorites')->execute();
+        $this->connection->createQueryBuilder()
+            ->delete('favorites')
+            ->executeStatement();
 
         // Store the delivered favorites for next fetching
         foreach ($command->targetBag as $target) {
-            $this->databasePlatform->createQueryBuilder()->createInsert()
+            $this->connection->createQueryBuilder()
                 ->insert('favorites')
                 ->values([
-                    'id' => $target->getId(),
-                    'title' => $target->getTitle(),
-                    'type' => (new ReflectionClass($target))->getShortName(),
+                    'id' => ':id',
+                    'title' => ':title',
+                    'type' => ':type',
                 ])
-                ->execute();
+                ->setParameter('id', $target->getId())
+                ->setParameter('title', $target->getTitle())
+                ->setParameter('type', (new ReflectionClass($target))->getShortName())
+                ->executeStatement();
         }
     }
 }

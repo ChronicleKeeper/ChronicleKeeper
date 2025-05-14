@@ -35,15 +35,35 @@ class WorldItemAutocompleteTest extends WebTestCase
             ->withType(ItemType::COUNTRY)
             ->build();
 
-        $this->databasePlatform->createQueryBuilder()->createInsert()
-            ->insert('world_items')
-            ->values([
+        // Check if record already exists
+        $existingRecord = $this->connection->createQueryBuilder()
+            ->select('id')
+            ->from('world_items')
+            ->where('id = :id')
+            ->setParameter('id', $this->searchableItem->getId())
+            ->executeQuery()
+            ->fetchAssociative();
+
+        if ($existingRecord !== false) {
+            // Update existing record
+            $this->connection->update(
+                'world_items',
+                [
+                    'name' => $this->searchableItem->getName(),
+                    'type' => $this->searchableItem->getType()->value,
+                    'short_description' => $this->searchableItem->getShortDescription(),
+                ],
+                ['id' => $this->searchableItem->getId()],
+            );
+        } else {
+            // Insert new record
+            $this->connection->insert('world_items', [
                 'id' => $this->searchableItem->getId(),
                 'name' => $this->searchableItem->getName(),
                 'type' => $this->searchableItem->getType()->value,
                 'short_description' => $this->searchableItem->getShortDescription(),
-            ])
-            ->execute();
+            ]);
+        }
     }
 
     #[Override]

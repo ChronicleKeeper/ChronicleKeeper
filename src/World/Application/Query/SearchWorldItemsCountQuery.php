@@ -6,14 +6,15 @@ namespace ChronicleKeeper\World\Application\Query;
 
 use ChronicleKeeper\Shared\Application\Query\Query;
 use ChronicleKeeper\Shared\Application\Query\QueryParameters;
-use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\ParameterType;
 
 use function assert;
 
 final class SearchWorldItemsCountQuery implements Query
 {
     public function __construct(
-        private readonly DatabasePlatform $platform,
+        private readonly Connection $connection,
     ) {
     }
 
@@ -21,22 +22,31 @@ final class SearchWorldItemsCountQuery implements Query
     {
         assert($parameters instanceof SearchWorldItemsCount);
 
-        $queryBuilder = $this->platform->createQueryBuilder()->createSelect()
+        $queryBuilder = $this->connection->createQueryBuilder()
             ->select('COUNT(id) as count')
             ->from('world_items');
 
         if ($parameters->search !== '') {
-            $queryBuilder->where('name', 'LIKE', '%' . $parameters->search . '%');
+            $queryBuilder->andWhere(
+                $queryBuilder->expr()->like('name', ':search'),
+            )
+                ->setParameter('search', '%' . $parameters->search . '%');
         }
 
         if ($parameters->type !== '') {
-            $queryBuilder->where('type', '=', $parameters->type);
+            $queryBuilder->andWhere('type = :type')
+                ->setParameter('type', $parameters->type);
         }
 
         if ($parameters->exclude !== []) {
-            $queryBuilder->where('id', 'NOT IN', $parameters->exclude);
+            $queryBuilder->andWhere(
+                $queryBuilder->expr()->notIn('id', ':excluded_ids'),
+            )
+                ->setParameter('excluded_ids', $parameters->exclude, ParameterType::STRING);
         }
 
-        return $queryBuilder->fetchOne()['count'];
+        $result = $queryBuilder->executeQuery()->fetchOne();
+
+        return (int) $result;
     }
 }

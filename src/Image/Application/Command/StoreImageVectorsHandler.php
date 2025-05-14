@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Image\Application\Command;
 
-use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
+use Doctrine\DBAL\Connection;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Messenger\MessageBusInterface;
 
@@ -14,7 +14,7 @@ use function implode;
 class StoreImageVectorsHandler
 {
     public function __construct(
-        private readonly DatabasePlatform $platform,
+        private readonly Connection $connection,
         private readonly MessageBusInterface $bus,
     ) {
     }
@@ -25,14 +25,18 @@ class StoreImageVectorsHandler
         $this->bus->dispatch(new DeleteImageVectors($command->vectorImage->image->getId()));
 
         // Then store it again
-        $this->platform->createQueryBuilder()->createInsert()
+        $this->connection->createQueryBuilder()
             ->insert('images_vectors')
             ->values([
-                'image_id' => $command->vectorImage->image->getId(),
-                'embedding' => '[' . implode(',', $command->vectorImage->vector) . ']',
-                'content' => $command->vectorImage->content,
-                'vectorContentHash' => $command->vectorImage->vectorContentHash,
+                'image_id' => ':imageId',
+                'embedding' => ':embedding',
+                'content' => ':content',
+                '"vectorContentHash"' => ':vectorContentHash',
             ])
-            ->execute();
+            ->setParameter('imageId', $command->vectorImage->image->getId())
+            ->setParameter('embedding', '[' . implode(',', $command->vectorImage->vector) . ']')
+            ->setParameter('content', $command->vectorImage->content)
+            ->setParameter('vectorContentHash', $command->vectorImage->vectorContentHash)
+            ->executeStatement();
     }
 }

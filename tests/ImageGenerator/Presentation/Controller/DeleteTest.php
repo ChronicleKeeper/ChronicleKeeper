@@ -40,14 +40,12 @@ class DeleteTest extends WebTestCase
     #[Test]
     public function thatRequestingPageWithExistentDataIsSuccess(): void
     {
-        $this->databasePlatform->createQueryBuilder()->createInsert()
-            ->insert('generator_requests')
-            ->values([
-                'id'       => 'c6f5d897-175c-4938-abe1-613fb51fdd68',
-                'title'    => 'Foo Bar Baz',
-                'userInput' => '{"foo": "bar"}',
-            ])
-            ->execute();
+        // Insert test data using Doctrine DBAL
+        $this->connection->insert('generator_requests', [
+            'id' => 'c6f5d897-175c-4938-abe1-613fb51fdd68',
+            'title' => 'Foo Bar Baz',
+            '"userInput"' => '{"foo": "bar"}',
+        ]);
 
         $this->client->request(
             Request::METHOD_GET,
@@ -56,10 +54,14 @@ class DeleteTest extends WebTestCase
 
         self::assertResponseRedirects('/image_generator');
 
-        $existingEntries = $this->databasePlatform->createQueryBuilder()->createSelect()
+        // Query to verify the record was deleted using Doctrine DBAL
+        $existingEntries = $this->connection->createQueryBuilder()
+            ->select('*')
             ->from('generator_requests')
-            ->where('id', '=', 'c6f5d897-175c-4938-abe1-613fb51fdd68')
-            ->fetchAll();
+            ->where('id = :id')
+            ->setParameter('id', 'c6f5d897-175c-4938-abe1-613fb51fdd68')
+            ->executeQuery()
+            ->fetchAllAssociative();
 
         self::assertEmpty($existingEntries);
     }

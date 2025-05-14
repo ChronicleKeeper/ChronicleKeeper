@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace ChronicleKeeper\Image\Application\Command;
 
 use ChronicleKeeper\Image\Domain\Event\ImageDeleted;
-use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
 use ChronicleKeeper\Shared\Infrastructure\Messenger\MessageEventResult;
+use Doctrine\DBAL\Connection;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Messenger\MessageBusInterface;
 
@@ -14,7 +14,7 @@ use Symfony\Component\Messenger\MessageBusInterface;
 class DeleteImageHandler
 {
     public function __construct(
-        private readonly DatabasePlatform $databasePlatform,
+        private readonly Connection $connection,
         private readonly MessageBusInterface $bus,
     ) {
     }
@@ -23,10 +23,11 @@ class DeleteImageHandler
     {
         $this->bus->dispatch(new DeleteImageVectors($command->image->getId()));
 
-        $this->databasePlatform->createQueryBuilder()->createDelete()
-            ->from('images')
-            ->where('id', '=', $command->image->getId())
-            ->execute();
+        $this->connection->createQueryBuilder()
+            ->delete('images')
+            ->where('id = :id')
+            ->setParameter('id', $command->image->getId())
+            ->executeStatement();
 
         return new MessageEventResult([new ImageDeleted($command->image)]);
     }

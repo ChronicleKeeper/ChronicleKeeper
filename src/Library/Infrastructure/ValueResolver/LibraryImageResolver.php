@@ -7,13 +7,13 @@ namespace ChronicleKeeper\Library\Infrastructure\ValueResolver;
 use ChronicleKeeper\Image\Application\Query\GetImage;
 use ChronicleKeeper\Image\Domain\Entity\Image;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
-use ChronicleKeeper\Shared\Infrastructure\Database\Exception\MissingResults;
 use RuntimeException;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Component\Uid\Uuid;
+use Throwable;
 
 use function is_a;
 use function is_string;
@@ -41,7 +41,7 @@ class LibraryImageResolver implements ValueResolverInterface
 
         try {
             $image = $this->queryService->query(new GetImage($imageIdentifier));
-        } catch (MissingResults) {
+        } catch (Throwable) {
             throw new RuntimeException('Image "' . $imageIdentifier . '" not found.');
         }
 

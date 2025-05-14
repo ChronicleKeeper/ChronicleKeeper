@@ -6,7 +6,8 @@ namespace ChronicleKeeper\Document\Application\Service\ImportExport;
 
 use ChronicleKeeper\Settings\Application\Service\Importer\SingleImport;
 use ChronicleKeeper\Settings\Application\Service\ImportSettings;
-use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Exception;
 use League\Flysystem\FileAttributes;
 use League\Flysystem\Filesystem;
 use Psr\Log\LoggerInterface;
@@ -21,7 +22,7 @@ use const JSON_THROW_ON_ERROR;
 final readonly class DocumentEmbeddingsImporter implements SingleImport
 {
     public function __construct(
-        private DatabasePlatform $databasePlatform,
+        private Connection $connection,
         private LoggerInterface $logger,
     ) {
     }
@@ -51,33 +52,59 @@ final readonly class DocumentEmbeddingsImporter implements SingleImport
                 continue;
             }
 
-            $this->databasePlatform->createQueryBuilder()->createDelete()
-                ->from('documents_vectors')
-                ->where('document_id', '=', $documentId)
-                ->execute();
+            try {
+                $this->connection->beginTransaction();
 
-            foreach ($content['data'] as $row) {
-                $this->databasePlatform->createQueryBuilder()->createInsert()
-                    ->insert('documents_vectors')
-                    ->values([
-                        'document_id' => $row['document_id'],
-                        'embedding' => $row['embedding'],
-                        'content' => $row['content'],
-                        'vectorContentHash' => $row['vectorContentHash'],
-                    ])
-                    ->execute();
+                // Delete existing vectors for this document
+                $this->connection->createQueryBuilder()
+                    ->delete('documents_vectors')
+                    ->where('document_id = :documentId')
+                    ->setParameter('documentId', $documentId)
+                    ->executeStatement();
+
+                // Insert new vectors
+                foreach ($content['data'] as $row) {
+                    $this->connection->createQueryBuilder()
+                        ->insert('documents_vectors')
+                        ->values([
+                            'document_id' => ':documentId',
+                            'embedding' => ':embedding',
+                            'content' => ':content',
+                            'vectorContentHash' => ':vectorContentHash',
+                        ])
+                        ->setParameters([
+                            'documentId' => $row['document_id'],
+                            'embedding' => $row['embedding'],
+                            'content' => $row['content'],
+                            'vectorContentHash' => $row['vectorContentHash'],
+                        ])
+                        ->executeStatement();
+                }
+
+                $this->connection->commit();
+                $this->logger->debug('Document vector storage imported.', ['document_id' => $documentId]);
+            } catch (Exception $e) {
+                $this->connection->rollBack();
+                $this->logger->error('Failed to import document vector storage', [
+                    'document_id' => $documentId,
+                    'error' => $e->getMessage(),
+                ]);
+
+                throw $e;
             }
-
-            $this->logger->debug('Document vector storage imported.', ['document_id' => $documentId]);
         }
     }
 
     private function hasDocumentVectors(string $id): bool
     {
-        return $this->databasePlatform->createQueryBuilder()->createSelect()
-                ->select('document_id')
-                ->from('documents_vectors')
-                ->where('document_id', '=', $id)
-                ->fetchOneOrNull() !== null;
+        $result = $this->connection->createQueryBuilder()
+            ->select('document_id')
+            ->from('documents_vectors')
+            ->where('document_id = :documentId')
+            ->setParameter('documentId', $id)
+            ->executeQuery()
+            ->fetchOne();
+
+        return $result !== false;
     }
 }

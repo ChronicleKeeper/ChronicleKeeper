@@ -13,9 +13,11 @@ abstract class DatabaseTestCase extends WebTestCase
     /** @param non-empty-string $table */
     protected function assertRowsInTable(string $table, int $expectedAmount): void
     {
-        $rows = $this->databasePlatform->createQueryBuilder()->createSelect()
+        $rows = $this->connection->createQueryBuilder()
+            ->select('*')
             ->from($table)
-            ->fetchAll();
+            ->executeQuery()
+            ->fetchAllAssociative();
 
         self::assertCount(
             $expectedAmount,
@@ -38,9 +40,14 @@ abstract class DatabaseTestCase extends WebTestCase
      */
     protected function getRowFromTable(string $table, string $column, mixed $value): array|null
     {
-        return $this->databasePlatform->createQueryBuilder()->createSelect()
+        $result = $this->connection->createQueryBuilder()
+            ->select('*')
             ->from($table)
-            ->where($column, '=', $value)
-            ->fetchOneOrNull();
+            ->where(sprintf('%s = :value', $column))
+            ->setParameter('value', $value)
+            ->executeQuery()
+            ->fetchAssociative();
+
+        return $result !== false ? $result : null;
     }
 }

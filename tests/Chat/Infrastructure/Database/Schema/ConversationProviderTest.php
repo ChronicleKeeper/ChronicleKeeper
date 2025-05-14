@@ -17,7 +17,7 @@ class ConversationProviderTest extends SchemaProviderTestCase
     #[Test]
     public function itCreatesTheSchema(): void
     {
-        (new ConversationProvider())->createSchema($this->databasePlatform);
+        (new ConversationProvider())->createSchema($this->connection);
 
         $tables = $this->schemaManager->getTables();
 
