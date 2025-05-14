@@ -6,16 +6,12 @@ parameters:
   app.data.base_dir: '%kernel.project_dir%/var/data'
   app.tmp.base_dir: '%kernel.project_dir%/var/tmp'
 
-  app.database.type: '%env(DATABASE_TYPE)%'
-  app.database.connection: '%env(DATABASE_CONNECTION)%'
-
 services:
   _defaults:
     autowire: true
     autoconfigure: true
     bind:
       string $environment: '%env(string:APP_ENV)%'
-      string $databasePath: '%app.data.base_dir%/%env(string:DATABASE_CONNECTION)%'
       string $projectRoot: '%kernel.project_dir%'
 
   ChronicleKeeper\:

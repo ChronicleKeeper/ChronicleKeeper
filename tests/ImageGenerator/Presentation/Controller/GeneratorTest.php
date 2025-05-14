@@ -37,14 +37,33 @@ class GeneratorTest extends WebTestCase
         $generatorRequest     = (new GeneratorRequestBuilder())->build();
         $generatorRequest->id = '6695cae4-ba8f-4d22-90e6-623675502817';
 
-        $this->databasePlatform->createQueryBuilder()->createInsert()
-            ->insert('generator_requests')
-            ->values([
-                'id'       => $generatorRequest->id,
-                'title'    => 'Default Title',
-                'userInput' => json_encode($generatorRequest->userInput, JSON_THROW_ON_ERROR),
-            ])
-            ->execute();
+        // Check if record already exists
+        $existingRecord = $this->connection->createQueryBuilder()
+            ->select('id')
+            ->from('generator_requests')
+            ->where('id = :id')
+            ->setParameter('id', $generatorRequest->id)
+            ->executeQuery()
+            ->fetchAssociative();
+
+        if ($existingRecord !== false) {
+            // Update existing record
+            $this->connection->update(
+                'generator_requests',
+                [
+                    'title' => 'Default Title',
+                    'userInput' => json_encode($generatorRequest->userInput, JSON_THROW_ON_ERROR),
+                ],
+                ['id' => $generatorRequest->id],
+            );
+        } else {
+            // Insert new record
+            $this->connection->insert('generator_requests', [
+                'id' => $generatorRequest->id,
+                'title' => 'Default Title',
+                '"userInput"' => json_encode($generatorRequest->userInput, JSON_THROW_ON_ERROR),
+            ]);
+        }
 
         $this->client->request(
             Request::METHOD_GET,

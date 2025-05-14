@@ -52,7 +52,7 @@ class ConversationImporterTest extends DatabaseTestCase
             ->with('library/conversations/06b90bed-97dc-42a2-bb66-10bef04ec881.json')
             ->willReturn('{"appVersion": "dev", "type": "conversation", "data": {"id": "06b90bed-97dc-42a2-bb66-10bef04ec881"}}');
 
-        $import = new ConversationImporter($this->databasePlatform, $denormalizer, $bus, new NullLogger());
+        $import = new ConversationImporter($this->connection, $denormalizer, $bus, new NullLogger());
         $import->import($filesystem, new ImportSettings());
     }
 }

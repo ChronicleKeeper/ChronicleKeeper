@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Test\World\Application\Event;
 
-use ChronicleKeeper\Settings\Application\Service\ImportSettings;
-use ChronicleKeeper\Settings\Domain\Event\ExecuteImportPruning;
 use ChronicleKeeper\Test\Shared\Infrastructure\Database\DatabaseTestCase;
 use ChronicleKeeper\Test\World\Domain\Entity\ItemBuilder;
 use ChronicleKeeper\World\Application\Command\StoreWorldItem;
@@ -52,7 +50,7 @@ class ImportPrunerTest extends DatabaseTestCase
 
         // ------------------- The test execution -------------------
 
-        ($this->importPruner)(new ExecuteImportPruning(new ImportSettings()));
+        ($this->importPruner)();
 
         // ------------------- The test assertions -------------------
 

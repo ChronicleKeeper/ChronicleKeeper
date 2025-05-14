@@ -40,15 +40,33 @@ class FavoritesOffcanvasTest extends WebTestCase
         $this->document = (new DocumentBuilder())->withTitle('Foo Bar Baz')->build();
         $this->bus->dispatch(new StoreDocument($this->document));
 
-        $this->databasePlatform->createQueryBuilder()->createInsert()
-            ->asReplace()
-            ->insert('favorites')
-            ->values([
+        // Check if this favorite already exists
+        $existingFavorite = $this->connection->createQueryBuilder()
+            ->select('id')
+            ->from('favorites')
+            ->where('id = :id')
+            ->setParameter('id', $this->document->getId())
+            ->executeQuery()
+            ->fetchAssociative();
+
+        if ($existingFavorite !== false) {
+            // Update existing record
+            $this->connection->update(
+                'favorites',
+                [
+                    'title' => $this->document->getTitle(),
+                    'type' => 'LibraryDocumentTarget',
+                ],
+                ['id' => $this->document->getId()],
+            );
+        } else {
+            // Insert new record
+            $this->connection->insert('favorites', [
                 'id' => $this->document->getId(),
                 'title' => $this->document->getTitle(),
                 'type' => 'LibraryDocumentTarget',
-            ])
-            ->execute();
+            ]);
+        }
     }
 
     #[Override]

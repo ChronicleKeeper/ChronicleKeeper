@@ -8,7 +8,7 @@ use ChronicleKeeper\Library\Domain\Entity\Directory;
 use ChronicleKeeper\Library\Domain\RootDirectory;
 use ChronicleKeeper\Shared\Application\Query\Query;
 use ChronicleKeeper\Shared\Application\Query\QueryParameters;
-use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
+use Doctrine\DBAL\Connection;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 use function array_map;
@@ -19,7 +19,7 @@ use function usort;
 final class FindAllDirectoriesQuery implements Query
 {
     public function __construct(
-        private readonly DatabasePlatform $databasePlatform,
+        private readonly Connection $connection,
         private readonly DenormalizerInterface $denormalizer,
     ) {
     }
@@ -29,9 +29,13 @@ final class FindAllDirectoriesQuery implements Query
     {
         assert($parameters instanceof FindAllDirectories);
 
-        $directories = $this->databasePlatform->createQueryBuilder()->createSelect()
+        $queryBuilder = $this->connection->createQueryBuilder();
+        $result       = $queryBuilder
+            ->select('*')
             ->from('directories')
-            ->fetchAll();
+            ->executeQuery();
+
+        $directories = $result->fetchAllAssociative();
 
         $directories = array_map(
             fn (array $directory) => $this->denormalizer->denormalize($directory, Directory::class),

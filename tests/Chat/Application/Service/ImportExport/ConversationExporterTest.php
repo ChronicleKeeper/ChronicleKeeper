@@ -35,7 +35,7 @@ class ConversationExporterTest extends DatabaseTestCase
         $serializer = $this->createMock(SerializerInterface::class);
         $serializer->expects($this->never())->method('serialize');
 
-        $export = new ConversationExporter($queryService, $serializer, $this->databasePlatform, new NullLogger());
+        $export = new ConversationExporter($queryService, $serializer, $this->connection, new NullLogger());
 
         $export->export(self::createStub(ZipArchive::class), new ExportSettings('dev'));
     }
@@ -77,7 +77,7 @@ class ConversationExporterTest extends DatabaseTestCase
 
         // ------------------- The test execution -------------------
 
-        $export = new ConversationExporter($this->queryService, $serializer, $this->databasePlatform, new NullLogger());
+        $export = new ConversationExporter($this->queryService, $serializer, $this->connection, new NullLogger());
         $export->export($archive, new ExportSettings('dev'));
     }
 }

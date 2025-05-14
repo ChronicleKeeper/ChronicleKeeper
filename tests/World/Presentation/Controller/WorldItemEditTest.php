@@ -39,15 +39,35 @@ class WorldItemEditTest extends WebTestCase
             ->withShortDescription('A description')
             ->build();
 
-        $this->databasePlatform->createQueryBuilder()->createInsert()
-            ->insert('world_items')
-            ->values([
+        // Check if item already exists
+        $existingItem = $this->connection->createQueryBuilder()
+            ->select('id')
+            ->from('world_items')
+            ->where('id = :id')
+            ->setParameter('id', $this->item->getId())
+            ->executeQuery()
+            ->fetchAssociative();
+
+        if ($existingItem !== false) {
+            // Update existing item
+            $this->connection->update(
+                'world_items',
+                [
+                    'name' => $this->item->getName(),
+                    'type' => $this->item->getType()->value,
+                    'short_description' => $this->item->getShortDescription(),
+                ],
+                ['id' => $this->item->getId()],
+            );
+        } else {
+            // Insert new item
+            $this->connection->insert('world_items', [
                 'id' => $this->item->getId(),
                 'name' => $this->item->getName(),
                 'type' => $this->item->getType()->value,
                 'short_description' => $this->item->getShortDescription(),
-            ])
-            ->execute();
+            ]);
+        }
     }
 
     #[Override]
@@ -91,12 +111,15 @@ class WorldItemEditTest extends WebTestCase
         $this->client->followRedirect();
         self::assertSelectorTextContains('.alert-success', 'Der Eintrag wurde erfolgreich bearbeitet.');
 
-        $updatedItem = $this->databasePlatform->createQueryBuilder()->createSelect()
+        $updatedItem = $this->connection->createQueryBuilder()
+            ->select('*')
             ->from('world_items')
-            ->where('id', '=', $this->item->getId())
-            ->fetchOne();
+            ->where('id = :id')
+            ->setParameter('id', $this->item->getId())
+            ->executeQuery()
+            ->fetchAssociative();
 
-        self::assertSame('Updated Item', $updatedItem['name']);
+        self::assertSame('Updated Item', $updatedItem['name']); // @phpstan-ignore offsetAccess.nonOffsetAccessible
         self::assertSame('Updated Description', $updatedItem['short_description']);
     }
 

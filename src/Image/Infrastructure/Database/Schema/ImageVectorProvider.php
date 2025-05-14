@@ -4,33 +4,21 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Image\Infrastructure\Database\Schema;
 
-use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
-use ChronicleKeeper\Shared\Infrastructure\Database\PgSql\PgSqlDatabasePlatform;
 use ChronicleKeeper\Shared\Infrastructure\Database\Schema\DefaultSchemaProvider;
+use Doctrine\DBAL\Connection;
+use Override;
 
 final class ImageVectorProvider extends DefaultSchemaProvider
 {
-    public function createSchema(DatabasePlatform $platform): void
+    #[Override]
+    public function createSchema(Connection $connection): void
     {
-        if ($platform instanceof PgSqlDatabasePlatform) {
-            $platform->executeRaw(<<<'SQL'
-                 CREATE TABLE images_vectors (
-                    image_id uuid NOT NULL,
-                    embedding vector(1536) NOT NULL,
-                    content text NOT NULL,
-                    "vectorContentHash" text NOT NULL
-                 );
-            SQL);
-
-            return;
-        }
-
-        $platform->executeRaw(<<<'SQL'
-            create virtual table images_vectors using vec0(
-                image_id text partition key,
-                embedding float[1536] distance_metric=cosine,
-                +content text,
-                +vectorContentHash text
+        $connection->executeStatement(<<<'SQL'
+            CREATE TABLE IF NOT EXISTS images_vectors (
+                image_id uuid NOT NULL,
+                embedding vector(1536) NOT NULL,
+                content text NOT NULL,
+                "vectorContentHash" text NOT NULL
             );
         SQL);
     }

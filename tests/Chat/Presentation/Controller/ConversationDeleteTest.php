@@ -24,18 +24,18 @@ use Symfony\Component\HttpFoundation\Response;
 #[Large]
 final class ConversationDeleteTest extends WebTestCase
 {
-    private Conversation $fixturteConversation;
+    private Conversation $fixtureConversation;
 
     #[Override]
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->fixturteConversation = (new ConversationBuilder())
+        $this->fixtureConversation = (new ConversationBuilder())
             ->withId('84e66e52-4e06-4f7d-b77e-ac03530deb10')
             ->build();
 
-        $this->bus->dispatch(new StoreConversationCommand($this->fixturteConversation));
+        $this->bus->dispatch(new StoreConversationCommand($this->fixtureConversation));
     }
 
     #[Override]
@@ -43,7 +43,7 @@ final class ConversationDeleteTest extends WebTestCase
     {
         parent::tearDown();
 
-        unset($this->fixturteConversation);
+        unset($this->fixtureConversation);
     }
 
     #[Test]
@@ -64,7 +64,7 @@ final class ConversationDeleteTest extends WebTestCase
     {
         $this->client->request(
             Request::METHOD_GET,
-            '/chat-delete/' . $this->fixturteConversation->getId(),
+            '/chat-delete/' . $this->fixtureConversation->getId(),
         );
 
         self::assertResponseRedirects('/library');
@@ -75,18 +75,20 @@ final class ConversationDeleteTest extends WebTestCase
     {
         $this->client->request(
             Request::METHOD_GET,
-            '/chat-delete/' . $this->fixturteConversation->getId(),
+            '/chat-delete/' . $this->fixtureConversation->getId(),
             ['confirm' => 1],
         );
 
         self::assertResponseRedirects('/library');
 
-        $conversation = $this->databasePlatform->createQueryBuilder()->createSelect()
+        $result = $this->connection->createQueryBuilder()
             ->select('*')
             ->from('conversations')
-            ->where('id', '=', $this->fixturteConversation->getId())
-            ->fetchOneOrNull();
+            ->where('id = :id')
+            ->setParameter('id', $this->fixtureConversation->getId())
+            ->executeQuery()
+            ->fetchAssociative();
 
-        self::assertNull($conversation);
+        self::assertFalse($result);
     }
 }

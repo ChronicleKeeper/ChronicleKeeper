@@ -7,7 +7,7 @@ namespace ChronicleKeeper\Library\Application\Query;
 use ChronicleKeeper\Library\Domain\Entity\Directory;
 use ChronicleKeeper\Shared\Application\Query\Query;
 use ChronicleKeeper\Shared\Application\Query\QueryParameters;
-use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
+use Doctrine\DBAL\Connection;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 use function array_map;
@@ -18,7 +18,7 @@ use function usort;
 final class FindDirectoriesByParentQuery implements Query
 {
     public function __construct(
-        private readonly DatabasePlatform $databasePlatform,
+        private readonly Connection $connection,
         private readonly DenormalizerInterface $denormalizer,
     ) {
     }
@@ -28,10 +28,15 @@ final class FindDirectoriesByParentQuery implements Query
     {
         assert($parameters instanceof FindDirectoriesByParent);
 
-        $directories = $this->databasePlatform->createQueryBuilder()->createSelect()
+        $queryBuilder = $this->connection->createQueryBuilder();
+        $result       = $queryBuilder
+            ->select('*')
             ->from('directories')
-            ->where('parent', '=', $parameters->parentId)
-            ->fetchAll();
+            ->where('parent = :parentId')
+            ->setParameter('parentId', $parameters->parentId)
+            ->executeQuery();
+
+        $directories = $result->fetchAllAssociative();
 
         $directories = array_map(
             fn (array $directory) => $this->denormalizer->denormalize($directory, Directory::class),

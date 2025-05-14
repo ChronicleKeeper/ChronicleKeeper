@@ -8,7 +8,8 @@ use ChronicleKeeper\Library\Domain\Entity\Directory;
 use ChronicleKeeper\Library\Domain\RootDirectory;
 use ChronicleKeeper\Shared\Application\Query\Query;
 use ChronicleKeeper\Shared\Application\Query\QueryParameters;
-use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
+use Doctrine\DBAL\Connection;
+use RuntimeException;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 use function assert;
@@ -16,7 +17,7 @@ use function assert;
 final class FindDirectoryByIdQuery implements Query
 {
     public function __construct(
-        private readonly DatabasePlatform $databasePlatform,
+        private readonly Connection $connection,
         private readonly DenormalizerInterface $denormalizer,
     ) {
     }
@@ -29,11 +30,18 @@ final class FindDirectoryByIdQuery implements Query
             return RootDirectory::get();
         }
 
-        $directory = $this->databasePlatform->createQueryBuilder()->createSelect()
+        $result = $this->connection->createQueryBuilder()
+            ->select('*')
             ->from('directories')
-            ->where('id', '=', $parameters->id)
-            ->fetchOne();
+            ->where('id = :id')
+            ->setParameter('id', $parameters->id)
+            ->executeQuery()
+            ->fetchAssociative();
 
-        return $this->denormalizer->denormalize($directory, Directory::class);
+        if ($result === false) {
+            throw new RuntimeException('Directory not found with id: ' . $parameters->id);
+        }
+
+        return $this->denormalizer->denormalize($result, Directory::class);
     }
 }

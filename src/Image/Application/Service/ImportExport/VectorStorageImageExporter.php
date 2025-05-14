@@ -11,7 +11,7 @@ use ChronicleKeeper\Settings\Application\Service\Exporter\ExportSettings;
 use ChronicleKeeper\Settings\Application\Service\Exporter\SingleExport;
 use ChronicleKeeper\Settings\Application\Service\Exporter\Type;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
-use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
+use Doctrine\DBAL\Connection;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 use ZipArchive;
@@ -26,7 +26,7 @@ final readonly class VectorStorageImageExporter implements SingleExport
     public function __construct(
         private QueryService $queryService,
         private SerializerInterface $serializer,
-        private DatabasePlatform $databasePlatform,
+        private Connection $connection,
         private LoggerInterface $logger,
     ) {
     }
@@ -42,13 +42,14 @@ final readonly class VectorStorageImageExporter implements SingleExport
         }
 
         foreach ($images as $image) {
-            $embeddingsOfImage = $this->databasePlatform->createQueryBuilder()
-                ->createSelect()
-                ->select('image_id', 'content', 'vectorContentHash')
-                ->vectorToJson('embedding', 'embedding')
+            $queryBuilder = $this->connection->createQueryBuilder();
+            $queryBuilder
+                ->select('image_id', 'content', '"vectorContentHash"', 'embedding')
                 ->from('images_vectors')
-                ->where('image_id', '=', $image->getId())
-                ->fetchAll();
+                ->where('image_id = :imageId')
+                ->setParameter('imageId', $image->getId());
+
+            $embeddingsOfImage = $queryBuilder->executeQuery()->fetchAllAssociative();
 
             if (count($embeddingsOfImage) === 0) {
                 $this->logger->debug(

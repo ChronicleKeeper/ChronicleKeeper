@@ -6,8 +6,6 @@ namespace ChronicleKeeper\Test\Library\Application\Event;
 
 use ChronicleKeeper\Library\Application\Command\StoreDirectory;
 use ChronicleKeeper\Library\Application\Event\ImportPruner;
-use ChronicleKeeper\Settings\Application\Service\ImportSettings;
-use ChronicleKeeper\Settings\Domain\Event\ExecuteImportPruning;
 use ChronicleKeeper\Test\Library\Domain\Entity\DirectoryBuilder;
 use ChronicleKeeper\Test\Shared\Infrastructure\Database\DatabaseTestCase;
 use Override;
@@ -52,7 +50,7 @@ class ImportPrunerTest extends DatabaseTestCase
 
         // ------------------- The test assertions -------------------
 
-        ($this->importPruner)(new ExecuteImportPruning(new ImportSettings()));
+        ($this->importPruner)();
 
         // ------------------- The test assertions -------------------
 

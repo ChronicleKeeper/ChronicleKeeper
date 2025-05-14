@@ -6,7 +6,7 @@ namespace ChronicleKeeper\Document\Application\Service\ImportExport;
 
 use ChronicleKeeper\Settings\Application\Service\Importer\SingleImport;
 use ChronicleKeeper\Settings\Application\Service\ImportSettings;
-use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
+use Doctrine\DBAL\Connection;
 use League\Flysystem\FileAttributes;
 use League\Flysystem\Filesystem;
 use Psr\Log\LoggerInterface;
@@ -20,7 +20,7 @@ use const JSON_THROW_ON_ERROR;
 final readonly class DocumentImporter implements SingleImport
 {
     public function __construct(
-        private DatabasePlatform $databasePlatform,
+        private Connection $connection,
         private LoggerInterface $logger,
     ) {
     }
@@ -57,25 +57,54 @@ final readonly class DocumentImporter implements SingleImport
             return;
         }
 
-        $this->databasePlatform->createQueryBuilder()->createInsert()
-            ->asReplace()
-            ->insert('documents')
-            ->values([
-                'id' => $content['id'],
-                'title' => $content['title'],
-                'content' => $content['content'],
-                'directory' => $content['directory'],
-                'last_updated' => $content['last_updated'],
-            ])
-            ->execute();
+        // Using upsert by checking if document exists first
+        if ($this->hasDocument($content['id'])) {
+            $this->connection->createQueryBuilder()
+                ->update('documents')
+                ->set('title', ':title')
+                ->set('content', ':content')
+                ->set('directory', ':directory')
+                ->set('last_updated', ':lastUpdated')
+                ->where('id = :id')
+                ->setParameters([
+                    'id' => $content['id'],
+                    'title' => $content['title'],
+                    'content' => $content['content'],
+                    'directory' => $content['directory'],
+                    'lastUpdated' => $content['last_updated'],
+                ])
+                ->executeStatement();
+        } else {
+            $this->connection->createQueryBuilder()
+                ->insert('documents')
+                ->values([
+                    'id' => ':id',
+                    'title' => ':title',
+                    'content' => ':content',
+                    'directory' => ':directory',
+                    'last_updated' => ':lastUpdated',
+                ])
+                ->setParameters([
+                    'id' => $content['id'],
+                    'title' => $content['title'],
+                    'content' => $content['content'],
+                    'directory' => $content['directory'],
+                    'lastUpdated' => $content['last_updated'],
+                ])
+                ->executeStatement();
+        }
     }
 
     private function hasDocument(string $id): bool
     {
-        return $this->databasePlatform->createQueryBuilder()->createSelect()
+        $result = $this->connection->createQueryBuilder()
             ->select('id')
             ->from('documents')
-            ->where('id', '=', $id)
-            ->fetchOneOrNull() !== null;
+            ->where('id = :id')
+            ->setParameter('id', $id)
+            ->executeQuery()
+            ->fetchOne();
+
+        return $result !== false;
     }
 }

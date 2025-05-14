@@ -5,14 +5,12 @@ declare(strict_types=1);
 namespace ChronicleKeeper\Shared\Presentation\Command;
 
 use ChronicleKeeper\Shared\Infrastructure\Database\Schema\SchemaManager;
-use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\Filesystem\Filesystem;
 use Throwable;
 
 #[AsCommand(
@@ -22,10 +20,7 @@ use Throwable;
 final class InitializeDatabaseCommand extends Command
 {
     public function __construct(
-        private readonly string $databasePath,
-        private readonly Filesystem $filesystem,
         private readonly SchemaManager $schemaManager,
-        private readonly LoggerInterface $logger,
     ) {
         parent::__construct();
     }
@@ -45,14 +40,6 @@ final class InitializeDatabaseCommand extends Command
         $io = new SymfonyStyle($input, $output);
         $io->title('Initializing Chronicle Keeper Database');
 
-        $filename = $this->databasePath;
-        if ($this->filesystem->exists($filename) && $input->getOption('force') === false) {
-            $io->warning('Database already exists at "' . $filename . '". You could overwrite it with the -f option.');
-
-            return self::FAILURE;
-        }
-
-        $this->logger->debug('Removing existing database file at "' . $filename . '".');
         try {
             $this->schemaManager->dropSchema();
             $this->schemaManager->createSchema();
@@ -64,7 +51,7 @@ final class InitializeDatabaseCommand extends Command
         }
 
         $io->writeln('');
-        $io->success('Database was created and successfully stored at "' . $filename . '".');
+        $io->success('Database was created.');
 
         return self::SUCCESS;
     }

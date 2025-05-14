@@ -4,34 +4,39 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\World\Application\Command;
 
-use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
+use Doctrine\DBAL\Connection;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler]
 class RemoveItemRelationHandler
 {
-    public function __construct(private readonly DatabasePlatform $platform)
+    public function __construct(private readonly Connection $connection)
     {
     }
 
     public function __invoke(RemoveItemRelation $itemRelation): void
     {
-        $this->platform->query(
-            <<<'SQL'
-                DELETE FROM
-                       world_item_relations
-                WHERE
-                    (
-                        (source_world_item_id = :source_world_item_id AND target_world_item_id = :target_world_item_id)
-                        OR (source_world_item_id = :target_world_item_id AND target_world_item_id = :source_world_item_id)
-                    )
-                    AND relation_type = :relation_type
-            SQL,
-            [
-                'source_world_item_id' => $itemRelation->sourceItemId,
-                'target_world_item_id' => $itemRelation->targetItemId,
-                'relation_type' => $itemRelation->relationType,
-            ],
-        );
+        $queryBuilder = $this->connection->createQueryBuilder();
+        $expr         = $queryBuilder->expr();
+
+        $queryBuilder
+            ->delete('world_item_relations')
+            ->where(
+                $expr->or(
+                    $expr->and(
+                        $expr->eq('source_world_item_id', ':source_world_item_id'),
+                        $expr->eq('target_world_item_id', ':target_world_item_id'),
+                    ),
+                    $expr->and(
+                        $expr->eq('source_world_item_id', ':target_world_item_id'),
+                        $expr->eq('target_world_item_id', ':source_world_item_id'),
+                    ),
+                ),
+            )
+            ->andWhere($expr->eq('relation_type', ':relation_type'))
+            ->setParameter('source_world_item_id', $itemRelation->sourceItemId)
+            ->setParameter('target_world_item_id', $itemRelation->targetItemId)
+            ->setParameter('relation_type', $itemRelation->relationType)
+            ->executeStatement();
     }
 }

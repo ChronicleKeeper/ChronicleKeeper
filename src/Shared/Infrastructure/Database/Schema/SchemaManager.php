@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Shared\Infrastructure\Database\Schema;
 
-use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
+use Doctrine\DBAL\Connection;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
@@ -24,7 +24,7 @@ class SchemaManager
      * @param iterable<DataProvider>   $dataProviders
      */
     public function __construct(
-        private readonly DatabasePlatform $platform,
+        private readonly Connection $connection,
         #[AutowireIterator('chronicle_keeper.schema_provider')]
         private readonly iterable $schemaProviders,
         #[AutowireIterator('chronicle_keeper.data_provider')]
@@ -37,7 +37,7 @@ class SchemaManager
     public function createSchema(array $onlySchemaProviders = []): void
     {
         try {
-            $this->platform->beginTransaction();
+            $this->connection->beginTransaction();
 
             $providers = iterator_to_array($this->schemaProviders);
             usort($providers, static fn (
@@ -51,7 +51,7 @@ class SchemaManager
                 }
 
                 $this->logger->debug('Creating schema with provider ' . $schemaProvider::class);
-                $schemaProvider->createSchema($this->platform);
+                $schemaProvider->createSchema($this->connection);
             }
 
             $providers = iterator_to_array($this->dataProviders);
@@ -59,12 +59,12 @@ class SchemaManager
 
             foreach ($providers as $dataProvider) {
                 $this->logger->debug('Loading data with provider ' . $dataProvider::class);
-                $dataProvider->loadData($this->platform);
+                $dataProvider->loadData($this->connection);
             }
 
-            $this->platform->commit();
+            $this->connection->commit();
         } catch (Throwable $e) {
-            $this->platform->rollback();
+            $this->connection->rollBack();
 
             throw $e;
         }
@@ -73,7 +73,13 @@ class SchemaManager
     /** @return array<int, string> */
     public function getTables(): array
     {
-        $tables = $this->platform->fetch('SELECT tablename FROM pg_tables WHERE schemaname = :schema', ['schema' => 'public']);
+        $queryBuilder = $this->connection->createQueryBuilder()
+            ->select('tablename')
+            ->from('pg_tables')
+            ->where('schemaname = :schema')
+            ->setParameter('schema', 'public');
+
+        $tables = $queryBuilder->executeQuery()->fetchAllAssociative();
 
         return array_column($tables, 'tablename');
     }
@@ -81,50 +87,34 @@ class SchemaManager
     public function dropSchema(): void
     {
         try {
-            $this->platform->beginTransaction();
+            $this->connection->beginTransaction();
 
-            // Disable triggers temporarily
-            $this->platform->executeRaw('SET session_replication_role = replica;');
+            // Check if the schema exists before attempting to drop it
+            $schemaExists = $this->connection->executeQuery("
+            SELECT EXISTS (
+                SELECT 1 FROM information_schema.schemata WHERE schema_name = 'public'
+            )
+        ")->fetchOne();
 
-            // Drop all objects in correct order
-            $this->platform->executeRaw("
-                DO $$
-                DECLARE
-                    _sql text;
-                BEGIN
-                    -- Drop Views
-                    FOR _sql IN
-                        SELECT 'DROP VIEW IF EXISTS ' || quote_ident(schemaname) || '.' || quote_ident(viewname) || ' CASCADE'
-                        FROM pg_views WHERE schemaname = 'public'
-                    LOOP
-                        EXECUTE _sql;
-                    END LOOP;
+            if ($schemaExists !== false) {
+                $this->logger->debug('Public schema exists, dropping it');
+                $this->connection->executeStatement('
+                DROP SCHEMA public CASCADE;
+                CREATE SCHEMA public;
+                GRANT ALL ON SCHEMA public TO PUBLIC;
+            ');
+            } else {
+                $this->logger->debug('Public schema does not exist, creating it');
+                $this->connection->executeStatement('
+                CREATE SCHEMA IF NOT EXISTS public;
+                GRANT ALL ON SCHEMA public TO PUBLIC;
+            ');
+            }
 
-                    -- Drop Tables
-                    FOR _sql IN
-                        SELECT 'DROP TABLE IF EXISTS ' || quote_ident(schemaname) || '.' || quote_ident(tablename) || ' CASCADE'
-                        FROM pg_tables WHERE schemaname = 'public'
-                    LOOP
-                        EXECUTE _sql;
-                    END LOOP;
-
-                    -- Drop Types
-                    FOR _sql IN
-                        SELECT 'DROP TYPE IF EXISTS ' || quote_ident(t.typname) || ' CASCADE'
-                        FROM pg_type t JOIN pg_namespace n ON (t.typnamespace = n.oid)
-                        WHERE n.nspname = 'public' AND t.typtype = 'c'
-                    LOOP
-                        EXECUTE _sql;
-                    END LOOP;
-                END $$;
-            ");
-
-            // Reset triggers
-            $this->platform->executeRaw('SET session_replication_role = DEFAULT;');
-
-            $this->platform->commit();
+            $this->connection->commit();
         } catch (Throwable $e) {
-            $this->platform->rollback();
+            $this->connection->rollBack();
+            $this->logger->error('Schema drop failed: ' . $e->getMessage());
 
             throw $e;
         }
