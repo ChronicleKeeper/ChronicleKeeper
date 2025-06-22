@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace ChronicleKeeper\Chat\Application\Event;
 
 use ChronicleKeeper\Settings\Domain\Event\ExecuteImportPruning;
-use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\PathRegistry;
+use Doctrine\DBAL\Connection;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\Filesystem\Filesystem;
@@ -17,7 +17,7 @@ use const DIRECTORY_SEPARATOR;
 class ImportPruner
 {
     public function __construct(
-        private readonly DatabasePlatform $databasePlatform,
+        private readonly Connection $connection,
         private readonly PathRegistry $pathRegistry,
         private readonly Filesystem $filesystem,
         private readonly LoggerInterface $logger,
@@ -34,9 +34,10 @@ class ImportPruner
             ],
         );
 
-        $this->databasePlatform->createQueryBuilder()->createDelete()->from('conversation_settings')->execute();
-        $this->databasePlatform->createQueryBuilder()->createDelete()->from('conversation_messages')->execute();
-        $this->databasePlatform->createQueryBuilder()->createDelete()->from('conversations')->execute();
+        // Delete in reverse order to avoid foreign key constraints
+        $this->connection->executeStatement('DELETE FROM conversation_settings');
+        $this->connection->executeStatement('DELETE FROM conversation_messages');
+        $this->connection->executeStatement('DELETE FROM conversations');
 
         $temporaryConversationFile = $this->pathRegistry->get('temp')
             . DIRECTORY_SEPARATOR

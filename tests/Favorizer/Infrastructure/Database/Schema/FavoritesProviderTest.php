@@ -17,7 +17,7 @@ class FavoritesProviderTest extends SchemaProviderTestCase
     #[Test]
     public function itCreatesTheSchema(): void
     {
-        (new FavoritesProvider())->createSchema($this->databasePlatform);
+        (new FavoritesProvider())->createSchema($this->connection);
 
         $tables = $this->schemaManager->getTables();
 

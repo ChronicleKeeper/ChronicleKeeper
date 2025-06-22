@@ -5,42 +5,48 @@ declare(strict_types=1);
 namespace ChronicleKeeper\Chat\Application\Command;
 
 use ChronicleKeeper\Chat\Domain\Event\ConversationDeleted;
-use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
-use ChronicleKeeper\Shared\Infrastructure\Database\Exception\DatabaseQueryException;
 use ChronicleKeeper\Shared\Infrastructure\Messenger\MessageEventResult;
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Exception;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler]
 class DeleteConversationHandler
 {
     public function __construct(
-        private readonly DatabasePlatform $databasePlatform,
+        private readonly Connection $connection,
     ) {
     }
 
     public function __invoke(DeleteConversation $message): MessageEventResult
     {
         try {
-            $this->databasePlatform->beginTransaction();
+            $this->connection->beginTransaction();
 
-            $this->databasePlatform->createQueryBuilder()->createDelete()
-                ->from('conversation_settings')
-                ->where('conversation_id', '=', $message->conversation->getId())
-                ->execute();
+            // Delete conversation settings
+            $this->connection->createQueryBuilder()
+                ->delete('conversation_settings')
+                ->where('conversation_id = :conversationId')
+                ->setParameter('conversationId', $message->conversation->getId())
+                ->executeStatement();
 
-            $this->databasePlatform->createQueryBuilder()->createDelete()
-                ->from('conversation_messages')
-                ->where('conversation_id', '=', $message->conversation->getId())
-                ->execute();
+            // Delete conversation messages
+            $this->connection->createQueryBuilder()
+                ->delete('conversation_messages')
+                ->where('conversation_id = :conversationId')
+                ->setParameter('conversationId', $message->conversation->getId())
+                ->executeStatement();
 
-            $this->databasePlatform->createQueryBuilder()->createDelete()
-                ->from('conversations')
-                ->where('id', '=', $message->conversation->getId())
-                ->execute();
+            // Delete conversation
+            $this->connection->createQueryBuilder()
+                ->delete('conversations')
+                ->where('id = :conversationId')
+                ->setParameter('conversationId', $message->conversation->getId())
+                ->executeStatement();
 
-            $this->databasePlatform->commit();
-        } catch (DatabaseQueryException $e) {
-            $this->databasePlatform->rollback();
+            $this->connection->commit();
+        } catch (Exception $e) {
+            $this->connection->rollBack();
 
             throw $e;
         }

@@ -4,33 +4,21 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Document\Infrastructure\Database\Schema;
 
-use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
-use ChronicleKeeper\Shared\Infrastructure\Database\PgSql\PgSqlDatabasePlatform;
 use ChronicleKeeper\Shared\Infrastructure\Database\Schema\DefaultSchemaProvider;
+use Doctrine\DBAL\Connection;
+use Override;
 
 final class DocumentVectorProvider extends DefaultSchemaProvider
 {
-    public function createSchema(DatabasePlatform $platform): void
+    #[Override]
+    public function createSchema(Connection $connection): void
     {
-        if ($platform instanceof PgSqlDatabasePlatform) {
-            $platform->executeRaw(<<<'SQL'
-                CREATE TABLE documents_vectors (
-                    document_id uuid NOT NULL,
-                    embedding vector(1536) NOT NULL,
-                    content text NOT NULL,
-                    "vectorContentHash" text NOT NULL
-                );
-            SQL);
-
-            return;
-        }
-
-        $platform->executeRaw(<<<'SQL'
-            create virtual table documents_vectors using vec0(
-                document_id text partition key,
-                embedding float[1536] distance_metric=cosine,
-                +content text,
-                +vectorContentHash text
+        $connection->executeStatement(<<<'SQL'
+            CREATE TABLE IF NOT EXISTS documents_vectors (
+                document_id uuid NOT NULL,
+                embedding vector(1536) NOT NULL,
+                content text NOT NULL,
+                "vectorContentHash" text NOT NULL
             );
         SQL);
     }

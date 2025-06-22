@@ -34,7 +34,7 @@ final class WorldItemProviderTest extends SchemaProviderTestCase
     #[Test]
     public function itCreatesTheSchema(): void
     {
-        (new WorldItemProvider())->createSchema($this->databasePlatform);
+        (new WorldItemProvider())->createSchema($this->connection);
 
         $tables = $this->schemaManager->getTables();
 

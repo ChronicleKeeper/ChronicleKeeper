@@ -7,7 +7,7 @@ namespace ChronicleKeeper\ImageGenerator\Application\Query;
 use ChronicleKeeper\ImageGenerator\Domain\Entity\GeneratorRequest;
 use ChronicleKeeper\Shared\Application\Query\Query;
 use ChronicleKeeper\Shared\Application\Query\QueryParameters;
-use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
+use Doctrine\DBAL\Connection;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 use function json_decode;
@@ -18,23 +18,41 @@ final readonly class FindAllGeneratorRequestsQuery implements Query
 {
     public function __construct(
         private DenormalizerInterface $denormalizer,
-        private DatabasePlatform $databasePlatform,
+        private Connection $connection,
     ) {
     }
 
     /** @return list<GeneratorRequest> */
     public function query(QueryParameters $parameters): array
     {
-        $files = $this->databasePlatform->createQueryBuilder()->createSelect()
+        $results = $this->fetchGeneratorRequests();
+
+        return $this->hydrateResults($results);
+    }
+
+    /** @return array<int, array<string, mixed>> */
+    private function fetchGeneratorRequests(): array
+    {
+        return $this->connection->createQueryBuilder()
+            ->select('*')
             ->from('generator_requests')
             ->orderBy('title')
-            ->fetchAll();
+            ->executeQuery()
+            ->fetchAllAssociative();
+    }
 
+    /**
+     * @param array<int, array<string, mixed>> $results
+     *
+     * @return list<GeneratorRequest>
+     */
+    private function hydrateResults(array $results): array
+    {
         $requests = [];
-        foreach ($files as $file) {
-            $file['userInput'] = json_decode((string) $file['userInput'], true, 512, JSON_THROW_ON_ERROR);
 
-            $requests[] = $this->denormalizer->denormalize($file, GeneratorRequest::class);
+        foreach ($results as $result) {
+            $result['userInput'] = json_decode((string) $result['userInput'], true, 512, JSON_THROW_ON_ERROR);
+            $requests[]          = $this->denormalizer->denormalize($result, GeneratorRequest::class);
         }
 
         return $requests;

@@ -8,7 +8,7 @@ use ChronicleKeeper\Favorizer\Domain\TargetBag;
 use ChronicleKeeper\Favorizer\Domain\ValueObject\Target;
 use ChronicleKeeper\Shared\Application\Query\Query;
 use ChronicleKeeper\Shared\Application\Query\QueryParameters;
-use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
+use Doctrine\DBAL\Connection;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 use function assert;
@@ -18,7 +18,7 @@ final class GetTargetBagQuery implements Query
 {
     public function __construct(
         private readonly DenormalizerInterface $denormalizer,
-        private readonly DatabasePlatform $databasePlatform,
+        private readonly Connection $connection,
     ) {
     }
 
@@ -26,10 +26,12 @@ final class GetTargetBagQuery implements Query
     {
         assert($parameters instanceof GetTargetBag);
 
-        $content = $this->databasePlatform->createQueryBuilder()->createSelect()
+        $content = $this->connection->createQueryBuilder()
+            ->select('*')
             ->from('favorites')
             ->orderBy('title')
-            ->fetchAll();
+            ->executeQuery()
+            ->fetchAllAssociative();
 
         if (count($content) === 0) {
             return new TargetBag();

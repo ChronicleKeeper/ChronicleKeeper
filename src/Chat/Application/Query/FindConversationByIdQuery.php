@@ -10,7 +10,7 @@ use ChronicleKeeper\Settings\Application\SettingsHandler;
 use ChronicleKeeper\Shared\Application\Query\Query;
 use ChronicleKeeper\Shared\Application\Query\QueryParameters;
 use ChronicleKeeper\Shared\Infrastructure\Database\Converter\DatabaseRowConverter;
-use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
+use Doctrine\DBAL\Connection;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 use function assert;
@@ -20,8 +20,8 @@ class FindConversationByIdQuery implements Query
     public function __construct(
         private readonly DenormalizerInterface $denormalizer,
         private readonly SettingsHandler $settingsHandler,
-        private readonly DatabasePlatform $databasePlatform,
         private readonly DatabaseRowConverter $databaseRowConverter,
+        private readonly Connection $connection,
     ) {
     }
 
@@ -29,12 +29,14 @@ class FindConversationByIdQuery implements Query
     {
         assert($parameters instanceof FindConversationByIdParameters);
 
-        $data = $this->databasePlatform->createQueryBuilder()->createSelect()
+        $data = $this->connection->createQueryBuilder()
+            ->select('*')
             ->from('conversations')
-            ->where('id', '=', $parameters->id)
-            ->fetchOneOrNull();
+            ->where('id = :id')
+            ->setParameter('id', $parameters->id)
+            ->fetchAssociative();
 
-        if ($data === null) {
+        if ($data === false) {
             return null;
         }
 

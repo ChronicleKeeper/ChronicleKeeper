@@ -11,12 +11,11 @@ use ChronicleKeeper\Settings\Application\Service\Exporter\ExportSettings;
 use ChronicleKeeper\Settings\Application\Service\Exporter\SingleExport;
 use ChronicleKeeper\Settings\Application\Service\Exporter\Type;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
-use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
+use Doctrine\DBAL\Connection;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 use ZipArchive;
 
-use function array_column;
 use function assert;
 use function count;
 
@@ -28,25 +27,26 @@ final readonly class ConversationExporter implements SingleExport
     public function __construct(
         private QueryService $queryService,
         private SerializerInterface $serializer,
-        private DatabasePlatform $databasePlatform,
+        private Connection $connection,
         private LoggerInterface $logger,
     ) {
     }
 
     public function export(ZipArchive $archive, ExportSettings $exportSettings): void
     {
-        $conversationIdentifier = $this->databasePlatform->createQueryBuilder()->createSelect()
+        $conversationIdentifiers = $this->connection->createQueryBuilder()
             ->select('id')
             ->from('conversations')
-            ->fetchAll();
+            ->executeQuery()
+            ->fetchFirstColumn();
 
-        if (count($conversationIdentifier) === 0) {
+        if (count($conversationIdentifiers) === 0) {
             $this->logger->debug('No conversations found, skipping export.');
 
             return;
         }
 
-        foreach (array_column($conversationIdentifier, 'id') as $identifier) {
+        foreach ($conversationIdentifiers as $identifier) {
             $conversation = $this->queryService->query(new FindConversationByIdParameters($identifier));
             assert($conversation instanceof Conversation);
 

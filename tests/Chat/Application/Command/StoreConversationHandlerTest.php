@@ -34,7 +34,6 @@ final class StoreConversationHandlerTest extends DatabaseTestCase
 
         $handler = self::getContainer()->get(StoreConversationHandler::class);
         assert($handler instanceof StoreConversationHandler);
-
         $this->handler = $handler;
     }
 
@@ -43,7 +42,7 @@ final class StoreConversationHandlerTest extends DatabaseTestCase
     {
         parent::tearDown();
 
-        unset($this->handler);
+        unset($this->handler, $this->connection);
     }
 
     #[Test]
@@ -66,18 +65,22 @@ final class StoreConversationHandlerTest extends DatabaseTestCase
 
         ($this->handler)(new StoreConversation($conversation));
 
-        // Assert the data is in the database
-        $entry = $this->databasePlatform->createQueryBuilder()->createSelect()
+        // Assert the data is in the database using Doctrine DBAL
+        $queryBuilder = $this->connection->createQueryBuilder();
+        $result       = $queryBuilder
+            ->select('*')
             ->from('conversations')
-            ->where('id', '=', '123e4567-e89b-12d3-a456-426614174000')
-            ->fetchOneOrNull();
+            ->where('id = :id')
+            ->setParameter('id', '123e4567-e89b-12d3-a456-426614174000')
+            ->executeQuery()
+            ->fetchAssociative();
 
-        self::assertIsArray($entry);
-        self::assertSame('123e4567-e89b-12d3-a456-426614174000', $entry['id']);
-        self::assertSame('Test conversation', $entry['title']);
+        self::assertIsArray($result);
+        self::assertSame('123e4567-e89b-12d3-a456-426614174000', $result['id']);
+        self::assertSame('Test conversation', $result['title']);
 
-        $this->assertRowsInTable('conversation_messages', 3);
-        $this->assertRowsInTable('conversation_settings', 1);
+        $this->assertMessageCount(3);
+        $this->assertSettingsCount(1);
     }
 
     #[Test]
@@ -91,5 +94,35 @@ final class StoreConversationHandlerTest extends DatabaseTestCase
         $command = new StoreConversation($conversation);
 
         self::assertSame($conversation, $command->conversation);
+    }
+
+    /**
+     * Assert the number of rows in the conversation_messages table
+     */
+    private function assertMessageCount(int $expectedCount): void
+    {
+        $queryBuilder = $this->connection->createQueryBuilder();
+        $count        = (int) $queryBuilder
+            ->select('COUNT(*)')
+            ->from('conversation_messages')
+            ->executeQuery()
+            ->fetchOne();
+
+        self::assertSame($expectedCount, $count);
+    }
+
+    /**
+     * Assert the number of rows in the conversation_settings table
+     */
+    private function assertSettingsCount(int $expectedCount): void
+    {
+        $queryBuilder = $this->connection->createQueryBuilder();
+        $count        = (int) $queryBuilder
+            ->select('COUNT(*)')
+            ->from('conversation_settings')
+            ->executeQuery()
+            ->fetchOne();
+
+        self::assertSame($expectedCount, $count);
     }
 }

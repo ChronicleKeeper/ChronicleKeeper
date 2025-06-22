@@ -7,8 +7,6 @@ namespace ChronicleKeeper\Test\Image\Application\Event;
 use ChronicleKeeper\Image\Application\Command\StoreImage;
 use ChronicleKeeper\Image\Application\Command\StoreImageVectors;
 use ChronicleKeeper\Image\Application\Event\ImportPruner;
-use ChronicleKeeper\Settings\Application\Service\ImportSettings;
-use ChronicleKeeper\Settings\Domain\Event\ExecuteImportPruning;
 use ChronicleKeeper\Test\Image\Domain\Entity\ImageBuilder;
 use ChronicleKeeper\Test\Image\Domain\Entity\VectorImageBuilder;
 use ChronicleKeeper\Test\Shared\Infrastructure\Database\DatabaseTestCase;
@@ -57,7 +55,7 @@ class ImportPrunerTest extends DatabaseTestCase
 
         // ------------------- The test assertions -------------------
 
-        ($this->importPruner)(new ExecuteImportPruning(new ImportSettings()));
+        ($this->importPruner)();
 
         // ------------------- The test assertions -------------------
 

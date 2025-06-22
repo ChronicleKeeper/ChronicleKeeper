@@ -112,7 +112,7 @@ jobs:
       - name: Setup Database Config
         run: |
           cp .env.test.dist .env.test
-          echo "DATABASE_CONNECTION=pgsql:host=localhost;port=5432;dbname=chronicle-keeper;user=app;password=app" >> .env.test
+          echo "DATABASE_URL=pgsql://app:app@localhost:5432/chronicle-keeper?serverVersion=15&charset=utf8" >> .env.test
 
       - uses: "ramsey/composer-install@v3"
 

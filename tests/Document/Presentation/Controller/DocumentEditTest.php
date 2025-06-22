@@ -30,7 +30,6 @@ use function assert;
 use function mt_getrandmax;
 use function mt_rand;
 use function range;
-use function reset;
 
 #[CoversClass(DocumentEdit::class)]
 #[CoversClass(DocumentType::class)]
@@ -47,16 +46,14 @@ class DocumentEditTest extends WebTestCase
         parent::setUp();
 
         $this->fixtureDocument = (new DocumentBuilder())->build();
-        $this->databasePlatform->createQueryBuilder()->createInsert()
-            ->insert('documents')
-            ->values([
-                'id'          => $this->fixtureDocument->getId(),
-                'title'       => $this->fixtureDocument->getTitle(),
-                'content'     => $this->fixtureDocument->getContent(),
-                'directory'   => $this->fixtureDocument->getDirectory()->getId(),
-                'last_updated' => $this->fixtureDocument->getUpdatedAt()->format('Y-m-d H:i:s'),
-            ])
-            ->execute();
+
+        $this->connection->insert('documents', [
+            'id' => $this->fixtureDocument->getId(),
+            'title' => $this->fixtureDocument->getTitle(),
+            'content' => $this->fixtureDocument->getContent(),
+            'directory' => $this->fixtureDocument->getDirectory()->getId(),
+            'last_updated' => $this->fixtureDocument->getUpdatedAt()->format('Y-m-d H:i:s'),
+        ]);
     }
 
     #[Override]
@@ -126,11 +123,17 @@ class DocumentEditTest extends WebTestCase
 
         self::assertResponseRedirects('/library');
 
-        // Check the new document is stored
-        $documents = $this->databasePlatform->fetch('SELECT * FROM documents');
+        // Check the edited document using Doctrine DBAL
+        $queryBuilder = $this->connection->createQueryBuilder();
+        $documents    = $queryBuilder
+            ->select('*')
+            ->from('documents')
+            ->executeQuery()
+            ->fetchAllAssociative();
+
         self::assertCount(1, $documents);
 
-        $document = reset($documents);
+        $document = $documents[0];
         self::assertStringContainsString('Test Edited Title', $document['title']);
         self::assertStringContainsString('Test Edited Content', $document['content']);
     }

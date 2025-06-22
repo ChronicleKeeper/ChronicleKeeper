@@ -7,7 +7,7 @@ namespace ChronicleKeeper\Image\Application\Query;
 use ChronicleKeeper\Image\Domain\Entity\Image;
 use ChronicleKeeper\Shared\Application\Query\Query;
 use ChronicleKeeper\Shared\Application\Query\QueryParameters;
-use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
+use Doctrine\DBAL\Connection;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 use function array_map;
@@ -16,7 +16,7 @@ use function assert;
 class FindAllImagesQuery implements Query
 {
     public function __construct(
-        private readonly DatabasePlatform $databasePlatform,
+        private readonly Connection $connection,
         private readonly DenormalizerInterface $denormalizer,
     ) {
     }
@@ -26,10 +26,12 @@ class FindAllImagesQuery implements Query
     {
         assert($parameters instanceof FindAllImages);
 
-        $images = $this->databasePlatform->createQueryBuilder()->createSelect()
+        $images = $this->connection->createQueryBuilder()
+            ->select('*')
             ->from('images')
             ->orderBy('title')
-            ->fetchAll();
+            ->executeQuery()
+            ->fetchAllAssociative();
 
         return array_map(
             fn (array $image) => $this->denormalizer->denormalize($image, Image::class),

@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace ChronicleKeeper\Document\Application\Command;
 
 use ChronicleKeeper\Document\Domain\Event\DocumentDeleted;
-use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
 use ChronicleKeeper\Shared\Infrastructure\Messenger\MessageEventResult;
+use Doctrine\DBAL\Connection;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Messenger\MessageBusInterface;
 
@@ -15,7 +15,7 @@ class DeleteDocumentHandler
 {
     public function __construct(
         private readonly MessageBusInterface $bus,
-        private readonly DatabasePlatform $databasePlatform,
+        private readonly Connection $connection,
     ) {
     }
 
@@ -23,10 +23,11 @@ class DeleteDocumentHandler
     {
         $this->bus->dispatch(new DeleteDocumentVectors($command->document->getId()));
 
-        $this->databasePlatform->createQueryBuilder()->createDelete()
-            ->from('documents')
-            ->where('id', '=', $command->document->getId())
-            ->execute();
+        $this->connection->createQueryBuilder()
+            ->delete('documents')
+            ->where('id = :id')
+            ->setParameter('id', $command->document->getId())
+            ->executeStatement();
 
         return new MessageEventResult([new DocumentDeleted($command->document)]);
     }

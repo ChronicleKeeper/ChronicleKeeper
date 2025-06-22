@@ -33,7 +33,6 @@ use function json_encode;
 use function mt_getrandmax;
 use function mt_rand;
 use function range;
-use function reset;
 
 use const JSON_THROW_ON_ERROR;
 
@@ -92,11 +91,17 @@ class DocumentCreationTest extends WebTestCase
 
         self::assertResponseRedirects('/library');
 
-        // Check the new document is stored
-        $documents = $this->databasePlatform->fetch('SELECT * FROM documents');
+        // Check the new document is stored using Doctrine DBAL
+        $queryBuilder = $this->connection->createQueryBuilder();
+        $documents    = $queryBuilder
+            ->select('*')
+            ->from('documents')
+            ->executeQuery()
+            ->fetchAllAssociative();
+
         self::assertCount(1, $documents);
 
-        $document = reset($documents);
+        $document = $documents[0];
         self::assertStringContainsString('Test Title', $document['title']);
         self::assertStringContainsString('Test Content', $document['content']);
     }
@@ -141,39 +146,31 @@ class DocumentCreationTest extends WebTestCase
         $fileAccess = $this->client->getContainer()->get(FileAccess::class);
         assert($fileAccess instanceof FileAccessDouble);
 
-        $this->databasePlatform->createQueryBuilder()->createInsert()
-            ->insert('conversations')
-            ->values([
-                'id' => $conversation->getId(),
-                'title' => $conversation->getTitle(),
-                'directory' => $conversation->getDirectory()->getId(),
-            ])
-            ->execute();
+        // Insert conversation using Doctrine DBAL
+        $this->connection->insert('conversations', [
+            'id' => $conversation->getId(),
+            'title' => $conversation->getTitle(),
+            'directory' => $conversation->getDirectory()->getId(),
+        ]);
 
-        $this->databasePlatform->createQueryBuilder()->createInsert()
-            ->insert('conversation_settings')
-            ->values([
-                'conversation_id' => $conversation->getId(),
-                'version' => $conversation->getSettings()->version,
-                'temperature' => $conversation->getSettings()->temperature,
-                'images_max_distance' => $conversation->getSettings()->imagesMaxDistance,
-                'documents_max_distance' => $conversation->getSettings()->imagesMaxDistance,
-            ])
-            ->execute();
+        $this->connection->insert('conversation_settings', [
+            'conversation_id' => $conversation->getId(),
+            'version' => $conversation->getSettings()->version,
+            'temperature' => $conversation->getSettings()->temperature,
+            'images_max_distance' => $conversation->getSettings()->imagesMaxDistance,
+            'documents_max_distance' => $conversation->getSettings()->imagesMaxDistance,
+        ]);
 
         assert($message->message instanceof AssistantMessage);
 
-        $this->databasePlatform->createQueryBuilder()->createInsert()
-            ->insert('conversation_messages')
-            ->values([
-                'id' => $message->id,
-                'conversation_id' => $conversation->getId(),
-                'role' => $message->message->getRole()->value,
-                'content' => $message->message->content,
-                'context' => '{}',
-                'debug' => '{}',
-            ])
-            ->execute();
+        $this->connection->insert('conversation_messages', [
+            'id' => $message->id,
+            'conversation_id' => $conversation->getId(),
+            'role' => $message->message->getRole()->value,
+            'content' => $message->message->content,
+            'context' => '{}',
+            'debug' => '{}',
+        ]);
 
         $this->client->request(
             Request::METHOD_GET,

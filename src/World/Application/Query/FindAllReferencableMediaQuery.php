@@ -6,7 +6,7 @@ namespace ChronicleKeeper\World\Application\Query;
 
 use ChronicleKeeper\Shared\Application\Query\Query;
 use ChronicleKeeper\Shared\Application\Query\QueryParameters;
-use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
+use Doctrine\DBAL\Connection;
 
 use function assert;
 use function strtolower;
@@ -14,7 +14,7 @@ use function trim;
 
 class FindAllReferencableMediaQuery implements Query
 {
-    public function __construct(private readonly DatabasePlatform $databasePlatform)
+    public function __construct(private readonly Connection $connection)
     {
     }
 
@@ -24,8 +24,8 @@ class FindAllReferencableMediaQuery implements Query
         assert($parameters instanceof FindAllReferencableMedia);
 
         $foundMedia = $parameters->search === ''
-            ? $this->getFindAllQuery()
-            : $this->getFindAllBySearchTermQuery($parameters->search);
+            ? $this->findAllMedia()
+            : $this->findMediaBySearchTerm($parameters->search);
 
         $formattedMedia = [];
         foreach ($foundMedia as $media) {
@@ -39,9 +39,9 @@ class FindAllReferencableMediaQuery implements Query
     }
 
     /** @return array<array<string, string>> */
-    private function getFindAllQuery(): array
+    private function findAllMedia(): array
     {
-        $query = <<<'SQL'
+        $sql = <<<'SQL'
             SELECT 'document' as type, id, title FROM documents
             UNION
             SELECT 'image' as type, id, title FROM images
@@ -50,13 +50,13 @@ class FindAllReferencableMediaQuery implements Query
             ORDER BY title
         SQL;
 
-        return $this->databasePlatform->fetch($query);
+        return $this->connection->fetchAllAssociative($sql);
     }
 
     /** @return array<array<string, string>> */
-    private function getFindAllBySearchTermQuery(string $search): array
+    private function findMediaBySearchTerm(string $search): array
     {
-        $query = <<<'SQL'
+        $sql = <<<'SQL'
             SELECT 'document' as type, id, title FROM documents WHERE LOWER(title) LIKE :search
             UNION
             SELECT 'image' as type, id, title FROM images WHERE LOWER(title) LIKE :search
@@ -65,6 +65,9 @@ class FindAllReferencableMediaQuery implements Query
             ORDER BY title
         SQL;
 
-        return $this->databasePlatform->fetch($query, ['search' => '%' . strtolower($search) . '%']);
+        return $this->connection->fetchAllAssociative(
+            $sql,
+            ['search' => '%' . strtolower($search) . '%'],
+        );
     }
 }

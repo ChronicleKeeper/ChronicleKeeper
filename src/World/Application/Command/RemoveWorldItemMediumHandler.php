@@ -4,46 +4,34 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\World\Application\Command;
 
-use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
+use Doctrine\DBAL\Connection;
+use InvalidArgumentException;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler]
 class RemoveWorldItemMediumHandler
 {
-    public function __construct(private readonly DatabasePlatform $platform)
+    public function __construct(private readonly Connection $connection)
     {
     }
 
     public function __invoke(RemoveWorldItemMedium $command): void
     {
-        if ($command->mediumType === 'document') {
-            $this->platform->createQueryBuilder()->createDelete()
-                ->from('world_item_documents')
-                ->where('world_item_id', '=', $command->itemId)
-                ->where('document_id', '=', $command->mediumId)
-                ->execute();
+        $table = match ($command->mediumType) {
+            'document' => 'world_item_documents',
+            'image' => 'world_item_images',
+            'conversation' => 'world_item_conversations',
+            default => throw new InvalidArgumentException('Unknown medium type: ' . $command->mediumType),
+        };
 
-            return;
-        }
+        $columnName = $command->mediumType . '_id';
 
-        if ($command->mediumType === 'image') {
-            $this->platform->createQueryBuilder()->createDelete()
-                ->from('world_item_images')
-                ->where('world_item_id', '=', $command->itemId)
-                ->where('image_id', '=', $command->mediumId)
-                ->execute();
-
-            return;
-        }
-
-        if ($command->mediumType === 'conversation') {
-            $this->platform->createQueryBuilder()->createDelete()
-                ->from('world_item_conversations')
-                ->where('world_item_id', '=', $command->itemId)
-                ->where('conversation_id', '=', $command->mediumId)
-                ->execute();
-
-            return;
-        }
+        $this->connection->createQueryBuilder()
+            ->delete($table)
+            ->where('world_item_id = :itemId')
+            ->andWhere($columnName . ' = :mediumId')
+            ->setParameter('itemId', $command->itemId)
+            ->setParameter('mediumId', $command->mediumId)
+            ->executeStatement();
     }
 }

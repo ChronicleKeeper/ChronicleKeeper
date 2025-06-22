@@ -33,15 +33,35 @@ class WorldItemDeleteTest extends WebTestCase
             ->withName('Test Item')
             ->build();
 
-        $this->databasePlatform->createQueryBuilder()->createInsert()
-            ->insert('world_items')
-            ->values([
+        // Check if item already exists
+        $existingItem = $this->connection->createQueryBuilder()
+            ->select('id')
+            ->from('world_items')
+            ->where('id = :id')
+            ->setParameter('id', $this->item->getId())
+            ->executeQuery()
+            ->fetchAssociative();
+
+        if ($existingItem !== false) {
+            // Update existing item
+            $this->connection->update(
+                'world_items',
+                [
+                    'name' => $this->item->getName(),
+                    'type' => $this->item->getType()->value,
+                    'short_description' => $this->item->getShortDescription(),
+                ],
+                ['id' => $this->item->getId()],
+            );
+        } else {
+            // Insert new item
+            $this->connection->insert('world_items', [
                 'id' => $this->item->getId(),
                 'name' => $this->item->getName(),
                 'type' => $this->item->getType()->value,
                 'short_description' => $this->item->getShortDescription(),
-            ])
-            ->execute();
+            ]);
+        }
     }
 
     #[Override]
@@ -78,10 +98,14 @@ class WorldItemDeleteTest extends WebTestCase
         $this->client->followRedirect();
         self::assertSelectorTextContains('.alert-success', 'Der Eintrag wurde erfolgreich gelöscht.');
 
-        $items = $this->databasePlatform->fetch(
-            'SELECT * FROM world_items WHERE id = :id',
-            ['id' => $this->item->getId()],
-        );
+        $items = $this->connection->createQueryBuilder()
+            ->select('*')
+            ->from('world_items')
+            ->where('id = :id')
+            ->setParameter('id', $this->item->getId())
+            ->executeQuery()
+            ->fetchAllAssociative();
+
         self::assertEmpty($items);
     }
 
@@ -90,24 +114,55 @@ class WorldItemDeleteTest extends WebTestCase
     {
         $anotherItem = (new ItemBuilder())->withName('Test Item 2')->build();
 
-        $this->databasePlatform->createQueryBuilder()->createInsert()
-            ->insert('world_items')
-            ->values([
+        // Check if item already exists
+        $existingItem = $this->connection->createQueryBuilder()
+            ->select('id')
+            ->from('world_items')
+            ->where('id = :id')
+            ->setParameter('id', $anotherItem->getId())
+            ->executeQuery()
+            ->fetchAssociative();
+
+        if ($existingItem !== false) {
+            // Update existing item
+            $this->connection->update(
+                'world_items',
+                [
+                    'name' => $anotherItem->getName(),
+                    'type' => $anotherItem->getType()->value,
+                    'short_description' => $anotherItem->getShortDescription(),
+                ],
+                ['id' => $anotherItem->getId()],
+            );
+        } else {
+            // Insert new item
+            $this->connection->insert('world_items', [
                 'id' => $anotherItem->getId(),
                 'name' => $anotherItem->getName(),
                 'type' => $anotherItem->getType()->value,
                 'short_description' => $anotherItem->getShortDescription(),
-            ])
-            ->execute();
+            ]);
+        }
 
-        $this->databasePlatform->createQueryBuilder()->createInsert()
-            ->insert('world_item_relations')
-            ->values([
+        // Check if relation already exists
+        $existingRelation = $this->connection->createQueryBuilder()
+            ->select('source_world_item_id')
+            ->from('world_item_relations')
+            ->where('source_world_item_id = :source_id')
+            ->andWhere('target_world_item_id = :target_id')
+            ->setParameter('source_id', $this->item->getId())
+            ->setParameter('target_id', $anotherItem->getId())
+            ->executeQuery()
+            ->fetchAssociative();
+
+        if ($existingRelation === false) {
+            // Only insert if relation doesn't exist
+            $this->connection->insert('world_item_relations', [
                 'relation_type' => 'related',
                 'source_world_item_id' => $this->item->getId(),
                 'target_world_item_id' => $anotherItem->getId(),
-            ])
-            ->execute();
+            ]);
+        }
 
         $this->client->request(
             Request::METHOD_GET,
@@ -119,16 +174,26 @@ class WorldItemDeleteTest extends WebTestCase
         $this->client->followRedirect();
         self::assertSelectorTextContains('.alert-success', 'Der Eintrag wurde erfolgreich gelöscht.');
 
-        $relations = $this->databasePlatform->fetch(
-            'SELECT * FROM world_item_relations WHERE source_world_item_id = :id OR target_world_item_id = :id',
-            ['id' => $this->item->getId()],
-        );
-        self::assertEmpty($relations);
+        $sourceRelations = $this->connection->createQueryBuilder()
+            ->select('*')
+            ->from('world_item_relations')
+            ->where('source_world_item_id = :id')
+            ->orWhere('target_world_item_id = :id')
+            ->setParameter('id', $this->item->getId())
+            ->executeQuery()
+            ->fetchAllAssociative();
 
-        $relations = $this->databasePlatform->fetch(
-            'SELECT * FROM world_item_relations WHERE source_world_item_id = :id OR target_world_item_id = :id',
-            ['id' => $anotherItem->getId()],
-        );
-        self::assertEmpty($relations);
+        self::assertEmpty($sourceRelations);
+
+        $targetRelations = $this->connection->createQueryBuilder()
+            ->select('*')
+            ->from('world_item_relations')
+            ->where('source_world_item_id = :id')
+            ->orWhere('target_world_item_id = :id')
+            ->setParameter('id', $anotherItem->getId())
+            ->executeQuery()
+            ->fetchAllAssociative();
+
+        self::assertEmpty($targetRelations);
     }
 }

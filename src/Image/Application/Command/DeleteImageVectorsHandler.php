@@ -4,22 +4,23 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Image\Application\Command;
 
-use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
+use Doctrine\DBAL\Connection;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler]
 class DeleteImageVectorsHandler
 {
     public function __construct(
-        private readonly DatabasePlatform $platform,
+        private readonly Connection $connection,
     ) {
     }
 
     public function __invoke(DeleteImageVectors $command): void
     {
-        $this->platform->createQueryBuilder()->createDelete()
-            ->from('images_vectors')
-            ->where('image_id', '=', $command->imageId)
-            ->execute();
+        $this->connection->createQueryBuilder()
+            ->delete('images_vectors')
+            ->where('image_id = :imageId')
+            ->setParameter('imageId', $command->imageId)
+            ->executeStatement();
     }
 }

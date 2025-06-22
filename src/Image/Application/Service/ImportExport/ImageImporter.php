@@ -6,7 +6,7 @@ namespace ChronicleKeeper\Image\Application\Service\ImportExport;
 
 use ChronicleKeeper\Settings\Application\Service\Importer\SingleImport;
 use ChronicleKeeper\Settings\Application\Service\ImportSettings;
-use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
+use Doctrine\DBAL\Connection;
 use League\Flysystem\FileAttributes;
 use League\Flysystem\Filesystem;
 use Psr\Log\LoggerInterface;
@@ -20,7 +20,7 @@ use const JSON_THROW_ON_ERROR;
 final readonly class ImageImporter implements SingleImport
 {
     public function __construct(
-        private DatabasePlatform $databasePlatform,
+        private Connection $connection,
         private LoggerInterface $logger,
     ) {
     }
@@ -52,27 +52,64 @@ final readonly class ImageImporter implements SingleImport
 
         $this->logger->debug('Importing image.', ['image_id' => $content['id']]);
 
-        $this->databasePlatform->createQueryBuilder()->createInsert()
-            ->asReplace()
-            ->insert('images')
-            ->values([
-                'id' => $content['id'],
-                'title' => $content['title'],
-                'mime_type' => $content['mime_type'],
-                'encoded_image' => $content['encoded_image'],
-                'description' => $content['description'],
-                'directory' => $content['directory'],
-                'last_updated' => $content['last_updated'],
-            ])
-            ->execute();
+        // Check if image exists to determine if insert or update is needed
+        if ($this->hasImage($content['id'])) {
+            // Update existing image
+            $this->connection->createQueryBuilder()
+                ->update('images')
+                ->set('title', ':title')
+                ->set('mime_type', ':mime_type')
+                ->set('encoded_image', ':encoded_image')
+                ->set('description', ':description')
+                ->set('directory', ':directory')
+                ->set('last_updated', ':last_updated')
+                ->where('id = :id')
+                ->setParameters([
+                    'id' => $content['id'],
+                    'title' => $content['title'],
+                    'mime_type' => $content['mime_type'],
+                    'encoded_image' => $content['encoded_image'],
+                    'description' => $content['description'],
+                    'directory' => $content['directory'],
+                    'last_updated' => $content['last_updated'],
+                ])
+                ->executeStatement();
+        } else {
+            // Insert new image
+            $this->connection->createQueryBuilder()
+                ->insert('images')
+                ->values([
+                    'id' => ':id',
+                    'title' => ':title',
+                    'mime_type' => ':mime_type',
+                    'encoded_image' => ':encoded_image',
+                    'description' => ':description',
+                    'directory' => ':directory',
+                    'last_updated' => ':last_updated',
+                ])
+                ->setParameters([
+                    'id' => $content['id'],
+                    'title' => $content['title'],
+                    'mime_type' => $content['mime_type'],
+                    'encoded_image' => $content['encoded_image'],
+                    'description' => $content['description'],
+                    'directory' => $content['directory'],
+                    'last_updated' => $content['last_updated'],
+                ])
+                ->executeStatement();
+        }
     }
 
     private function hasImage(string $id): bool
     {
-        return $this->databasePlatform->createQueryBuilder()->createSelect()
+        $result = $this->connection->createQueryBuilder()
             ->select('id')
             ->from('images')
-            ->where('id', '=', $id)
-            ->fetchOneOrNull() !== null;
+            ->where('id = :id')
+            ->setParameter('id', $id)
+            ->executeQuery()
+            ->fetchOne();
+
+        return $result !== false;
     }
 }

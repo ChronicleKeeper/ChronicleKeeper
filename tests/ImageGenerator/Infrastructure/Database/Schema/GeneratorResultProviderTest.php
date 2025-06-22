@@ -17,7 +17,7 @@ class GeneratorResultProviderTest extends SchemaProviderTestCase
     #[Test]
     public function itCreatesTheSchema(): void
     {
-        (new GeneratorResultProvider())->createSchema($this->databasePlatform);
+        (new GeneratorResultProvider())->createSchema($this->connection);
 
         $tables = $this->schemaManager->getTables();
 

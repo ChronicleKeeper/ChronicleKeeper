@@ -8,7 +8,7 @@ use ChronicleKeeper\Chat\Application\Command\StoreConversation;
 use ChronicleKeeper\Chat\Domain\Entity\Conversation;
 use ChronicleKeeper\Settings\Application\Service\Importer\SingleImport;
 use ChronicleKeeper\Settings\Application\Service\ImportSettings;
-use ChronicleKeeper\Shared\Infrastructure\Database\DatabasePlatform;
+use Doctrine\DBAL\Connection;
 use League\Flysystem\FileAttributes;
 use League\Flysystem\Filesystem;
 use Psr\Log\LoggerInterface;
@@ -24,7 +24,7 @@ use const JSON_THROW_ON_ERROR;
 final readonly class ConversationImporter implements SingleImport
 {
     public function __construct(
-        private DatabasePlatform $databasePlatform,
+        private Connection $connection,
         private DenormalizerInterface $denormalizer,
         private MessageBusInterface $bus,
         private LoggerInterface $logger,
@@ -61,10 +61,14 @@ final readonly class ConversationImporter implements SingleImport
 
     private function hasConversation(string $id): bool
     {
-        return $this->databasePlatform->createQueryBuilder()->createSelect()
+        $result = $this->connection->createQueryBuilder()
             ->select('id')
             ->from('conversations')
-            ->where('id', '=', $id)
-            ->fetchOneOrNull() !== null;
+            ->where('id = :id')
+            ->setParameter('id', $id)
+            ->executeQuery()
+            ->fetchOne();
+
+        return $result !== false;
     }
 }
