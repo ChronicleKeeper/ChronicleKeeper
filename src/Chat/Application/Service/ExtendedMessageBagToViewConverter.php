@@ -7,11 +7,11 @@ namespace ChronicleKeeper\Chat\Application\Service;
 use ChronicleKeeper\Chat\Domain\Entity\ExtendedMessage;
 use ChronicleKeeper\Chat\Domain\Entity\ExtendedMessageBag;
 use ChronicleKeeper\Settings\Application\SettingsHandler;
-use PhpLlm\LlmChain\Model\Message\AssistantMessage;
-use PhpLlm\LlmChain\Model\Message\Content\Content;
-use PhpLlm\LlmChain\Model\Message\Content\Text;
-use PhpLlm\LlmChain\Model\Message\Role;
-use PhpLlm\LlmChain\Model\Message\UserMessage;
+use PhpLlm\LlmChain\Platform\Message\AssistantMessage;
+use PhpLlm\LlmChain\Platform\Message\Content\ContentInterface;
+use PhpLlm\LlmChain\Platform\Message\Content\Text;
+use PhpLlm\LlmChain\Platform\Message\Role;
+use PhpLlm\LlmChain\Platform\Message\UserMessage;
 
 use function array_column;
 use function array_filter;
@@ -48,7 +48,7 @@ class ExtendedMessageBagToViewConverter
             if ($originMessage instanceof UserMessage) {
                 $contentText = array_filter(
                     $originMessage->content,
-                    static fn (Content $entry) => $entry instanceof Text,
+                    static fn (ContentInterface $entry) => $entry instanceof Text,
                 );
                 $content     = implode(PHP_EOL, array_column($contentText, 'text'));
             } elseif ($originMessage instanceof AssistantMessage) {

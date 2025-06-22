@@ -6,12 +6,14 @@ namespace ChronicleKeeper\Chat\Application\Command;
 
 use ChronicleKeeper\Shared\Infrastructure\Messenger\MessageEventResult;
 use Doctrine\DBAL\Connection;
-use PhpLlm\LlmChain\Model\Message\AssistantMessage;
-use PhpLlm\LlmChain\Model\Message\SystemMessage;
-use PhpLlm\LlmChain\Model\Message\UserMessage;
+use PhpLlm\LlmChain\Platform\Message\AssistantMessage;
+use PhpLlm\LlmChain\Platform\Message\Content\Text;
+use PhpLlm\LlmChain\Platform\Message\SystemMessage;
+use PhpLlm\LlmChain\Platform\Message\UserMessage;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Throwable;
 
+use function assert;
 use function json_encode;
 
 use const JSON_THROW_ON_ERROR;
@@ -130,8 +132,10 @@ class StoreConversationHandler
                 if ($messageArray['message'] instanceof SystemMessage || $messageArray['message'] instanceof AssistantMessage) {
                     $messageContent = (string) $messageArray['message']->content;
                 } elseif ($messageArray['message'] instanceof UserMessage) {
-                    $messageContent = $messageArray['message']->jsonSerialize();
-                    $messageContent = $messageContent['content'];
+                    $content = $messageArray['message']->content[0];
+                    assert($content instanceof Text);
+
+                    $messageContent = $content->text;
                 }
 
                 $this->connection->createQueryBuilder()

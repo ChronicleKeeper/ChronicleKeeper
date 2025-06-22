@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Shared\Infrastructure\LLMChain\Serializer;
 
-use PhpLlm\LlmChain\Model\Message\AssistantMessage;
-use PhpLlm\LlmChain\Model\Message\Content\Content;
-use PhpLlm\LlmChain\Model\Message\Content\Image;
-use PhpLlm\LlmChain\Model\Message\Content\Text;
-use PhpLlm\LlmChain\Model\Message\MessageInterface;
-use PhpLlm\LlmChain\Model\Message\Role;
-use PhpLlm\LlmChain\Model\Message\SystemMessage;
-use PhpLlm\LlmChain\Model\Message\ToolCallMessage;
-use PhpLlm\LlmChain\Model\Message\UserMessage;
+use PhpLlm\LlmChain\Platform\Message\AssistantMessage;
+use PhpLlm\LlmChain\Platform\Message\Content\ContentInterface;
+use PhpLlm\LlmChain\Platform\Message\Content\ImageUrl;
+use PhpLlm\LlmChain\Platform\Message\Content\Text;
+use PhpLlm\LlmChain\Platform\Message\MessageInterface;
+use PhpLlm\LlmChain\Platform\Message\Role;
+use PhpLlm\LlmChain\Platform\Message\SystemMessage;
+use PhpLlm\LlmChain\Platform\Message\ToolCallMessage;
+use PhpLlm\LlmChain\Platform\Message\UserMessage;
 use Symfony\Component\Serializer\Normalizer\DenormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Webmozart\Assert\Assert;
@@ -46,13 +46,13 @@ final class LLMUserMessageDenormalizer implements DenormalizerInterface, Denorma
             return new UserMessage(new Text($data['content']));
         }
 
-        $content = array_map(static function (array $content): Content|null {
+        $content = array_map(static function (array $content): ContentInterface|null {
             if ($content['type'] === 'text') {
                 return new Text($content['text']);
             }
 
             if ($content['type'] === 'image_url') {
-                return new Image($content['image_url']['url']);
+                return new ImageUrl($content['image_url']['url']);
             }
 
             return null;

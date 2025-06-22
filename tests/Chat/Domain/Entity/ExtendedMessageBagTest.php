@@ -6,7 +6,7 @@ namespace ChronicleKeeper\Test\Chat\Domain\Entity;
 
 use ChronicleKeeper\Chat\Domain\Entity\ExtendedMessage;
 use ChronicleKeeper\Chat\Domain\Entity\ExtendedMessageBag;
-use PhpLlm\LlmChain\Model\Message\MessageInterface;
+use PhpLlm\LlmChain\Platform\Message\MessageInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\Attributes\Test;

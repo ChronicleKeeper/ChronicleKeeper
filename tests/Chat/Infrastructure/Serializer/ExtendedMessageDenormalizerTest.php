@@ -6,8 +6,8 @@ namespace ChronicleKeeper\Test\Chat\Infrastructure\Serializer;
 
 use ChronicleKeeper\Chat\Domain\Entity\ExtendedMessage;
 use ChronicleKeeper\Chat\Infrastructure\Serializer\ExtendedMessageDenormalizer;
-use PhpLlm\LlmChain\Model\Message\MessageInterface;
-use PhpLlm\LlmChain\Model\Message\SystemMessage;
+use PhpLlm\LlmChain\Platform\Message\MessageInterface;
+use PhpLlm\LlmChain\Platform\Message\SystemMessage;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\Attributes\Test;

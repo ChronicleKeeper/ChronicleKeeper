@@ -9,7 +9,7 @@ use ChronicleKeeper\Chat\Domain\ValueObject\FunctionDebug;
 use ChronicleKeeper\Chat\Domain\ValueObject\MessageContext;
 use ChronicleKeeper\Chat\Domain\ValueObject\MessageDebug;
 use ChronicleKeeper\Chat\Domain\ValueObject\Reference;
-use PhpLlm\LlmChain\Model\Message\MessageInterface;
+use PhpLlm\LlmChain\Platform\Message\MessageInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Webmozart\Assert\Assert;

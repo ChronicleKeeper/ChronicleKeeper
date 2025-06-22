@@ -7,7 +7,7 @@ namespace ChronicleKeeper\Chat\Domain\Entity;
 use ChronicleKeeper\Chat\Domain\ValueObject\MessageContext;
 use ChronicleKeeper\Chat\Domain\ValueObject\MessageDebug;
 use JsonSerializable;
-use PhpLlm\LlmChain\Model\Message\MessageInterface;
+use PhpLlm\LlmChain\Platform\Message\MessageInterface;
 use Symfony\Component\Uid\Uuid;
 
 /**

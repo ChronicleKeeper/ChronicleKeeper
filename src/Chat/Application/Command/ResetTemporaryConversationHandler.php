@@ -7,7 +7,7 @@ namespace ChronicleKeeper\Chat\Application\Command;
 use ChronicleKeeper\Chat\Domain\Entity\Conversation;
 use ChronicleKeeper\Chat\Domain\Entity\ExtendedMessage;
 use ChronicleKeeper\Settings\Application\SettingsHandler;
-use PhpLlm\LlmChain\Model\Message\Message;
+use PhpLlm\LlmChain\Platform\Message\Message;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Messenger\MessageBusInterface;
 

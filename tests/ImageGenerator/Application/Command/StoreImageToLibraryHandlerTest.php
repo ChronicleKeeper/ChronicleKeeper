@@ -12,9 +12,9 @@ use ChronicleKeeper\Test\ImageGenerator\Domain\Entity\GeneratorRequestBuilder;
 use ChronicleKeeper\Test\ImageGenerator\Domain\Entity\GeneratorResultBuilder;
 use ChronicleKeeper\Test\Shared\Infrastructure\Database\DatabaseTestCase;
 use Override;
-use PhpLlm\LlmChain\Bridge\OpenAI\Embeddings;
-use PhpLlm\LlmChain\Document\Vector;
-use PhpLlm\LlmChain\Model\Response\ResponseInterface;
+use PhpLlm\LlmChain\Platform\Bridge\OpenAI\Embeddings;
+use PhpLlm\LlmChain\Platform\Response\VectorResponse;
+use PhpLlm\LlmChain\Platform\Vector\Vector;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Large;
 use PHPUnit\Framework\Attributes\Test;
@@ -89,13 +89,7 @@ class StoreImageToLibraryHandlerTest extends DatabaseTestCase
 
         $this->llmChainFactory->addPlatformResponse(
             Embeddings::class,
-            new class implements ResponseInterface {
-                /** @return Vector[] */
-                public function getContent(): array
-                {
-                    return [new Vector(array_map(static fn () => mt_rand() / mt_getrandmax(), range(1, 1536)))];
-                }
-            },
+            new VectorResponse(new Vector(array_map(static fn () => mt_rand() / mt_getrandmax(), range(1, 1536)))),
         );
 
         // ------------------- The test scenario -------------------

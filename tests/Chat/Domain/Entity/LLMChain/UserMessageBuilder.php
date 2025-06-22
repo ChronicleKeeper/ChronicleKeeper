@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Test\Chat\Domain\Entity\LLMChain;
 
-use PhpLlm\LlmChain\Model\Message\Content\Text;
-use PhpLlm\LlmChain\Model\Message\UserMessage;
+use PhpLlm\LlmChain\Platform\Message\Content\Text;
+use PhpLlm\LlmChain\Platform\Message\UserMessage;
 
 class UserMessageBuilder
 {

@@ -17,7 +17,7 @@ use ChronicleKeeper\Shared\Application\Query\QueryService;
 use ChronicleKeeper\Shared\Presentation\FlashMessages\Alert;
 use ChronicleKeeper\Shared\Presentation\FlashMessages\HandleFlashMessages;
 use ChronicleKeeper\Shared\Presentation\Twig\Form\HandleFooterButtonGroup;
-use PhpLlm\LlmChain\Model\Message\AssistantMessage;
+use PhpLlm\LlmChain\Platform\Message\AssistantMessage;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

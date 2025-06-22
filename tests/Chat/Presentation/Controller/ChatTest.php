@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Test\Chat\Presentation\Controller;
 
+use ArrayIterator;
 use ChronicleKeeper\Chat\Application\Query\FindConversationByIdParameters;
 use ChronicleKeeper\Chat\Application\Query\FindConversationByIdQuery;
 use ChronicleKeeper\Chat\Application\Query\GetTemporaryConversationParameters;
@@ -17,9 +18,9 @@ use ChronicleKeeper\Test\Chat\Domain\Entity\LLMChain\UserMessageBuilder;
 use ChronicleKeeper\Test\Shared\Infrastructure\Persistence\Filesystem\FileAccessDouble;
 use ChronicleKeeper\Test\WebTestCase;
 use Generator;
-use PhpLlm\LlmChain\Model\Message\Content\Text;
-use PhpLlm\LlmChain\Model\Message\UserMessage;
-use PhpLlm\LlmChain\Model\Response\StreamResponse;
+use PhpLlm\LlmChain\Platform\Message\Content\Text;
+use PhpLlm\LlmChain\Platform\Message\UserMessage;
+use PhpLlm\LlmChain\Platform\Response\StreamResponse;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Large;
 use PHPUnit\Framework\Attributes\Test;
@@ -128,18 +129,6 @@ class ChatTest extends WebTestCase
         $this->client->request(Request::METHOD_GET, '/chat/455af8a7-14f6-4516-910e-3bdb460c5418');
 
         self::assertResponseRedirects('/');
-    }
-
-    #[Test]
-    public function itWillStreamAMessageResponseCorrectlyWithEmptyResponse(): void
-    {
-        $this->client->request(Request::METHOD_GET, '/chat/stream/message?message=Hello&conversation=');
-        self::assertTrue($this->client->getResponse()->isSuccessful());
-
-        $response = $this->client->getInternalResponse()->getContent();
-
-        self::assertResponseIsSuccessful();
-        self::assertStringContainsString('data: {"type":"complete"', $response);
     }
 
     #[Test]

@@ -6,8 +6,8 @@ namespace ChronicleKeeper\Chat\Domain\Entity;
 
 use ArrayObject;
 use JsonSerializable;
-use PhpLlm\LlmChain\Model\Message\MessageBag;
-use PhpLlm\LlmChain\Model\Message\MessageInterface;
+use PhpLlm\LlmChain\Platform\Message\MessageBag;
+use PhpLlm\LlmChain\Platform\Message\MessageInterface;
 
 use function array_map;
 use function array_values;

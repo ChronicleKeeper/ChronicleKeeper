@@ -5,14 +5,14 @@ declare(strict_types=1);
 namespace ChronicleKeeper\Test\Shared\Infrastructure\LLMChain\Serializer;
 
 use ChronicleKeeper\Shared\Infrastructure\LLMChain\Serializer\LLMUserMessageDenormalizer;
-use PhpLlm\LlmChain\Model\Message\AssistantMessage;
-use PhpLlm\LlmChain\Model\Message\Content\Image;
-use PhpLlm\LlmChain\Model\Message\Content\Text;
-use PhpLlm\LlmChain\Model\Message\MessageInterface;
-use PhpLlm\LlmChain\Model\Message\SystemMessage;
-use PhpLlm\LlmChain\Model\Message\ToolCallMessage;
-use PhpLlm\LlmChain\Model\Message\UserMessage;
-use PhpLlm\LlmChain\Model\Response\ToolCall;
+use PhpLlm\LlmChain\Platform\Message\AssistantMessage;
+use PhpLlm\LlmChain\Platform\Message\Content\ImageUrl;
+use PhpLlm\LlmChain\Platform\Message\Content\Text;
+use PhpLlm\LlmChain\Platform\Message\MessageInterface;
+use PhpLlm\LlmChain\Platform\Message\SystemMessage;
+use PhpLlm\LlmChain\Platform\Message\ToolCallMessage;
+use PhpLlm\LlmChain\Platform\Message\UserMessage;
+use PhpLlm\LlmChain\Platform\Response\ToolCall;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\Attributes\Test;
@@ -105,7 +105,7 @@ class LLMUserMessageDenormalizerTest extends TestCase
         self::assertInstanceOf(Text::class, $obj->content[0]);
         self::assertSame('foo bar baz', $obj->content[0]->text);
 
-        self::assertInstanceOf(Image::class, $obj->content[1]);
+        self::assertInstanceOf(ImageUrl::class, $obj->content[1]);
         self::assertSame('data:baz foo bar', $obj->content[1]->url);
     }
 

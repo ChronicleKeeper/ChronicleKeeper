@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace ChronicleKeeper\Chat\Domain\ValueObject;
 
 use JsonSerializable;
-use PhpLlm\LlmChain\Bridge\OpenAI\GPT;
+use PhpLlm\LlmChain\Platform\Bridge\OpenAI\GPT;
 
 class Settings implements JsonSerializable
 {

@@ -9,8 +9,8 @@ use ChronicleKeeper\Chat\Domain\Entity\Conversation;
 use ChronicleKeeper\Chat\Domain\Entity\ExtendedMessage;
 use ChronicleKeeper\Settings\Application\Service\SystemPromptRegistry;
 use ChronicleKeeper\Settings\Domain\ValueObject\SystemPrompt\Purpose;
-use PhpLlm\LlmChain\Model\Message\AssistantMessage;
-use PhpLlm\LlmChain\Model\Message\Message;
+use PhpLlm\LlmChain\Platform\Message\AssistantMessage;
+use PhpLlm\LlmChain\Platform\Message\Message;
 
 use function array_key_last;
 use function assert;

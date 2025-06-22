@@ -20,7 +20,7 @@ class MonthsForm extends AbstractController
     use DefaultActionTrait;
     use LiveCollectionTrait;
 
-    /** @var array{weekdays: array<MonthSettingsArray>}|null */
+    /** @var array{months: array<MonthSettingsArray>}|null */
     #[LiveProp(fieldName: 'formData')]
     public array|null $months = null;
 

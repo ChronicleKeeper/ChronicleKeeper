@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace ChronicleKeeper\Chat\Presentation\Form;
 
 use ChronicleKeeper\Chat\Domain\ValueObject\Settings;
-use PhpLlm\LlmChain\Bridge\OpenAI\GPT;
+use PhpLlm\LlmChain\Platform\Bridge\OpenAI\GPT;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\DataMapperInterface;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;

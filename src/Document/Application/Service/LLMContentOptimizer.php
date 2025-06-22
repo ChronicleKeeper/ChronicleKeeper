@@ -6,10 +6,10 @@ namespace ChronicleKeeper\Document\Application\Service;
 
 use ChronicleKeeper\Settings\Domain\Entity\SystemPrompt;
 use ChronicleKeeper\Shared\Infrastructure\LLMChain\LLMChainFactory;
-use PhpLlm\LlmChain\Bridge\OpenAI\GPT;
-use PhpLlm\LlmChain\Model\Message\Message;
-use PhpLlm\LlmChain\Model\Message\MessageBag;
-use PhpLlm\LlmChain\Model\Response\TextResponse;
+use PhpLlm\LlmChain\Platform\Bridge\OpenAI\GPT;
+use PhpLlm\LlmChain\Platform\Message\Message;
+use PhpLlm\LlmChain\Platform\Message\MessageBag;
+use PhpLlm\LlmChain\Platform\Response\TextResponse;
 
 use function assert;
 

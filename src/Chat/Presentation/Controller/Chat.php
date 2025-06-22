@@ -21,8 +21,8 @@ use ChronicleKeeper\Settings\Application\SettingsHandler;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
 use ChronicleKeeper\Shared\Infrastructure\LLMChain\LLMChainFactory;
 use PhpLlm\LlmChain\Chain\Toolbox\StreamResponse as ToolboxStreamResponse;
-use PhpLlm\LlmChain\Model\Message\Message;
-use PhpLlm\LlmChain\Model\Response\StreamResponse as LLMStreamResponse;
+use PhpLlm\LlmChain\Platform\Message\Message;
+use PhpLlm\LlmChain\Platform\Response\StreamResponse as LLMStreamResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -33,6 +33,7 @@ use Symfony\Component\Routing\Requirement\Requirement;
 
 use function assert;
 use function flush;
+use function is_iterable;
 use function json_encode;
 use function ob_end_flush;
 use function ob_flush;
@@ -134,10 +135,12 @@ class Chat extends AbstractController
                     'stream' => true,
                 ],
             );
-            assert($response instanceof LLMStreamResponse || $response instanceof ToolboxStreamResponse);
+
+            $content = $response->getContent();
+            assert(is_iterable($content));
 
             $fullResponse = '';
-            foreach ($response->getContent() as $chunk) {
+            foreach ($content as $chunk) {
                 $fullResponse .= $chunk;
                 echo 'data: ' . json_encode([
                     'type' => 'chunk',

@@ -15,7 +15,7 @@ use ChronicleKeeper\Settings\Domain\ValueObject\Settings as AppSettings;
 use ChronicleKeeper\Shared\Domain\Entity\AggregateRoot;
 use ChronicleKeeper\Shared\Domain\Sluggable;
 use JsonSerializable;
-use PhpLlm\LlmChain\Bridge\OpenAI\GPT;
+use PhpLlm\LlmChain\Platform\Bridge\OpenAI\GPT;
 use Symfony\Component\String\Slugger\AsciiSlugger;
 use Symfony\Component\Uid\Uuid;
 

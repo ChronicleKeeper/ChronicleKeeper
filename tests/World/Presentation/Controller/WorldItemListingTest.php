@@ -24,8 +24,6 @@ use Symfony\Component\HttpFoundation\Request;
 #[CoversClass(SearchWorldItems::class)]
 #[CoversClass(SearchWorldItemsQuery::class)]
 #[CoversClass(ItemSearch::class)]
-#[CoversClass(SearchWorldItems::class)]
-#[CoversClass(SearchWorldItemsQuery::class)]
 #[CoversClass(SearchWorldItemsCount::class)]
 #[CoversClass(SearchWorldItemsCountQuery::class)]
 #[Large]

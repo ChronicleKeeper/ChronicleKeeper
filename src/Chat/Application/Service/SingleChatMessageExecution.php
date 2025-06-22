@@ -13,8 +13,8 @@ use ChronicleKeeper\Chat\Infrastructure\LLMChain\RuntimeCollector;
 use ChronicleKeeper\Document\Infrastructure\LLMChain\DocumentSearch;
 use ChronicleKeeper\Library\Infrastructure\LLMChain\Tool\ImageSearch;
 use ChronicleKeeper\Shared\Infrastructure\LLMChain\LLMChainFactory;
-use PhpLlm\LlmChain\Model\Message\Message;
-use PhpLlm\LlmChain\Model\Response\TextResponse;
+use PhpLlm\LlmChain\Platform\Message\Message;
+use PhpLlm\LlmChain\Platform\Response\TextResponse;
 
 use function assert;
 

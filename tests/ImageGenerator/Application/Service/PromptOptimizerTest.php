@@ -11,7 +11,7 @@ use ChronicleKeeper\ImageGenerator\Application\Service\PromptOptimizer;
 use ChronicleKeeper\Settings\Application\Service\SystemPromptRegistry;
 use ChronicleKeeper\Settings\Domain\Entity\SystemPrompt;
 use ChronicleKeeper\Settings\Domain\ValueObject\SystemPrompt\Purpose;
-use PhpLlm\LlmChain\Model\Message\Message;
+use PhpLlm\LlmChain\Platform\Message\Message;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\Attributes\Test;

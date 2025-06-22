@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Test\Chat\Domain\Entity\LLMChain;
 
-use PhpLlm\LlmChain\Model\Message\AssistantMessage;
+use PhpLlm\LlmChain\Platform\Message\AssistantMessage;
 
 class AssistantMessageBuilder
 {

@@ -6,10 +6,9 @@ namespace ChronicleKeeper\ImageGenerator\Application\Service;
 
 use ChronicleKeeper\ImageGenerator\Domain\Entity\GeneratorResult;
 use ChronicleKeeper\Shared\Infrastructure\LLMChain\LLMChainFactory;
-use PhpLlm\LlmChain\Bridge\OpenAI\DallE;
-use PhpLlm\LlmChain\Bridge\OpenAI\DallE\Base64Image;
-use PhpLlm\LlmChain\Bridge\OpenAI\DallE\ImageResponse;
-use PhpLlm\LlmChain\Model\Response\AsyncResponse;
+use PhpLlm\LlmChain\Platform\Bridge\OpenAI\DallE;
+use PhpLlm\LlmChain\Platform\Bridge\OpenAI\DallE\Base64Image;
+use PhpLlm\LlmChain\Platform\Bridge\OpenAI\DallE\ImageResponse;
 
 use function assert;
 use function count;
@@ -28,17 +27,14 @@ class OpenAIGenerator
         ini_set('default_socket_timeout', -1);
 
         $response = $this->llmChainFactory->createPlatform()->request(
-            model: new DallE(version: DallE::DALL_E_3),
+            model: new DallE(name: DallE::DALL_E_3),
             input: $prompt,
             options: ['response_format' => 'b64_json'],
-        );
-
-        if ($response instanceof AsyncResponse) {
-            $response = $response->unwrap();
-        }
+        )->getResponse();
 
         assert($response instanceof ImageResponse);
         $images = $response->getContent();
+
         assert(count($images) === 1); // Always only a single image cause of Dalle3
         assert($images[0] instanceof Base64Image);
 

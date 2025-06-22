@@ -11,7 +11,7 @@ use ChronicleKeeper\Chat\Domain\Entity\ExtendedMessage;
 use ChronicleKeeper\Settings\Application\SettingsHandler;
 use ChronicleKeeper\Test\Settings\Domain\Entity\SystemPromptBuilder;
 use ChronicleKeeper\Test\Settings\Domain\ValueObject\SettingsBuilder;
-use PhpLlm\LlmChain\Model\Message\SystemMessage;
+use PhpLlm\LlmChain\Platform\Message\SystemMessage;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\Attributes\Test;

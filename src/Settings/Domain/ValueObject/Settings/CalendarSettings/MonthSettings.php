@@ -16,7 +16,11 @@ use JsonSerializable;
  *     index: int,
  *     name: string,
  *     days: int<0, max>,
- *     leap_days?: array<LeapDaySettingsArray>
+ *     leap_days?: array<array{
+ *       day: int,
+ *       name: string,
+ *       year_interval?: int
+ *    }>
  * }
  */
 class MonthSettings implements JsonSerializable

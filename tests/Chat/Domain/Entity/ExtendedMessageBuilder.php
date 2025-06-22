@@ -7,7 +7,7 @@ namespace ChronicleKeeper\Test\Chat\Domain\Entity;
 use ChronicleKeeper\Chat\Domain\Entity\ExtendedMessage;
 use ChronicleKeeper\Chat\Domain\ValueObject\MessageContext;
 use ChronicleKeeper\Test\Chat\Domain\Entity\LLMChain\SystemMessageBuilder;
-use PhpLlm\LlmChain\Model\Message\MessageInterface;
+use PhpLlm\LlmChain\Platform\Message\MessageInterface;
 use Symfony\Component\Uid\Uuid;
 
 class ExtendedMessageBuilder

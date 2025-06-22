@@ -5,17 +5,17 @@ declare(strict_types=1);
 namespace ChronicleKeeper\Shared\Infrastructure\LLMChain;
 
 use ChronicleKeeper\Settings\Application\SettingsHandler;
-use PhpLlm\LlmChain\Bridge\OpenAI\DallE\ModelClient as DallEModelClient;
-use PhpLlm\LlmChain\Bridge\OpenAI\Embeddings\ModelClient as EmbeddingsModelClient;
-use PhpLlm\LlmChain\Bridge\OpenAI\Embeddings\ResponseConverter as EmbeddingsResponseConverter;
-use PhpLlm\LlmChain\Bridge\OpenAI\GPT;
-use PhpLlm\LlmChain\Bridge\OpenAI\GPT\ModelClient as GPTModelClient;
-use PhpLlm\LlmChain\Bridge\OpenAI\GPT\ResponseConverter as GPTResponseConverter;
-use PhpLlm\LlmChain\Chain;
+use PhpLlm\LlmChain\Chain\Chain;
+use PhpLlm\LlmChain\Chain\ChainInterface;
 use PhpLlm\LlmChain\Chain\Toolbox\ChainProcessor;
-use PhpLlm\LlmChain\ChainInterface;
-use PhpLlm\LlmChain\Platform;
-use PhpLlm\LlmChain\PlatformInterface;
+use PhpLlm\LlmChain\Platform\Bridge\OpenAI\DallE\ModelClient as DallEModelClient;
+use PhpLlm\LlmChain\Platform\Bridge\OpenAI\Embeddings\ModelClient as EmbeddingsModelClient;
+use PhpLlm\LlmChain\Platform\Bridge\OpenAI\Embeddings\ResponseConverter as EmbeddingsResponseConverter;
+use PhpLlm\LlmChain\Platform\Bridge\OpenAI\GPT;
+use PhpLlm\LlmChain\Platform\Bridge\OpenAI\GPT\ModelClient as GPTModelClient;
+use PhpLlm\LlmChain\Platform\Bridge\OpenAI\GPT\ResponseConverter as GPTResponseConverter;
+use PhpLlm\LlmChain\Platform\Platform;
+use PhpLlm\LlmChain\Platform\PlatformInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class LLMChainFactory
