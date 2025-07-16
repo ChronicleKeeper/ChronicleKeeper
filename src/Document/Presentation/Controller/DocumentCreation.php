@@ -7,7 +7,7 @@ namespace ChronicleKeeper\Document\Presentation\Controller;
 use ChronicleKeeper\Chat\Application\Query\FindConversationByIdParameters;
 use ChronicleKeeper\Chat\Application\Query\GetTemporaryConversationParameters;
 use ChronicleKeeper\Chat\Domain\Entity\Conversation;
-use ChronicleKeeper\Chat\Domain\Entity\ExtendedMessage;
+use ChronicleKeeper\Chat\Domain\Entity\Message;
 use ChronicleKeeper\Document\Application\Command\StoreDocument;
 use ChronicleKeeper\Document\Domain\Entity\Document;
 use ChronicleKeeper\Document\Presentation\Form\DocumentType;
@@ -17,7 +17,6 @@ use ChronicleKeeper\Shared\Application\Query\QueryService;
 use ChronicleKeeper\Shared\Presentation\FlashMessages\Alert;
 use ChronicleKeeper\Shared\Presentation\FlashMessages\HandleFlashMessages;
 use ChronicleKeeper\Shared\Presentation\Twig\Form\HandleFooterButtonGroup;
-use PhpLlm\LlmChain\Platform\Message\AssistantMessage;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -94,22 +93,22 @@ class DocumentCreation extends AbstractController
         $latestMessages            = $conversation->getMessages()->getArrayCopy();
         $foundMessagesByIdentifier = array_filter(
             $latestMessages,
-            static fn (ExtendedMessage $message) => $message->id === $chatMessageToTemplateFrom,
+            static fn (Message $message) => $message->getId() === $chatMessageToTemplateFrom,
         );
 
         $foundMessageByIdentifier = reset($foundMessagesByIdentifier);
 
-        if (! $foundMessageByIdentifier instanceof ExtendedMessage) {
+        if (! $foundMessageByIdentifier instanceof Message) {
             return null;
         }
 
-        if (! $foundMessageByIdentifier->message instanceof AssistantMessage) {
+        if (! $foundMessageByIdentifier->isAssistant()) {
             return null;
         }
 
         return Document::create(
             $conversation->getTitle(),
-            (string) $foundMessageByIdentifier->message->content,
+            $foundMessageByIdentifier->getContent(),
         );
     }
 }

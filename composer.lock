@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "54812c428870b134a83c0db3df731ef5",
+    "content-hash": "a71765c569a2d8b321e27e5203d7cb6c",
     "packages": [
         {
             "name": "composer/semver",
@@ -1966,16 +1966,16 @@
         },
         {
             "name": "php-llm/llm-chain",
-            "version": "0.24.0",
+            "version": "0.25.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-llm/llm-chain.git",
-                "reference": "cb6fc83aec7038646a4aa187436d53c8cf05865c"
+                "reference": "aa9c268d5cb1bdb36f1851e892ac1bcab5264a69"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-llm/llm-chain/zipball/cb6fc83aec7038646a4aa187436d53c8cf05865c",
-                "reference": "cb6fc83aec7038646a4aa187436d53c8cf05865c",
+                "url": "https://api.github.com/repos/php-llm/llm-chain/zipball/aa9c268d5cb1bdb36f1851e892ac1bcab5264a69",
+                "reference": "aa9c268d5cb1bdb36f1851e892ac1bcab5264a69",
                 "shasum": ""
             },
             "require": {
@@ -2025,19 +2025,6 @@
                 "symfony/process": "^6.4 || ^7.1",
                 "symfony/var-dumper": "^6.4 || ^7.1"
             },
-            "suggest": {
-                "async-aws/bedrock-runtime": "For using the Bedrock platform.",
-                "codewithkyrian/chromadb-php": "For using the ChromaDB as retrieval vector store.",
-                "codewithkyrian/transformers": "For using the TransformersPHP with FFI to run models in PHP.",
-                "doctrine/dbal": "For using MariaDB via Doctrine as retrieval vector store",
-                "ext-pdo": "For using MariaDB as retrieval vector store.",
-                "mongodb/mongodb": "For using MongoDB Atlas as retrieval vector store.",
-                "mrmysql/youtube-transcript": "For using the YouTube transcription tool.",
-                "probots-io/pinecone-php": "For using the Pinecone as retrieval vector store.",
-                "psr/cache": "For using the CacheStore as message store.",
-                "symfony/dom-crawler": "For using the Crawler tool.",
-                "symfony/http-foundation": "For using the SessionStore as message store."
-            },
             "type": "library",
             "autoload": {
                 "psr-4": {
@@ -2067,9 +2054,10 @@
             ],
             "support": {
                 "issues": "https://github.com/php-llm/llm-chain/issues",
-                "source": "https://github.com/php-llm/llm-chain/tree/0.24.0"
+                "source": "https://github.com/php-llm/llm-chain/tree/0.25.0"
             },
-            "time": "2025-07-06T17:56:46+00:00"
+            "abandoned": "symfony/ai-agent",
+            "time": "2025-07-16T21:45:45+00:00"
         },
         {
             "name": "phpdocumentor/reflection-common",
@@ -8763,16 +8751,16 @@
         },
         {
             "name": "phpstan/phpstan",
-            "version": "2.1.17",
+            "version": "2.1.18",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpstan.git",
-                "reference": "89b5ef665716fa2a52ecd2633f21007a6a349053"
+                "reference": "ee1f390b7a70cdf74a2b737e554f68afea885db7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/89b5ef665716fa2a52ecd2633f21007a6a349053",
-                "reference": "89b5ef665716fa2a52ecd2633f21007a6a349053",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/ee1f390b7a70cdf74a2b737e554f68afea885db7",
+                "reference": "ee1f390b7a70cdf74a2b737e554f68afea885db7",
                 "shasum": ""
             },
             "require": {
@@ -8817,7 +8805,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-05-21T20:55:28+00:00"
+            "time": "2025-07-17T17:22:31+00:00"
         },
         {
             "name": "phpstan/phpstan-phpunit",

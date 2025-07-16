@@ -6,14 +6,9 @@ namespace ChronicleKeeper\Chat\Application\Command;
 
 use ChronicleKeeper\Shared\Infrastructure\Messenger\MessageEventResult;
 use Doctrine\DBAL\Connection;
-use PhpLlm\LlmChain\Platform\Message\AssistantMessage;
-use PhpLlm\LlmChain\Platform\Message\Content\Text;
-use PhpLlm\LlmChain\Platform\Message\SystemMessage;
-use PhpLlm\LlmChain\Platform\Message\UserMessage;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Throwable;
 
-use function assert;
 use function json_encode;
 
 use const JSON_THROW_ON_ERROR;
@@ -126,18 +121,6 @@ class StoreConversationHandler
 
             // Insert messages using query builder
             foreach ($message->conversation->getMessages() as $conversationMessage) {
-                $messageArray = $conversationMessage->jsonSerialize();
-
-                $messageContent = '';
-                if ($messageArray['message'] instanceof SystemMessage || $messageArray['message'] instanceof AssistantMessage) {
-                    $messageContent = (string) $messageArray['message']->content;
-                } elseif ($messageArray['message'] instanceof UserMessage) {
-                    $content = $messageArray['message']->content[0];
-                    assert($content instanceof Text);
-
-                    $messageContent = $content->text;
-                }
-
                 $this->connection->createQueryBuilder()
                     ->insert('conversation_messages')
                     ->values([
@@ -149,12 +132,12 @@ class StoreConversationHandler
                         'debug' => ':debug',
                     ])
                     ->setParameters([
-                        'id' => $messageArray['id'],
+                        'id' => $conversationMessage->getId(),
                         'conversationId' => $message->conversation->getId(),
-                        'role' => $messageArray['message']->getRole()->value,
-                        'content' => $messageContent,
-                        'context' => json_encode($messageArray['context'], JSON_THROW_ON_ERROR),
-                        'debug' => json_encode($messageArray['debug'], JSON_THROW_ON_ERROR),
+                        'role' => $conversationMessage->getRole()->value,
+                        'content' => $conversationMessage->getContent(),
+                        'context' => json_encode($conversationMessage->getContext(), JSON_THROW_ON_ERROR),
+                        'debug' => json_encode($conversationMessage->getDebug(), JSON_THROW_ON_ERROR),
                     ])
                     ->executeStatement();
             }

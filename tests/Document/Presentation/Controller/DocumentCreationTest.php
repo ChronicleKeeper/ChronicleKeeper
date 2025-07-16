@@ -12,31 +12,26 @@ use ChronicleKeeper\Library\Presentation\Twig\DirectorySelection;
 use ChronicleKeeper\Shared\Infrastructure\LLMChain\LLMChainFactory;
 use ChronicleKeeper\Shared\Infrastructure\Persistence\Filesystem\Contracts\FileAccess;
 use ChronicleKeeper\Test\Chat\Domain\Entity\ConversationBuilder;
-use ChronicleKeeper\Test\Chat\Domain\Entity\ExtendedMessageBagBuilder;
 use ChronicleKeeper\Test\Chat\Domain\Entity\ExtendedMessageBuilder;
 use ChronicleKeeper\Test\Chat\Domain\Entity\LLMChain\AssistantMessageBuilder;
+use ChronicleKeeper\Test\Chat\Domain\Entity\MessageBagBuilder;
 use ChronicleKeeper\Test\Shared\Infrastructure\LLMChain\LLMChainFactoryDouble;
 use ChronicleKeeper\Test\Shared\Infrastructure\Persistence\Filesystem\FileAccessDouble;
 use ChronicleKeeper\Test\WebTestCase;
 use PhpLlm\LlmChain\Platform\Bridge\OpenAI\Embeddings;
-use PhpLlm\LlmChain\Platform\Message\AssistantMessage;
-use PhpLlm\LlmChain\Platform\Response\Metadata\Metadata;
-use PhpLlm\LlmChain\Platform\Response\RawResponseInterface;
-use PhpLlm\LlmChain\Platform\Response\ResponseInterface;
+use PhpLlm\LlmChain\Platform\Response\VectorResponse;
 use PhpLlm\LlmChain\Platform\Vector\Vector;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Large;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Serializer\SerializerInterface;
 
 use function array_map;
 use function assert;
-use function json_encode;
 use function mt_getrandmax;
 use function mt_rand;
 use function range;
-
-use const JSON_THROW_ON_ERROR;
 
 #[CoversClass(DocumentCreation::class)]
 #[CoversClass(DocumentType::class)]
@@ -70,27 +65,9 @@ class DocumentCreationTest extends WebTestCase
 
         $llmChainFactory->addPlatformResponse(
             Embeddings::class,
-            new class implements ResponseInterface {
-                /** @return Vector[] */
-                public function getContent(): array
-                {
-                    return [new Vector(array_map(static fn () => mt_rand() / mt_getrandmax(), range(1, 1536)))];
-                }
-
-                public function getMetadata(): Metadata
-                {
-                    return new Metadata();
-                }
-
-                public function getRawResponse(): RawResponseInterface|null
-                {
-                    return null;
-                }
-
-                public function setRawResponse(RawResponseInterface $rawResponse): void
-                {
-                }
-            },
+            new VectorResponse(
+                new Vector(array_map(static fn () => mt_rand() / mt_getrandmax(), range(1, 1536))),
+            ),
         );
 
         $this->client->request(
@@ -118,8 +95,8 @@ class DocumentCreationTest extends WebTestCase
         self::assertCount(1, $documents);
 
         $document = $documents[0];
-        self::assertStringContainsString('Test Title', $document['title']);
-        self::assertStringContainsString('Test Content', $document['content']);
+        self::assertStringContainsString('Test Title', (string) $document['title']);
+        self::assertStringContainsString('Test Content', (string) $document['content']);
     }
 
     #[Test]
@@ -150,7 +127,7 @@ class DocumentCreationTest extends WebTestCase
             ->withId('8e316807-592f-4e11-b298-259858dc2a2a')
             ->withTitle('Conversation Title')
             ->withMessages(
-                (new ExtendedMessageBagBuilder())->withMessages(
+                (new MessageBagBuilder())->withMessages(
                     $message = (new ExtendedMessageBuilder())
                         ->withId('40a477e7-8e0a-4158-9dac-8dd9b1df9f87')
                         ->withMessage((new AssistantMessageBuilder())->withContent('Message Content')->build())
@@ -177,13 +154,13 @@ class DocumentCreationTest extends WebTestCase
             'documents_max_distance' => $conversation->getSettings()->imagesMaxDistance,
         ]);
 
-        assert($message->message instanceof AssistantMessage);
+        assert($message->isAssistant());
 
         $this->connection->insert('conversation_messages', [
-            'id' => $message->id,
+            'id' => $message->getId(),
             'conversation_id' => $conversation->getId(),
-            'role' => $message->message->getRole()->value,
-            'content' => $message->message->content,
+            'role' => $message->getRole()->value,
+            'content' => $message->getContent(),
             'context' => '{}',
             'debug' => '{}',
         ]);
@@ -212,7 +189,7 @@ class DocumentCreationTest extends WebTestCase
         $conversation = (new ConversationBuilder())
             ->withTitle('Unnamed Conversation')
             ->withMessages(
-                (new ExtendedMessageBagBuilder())->withMessages(
+                (new MessageBagBuilder())->withMessages(
                     (new ExtendedMessageBuilder())
                         ->withId('40a477e7-8e0a-4158-9dac-8dd9b1df9f87')
                         ->withMessage((new AssistantMessageBuilder())->withContent('Message Content')->build())
@@ -224,10 +201,14 @@ class DocumentCreationTest extends WebTestCase
         $fileAccess = $this->client->getContainer()->get(FileAccess::class);
         assert($fileAccess instanceof FileAccessDouble);
 
+        $serializer = $this->client->getContainer()->get('serializer');
+        assert($serializer instanceof SerializerInterface);
+        $serializedData = $serializer->serialize($conversation, 'json');
+
         $fileAccess->write(
             'temp',
             'conversation_temporary.json',
-            json_encode($conversation, JSON_THROW_ON_ERROR),
+            $serializedData,
         );
 
         $this->client->request(

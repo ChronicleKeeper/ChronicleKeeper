@@ -6,12 +6,13 @@ namespace ChronicleKeeper\Test\ImageGenerator\Application\Service;
 
 use ChronicleKeeper\Chat\Application\Service\SingleChatMessageExecution;
 use ChronicleKeeper\Chat\Domain\Entity\Conversation;
-use ChronicleKeeper\Chat\Domain\Entity\ExtendedMessage;
+use ChronicleKeeper\Chat\Domain\Entity\Message;
+use ChronicleKeeper\Chat\Domain\ValueObject\MessageContext;
+use ChronicleKeeper\Chat\Domain\ValueObject\MessageDebug;
 use ChronicleKeeper\ImageGenerator\Application\Service\PromptOptimizer;
 use ChronicleKeeper\Settings\Application\Service\SystemPromptRegistry;
 use ChronicleKeeper\Settings\Domain\Entity\SystemPrompt;
 use ChronicleKeeper\Settings\Domain\ValueObject\SystemPrompt\Purpose;
-use PhpLlm\LlmChain\Platform\Message\Message;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\Attributes\Test;
@@ -43,7 +44,7 @@ class PromptOptimizerTest extends TestCase
                     $messages = $conversation->getMessages();
 
                     self::assertCount(1, $messages);
-                    $messages[] = new ExtendedMessage(Message::ofAssistant('Success!'));
+                    $messages[] = Message::forAssistant('Success!', new MessageContext(), new MessageDebug());
 
                     return true;
                 }),

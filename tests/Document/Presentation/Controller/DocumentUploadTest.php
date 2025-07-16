@@ -12,9 +12,7 @@ use ChronicleKeeper\Shared\Infrastructure\LLMChain\LLMChainFactory;
 use ChronicleKeeper\Test\Shared\Infrastructure\LLMChain\LLMChainFactoryDouble;
 use ChronicleKeeper\Test\WebTestCase;
 use PhpLlm\LlmChain\Platform\Bridge\OpenAI\Embeddings;
-use PhpLlm\LlmChain\Platform\Response\Metadata\Metadata;
-use PhpLlm\LlmChain\Platform\Response\RawResponseInterface;
-use PhpLlm\LlmChain\Platform\Response\ResponseInterface;
+use PhpLlm\LlmChain\Platform\Response\VectorResponse;
 use PhpLlm\LlmChain\Platform\Vector\Vector;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Large;
@@ -66,27 +64,9 @@ class DocumentUploadTest extends WebTestCase
 
         $llmChainFactory->addPlatformResponse(
             Embeddings::class,
-            new class implements ResponseInterface {
-                /** @return Vector[] */
-                public function getContent(): array
-                {
-                    return [new Vector(array_map(static fn () => mt_rand() / mt_getrandmax(), range(1, 1536)))];
-                }
-
-                public function getMetadata(): Metadata
-                {
-                    return new Metadata();
-                }
-
-                public function getRawResponse(): RawResponseInterface|null
-                {
-                    return null;
-                }
-
-                public function setRawResponse(RawResponseInterface $rawResponse): void
-                {
-                }
-            },
+            new VectorResponse(
+                new Vector(array_map(static fn () => mt_rand() / mt_getrandmax(), range(1, 1536))),
+            ),
         );
 
         $this->client->request(

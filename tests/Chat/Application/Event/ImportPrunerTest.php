@@ -9,11 +9,11 @@ use ChronicleKeeper\Chat\Application\Event\ImportPruner;
 use ChronicleKeeper\Settings\Application\Service\ImportSettings;
 use ChronicleKeeper\Settings\Domain\Event\ExecuteImportPruning;
 use ChronicleKeeper\Test\Chat\Domain\Entity\ConversationBuilder;
-use ChronicleKeeper\Test\Chat\Domain\Entity\ExtendedMessageBagBuilder;
 use ChronicleKeeper\Test\Chat\Domain\Entity\ExtendedMessageBuilder;
 use ChronicleKeeper\Test\Chat\Domain\Entity\LLMChain\AssistantMessageBuilder;
 use ChronicleKeeper\Test\Chat\Domain\Entity\LLMChain\SystemMessageBuilder;
 use ChronicleKeeper\Test\Chat\Domain\Entity\LLMChain\UserMessageBuilder;
+use ChronicleKeeper\Test\Chat\Domain\Entity\MessageBagBuilder;
 use ChronicleKeeper\Test\Shared\Infrastructure\Database\DatabaseTestCase;
 use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -51,7 +51,7 @@ class ImportPrunerTest extends DatabaseTestCase
     public function itIsPruning(): void
     {
         // ------------------- The test setup -------------------
-        $messages = (new ExtendedMessageBagBuilder())
+        $messages = (new MessageBagBuilder())
             ->withMessages(
                 (new ExtendedMessageBuilder())->withMessage((new SystemMessageBuilder())->build())->build(),
                 (new ExtendedMessageBuilder())->withMessage((new UserMessageBuilder())->build())->build(),

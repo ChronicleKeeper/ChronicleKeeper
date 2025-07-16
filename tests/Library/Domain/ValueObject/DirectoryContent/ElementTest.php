@@ -6,7 +6,8 @@ namespace ChronicleKeeper\Test\Library\Domain\ValueObject\DirectoryContent;
 
 use ChronicleKeeper\Library\Domain\ValueObject\DirectoryContent\Element;
 use ChronicleKeeper\Test\Chat\Domain\Entity\ConversationBuilder;
-use ChronicleKeeper\Test\Chat\Domain\Entity\ExtendedMessageBagBuilder;
+use ChronicleKeeper\Test\Chat\Domain\Entity\MessageBagBuilder;
+use ChronicleKeeper\Test\Chat\Domain\Entity\MessageBuilder;
 use ChronicleKeeper\Test\Document\Domain\Entity\DocumentBuilder;
 use ChronicleKeeper\Test\Image\Domain\Entity\ImageBuilder;
 use DateTimeImmutable;
@@ -87,7 +88,9 @@ class ElementTest extends TestCase
         $conversation = (new ConversationBuilder())
             ->withTitle('title')
             ->withId('5244cbff-a465-4a90-887a-a9df56bcf513')
-            ->withMessages((new ExtendedMessageBagBuilder())->build())
+            ->withMessages((new MessageBagBuilder())->withMessage(
+                (new MessageBuilder())->asUser()->withContent('Test message')->build(),
+            )->build())
             ->build();
 
         $element = Element::fromConversationEntity($conversation);

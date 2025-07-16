@@ -4,15 +4,13 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Settings\Application\Service\Exporter;
 
-use JsonSerializable;
-
-class ExportData implements JsonSerializable
+class ExportData
 {
-    private string $appVersion;
-    private Type $type;
+    public string $appVersion;
+    public Type $type;
 
-    /** @var array<int|string, mixed> */
-    private array $data = [];
+    /** @var array<int|string, mixed>|object */
+    public array|object $data;
 
     private function __construct()
     {
@@ -20,7 +18,7 @@ class ExportData implements JsonSerializable
     }
 
     /** @param array<int|string, mixed> $data */
-    public static function create(ExportSettings $exportSettings, Type $type, array $data): self
+    public static function create(ExportSettings $exportSettings, Type $type, array|object $data): self
     {
         $exportData             = new self();
         $exportData->appVersion = $exportSettings->appVersion;
@@ -28,15 +26,5 @@ class ExportData implements JsonSerializable
         $exportData->data       = $data;
 
         return $exportData;
-    }
-
-    /** @return array<int|string, mixed> */
-    public function jsonSerialize(): array
-    {
-        return [
-            'appVersion' => $this->appVersion,
-            'type' => $this->type->value,
-            'data' => $this->data,
-        ];
     }
 }

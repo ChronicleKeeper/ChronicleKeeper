@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace ChronicleKeeper\Test\Chat\Domain\Entity;
 
 use ChronicleKeeper\Chat\Domain\Entity\Conversation;
-use ChronicleKeeper\Chat\Domain\Entity\ExtendedMessageBag;
+use ChronicleKeeper\Chat\Domain\Entity\MessageBag;
 use ChronicleKeeper\Chat\Domain\Event\ConversationMovedToDirectory;
 use ChronicleKeeper\Chat\Domain\Event\ConversationRenamed;
 use ChronicleKeeper\Chat\Domain\Event\ConversationSettingsChanged;
@@ -50,42 +50,17 @@ class ConversationTest extends TestCase
             'Test Title',
             RootDirectory::get(),
             new Settings(),
-            new ExtendedMessageBag(),
+            new MessageBag(),
         );
 
         self::assertSame('Test-Title', $conversation->getSlug());
     }
 
     #[Test]
-    public function jsonSerialize(): void
-    {
-        $conversation   = new Conversation(
-            $id         = Uuid::v4()->toString(),
-            $title      = 'Test Title',
-            $directory  = RootDirectory::get(),
-            $settings   = new Settings(),
-            $messageBag = new ExtendedMessageBag(),
-        );
-
-        $json = $conversation->jsonSerialize();
-
-        self::assertSame(
-            [
-                'id' => $id,
-                'title' => $title,
-                'directory' => $directory->getId(),
-                'settings' => $settings,
-                'messages' => $messageBag,
-            ],
-            $json,
-        );
-    }
-
-    #[Test]
     public function itCanBeDuplicated(): void
     {
         $conversation = (new ConversationBuilder())
-            ->withMessages((new ExtendedMessageBagBuilder())
+            ->withMessages((new MessageBagBuilder())
                 ->withMessages((new ExtendedMessageBuilder())->build(), (new ExtendedMessageBuilder())->build())
                 ->build())
             ->build();

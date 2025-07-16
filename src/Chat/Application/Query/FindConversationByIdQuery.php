@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace ChronicleKeeper\Chat\Application\Query;
 
 use ChronicleKeeper\Chat\Domain\Entity\Conversation;
-use ChronicleKeeper\Chat\Infrastructure\Serializer\ExtendedMessageDenormalizer;
+use ChronicleKeeper\Chat\Infrastructure\Serializer\MessageContextDenormalizer;
+use ChronicleKeeper\Chat\Infrastructure\Serializer\MessageDenormalizer;
 use ChronicleKeeper\Settings\Application\SettingsHandler;
 use ChronicleKeeper\Shared\Application\Query\Query;
 use ChronicleKeeper\Shared\Application\Query\QueryParameters;
@@ -51,9 +52,9 @@ class FindConversationByIdQuery implements Query
             data: $conversation,
             type: Conversation::class,
             context: [
-                ExtendedMessageDenormalizer::WITH_CONTEXT_DOCUMENTS => $showReferencedDocuments,
-                ExtendedMessageDenormalizer::WITH_CONTEXT_IMAGES => $showReferencedImages,
-                ExtendedMessageDenormalizer::WITH_DEBUG_FUNCTIONS => $showDebugOutput,
+                MessageContextDenormalizer::WITH_CONTEXT_DOCUMENTS => $showReferencedDocuments,
+                MessageContextDenormalizer::WITH_CONTEXT_IMAGES => $showReferencedImages,
+                MessageDenormalizer::WITH_DEBUG_FUNCTIONS => $showDebugOutput,
             ],
         );
     }

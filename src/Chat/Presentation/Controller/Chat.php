@@ -10,17 +10,17 @@ use ChronicleKeeper\Chat\Application\Query\FindConversationByIdParameters;
 use ChronicleKeeper\Chat\Application\Query\GetTemporaryConversationParameters;
 use ChronicleKeeper\Chat\Application\Service\ExtendedMessageBagToViewConverter;
 use ChronicleKeeper\Chat\Domain\Entity\Conversation;
-use ChronicleKeeper\Chat\Domain\Entity\ExtendedMessage;
+use ChronicleKeeper\Chat\Domain\Entity\Message;
 use ChronicleKeeper\Chat\Domain\ValueObject\MessageContext;
 use ChronicleKeeper\Chat\Domain\ValueObject\MessageDebug;
 use ChronicleKeeper\Chat\Domain\ValueObject\Reference;
+use ChronicleKeeper\Chat\Infrastructure\LLMChain\MessageBagConverter;
 use ChronicleKeeper\Chat\Infrastructure\LLMChain\RuntimeCollector;
 use ChronicleKeeper\Document\Infrastructure\LLMChain\DocumentSearch;
 use ChronicleKeeper\Library\Infrastructure\LLMChain\Tool\ImageSearch;
 use ChronicleKeeper\Settings\Application\SettingsHandler;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
 use ChronicleKeeper\Shared\Infrastructure\LLMChain\LLMChainFactory;
-use PhpLlm\LlmChain\Platform\Message\Message;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -50,6 +50,7 @@ class Chat extends AbstractController
         private readonly ImageSearch $libraryImages,
         private readonly RuntimeCollector $runtimeCollector,
         private readonly SettingsHandler $settingsHandler,
+        private readonly MessageBagConverter $messageBagConverter,
     ) {
     }
 
@@ -119,14 +120,14 @@ class Chat extends AbstractController
             flush();
 
             $messages   = $conversation->getMessages();
-            $messages[] = new ExtendedMessage(message: Message::ofUser($message));
+            $messages[] = Message::forUser($message);
 
             // Set Maximum distances in tools
             $this->libraryDocuments->setOneTimeMaxDistance($conversation->getSettings()->documentsMaxDistance);
             $this->libraryImages->setOneTimeMaxDistance($conversation->getSettings()->imagesMaxDistance);
 
             $response = $this->chain->create()->call(
-                $messages->getLLMChainMessages(),
+                $this->messageBagConverter->toLlmMessageBag($messages),
                 [
                     'model' => $conversation->getSettings()->version,
                     'temperature' => $conversation->getSettings()->temperature,
@@ -149,18 +150,18 @@ class Chat extends AbstractController
             }
 
             // Add the messages to conversation and persist
-            $fullMessage          = new ExtendedMessage(message: Message::ofAssistant($fullResponse));
-            $fullMessage->context = $this->buildMessageContext();
-            $fullMessage->debug   = $this->buildMessageDebug();
-
-            $messages[] = $fullMessage;
+            $messages[] = $fullMessage = Message::forAssistant(
+                $fullResponse,
+                $this->buildMessageContext(),
+                $this->buildMessageDebug(),
+            );
 
             $settings = $this->settingsHandler->get();
-            if ($fullMessage->debug->functions !== [] && $settings->getChatbotFunctions()->isAllowDebugOutput()) {
+            if ($fullMessage->getDebug()->functions !== [] && $settings->getChatbotFunctions()->isAllowDebugOutput()) {
                 echo 'data: ' . json_encode([
                     'type' => 'debug',
-                    'id' => $fullMessage->id,
-                    'debug' => $fullMessage->debug->functions,
+                    'id' => $fullMessage->getId(),
+                    'debug' => $fullMessage->getDebug()->functions,
                 ], JSON_THROW_ON_ERROR) . "\n\n";
                 ob_flush();
                 flush();
@@ -168,14 +169,14 @@ class Chat extends AbstractController
 
             $chatbotGeneralSettings = $settings->getChatbotGeneral();
             if (
-                ($chatbotGeneralSettings->showReferencedImages() && $fullMessage->context->images !== [])
-                || ($chatbotGeneralSettings->showReferencedDocuments() && $fullMessage->context->documents !== [])
+                ($chatbotGeneralSettings->showReferencedImages() && $fullMessage->getContext()->images !== [])
+                || ($chatbotGeneralSettings->showReferencedDocuments() && $fullMessage->getContext()->documents !== [])
             ) {
                 echo 'data: ' . json_encode([
                     'type' => 'context',
                     'context' => [
-                        'documents' => $fullMessage->context->documents,
-                        'images' => $fullMessage->context->images,
+                        'documents' => $fullMessage->getContext()->documents,
+                        'images' => $fullMessage->getContext()->images,
                     ],
                 ], JSON_THROW_ON_ERROR) . "\n\n";
                 ob_flush();
@@ -185,10 +186,10 @@ class Chat extends AbstractController
             // Send completion message
             echo 'data: ' . json_encode([
                 'type' => 'complete',
-                'id' => $fullMessage->id,
+                'id' => $fullMessage->getId(),
                 'convertToDocumentTarget' => $this->generateUrl(
                     'library_document_create',
-                    ['conversation' => $conversation->getId(), 'conversation_message' => $fullMessage->id],
+                    ['conversation' => $conversation->getId(), 'conversation_message' => $fullMessage->getId()],
                 ),
             ], JSON_THROW_ON_ERROR) . "\n\n";
             ob_flush();

@@ -9,11 +9,11 @@ use ChronicleKeeper\Chat\Application\Query\FindConversationsByDirectoryParameter
 use ChronicleKeeper\Chat\Application\Query\FindConversationsByDirectoryQuery;
 use ChronicleKeeper\Library\Domain\RootDirectory;
 use ChronicleKeeper\Test\Chat\Domain\Entity\ConversationBuilder;
-use ChronicleKeeper\Test\Chat\Domain\Entity\ExtendedMessageBagBuilder;
 use ChronicleKeeper\Test\Chat\Domain\Entity\ExtendedMessageBuilder;
 use ChronicleKeeper\Test\Chat\Domain\Entity\LLMChain\AssistantMessageBuilder;
 use ChronicleKeeper\Test\Chat\Domain\Entity\LLMChain\SystemMessageBuilder;
 use ChronicleKeeper\Test\Chat\Domain\Entity\LLMChain\UserMessageBuilder;
+use ChronicleKeeper\Test\Chat\Domain\Entity\MessageBagBuilder;
 use ChronicleKeeper\Test\Library\Domain\Entity\DirectoryBuilder;
 use ChronicleKeeper\Test\Shared\Infrastructure\Database\DatabaseTestCase;
 use Override;
@@ -62,7 +62,7 @@ class FindConversationsByDirectoryQueryTest extends DatabaseTestCase
     public function queryReturnsConversations(): void
     {
         // ------------------- The test setup -------------------
-        $messages = (new ExtendedMessageBagBuilder())
+        $messages = (new MessageBagBuilder())
             ->withMessages(
                 (new ExtendedMessageBuilder())->withMessage((new SystemMessageBuilder())->build())->build(),
                 (new ExtendedMessageBuilder())->withMessage((new UserMessageBuilder())->build())->build(),

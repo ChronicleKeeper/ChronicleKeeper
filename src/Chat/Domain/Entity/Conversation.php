@@ -14,19 +14,18 @@ use ChronicleKeeper\Library\Domain\RootDirectory;
 use ChronicleKeeper\Settings\Domain\ValueObject\Settings as AppSettings;
 use ChronicleKeeper\Shared\Domain\Entity\AggregateRoot;
 use ChronicleKeeper\Shared\Domain\Sluggable;
-use JsonSerializable;
 use PhpLlm\LlmChain\Platform\Bridge\OpenAI\GPT;
 use Symfony\Component\String\Slugger\AsciiSlugger;
 use Symfony\Component\Uid\Uuid;
 
-class Conversation extends AggregateRoot implements JsonSerializable, Sluggable
+class Conversation extends AggregateRoot implements Sluggable
 {
     public function __construct(
         private readonly string $id,
         private string $title,
         private Directory $directory,
         private Settings $settings,
-        private readonly ExtendedMessageBag $messages,
+        private readonly MessageBag $messages,
     ) {
     }
 
@@ -37,7 +36,7 @@ class Conversation extends AggregateRoot implements JsonSerializable, Sluggable
             'Unbekanntes Gespräch',
             RootDirectory::get(),
             new Settings(),
-            new ExtendedMessageBag(),
+            new MessageBag(),
         );
         $conversation->record(new ConversationCreated($conversation));
 
@@ -56,7 +55,7 @@ class Conversation extends AggregateRoot implements JsonSerializable, Sluggable
                 $conversation->getSettings()->imagesMaxDistance,
                 $conversation->getSettings()->documentsMaxDistance,
             ),
-            new ExtendedMessageBag(...$conversation->getMessages()->getArrayCopy()),
+            new MessageBag(...$conversation->getMessages()->getArrayCopy()),
         );
         $conversation->record(new ConversationCreated($conversation));
 
@@ -75,7 +74,7 @@ class Conversation extends AggregateRoot implements JsonSerializable, Sluggable
                 $settings->getChatbotTuning()->getDocumentsMaxDistance(),
                 $settings->getChatbotTuning()->getDocumentsMaxDistance(),
             ),
-            new ExtendedMessageBag(),
+            new MessageBag(),
         );
         $conversation->record(new ConversationCreated($conversation));
 
@@ -102,7 +101,7 @@ class Conversation extends AggregateRoot implements JsonSerializable, Sluggable
         return $this->settings;
     }
 
-    public function getMessages(): ExtendedMessageBag
+    public function getMessages(): MessageBag
     {
         return $this->messages;
     }
@@ -143,25 +142,5 @@ class Conversation extends AggregateRoot implements JsonSerializable, Sluggable
         $this->record(new ConversationSettingsChanged($this, $this->settings));
 
         $this->settings = $settings;
-    }
-
-    /**
-     * @return array{
-     *     id: string,
-     *     title: string,
-     *     directory: string,
-     *     settings: Settings,
-     *     messages: ExtendedMessageBag
-     * }
-     */
-    public function jsonSerialize(): array
-    {
-        return [
-            'id' => $this->id,
-            'title' => $this->title,
-            'directory' => $this->directory->getId(),
-            'settings' => $this->settings,
-            'messages' => $this->messages,
-        ];
     }
 }

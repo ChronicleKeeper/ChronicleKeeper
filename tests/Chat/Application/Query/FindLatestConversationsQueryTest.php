@@ -8,11 +8,11 @@ use ChronicleKeeper\Chat\Application\Command\StoreConversation;
 use ChronicleKeeper\Chat\Application\Query\FindLatestConversationsParameters;
 use ChronicleKeeper\Chat\Application\Query\FindLatestConversationsQuery;
 use ChronicleKeeper\Test\Chat\Domain\Entity\ConversationBuilder;
-use ChronicleKeeper\Test\Chat\Domain\Entity\ExtendedMessageBagBuilder;
 use ChronicleKeeper\Test\Chat\Domain\Entity\ExtendedMessageBuilder;
 use ChronicleKeeper\Test\Chat\Domain\Entity\LLMChain\AssistantMessageBuilder;
 use ChronicleKeeper\Test\Chat\Domain\Entity\LLMChain\SystemMessageBuilder;
 use ChronicleKeeper\Test\Chat\Domain\Entity\LLMChain\UserMessageBuilder;
+use ChronicleKeeper\Test\Chat\Domain\Entity\MessageBagBuilder;
 use ChronicleKeeper\Test\Shared\Infrastructure\Database\DatabaseTestCase;
 use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -63,7 +63,7 @@ class FindLatestConversationsQueryTest extends DatabaseTestCase
         $firstConversation = (new ConversationBuilder())
             ->withId('123e4567-e89b-12d3-a456-426614174000')
             ->withTitle('Test conversation')
-            ->withMessages((new ExtendedMessageBagBuilder())
+            ->withMessages((new MessageBagBuilder())
                 ->withMessages(
                     (new ExtendedMessageBuilder())->withMessage((new SystemMessageBuilder())->build())->build(),
                     (new ExtendedMessageBuilder())->withMessage((new UserMessageBuilder())->build())->build(),
@@ -75,7 +75,7 @@ class FindLatestConversationsQueryTest extends DatabaseTestCase
         $secondConversation = (new ConversationBuilder())
             ->withId('ddb44c62-4eae-4411-a421-0c56927c9e2b')
             ->withTitle('Test conversation 2')
-            ->withMessages((new ExtendedMessageBagBuilder())
+            ->withMessages((new MessageBagBuilder())
                 ->withMessages(
                     (new ExtendedMessageBuilder())->withMessage((new SystemMessageBuilder())->build())->build(),
                     (new ExtendedMessageBuilder())->withMessage((new UserMessageBuilder())->build())->build(),
