@@ -61,7 +61,7 @@ final readonly class ImageEmbeddingsImporter implements SingleImport
                         'image_id' => ':imageId',
                         'embedding' => ':embedding',
                         'content' => ':content',
-                        'vectorContentHash' => ':vectorContentHash',
+                        '"vectorContentHash"' => ':vectorContentHash',
                     ])
                     ->setParameters([
                         'imageId' => $row['image_id'],

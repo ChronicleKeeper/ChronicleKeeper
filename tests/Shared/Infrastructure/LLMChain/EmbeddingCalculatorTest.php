@@ -7,9 +7,9 @@ namespace ChronicleKeeper\Test\Shared\Infrastructure\LLMChain;
 use ChronicleKeeper\Shared\Infrastructure\LLMChain\EmbeddingCalculator;
 use ChronicleKeeper\Shared\Infrastructure\LLMChain\Exception\EmbeddingCalculationFailed;
 use ChronicleKeeper\Shared\Infrastructure\LLMChain\LLMChainFactory;
-use PhpLlm\LlmChain\Document\Vector;
-use PhpLlm\LlmChain\Model\Response\VectorResponse;
-use PhpLlm\LlmChain\PlatformInterface;
+use PhpLlm\LlmChain\Platform\PlatformInterface;
+use PhpLlm\LlmChain\Platform\Response\VectorResponse;
+use PhpLlm\LlmChain\Platform\Vector\Vector;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\Attributes\Test;
@@ -28,7 +28,7 @@ class EmbeddingCalculatorTest extends TestCase
         $response = new VectorResponse(new Vector([0.1, 0.2, 0.3]));
 
         $platform = self::createStub(PlatformInterface::class);
-        $platform->method('request')->willReturn($response);
+        $platform->method('request')->willReturn(ResponsePromiseFactory::create($response));
 
         $llmChainFactory = self::createStub(LLMChainFactory::class);
         $llmChainFactory->method('createPlatform')->willReturn($platform);
@@ -49,7 +49,7 @@ class EmbeddingCalculatorTest extends TestCase
         );
 
         $platform = self::createStub(PlatformInterface::class);
-        $platform->method('request')->willReturn($response);
+        $platform->method('request')->willReturn(ResponsePromiseFactory::create($response));
 
         $llmChainFactory = self::createStub(LLMChainFactory::class);
         $llmChainFactory->method('createPlatform')->willReturn($platform);
@@ -117,7 +117,7 @@ class EmbeddingCalculatorTest extends TestCase
         $response->method('getStatusCode')->willReturn(Response::HTTP_BAD_REQUEST);
         $response->method('getContent')->willReturn('Bad Request');
         $response->method('getInfo')->willReturnCallback(
-            static fn (string $name) => match ($name) {
+            static fn (string $name): mixed => match ($name) {
                 'http_code' => Response::HTTP_BAD_REQUEST,
                 'url' => 'https://api.example.com/embeddings',
                 'response_headers' => [

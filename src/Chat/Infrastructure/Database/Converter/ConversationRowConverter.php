@@ -64,10 +64,8 @@ class ConversationRowConverter implements RowConverter
         foreach ($rawMessages as $rawMessage) {
             $conversation['messages'][] = [
                 'id' => $rawMessage['id'],
-                'message' => [
-                    'role' => $rawMessage['role'],
-                    'content' => $rawMessage['content'],
-                ],
+                'role' => $rawMessage['role'],
+                'content' => $rawMessage['content'],
                 'context' => json_decode((string) $rawMessage['context'], true, 512, JSON_THROW_ON_ERROR),
                 'debug' => json_decode((string) $rawMessage['debug'], true, 512, JSON_THROW_ON_ERROR),
             ];

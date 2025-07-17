@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace ChronicleKeeper\Test\Chat\Domain\Entity;
 
 use ChronicleKeeper\Chat\Domain\Entity\Conversation;
-use ChronicleKeeper\Chat\Domain\Entity\ExtendedMessageBag;
+use ChronicleKeeper\Chat\Domain\Entity\MessageBag;
 use ChronicleKeeper\Chat\Domain\ValueObject\Settings;
 use ChronicleKeeper\Library\Domain\Entity\Directory;
 use ChronicleKeeper\Library\Domain\RootDirectory;
@@ -17,7 +17,7 @@ class ConversationBuilder
     private string $title;
     private Directory $directory;
     private Settings $settings;
-    private ExtendedMessageBag $messages;
+    private MessageBag $messages;
 
     public function __construct()
     {
@@ -25,7 +25,7 @@ class ConversationBuilder
         $this->title     = 'Default Title';
         $this->directory = RootDirectory::get();
         $this->settings  = new Settings();
-        $this->messages  = new ExtendedMessageBag();
+        $this->messages  = new MessageBag();
     }
 
     public function withId(string $id): self
@@ -56,7 +56,7 @@ class ConversationBuilder
         return $this;
     }
 
-    public function withMessages(ExtendedMessageBag $messages): self
+    public function withMessages(MessageBag $messages): self
     {
         $this->messages = $messages;
 

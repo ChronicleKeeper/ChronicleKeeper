@@ -6,11 +6,11 @@ namespace ChronicleKeeper\Test\Chat\Application\Service;
 
 use ChronicleKeeper\Chat\Application\Service\ExtendedMessageBagToViewConverter;
 use ChronicleKeeper\Settings\Application\SettingsHandler;
-use ChronicleKeeper\Test\Chat\Domain\Entity\ExtendedMessageBagBuilder;
 use ChronicleKeeper\Test\Chat\Domain\Entity\ExtendedMessageBuilder;
 use ChronicleKeeper\Test\Chat\Domain\Entity\LLMChain\AssistantMessageBuilder;
 use ChronicleKeeper\Test\Chat\Domain\Entity\LLMChain\SystemMessageBuilder;
 use ChronicleKeeper\Test\Chat\Domain\Entity\LLMChain\UserMessageBuilder;
+use ChronicleKeeper\Test\Chat\Domain\Entity\MessageBagBuilder;
 use ChronicleKeeper\Test\Settings\Domain\ValueObject\SettingsBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
@@ -26,7 +26,7 @@ final class ExtendedMessageBagToViewConverterTest extends TestCase
     #[Test]
     public function itCanConvertAMessageBagToViewData(): void
     {
-        $messageBag               = (new ExtendedMessageBagBuilder())
+        $messageBag               = (new MessageBagBuilder())
             ->withMessages(
                 (new ExtendedMessageBuilder())
                     ->withMessage((new SystemMessageBuilder())->build())

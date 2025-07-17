@@ -5,17 +5,16 @@ declare(strict_types=1);
 namespace ChronicleKeeper\Test\Chat\Application\Service;
 
 use ChronicleKeeper\Chat\Application\Service\SingleChatMessageExecution;
+use ChronicleKeeper\Chat\Domain\ValueObject\Role;
+use ChronicleKeeper\Chat\Infrastructure\LLMChain\MessageBagConverter;
 use ChronicleKeeper\Chat\Infrastructure\LLMChain\RuntimeCollector;
 use ChronicleKeeper\Document\Infrastructure\LLMChain\DocumentSearch;
 use ChronicleKeeper\Library\Infrastructure\LLMChain\Tool\ImageSearch;
 use ChronicleKeeper\Shared\Infrastructure\LLMChain\LLMChainFactory;
 use ChronicleKeeper\Test\Chat\Domain\Entity\ConversationBuilder;
-use PhpLlm\LlmChain\ChainInterface;
-use PhpLlm\LlmChain\Model\Message\AssistantMessage;
-use PhpLlm\LlmChain\Model\Message\Content\Text;
-use PhpLlm\LlmChain\Model\Message\MessageBag;
-use PhpLlm\LlmChain\Model\Message\UserMessage;
-use PhpLlm\LlmChain\Model\Response\TextResponse;
+use PhpLlm\LlmChain\Chain\ChainInterface;
+use PhpLlm\LlmChain\Platform\Message\MessageBag;
+use PhpLlm\LlmChain\Platform\Response\TextResponse;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\Attributes\Test;
@@ -46,13 +45,15 @@ class SingleChatMessageExecutionTest extends TestCase
         $serarchDocuments = self::createStub(DocumentSearch::class);
         $searchImages     = self::createStub(ImageSearch::class);
 
-        $runtimeCollector = self::createStub(RuntimeCollector::class);
+        $runtimeCollector    = self::createStub(RuntimeCollector::class);
+        $messageBagConverter = self::createStub(MessageBagConverter::class);
 
         $chatMessageExecution = new SingleChatMessageExecution(
             $chainFactory,
             $serarchDocuments,
             $searchImages,
             $runtimeCollector,
+            $messageBagConverter,
         );
 
         $conversation = (new ConversationBuilder())->build();
@@ -62,13 +63,11 @@ class SingleChatMessageExecutionTest extends TestCase
         self::assertCount(2, $conversation);
 
         $userMessage = $conversation[0];
-        self::assertInstanceOf(UserMessage::class, $userMessage->message);
-        $textContent = $userMessage->message->content[0];
-        self::assertInstanceOf(Text::class, $textContent);
-        self::assertSame('Hello?', $textContent->text);
+        self::assertSame(Role::USER, $userMessage->getRole());
+        self::assertSame('Hello?', $userMessage->getContent());
 
         $assistantMessage = $conversation[1];
-        self::assertInstanceOf(AssistantMessage::class, $assistantMessage->message);
-        self::assertSame('Hello World!', $assistantMessage->message->content);
+        self::assertSame(Role::ASSISTANT, $assistantMessage->getRole());
+        self::assertSame('Hello World!', $assistantMessage->getContent());
     }
 }

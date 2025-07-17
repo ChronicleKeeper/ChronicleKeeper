@@ -8,10 +8,10 @@ use ChronicleKeeper\Settings\Application\SettingsHandler;
 use ChronicleKeeper\Settings\Domain\ValueObject\Settings\ChatbotFunctions;
 use ChronicleKeeper\Shared\Infrastructure\LLMChain\SettingsToolbox;
 use ChronicleKeeper\Test\Settings\Domain\ValueObject\SettingsBuilder;
-use PhpLlm\LlmChain\Chain\Toolbox\ExecutionReference;
-use PhpLlm\LlmChain\Chain\Toolbox\Metadata;
 use PhpLlm\LlmChain\Chain\Toolbox\ToolboxInterface;
-use PhpLlm\LlmChain\Model\Response\ToolCall;
+use PhpLlm\LlmChain\Platform\Response\ToolCall;
+use PhpLlm\LlmChain\Platform\Tool\ExecutionReference;
+use PhpLlm\LlmChain\Platform\Tool\Tool;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\Attributes\Test;
@@ -29,13 +29,13 @@ class SettingsToolboxTest extends TestCase
         $llmToolbox      = self::createStub(ToolboxInterface::class);
         $settingsToolbox = new SettingsToolbox($settingsHandler, $llmToolbox);
 
-        self::assertEmpty($settingsToolbox->getMap());
+        self::assertEmpty($settingsToolbox->getTools());
     }
 
     #[Test]
     public function getMapWithTools(): void
     {
-        $exampleTool = new Metadata(
+        $exampleTool = new Tool(
             new ExecutionReference(stdClass::class),
             'ExampleTool',
             'This is an example tool.',
@@ -44,16 +44,16 @@ class SettingsToolboxTest extends TestCase
 
         $settingsHandler = self::createStub(SettingsHandler::class);
         $llmToolbox      = self::createStub(ToolboxInterface::class);
-        $llmToolbox->method('getMap')->willReturn([$exampleTool]);
+        $llmToolbox->method('getTools')->willReturn([$exampleTool]);
         $settingsToolbox = new SettingsToolbox($settingsHandler, $llmToolbox);
 
-        self::assertCount(1, $settingsToolbox->getMap());
+        self::assertCount(1, $settingsToolbox->getTools());
     }
 
     #[Test]
     public function getMapWithToolsAndDescriptions(): void
     {
-        $exampleTool = new Metadata(
+        $exampleTool = new Tool(
             new ExecutionReference(stdClass::class),
             'ExampleTool',
             'This is an example tool.',
@@ -71,10 +71,10 @@ class SettingsToolboxTest extends TestCase
         $settingsHandler->method('get')->willReturn($settings);
 
         $llmToolbox = self::createStub(ToolboxInterface::class);
-        $llmToolbox->method('getMap')->willReturn([$exampleTool]);
+        $llmToolbox->method('getTools')->willReturn([$exampleTool]);
         $settingsToolbox = new SettingsToolbox($settingsHandler, $llmToolbox);
 
-        $metadata = $settingsToolbox->getMap()[0];
+        $metadata = $settingsToolbox->getTools()[0];
         self::assertSame('foo bar baz', $metadata->description);
     }
 

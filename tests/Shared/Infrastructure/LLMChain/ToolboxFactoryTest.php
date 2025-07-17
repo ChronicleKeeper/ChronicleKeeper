@@ -26,7 +26,7 @@ class ToolboxFactoryTest extends TestCase
         $toolboxFactory = new ToolboxFactory(self::createStub(SettingsHandler::class));
         $toolbox        = $toolboxFactory->create();
 
-        self::assertEmpty($toolbox->getMap());
+        self::assertEmpty($toolbox->getTools());
     }
 
     #[Test]
@@ -35,7 +35,7 @@ class ToolboxFactoryTest extends TestCase
         $toolboxFactory = new ToolboxFactory(self::createStub(SettingsHandler::class), [new ExampleTool()]);
         $toolbox        = $toolboxFactory->create();
 
-        self::assertCount(1, $toolbox->getMap());
+        self::assertCount(1, $toolbox->getTools());
     }
 
     #[Test]
@@ -47,6 +47,6 @@ class ToolboxFactoryTest extends TestCase
         );
         $toolbox        = $toolboxFactory->create();
 
-        self::assertCount(1, $toolbox->getMap());
+        self::assertCount(1, $toolbox->getTools());
     }
 }

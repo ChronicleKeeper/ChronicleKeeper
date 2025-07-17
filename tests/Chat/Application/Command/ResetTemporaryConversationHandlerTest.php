@@ -7,11 +7,11 @@ namespace ChronicleKeeper\Test\Chat\Application\Command;
 use ChronicleKeeper\Chat\Application\Command\ResetTemporaryConversation;
 use ChronicleKeeper\Chat\Application\Command\ResetTemporaryConversationHandler;
 use ChronicleKeeper\Chat\Application\Command\StoreTemporaryConversation;
-use ChronicleKeeper\Chat\Domain\Entity\ExtendedMessage;
+use ChronicleKeeper\Chat\Domain\Entity\Message;
+use ChronicleKeeper\Chat\Domain\ValueObject\Role;
 use ChronicleKeeper\Settings\Application\SettingsHandler;
 use ChronicleKeeper\Test\Settings\Domain\Entity\SystemPromptBuilder;
 use ChronicleKeeper\Test\Settings\Domain\ValueObject\SettingsBuilder;
-use PhpLlm\LlmChain\Model\Message\SystemMessage;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\Attributes\Test;
@@ -54,10 +54,10 @@ class ResetTemporaryConversationHandlerTest extends TestCase
                 self::assertCount(1, $conversation->getMessages());
 
                 $message = $messages[0];
-                self::assertInstanceOf(ExtendedMessage::class, $message);
-                self::assertInstanceOf(SystemMessage::class, $message->message);
+                self::assertInstanceOf(Message::class, $message);
+                self::assertSame(Role::SYSTEM, $message->getRole());
 
-                self::assertSame($systemPrompt->getContent(), $message->message->content);
+                self::assertSame($systemPrompt->getContent(), $message->getContent());
 
                 return new Envelope($message);
             },

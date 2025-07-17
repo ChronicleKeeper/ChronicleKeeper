@@ -5,14 +5,12 @@ declare(strict_types=1);
 namespace ChronicleKeeper\Shared\Infrastructure\LLMChain;
 
 use ChronicleKeeper\Shared\Infrastructure\LLMChain\Exception\EmbeddingCalculationFailed;
-use PhpLlm\LlmChain\Bridge\OpenAI\Embeddings;
-use PhpLlm\LlmChain\Document\Vector;
+use PhpLlm\LlmChain\Platform\Bridge\OpenAI\Embeddings;
+use PhpLlm\LlmChain\Platform\Vector\Vector;
 use Symfony\Component\HttpClient\Exception\ClientException;
 
 use function array_filter;
 use function array_map;
-use function assert;
-use function is_array;
 use function strlen;
 use function substr;
 use function Symfony\Component\String\u;
@@ -28,13 +26,10 @@ class EmbeddingCalculator
     /** @return list<float> */
     public function getSingleEmbedding(string $text): array
     {
-        $response = $this->chainFactory->createPlatform()->request(
+        return $this->chainFactory->createPlatform()->request(
             model: new Embeddings(),
             input: $text,
-        )->getContent();
-        assert(is_array($response) && $response[0] instanceof Vector);
-
-        return $response[0]->getData();
+        )->asVectors()[0]->getData();
     }
 
     /**
@@ -48,7 +43,7 @@ class EmbeddingCalculator
 
         try {
             /** @var list<Vector> $response */
-            $response = $platform->request(new Embeddings(), $texts)->getContent();
+            $response = $platform->request(new Embeddings(), $texts)->asVectors();
         } catch (ClientException $e) {
             // The request contained a bad content, so log knowledge about the falsy content
             throw new EmbeddingCalculationFailed($e);

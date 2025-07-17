@@ -7,11 +7,11 @@ namespace ChronicleKeeper\Test\Chat\Application\Command;
 use ChronicleKeeper\Chat\Application\Command\StoreConversation;
 use ChronicleKeeper\Chat\Application\Command\StoreConversationHandler;
 use ChronicleKeeper\Test\Chat\Domain\Entity\ConversationBuilder;
-use ChronicleKeeper\Test\Chat\Domain\Entity\ExtendedMessageBagBuilder;
 use ChronicleKeeper\Test\Chat\Domain\Entity\ExtendedMessageBuilder;
 use ChronicleKeeper\Test\Chat\Domain\Entity\LLMChain\AssistantMessageBuilder;
 use ChronicleKeeper\Test\Chat\Domain\Entity\LLMChain\SystemMessageBuilder;
 use ChronicleKeeper\Test\Chat\Domain\Entity\LLMChain\UserMessageBuilder;
+use ChronicleKeeper\Test\Chat\Domain\Entity\MessageBagBuilder;
 use ChronicleKeeper\Test\Shared\Infrastructure\Database\DatabaseTestCase;
 use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -49,7 +49,7 @@ final class StoreConversationHandlerTest extends DatabaseTestCase
     public function itCanStoreAConversation(): void
     {
         // Generate stub objects
-        $messages = (new ExtendedMessageBagBuilder())
+        $messages = (new MessageBagBuilder())
             ->withMessages(
                 (new ExtendedMessageBuilder())->withMessage((new SystemMessageBuilder())->build())->build(),
                 (new ExtendedMessageBuilder())->withMessage((new UserMessageBuilder())->build())->build(),

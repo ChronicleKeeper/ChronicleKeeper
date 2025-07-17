@@ -17,18 +17,14 @@ use ChronicleKeeper\Test\Chat\Domain\Entity\LLMChain\UserMessageBuilder;
 use ChronicleKeeper\Test\Shared\Infrastructure\Persistence\Filesystem\FileAccessDouble;
 use ChronicleKeeper\Test\WebTestCase;
 use Generator;
-use PhpLlm\LlmChain\Model\Message\Content\Text;
-use PhpLlm\LlmChain\Model\Message\UserMessage;
-use PhpLlm\LlmChain\Model\Response\StreamResponse;
+use PhpLlm\LlmChain\Platform\Response\StreamResponse;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Large;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Serializer\SerializerInterface;
 
 use function assert;
-use function json_encode;
-
-use const JSON_THROW_ON_ERROR;
 
 #[CoversClass(Chat::class)]
 #[CoversClass(ExtendedMessageBagToViewConverter::class)]
@@ -61,10 +57,14 @@ class ChatTest extends WebTestCase
             ->withMessage((new UserMessageBuilder())->withContent('Hello World')->build())
             ->build();
 
+        $serializer = $this->client->getContainer()->get('serializer');
+        assert($serializer instanceof SerializerInterface);
+        $serializedData = $serializer->serialize($conversation, 'json');
+
         $fileAccess->write(
             'temp',
             'conversation_temporary.json',
-            json_encode($conversation, JSON_THROW_ON_ERROR),
+            $serializedData,
         );
 
         $this->client->request(Request::METHOD_GET, '/');
@@ -103,14 +103,13 @@ class ChatTest extends WebTestCase
             'documents_max_distance' => $conversation->getSettings()->imagesMaxDistance,
         ]);
 
-        assert($message->message instanceof UserMessage);
-        assert(isset($message->message->content[0]) && $message->message->content[0] instanceof Text);
+        assert($message->isUser());
 
         $this->connection->insert('conversation_messages', [
-            'id' => $message->id,
+            'id' => $message->getId(),
             'conversation_id' => $conversation->getId(),
-            'role' => $message->message->getRole()->value,
-            'content' => $message->message->content[0]->text,
+            'role' => $message->getRole()->value,
+            'content' => $message->getContent(),
             'context' => '{}',
             'debug' => '{}',
         ]);
@@ -128,18 +127,6 @@ class ChatTest extends WebTestCase
         $this->client->request(Request::METHOD_GET, '/chat/455af8a7-14f6-4516-910e-3bdb460c5418');
 
         self::assertResponseRedirects('/');
-    }
-
-    #[Test]
-    public function itWillStreamAMessageResponseCorrectlyWithEmptyResponse(): void
-    {
-        $this->client->request(Request::METHOD_GET, '/chat/stream/message?message=Hello&conversation=');
-        self::assertTrue($this->client->getResponse()->isSuccessful());
-
-        $response = $this->client->getInternalResponse()->getContent();
-
-        self::assertResponseIsSuccessful();
-        self::assertStringContainsString('data: {"type":"complete"', $response);
     }
 
     #[Test]

@@ -5,9 +5,8 @@ declare(strict_types=1);
 namespace ChronicleKeeper\Chat\Application\Command;
 
 use ChronicleKeeper\Chat\Domain\Entity\Conversation;
-use ChronicleKeeper\Chat\Domain\Entity\ExtendedMessage;
+use ChronicleKeeper\Chat\Domain\Entity\Message;
 use ChronicleKeeper\Settings\Application\SettingsHandler;
-use PhpLlm\LlmChain\Model\Message\Message;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Messenger\MessageBusInterface;
 
@@ -28,7 +27,7 @@ class ResetTemporaryConversationHandler
         // First Setup before creation of the real temporary conversation containing all temporary data
         $conversation = Conversation::createFromSettings($settings);
         $conversation->rename($message->title);
-        $conversation->getMessages()[] = new ExtendedMessage(Message::forSystem($message->utilizePrompt->getContent()));
+        $conversation->getMessages()[] = Message::forSystem($message->utilizePrompt->getContent());
 
         // And now store the newly created temporary conversation
         $this->bus->dispatch(new StoreTemporaryConversation(Conversation::createFromConversation($conversation)));

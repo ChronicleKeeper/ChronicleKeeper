@@ -6,14 +6,11 @@ namespace ChronicleKeeper\ImageGenerator\Application\Service;
 
 use ChronicleKeeper\Chat\Application\Service\SingleChatMessageExecution;
 use ChronicleKeeper\Chat\Domain\Entity\Conversation;
-use ChronicleKeeper\Chat\Domain\Entity\ExtendedMessage;
+use ChronicleKeeper\Chat\Domain\Entity\Message;
 use ChronicleKeeper\Settings\Application\Service\SystemPromptRegistry;
 use ChronicleKeeper\Settings\Domain\ValueObject\SystemPrompt\Purpose;
-use PhpLlm\LlmChain\Model\Message\AssistantMessage;
-use PhpLlm\LlmChain\Model\Message\Message;
 
 use function array_key_last;
-use function assert;
 
 class PromptOptimizer
 {
@@ -33,14 +30,12 @@ class PromptOptimizer
         $systemPrompt = $this->systemPromptRegistry->getDefaultForPurpose(Purpose::IMAGE_GENERATOR_OPTIMIZER);
 
         // Create Prompt that makes clear the user message should be rewritten to a Dall-E prompt
-        $messages[] = new ExtendedMessage(Message::forSystem($systemPrompt->getContent()));
+        $messages[] = Message::forSystem($systemPrompt->getContent());
 
         $this->chatMessageExecution->execute($originPrompt, $conversation);
 
-        $messages        = $conversation->getMessages()->getLLMChainMessages()->getMessages();
-        $optimizedPrompt = $messages[array_key_last($messages)];
-        assert($optimizedPrompt instanceof AssistantMessage);
+        $messages = $conversation->getMessages()->getArrayCopy();
 
-        return (string) $optimizedPrompt->content;
+        return $messages[array_key_last($messages)]->getContent();
     }
 }

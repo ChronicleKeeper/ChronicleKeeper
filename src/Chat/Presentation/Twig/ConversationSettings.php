@@ -9,7 +9,8 @@ use ChronicleKeeper\Chat\Application\Command\StoreTemporaryConversation;
 use ChronicleKeeper\Chat\Application\Query\GetTemporaryConversationParameters;
 use ChronicleKeeper\Chat\Domain\Entity\Conversation;
 use ChronicleKeeper\Chat\Domain\ValueObject\Settings;
-use ChronicleKeeper\Chat\Infrastructure\Serializer\ExtendedMessageDenormalizer;
+use ChronicleKeeper\Chat\Infrastructure\Serializer\MessageContextDenormalizer;
+use ChronicleKeeper\Chat\Infrastructure\Serializer\MessageDenormalizer;
 use ChronicleKeeper\Chat\Presentation\Form\ConversationSettingsType;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -43,9 +44,9 @@ class ConversationSettings extends AbstractController
         writable: true,
         useSerializerForHydration: true,
         serializationContext: [
-            ExtendedMessageDenormalizer::WITH_CONTEXT_DOCUMENTS => true,
-            ExtendedMessageDenormalizer::WITH_CONTEXT_IMAGES => true,
-            ExtendedMessageDenormalizer::WITH_DEBUG_FUNCTIONS => true,
+            MessageContextDenormalizer::WITH_CONTEXT_DOCUMENTS => true,
+            MessageContextDenormalizer::WITH_CONTEXT_IMAGES => true,
+            MessageDenormalizer::WITH_DEBUG_FUNCTIONS => true,
         ],
     )]
     public Conversation $conversation;

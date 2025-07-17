@@ -26,7 +26,6 @@ use function reset;
 #[CoversClass(MonthSettings::class)]
 #[CoversClass(LeapDaysType::class)]
 #[CoversClass(CalendarSettings::class)]
-#[CoversClass(LeapDaysType::class)]
 #[CoversClass(LeapDaysForm::class)]
 #[CoversClass(LeapDayType::class)]
 #[Large]

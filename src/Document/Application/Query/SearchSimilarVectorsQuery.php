@@ -30,9 +30,9 @@ class SearchSimilarVectorsQuery implements Query
         $vectorString = '[' . implode(',', $parameters->searchedVectors) . ']';
 
         $sql = 'SELECT document_id, content,
-                   (embedding <-> :vector) as distance
+                   (embedding <=> :vector) as distance
                 FROM documents_vectors
-                WHERE (embedding <-> :vector) < :maxDistance
+                WHERE (embedding <=> :vector) < :maxDistance
                 ORDER BY distance
                 LIMIT :maxResults';
 

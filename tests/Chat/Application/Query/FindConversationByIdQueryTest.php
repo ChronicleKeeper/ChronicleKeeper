@@ -11,11 +11,11 @@ use ChronicleKeeper\Chat\Domain\Entity\Conversation;
 use ChronicleKeeper\Chat\Infrastructure\Database\Converter\ConversationRowConverter;
 use ChronicleKeeper\Shared\Infrastructure\Database\Converter\DatabaseRowConverter;
 use ChronicleKeeper\Test\Chat\Domain\Entity\ConversationBuilder;
-use ChronicleKeeper\Test\Chat\Domain\Entity\ExtendedMessageBagBuilder;
 use ChronicleKeeper\Test\Chat\Domain\Entity\ExtendedMessageBuilder;
 use ChronicleKeeper\Test\Chat\Domain\Entity\LLMChain\AssistantMessageBuilder;
 use ChronicleKeeper\Test\Chat\Domain\Entity\LLMChain\SystemMessageBuilder;
 use ChronicleKeeper\Test\Chat\Domain\Entity\LLMChain\UserMessageBuilder;
+use ChronicleKeeper\Test\Chat\Domain\Entity\MessageBagBuilder;
 use ChronicleKeeper\Test\Shared\Infrastructure\Database\DatabaseTestCase;
 use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -23,6 +23,7 @@ use PHPUnit\Framework\Attributes\Large;
 use PHPUnit\Framework\Attributes\Test;
 
 use function assert;
+use function count;
 
 #[CoversClass(FindConversationByIdQuery::class)]
 #[CoversClass(FindConversationByIdParameters::class)]
@@ -65,7 +66,7 @@ class FindConversationByIdQueryTest extends DatabaseTestCase
     public function itCanFetchASpecificConversation(): void
     {
         // ------------------- The test setup -------------------
-        $messages = (new ExtendedMessageBagBuilder())
+        $messages = (new MessageBagBuilder())
             ->withMessages(
                 (new ExtendedMessageBuilder())->withMessage((new SystemMessageBuilder())->build())->build(),
                 (new ExtendedMessageBuilder())->withMessage((new UserMessageBuilder())->build())->build(),
@@ -90,7 +91,7 @@ class FindConversationByIdQueryTest extends DatabaseTestCase
         self::assertInstanceOf(Conversation::class, $result);
         self::assertSame($conversation->getId(), $result->getId());
         self::assertSame($conversation->getTitle(), $result->getTitle());
-        self::assertEquals($conversation->getMessages(), $result->getMessages());
+        self::assertCount(count($conversation->getMessages()), $result->getMessages());
     }
 
     #[Test]

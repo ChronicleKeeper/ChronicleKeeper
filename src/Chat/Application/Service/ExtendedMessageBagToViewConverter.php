@@ -4,20 +4,9 @@ declare(strict_types=1);
 
 namespace ChronicleKeeper\Chat\Application\Service;
 
-use ChronicleKeeper\Chat\Domain\Entity\ExtendedMessage;
-use ChronicleKeeper\Chat\Domain\Entity\ExtendedMessageBag;
+use ChronicleKeeper\Chat\Domain\Entity\Message;
+use ChronicleKeeper\Chat\Domain\Entity\MessageBag;
 use ChronicleKeeper\Settings\Application\SettingsHandler;
-use PhpLlm\LlmChain\Model\Message\AssistantMessage;
-use PhpLlm\LlmChain\Model\Message\Content\Content;
-use PhpLlm\LlmChain\Model\Message\Content\Text;
-use PhpLlm\LlmChain\Model\Message\Role;
-use PhpLlm\LlmChain\Model\Message\UserMessage;
-
-use function array_column;
-use function array_filter;
-use function implode;
-
-use const PHP_EOL;
 
 class ExtendedMessageBagToViewConverter
 {
@@ -25,40 +14,27 @@ class ExtendedMessageBagToViewConverter
     {
     }
 
-    /** @return list<array{role: string, message: string, extended: ExtendedMessage}> */
-    public function convert(ExtendedMessageBag $messageBag): array
+    /** @return list<array{role: string, message: string, extended: Message}> */
+    public function convert(MessageBag $messageBag): array
     {
         $settings = $this->settingsHandler->get();
 
         $messages = [];
 
-        foreach ($messageBag as $extendedMessage) {
-            $originMessage = $extendedMessage->message;
-
-            if ($originMessage->getRole() !== Role::User && $originMessage->getRole() !== Role::Assistant) {
+        foreach ($messageBag as $originMessage) {
+            if (! $originMessage->isUser() && ! $originMessage->isAssistant()) {
                 continue;
             }
 
             $role = $settings->getChatbotGeneral()->getChatbotName();
-            if ($originMessage->getRole() === Role::User) {
+            if ($originMessage->isUser()) {
                 $role = $settings->getChatbotGeneral()->getChatterName();
-            }
-
-            $content = '';
-            if ($originMessage instanceof UserMessage) {
-                $contentText = array_filter(
-                    $originMessage->content,
-                    static fn (Content $entry) => $entry instanceof Text,
-                );
-                $content     = implode(PHP_EOL, array_column($contentText, 'text'));
-            } elseif ($originMessage instanceof AssistantMessage) {
-                $content = (string) $originMessage->content;
             }
 
             $messages[] = [
                 'role' => $role,
-                'message' => $content,
-                'extended' => $extendedMessage,
+                'message' => $originMessage->getContent(),
+                'extended' => $originMessage,
             ];
         }
 

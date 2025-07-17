@@ -9,11 +9,11 @@ use ChronicleKeeper\Chat\Application\Service\ImportExport\ConversationExporter;
 use ChronicleKeeper\Settings\Application\Service\Exporter\ExportSettings;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
 use ChronicleKeeper\Test\Chat\Domain\Entity\ConversationBuilder;
-use ChronicleKeeper\Test\Chat\Domain\Entity\ExtendedMessageBagBuilder;
 use ChronicleKeeper\Test\Chat\Domain\Entity\ExtendedMessageBuilder;
 use ChronicleKeeper\Test\Chat\Domain\Entity\LLMChain\AssistantMessageBuilder;
 use ChronicleKeeper\Test\Chat\Domain\Entity\LLMChain\SystemMessageBuilder;
 use ChronicleKeeper\Test\Chat\Domain\Entity\LLMChain\UserMessageBuilder;
+use ChronicleKeeper\Test\Chat\Domain\Entity\MessageBagBuilder;
 use ChronicleKeeper\Test\Shared\Infrastructure\Database\DatabaseTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Large;
@@ -44,7 +44,7 @@ class ConversationExporterTest extends DatabaseTestCase
     public function itIsAddingASerializedConversationToArchive(): void
     {
         // ------------------- The test setup -------------------
-        $messages = (new ExtendedMessageBagBuilder())
+        $messages = (new MessageBagBuilder())
             ->withMessages(
                 (new ExtendedMessageBuilder())->withMessage((new SystemMessageBuilder())->build())->build(),
                 (new ExtendedMessageBuilder())->withMessage((new UserMessageBuilder())->build())->build(),

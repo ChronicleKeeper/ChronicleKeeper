@@ -5,16 +5,16 @@ declare(strict_types=1);
 namespace ChronicleKeeper\Chat\Application\Service;
 
 use ChronicleKeeper\Chat\Domain\Entity\Conversation;
-use ChronicleKeeper\Chat\Domain\Entity\ExtendedMessage;
+use ChronicleKeeper\Chat\Domain\Entity\Message;
 use ChronicleKeeper\Chat\Domain\ValueObject\MessageContext;
 use ChronicleKeeper\Chat\Domain\ValueObject\MessageDebug;
 use ChronicleKeeper\Chat\Domain\ValueObject\Reference;
+use ChronicleKeeper\Chat\Infrastructure\LLMChain\MessageBagConverter;
 use ChronicleKeeper\Chat\Infrastructure\LLMChain\RuntimeCollector;
 use ChronicleKeeper\Document\Infrastructure\LLMChain\DocumentSearch;
 use ChronicleKeeper\Library\Infrastructure\LLMChain\Tool\ImageSearch;
 use ChronicleKeeper\Shared\Infrastructure\LLMChain\LLMChainFactory;
-use PhpLlm\LlmChain\Model\Message\Message;
-use PhpLlm\LlmChain\Model\Response\TextResponse;
+use PhpLlm\LlmChain\Platform\Response\TextResponse;
 
 use function assert;
 
@@ -25,6 +25,7 @@ class SingleChatMessageExecution
         private readonly DocumentSearch $libraryDocuments,
         private readonly ImageSearch $libraryImages,
         private readonly RuntimeCollector $runtimeCollector,
+        private readonly MessageBagConverter $messageBagConverter,
     ) {
     }
 
@@ -35,14 +36,14 @@ class SingleChatMessageExecution
         float $useTemperature = 1.0,
     ): void {
         $messages   = $conversation->getMessages();
-        $messages[] = new ExtendedMessage(message: Message::ofUser($message));
+        $messages[] = Message::forUser($message);
 
         // Set Maximum distances in tools
         $this->libraryDocuments->setOneTimeMaxDistance($conversation->getSettings()->documentsMaxDistance);
         $this->libraryImages->setOneTimeMaxDistance($conversation->getSettings()->imagesMaxDistance);
 
         $response = $this->chain->create()->call(
-            $messages->getLLMChainMessages(),
+            $this->messageBagConverter->toLlmMessageBag($messages),
             [
                 'model' => $useModel,
                 'temperature' => $useTemperature,
@@ -54,11 +55,11 @@ class SingleChatMessageExecution
         $this->libraryDocuments->setOneTimeMaxDistance(null);
         $this->libraryImages->setOneTimeMaxDistance(null);
 
-        $response          = new ExtendedMessage(message: Message::ofAssistant($response->getContent()));
-        $response->context = $this->buildMessageContext();
-        $response->debug   = $this->buildMessageDebug();
-
-        $messages[] = $response;
+        $messages[] = Message::forAssistant(
+            $response->getContent(),
+            $this->buildMessageContext(),
+            $this->buildMessageDebug(),
+        );
     }
 
     private function buildMessageDebug(): MessageDebug

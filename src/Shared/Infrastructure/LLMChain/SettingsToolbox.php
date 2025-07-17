@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace ChronicleKeeper\Shared\Infrastructure\LLMChain;
 
 use ChronicleKeeper\Settings\Application\SettingsHandler;
-use PhpLlm\LlmChain\Chain\Toolbox\Metadata;
 use PhpLlm\LlmChain\Chain\Toolbox\ToolboxInterface;
-use PhpLlm\LlmChain\Model\Response\ToolCall;
+use PhpLlm\LlmChain\Platform\Response\ToolCall;
+use PhpLlm\LlmChain\Platform\Tool\Tool;
 
 use function array_key_exists;
 
@@ -19,14 +19,14 @@ class SettingsToolbox implements ToolboxInterface
     ) {
     }
 
-    /** @return Metadata[] */
-    public function getMap(): array
+    /** @return Tool[] */
+    public function getTools(): array
     {
         $descriptions = $this->settingsHandler->get()->getChatbotFunctions()->getFunctionDescriptions();
-        $toolMap      = $this->llmToolBox->getMap();
+        $tools        = $this->llmToolBox->getTools();
         // Check Settings for custom tool names and descriptions and overhault the metadata here :)
 
-        foreach ($toolMap as $index => $tool) {
+        foreach ($tools as $index => $tool) {
             if (! array_key_exists($tool->name, $descriptions)) {
                 continue;
             }
@@ -35,7 +35,7 @@ class SettingsToolbox implements ToolboxInterface
                 continue;
             }
 
-            $toolMap[$index] = new Metadata(
+            $tools[$index] = new Tool(
                 $tool->reference,
                 $tool->name,
                 $descriptions[$tool->name],
@@ -43,7 +43,7 @@ class SettingsToolbox implements ToolboxInterface
             );
         }
 
-        return $toolMap;
+        return $tools;
     }
 
     /**

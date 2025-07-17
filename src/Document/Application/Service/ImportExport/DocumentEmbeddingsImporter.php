@@ -70,7 +70,7 @@ final readonly class DocumentEmbeddingsImporter implements SingleImport
                             'document_id' => ':documentId',
                             'embedding' => ':embedding',
                             'content' => ':content',
-                            'vectorContentHash' => ':vectorContentHash',
+                            '"vectorContentHash"' => ':vectorContentHash',
                         ])
                         ->setParameters([
                             'documentId' => $row['document_id'],

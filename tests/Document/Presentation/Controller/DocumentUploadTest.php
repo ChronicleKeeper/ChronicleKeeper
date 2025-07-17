@@ -11,9 +11,9 @@ use ChronicleKeeper\Library\Presentation\Twig\DirectoryBreadcrumb;
 use ChronicleKeeper\Shared\Infrastructure\LLMChain\LLMChainFactory;
 use ChronicleKeeper\Test\Shared\Infrastructure\LLMChain\LLMChainFactoryDouble;
 use ChronicleKeeper\Test\WebTestCase;
-use PhpLlm\LlmChain\Bridge\OpenAI\Embeddings;
-use PhpLlm\LlmChain\Document\Vector;
-use PhpLlm\LlmChain\Model\Response\ResponseInterface;
+use PhpLlm\LlmChain\Platform\Bridge\OpenAI\Embeddings;
+use PhpLlm\LlmChain\Platform\Response\VectorResponse;
+use PhpLlm\LlmChain\Platform\Vector\Vector;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Large;
 use PHPUnit\Framework\Attributes\Test;
@@ -64,13 +64,9 @@ class DocumentUploadTest extends WebTestCase
 
         $llmChainFactory->addPlatformResponse(
             Embeddings::class,
-            new class implements ResponseInterface {
-                /** @return Vector[] */
-                public function getContent(): array
-                {
-                    return [new Vector(array_map(static fn () => mt_rand() / mt_getrandmax(), range(1, 1536)))];
-                }
-            },
+            new VectorResponse(
+                new Vector(array_map(static fn () => mt_rand() / mt_getrandmax(), range(1, 1536))),
+            ),
         );
 
         $this->client->request(

@@ -20,7 +20,6 @@ use Symfony\Component\HttpFoundation\Request;
 
 #[CoversClass(EpochSettings::class)]
 #[CoversClass(CalendarSettings::class)]
-#[CoversClass(EpochSettings::class)]
 #[CoversClass(SettingsHandler::class)]
 #[CoversClass(EpochsForm::class)]
 #[CoversClass(EpochsType::class)]

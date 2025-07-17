@@ -58,7 +58,7 @@ final readonly class ConversationExporter implements SingleExport
                     ExportData::create(
                         $exportSettings,
                         Type::CONVERSATION,
-                        $conversation->jsonSerialize(),
+                        $conversation,
                     ),
                     'json',
                     ['json_encode_options' => JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR],

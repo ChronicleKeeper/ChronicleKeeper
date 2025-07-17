@@ -7,7 +7,7 @@ namespace ChronicleKeeper\Settings\Presentation\Form;
 use ChronicleKeeper\Settings\Domain\ValueObject\Settings;
 use ChronicleKeeper\Settings\Domain\ValueObject\Settings\ChatbotFunctions;
 use ChronicleKeeper\Shared\Infrastructure\LLMChain\ToolboxFactory;
-use PhpLlm\LlmChain\Chain\Toolbox\Metadata;
+use PhpLlm\LlmChain\Platform\Tool\Tool;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\DataMapperInterface;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
@@ -27,13 +27,13 @@ use function time;
 
 final class ChatbotFunctionsType extends AbstractType implements DataMapperInterface
 {
-    /** @var Metadata[] */
+    /** @var Tool[] */
     private readonly array $tools;
 
     public function __construct(
         private readonly ToolboxFactory $toolboxFactory,
     ) {
-        $this->tools = $this->toolboxFactory->create()->getMap();
+        $this->tools = $this->toolboxFactory->create()->getTools();
     }
 
     public function configureOptions(OptionsResolver $resolver): void

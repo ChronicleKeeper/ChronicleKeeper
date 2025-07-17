@@ -1,4 +1,4 @@
-{% if message.extended.message.role.value == 'assistant' %}
+{% if message.extended.role.value == 'assistant' %}
     {{ _self.bot(conversation, message) }}
 {% else %}
     {{ _self.user(conversation, message) }}

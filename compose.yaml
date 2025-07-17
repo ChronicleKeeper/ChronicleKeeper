@@ -29,7 +29,6 @@ services:
 
   database:
     profiles: ["dev", "all"]
-    image: postgres:15-alpine
     build:
         context: .
         dockerfile: .docker/postgres/Dockerfile
@@ -42,11 +41,9 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./.docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
 
   database_test:
     profiles: ["test", "all"]
-    image: postgres:15-alpine
     build:
       context: .
       dockerfile: .docker/postgres/Dockerfile
@@ -59,7 +56,6 @@ services:
       - "5433:5432"
     volumes:
       - postgres_test_data:/var/lib/postgresql/data
-      - ./.docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
 
 # Volumes needed for Caddy certificates and configuration
 volumes:
