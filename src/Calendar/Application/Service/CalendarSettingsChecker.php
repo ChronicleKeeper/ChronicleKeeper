@@ -15,8 +15,7 @@ class CalendarSettingsChecker
     ) {
     }
 
-    /** @throws CalendarConfigurationIncomplete */
-    public function hasValidSettings(): void
+    public function hasValidSettings(bool $throw = true): bool
     {
         $calendarSettings = $this->settingsHandler->get()->getCalendarSettings();
         $missingSettings  = [];
@@ -38,9 +37,13 @@ class CalendarSettingsChecker
         }
 
         if ($missingSettings === []) {
-            return;
+            return true;
         }
 
-        throw new CalendarConfigurationIncomplete($missingSettings);
+        if ($throw === true) {
+            throw new CalendarConfigurationIncomplete($missingSettings);
+        }
+
+        return false;
     }
 }

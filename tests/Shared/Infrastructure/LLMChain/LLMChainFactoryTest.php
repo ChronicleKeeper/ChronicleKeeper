@@ -33,7 +33,7 @@ class LLMChainFactoryTest extends TestCase
 
         $httpCllient = self::createStub(HttpClientInterface::class);
 
-        $llmChainFactory = new LLMChainFactory($settingsHandler, $toolboxFactory, $httpCllient);
+        $llmChainFactory = new LLMChainFactory($settingsHandler, $toolboxFactory, $httpCllient, []);
         $llmChainFactory->create();
     }
 
@@ -46,7 +46,7 @@ class LLMChainFactoryTest extends TestCase
         $toolboxFactory = $this->createMock(ToolboxFactory::class);
         $httpCllient    = self::createStub(HttpClientInterface::class);
 
-        $llmChainFactory = new LLMChainFactory($settingsHandler, $toolboxFactory, $httpCllient);
+        $llmChainFactory = new LLMChainFactory($settingsHandler, $toolboxFactory, $httpCllient, []);
         $llmChainFactory->createPlatform();
     }
 
@@ -61,7 +61,7 @@ class LLMChainFactoryTest extends TestCase
 
         $httpCllient = self::createStub(HttpClientInterface::class);
 
-        $llmChainFactory = new LLMChainFactory($settingsHandler, $toolboxFactory, $httpCllient);
+        $llmChainFactory = new LLMChainFactory($settingsHandler, $toolboxFactory, $httpCllient, []);
 
         self::assertSame(
             $llmChainFactory->create(),

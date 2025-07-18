@@ -40,8 +40,7 @@ final class CalendarSettingsCheckerTest extends TestCase
         $checker = new CalendarSettingsChecker($settingsHandler);
 
         // No exception should be thrown
-        $checker->hasValidSettings();
-        $this->addToAssertionCount(1);
+        self::assertTrue($checker->hasValidSettings());
     }
 
     /**
@@ -82,6 +81,38 @@ final class CalendarSettingsCheckerTest extends TestCase
 
             throw $e;
         }
+    }
+
+    /**
+     * @param string[] $epochs
+     * @param string[] $months
+     * @param string[] $weeks
+     * @param string[] $expectedMissingSettings
+     */
+    #[Test]
+    #[DataProvider('provideIncompleteSetting')]
+    public function itRejectsIncompleteSettingsWithABoolean(
+        CurrentDay|null $currentDay,
+        array $epochs,
+        array $months,
+        array $weeks,
+        array $expectedMissingSettings,
+    ): void {
+        $calendarSettings = $this->createMock(CalendarSettings::class);
+        $calendarSettings->method('getCurrentDay')->willReturn($currentDay);
+        $calendarSettings->method('getEpochs')->willReturn($epochs);
+        $calendarSettings->method('getMonths')->willReturn($months);
+        $calendarSettings->method('getWeeks')->willReturn($weeks);
+
+        $settings = $this->createMock(Settings::class);
+        $settings->method('getCalendarSettings')->willReturn($calendarSettings);
+
+        $settingsHandler = $this->createMock(SettingsHandler::class);
+        $settingsHandler->method('get')->willReturn($settings);
+
+        $checker = new CalendarSettingsChecker($settingsHandler);
+
+        self::assertFalse($checker->hasValidSettings(false));
     }
 
     public static function provideIncompleteSetting(): Generator
