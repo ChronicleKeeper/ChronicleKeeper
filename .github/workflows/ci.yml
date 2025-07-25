@@ -17,9 +17,6 @@ jobs:
         with:
           php-version: '8.3'
 
-      - name: Setup Temporary Config
-        run: cp .env.test.dist .env.test
-
       - uses: "ramsey/composer-install@v3"
 
       - name: Linting PHP
@@ -52,9 +49,6 @@ jobs:
         - uses: shivammathur/setup-php@v2
           with:
             php-version: ${{ matrix.php }}
-
-        - name: Setup Temporary Config
-          run: cp .env.test.dist .env.test
 
         - uses: "ramsey/composer-install@v3"
 
@@ -111,7 +105,6 @@ jobs:
 
       - name: Setup Database Config
         run: |
-          cp .env.test.dist .env.test
           echo "DATABASE_URL=pgsql://app:app@localhost:5432/chronicle-keeper?serverVersion=15&charset=utf8" >> .env.test
 
       - uses: "ramsey/composer-install@v3"

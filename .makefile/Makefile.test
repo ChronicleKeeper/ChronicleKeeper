@@ -10,11 +10,11 @@ check-test-containers:
 		sleep 3; \
 	fi
 
-test: setup-test-env ## Run tests with configured database
+test: ## Run tests with configured database
 	$(MAKE) check-test-containers
 	$(PHP) bin/console cache:clear --env=test
 	$(PHP) bin/console app:db:drop -f --env=test
 	docker compose exec -e APP_ENV=test php vendor/bin/phpunit --colors
 
-coverage: setup-test-env ## Generate test coverage report
+coverage: ## Generate test coverage report
 	XDEBUG_MODE=coverage $(PHP) vendor/bin/phpunit --coverage-html=coverage --coverage-clover=coverage.xml

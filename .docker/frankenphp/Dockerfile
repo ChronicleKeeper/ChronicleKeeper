@@ -6,14 +6,14 @@ WORKDIR /app
 # VOLUME /app/var/
 
 RUN install-php-extensions \
-    @composer \
+	@composer \
 	gd \
 	intl \
-    mbstring \
+	mbstring \
 	zip \
 	opcache \
-    pdo \
-    pdo_pgsql \
+	pdo \
+	pdo_pgsql \
 ;
 
 # https://getcomposer.org/doc/03-cli.md#composer-allow-superuser
@@ -32,15 +32,14 @@ CMD [ "frankenphp", "run", "--config", "/etc/caddy/Caddyfile" ]
 
 FROM chronicle_keeper_base AS chronicle_keeper_dev
 
-ENV APP_ENV=dev
-
+# APP_ENV will be inherited from .env or can be overridden via environment variables
 CMD [ "frankenphp", "run", "--config", "/etc/caddy/Caddyfile", "--watch" ]
 
 FROM chronicle_keeper_base AS chronicle_keeper_prod
 
 COPY --link ./.docker/frankenphp/conf.d/app.prod.ini $PHP_INI_DIR/app.conf.d/
 
-ENV APP_ENV=prod
+# APP_ENV will be inherited from .env or can be overridden via environment variables
 ENV FRANKENPHP_CONFIG=""
 ENV BASIC_AUTH_USER=""
 ENV BASIC_AUTH_PASSWORD=""
@@ -57,7 +56,7 @@ RUN set -eux; \
 	composer dump-autoload --classmap-authoritative --no-dev; \
 	composer run-script --no-dev post-install-cmd; \
 	chmod +x bin/console; \
-    php bin/console asset-map:compile; \
-    php bin/console cache:clear; \
-    php bin/console cache:warmup; \
-    sync;
+	php bin/console asset-map:compile; \
+	php bin/console cache:clear; \
+	php bin/console cache:warmup; \
+	sync;

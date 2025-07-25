@@ -3,11 +3,10 @@
 /vendor/
 /public/assets/
 
-.env
-.env.test
 .env.local
 .env.*.local
-!.env.dist
+.env.prod.local
+.env.test.local
 
 /.phpcs-cache
 /.phpunit.cache/
