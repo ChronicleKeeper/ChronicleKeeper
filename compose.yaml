@@ -7,9 +7,6 @@ services:
       dockerfile: .docker/frankenphp/Dockerfile
     environment:
       SERVER_NAME: ${SERVER_NAME:-localhost}, php:80
-      DATABASE_TYPE: PgSql
-      DATABASE_CONNECTION: pgsql:host=${POSTGRES_HOST:-database};port=${POSTGRES_PORT:-5432};dbname=${POSTGRES_DB:-chronicle-keeper};user=${POSTGRES_USER:-app};password=${POSTGRES_PASSWORD:-app}
-      DATABASE_URL: pgsql://${POSTGRES_USER:-${POSTGRES_PASSWORD:-app}}:app@${POSTGRES_HOST:-database}:${POSTGRES_PORT:-5432}/${POSTGRES_DB:-chronicle-keeper}?serverVersion=15&charset=utf8
     ports:
       # HTTP
       - target: 80
@@ -49,11 +46,11 @@ services:
       dockerfile: .docker/postgres/Dockerfile
     restart: always
     environment:
-      POSTGRES_USER: app_test
-      POSTGRES_PASSWORD: app_test
-      POSTGRES_DB: chronicle-keeper-test
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: app
+      POSTGRES_DB: chronicle-keeper
     ports:
-      - "5433:5432"
+      - "5434:5432"
     volumes:
       - postgres_test_data:/var/lib/postgresql/data
 

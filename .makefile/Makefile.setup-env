@@ -2,23 +2,7 @@ SHELL := /bin/bash
 .PHONY: *
 
 # Environment handling
-setup-env = @if [ ! -f .env.$(1).dist ]; then \
-		echo "Error: .env.$(1).dist not found"; \
-		exit 1; \
-	fi; \
-	cp .env.$(1).dist .env;
-
-setup-test-env = @if [ ! -f .env.$(1).dist ]; then \
-		echo "Error: .env.$(1).dist not found"; \
-		exit 1; \
-	fi; \
-	cp .env.$(1).dist .env.test;
-
-setup-dev-env: ## Setup development environment
-	$(call setup-env,dev)
-
-setup-test-env: ## Setup test environment
-	$(call setup-test-env,test)
+# (Removed custom env setup logic; rely on Symfony's .env loading)
 
 setup-database: ## setup the database
 	 $(PHP) bin/console app:db:init --force -vvv
