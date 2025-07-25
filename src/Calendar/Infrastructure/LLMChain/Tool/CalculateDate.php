@@ -25,11 +25,8 @@ use const PHP_EOL;
 #[AsTool(
     'calendar_date_calculator',
     description: <<<'TEXT'
-    IMPORTANT: BEFORE using this tool, you MUST first call calendar_system_info to understand the fantasy calendar structure!
-
     Performs date calculations in a CUSTOM FANTASY CALENDAR system that differs from Earth's calendar.
-    This tool requires understanding the unique calendar structure (days per week, months per year, etc.)
-    which can only be obtained by first calling calendar_system_info.
+    This tool requires understanding the unique calendar structure (days per week, months per year, etc.).
 
     Operations:
     - "add_days": Adds days to current date (requires days parameter)
