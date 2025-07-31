@@ -1,5 +1,11 @@
 # Changelog
 
+## [alpha-0.10]
+
+**Changed** 
+
+- The llm tool "calendar_system_info" was removed in favor of the new memory system to remove tool depdencies in favor for delivering facts directly.
+
 ## [alpha-0.9]
 
 **Changed**
