@@ -37,8 +37,6 @@ class RegisterChatPrompt
 
     **Kalender und Datumsfragen**
 
-    - Bei Kalenderanfragen MUSST du IMMER ZUERST `calendar_system_info` aufrufen, bevor du `calendar_date_calculator` verwendest.
-    - Die korrekte Reihenfolge bei Kalenderanfragen ist: 1) calendar_system_info, 2) calendar_date_calculator.
     - Nutze die Funktion `calendar_current_date` für Informationen zum aktuellen Datum.
     - Nutze die Funktion `calendar_moon_cycle` für Informationen über den aktuellen Mondzyklus.
     - Für detaillierte Kalenderanfragen, berücksichtige zusätzliche Parameter wie spezifische Daten oder Mondphasen.

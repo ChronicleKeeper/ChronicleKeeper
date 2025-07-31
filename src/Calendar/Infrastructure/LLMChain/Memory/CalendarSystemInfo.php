@@ -2,15 +2,16 @@
 
 declare(strict_types=1);
 
-namespace ChronicleKeeper\Calendar\Infrastructure\LLMChain\Tool;
+namespace ChronicleKeeper\Calendar\Infrastructure\LLMChain\Memory;
 
 use ChronicleKeeper\Calendar\Application\Query\LoadCalendar;
+use ChronicleKeeper\Calendar\Application\Service\CalendarSettingsChecker;
 use ChronicleKeeper\Calendar\Domain\Entity\Calendar;
 use ChronicleKeeper\Calendar\Domain\ValueObject\MoonState;
-use ChronicleKeeper\Chat\Domain\ValueObject\FunctionDebug;
-use ChronicleKeeper\Chat\Infrastructure\LLMChain\RuntimeCollector;
 use ChronicleKeeper\Shared\Application\Query\QueryService;
-use PhpLlm\LlmChain\Chain\Toolbox\Attribute\AsTool;
+use PhpLlm\LlmChain\Chain\Input;
+use PhpLlm\LlmChain\Chain\Memory\Memory;
+use PhpLlm\LlmChain\Chain\Memory\MemoryProviderInterface;
 
 use function array_map;
 use function assert;
@@ -18,37 +19,25 @@ use function implode;
 
 use const PHP_EOL;
 
-#[AsTool(
-    'calendar_system_info',
-    description: <<<'TEXT'
-    *** REQUIRED FIRST TOOL FOR ALL CALENDAR OPERATIONS ***
-
-    Returns detailed information about the fantasy calendar system structure including days per week,
-    month structure, moon cycles, and other essential calendar properties.
-
-    YOU MUST CALL THIS TOOL FIRST before using calendar_date_calculator for any date calculations!
-    This ensures proper understanding of the non-standard fantasy calendar system which has different:
-    - Number of days per week than Earth
-    - Month structure and names
-    - Moon cycle patterns
-
-    After calling this tool, you can proceed to using calendar_date_calculator.
-    TEXT,
-)]
-class CalendarSystemInfo
+final class CalendarSystemInfo implements MemoryProviderInterface
 {
     public function __construct(
         private readonly QueryService $queryService,
-        private readonly RuntimeCollector $runtimeCollector,
+        private readonly CalendarSettingsChecker $calendarSettingsChecker,
     ) {
     }
 
-    public function __invoke(): string
+    /** @inheritdoc */
+    public function loadMemory(Input $input): array
     {
+        if ($this->calendarSettingsChecker->hasValidSettings(false) === false) {
+            return [];
+        }
+
         $calendar = $this->queryService->query(new LoadCalendar());
         assert($calendar instanceof Calendar);
 
-        $info = '[FANTASY CALENDAR SYSTEM INFORMATION]' . PHP_EOL . PHP_EOL;
+        $info = '## Fantasy Calendar Instructions' . PHP_EOL . PHP_EOL;
 
         // Week structure
         $info .= 'WEEK STRUCTURE:' . PHP_EOL;
@@ -62,7 +51,7 @@ class CalendarSystemInfo
         $info .= 'MONTH STRUCTURE:' . PHP_EOL;
         $info .= '- Months per year: ' . $calendar->getMonths()->count() . PHP_EOL;
         foreach ($calendar->getMonths()->getAll() as $month) {
-            $info .= '  • ' . $month->name . ': ' . $month->days->count() . ' regular days';
+            $info .= '  • ' . $month->name . ': ' . $month->days->countRegularDays() . ' regular days';
 
             $leapDayCount = $month->days->count() - $month->days->countRegularDays();
             if ($leapDayCount > 0) {
@@ -94,13 +83,6 @@ class CalendarSystemInfo
         $info .= "- Always specify you're using this fantasy calendar when mentioning dates" . PHP_EOL;
         $info .= '- For date calculations, use the calendar_date_calculator tool' . PHP_EOL;
 
-        $this->runtimeCollector->addFunctionDebug(
-            new FunctionDebug(
-                tool: 'calendar_system_info',
-                result: $info,
-            ),
-        );
-
-        return $info;
+        return [new Memory($info)];
     }
 }
