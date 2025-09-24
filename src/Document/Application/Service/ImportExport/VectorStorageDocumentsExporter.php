@@ -43,7 +43,7 @@ final readonly class VectorStorageDocumentsExporter implements SingleExport
 
         foreach ($documents as $document) {
             $embeddingsQuery = $this->connection->createQueryBuilder()
-                ->select('document_id', 'content', 'vectorContentHash', 'JSON(embedding) as embedding')
+                ->select('document_id', 'content', '"vectorContentHash"', 'embedding')
                 ->from('documents_vectors')
                 ->where('document_id = :documentId')
                 ->setParameter('documentId', $document->getId());
