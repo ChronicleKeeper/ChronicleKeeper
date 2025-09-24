@@ -54,8 +54,8 @@ final class MessageDenormalizer implements DenormalizerInterface, DenormalizerAw
 
         return new Message(
             $data['id'],
-            Role::from($data['role']),
-            $data['content'],
+            Role::from($data['role'] ?? $data['message']['role']),
+            $data['content'] ?? $data['message']['content'],
             $this->denormalizer->denormalize($data['context'], MessageContext::class, $format, $context),
             new MessageDebug(array_values($debug)),
         );
