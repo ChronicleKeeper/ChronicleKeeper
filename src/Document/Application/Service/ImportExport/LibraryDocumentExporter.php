@@ -47,7 +47,7 @@ final readonly class LibraryDocumentExporter implements SingleExport
                 $this->serializer->serialize(
                     ExportData::create(
                         $exportSettings,
-                        Type::DIRECTORY,
+                        Type::DOCUMENT,
                         $document->toArray(),
                     ),
                     'json',
